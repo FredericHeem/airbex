@@ -1,6 +1,4 @@
 npm-debug.log
 config.dev.json
 node_modules/
-fre/
-tn3/
-btc/
+*.ps1

@@ -1,0 +1,41 @@
+<form class="well form form-horizontal create-order">
+    <fieldset>
+        <legend>New order</legend>
+
+        <div class="control-group">
+            <label class="control-label">Side</label>
+            <div class="controls">
+                <div class="btn-group">
+                    <button type="button" class="btn" data-action="bid">Bid</button>
+                    <button type="button" class="btn" data-action="ask">Ask</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Price</label>
+            <div class="controls">
+                <input class="input input-small price" type="text" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Volume</label>
+            <div class="controls">
+                <div class="input-append">
+                    <input class="input input-small volume" type="text" />
+                    <span class="add-on base-security">?</span>
+                </div>
+            </div>
+        </div>
+
+        <p class="explanation"></p>
+        
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn btn-success" data-action="place-order">Place order</button>
+                <button class="btn" data-action="cancel">Cancel</button>
+            </div>
+        </div>
+    </fieldset>
+</form>

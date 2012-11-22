@@ -1,0 +1,23 @@
+<td>
+    Order #<%= order_id %>
+<td>
+    <%= side == 0 ? 'Bid' : 'Ask' %>
+</td>
+<td>
+    <%= priceDecimal %>
+</td>
+<td>
+    <%= originalDecimal %>
+</td>
+<td>
+    <%= matchedDecimal %>
+</td>
+<td>
+    <%= volumeDecimal %>
+</td>
+<td>
+    <%= cancelledDecimal %>
+</td>
+<td>
+    <button class="btn" data-action="cancel-order">Cancel</button>
+</td>

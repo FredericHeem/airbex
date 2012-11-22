@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Snow</title>
+        <link href="/styles.css" rel="stylesheet">
+
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top" id="header">
+            <div class="navbar-inner">
+            <div class="container-fluid">
+              <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </a>
+              <a class="brand" href="#">Snow</a>
+              <div class="nav-collapse collapse">
+                <p class="navbar-text pull-right" id="auth-status">
+                </p>
+                <ul class="nav">
+                  <li class="active books"><a href="#books">Books</a></li>
+                  <li class="accounts"><a href="#my/accounts">Accounts</a></li>
+                  <li class="orders"><a href="#my/orders">Orders</a></li>
+                </ul>
+              </div>
+            </div>
+            </div>
+        </div>
+
+        <div id="section"></section>
+
+        <% for (var k in templates) { %>
+                <script type="text/template" id="<%= k %>-template"><%- templates[k] %></script>
+        <% } %>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.2/jquery.cookie.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.2.1/bootstrap.min.js"></script>
+
+        <script src="../scripts.js"></script>
+    </body>
+</html>

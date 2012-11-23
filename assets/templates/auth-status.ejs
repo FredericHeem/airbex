@@ -1,15 +1,14 @@
-<div class="btn-group pull-right">
-  <% if (session.username) { %>
+<% if (session._id) { %>
+  <div class="btn-group pull-right">
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-      <i class="icon-user"></i> <%= session.username %>
+      <i class="icon-user"></i>User #<%= session._id %>
       <span class="caret"></span>
     </a>
-    
+
     <ul class="dropdown-menu" id="username-dropdown">
       <li><a href="#sign-out">Sign out</a></li>
     </ul>
+  </div>
   <% } else { %>
-    <a class="btn" href="#login">Sign in</a>
-    <a class="btn" href="#register">Register</a>
+    <a href="/authorize/redirect">Sign in</a>
   <% } %>
-</div>

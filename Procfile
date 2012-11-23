@@ -1,1 +1,1 @@
-rest: node lib/rest.js
+web: node lib/rest.js

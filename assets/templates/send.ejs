@@ -1,0 +1,40 @@
+<div class="section container">
+    <div class="row">
+        <div class="span4">
+            <h3>Send</h3>
+
+            <form class="form span4">
+                <div class="control-group">
+                    <label class="control-label" for="debit">From</label>
+                    <div class="controls">
+                        <select id="debit" data-binding="debit">
+                            <% _.each(accounts, function(a) { %>
+                                <option value="<%= a.id %>">Account #<%= a.id %> (<%= a.available %> <%= a.security %>)</option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="credit">To</label>
+                    <div class="controls">
+                        <input type="text" class="span4" id="credit" data-binding="credit" placeholder="Account #" value="<%= credit || '' %>">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="amount">Amount</label>
+                    <div class="controls">
+                        <div class="input-append">
+                            <input class="input input-small volume" for="amount" data-binding="amount" type="text" value="<%= amount %>" />
+                            <!--<span class="add-on security"><%= 'TODO' %></span>-->
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <button type="submit" class="btn btn-success" data-action="send">Send</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

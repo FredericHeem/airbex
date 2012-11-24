@@ -1,7 +1,8 @@
-<td><a href="#accounts/<%= account_id %>"><%= account_id %></a></td>
+<td>Account #<%= account_id %></td>
 <td><%= security.security_id %></td>
 <td><%= availableDecimal.toString() %></td>
 <td>
+    <a href="#my/send!security=<%= security.security_id %>" class="btn">Send</a>
     <a href="#my/deposit/<%= security.security_id %>" class="btn">Deposit</a>
     <a href="#my/withdraw/<%= security.security_id %>" class="btn">Withdraw</a>
 </td>

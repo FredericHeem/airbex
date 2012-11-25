@@ -1,6 +1,7 @@
 {
-    "name": "snow-rest",
+    "name": "snow-api",
     "version": "0.0.1",
+    "description": "rest interface to snow",
     "dependencies": {
         "pg": "x",
         "nconf": "0.6.5",

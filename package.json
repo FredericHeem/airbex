@@ -15,7 +15,8 @@
         "num": "0.2.0",
         "semaphore": "1.0.1",
         "mtgox": "0.0.2",
-        "always": "2.0.0"
+        "always": "2.0.0",
+        "q": "0.8.11"
     },
     "devDependencies": {
         "mocha": "1.7.0",

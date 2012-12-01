@@ -1,7 +1,7 @@
 {
     "name": "snow-client",
     "description": "trading client",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "main": "./lib/snow.js",
     "dependencies": {
         "request": "2.12.0",

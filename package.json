@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "description": "rest interface to snow",
     "dependencies": {
-        "pg": "x",
+        "pg": "0.13.1",
         "nconf": "0.6.5",
         "async": "0.1.22",
         "underscore": "1.4.2",

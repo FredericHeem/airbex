@@ -10,5 +10,5 @@ task('publish-prod', ['test'], function() {
         'git merge master',
         'git checkout master',
         'git push heroku prod:master'
-    ])
+    ], { printStderr: true })
 })

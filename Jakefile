@@ -1,10 +1,11 @@
 require('shelljs/global')
 
-task('publish-prod', function() {
+task('test', function() {
+    jake.exec('mocha -R spec -b')
+})
+
+task('publish-prod', ['test'], function() {
     exec({
-        'git checkout prod',
-        'git merge master',
-        'git checkout master',
-        'git push ec2prod prod:master'
+        'heroku publish'
     })
 })

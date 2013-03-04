@@ -5,7 +5,10 @@ task('test', function() {
 })
 
 task('publish-prod', ['test'], function() {
-    exec({
-        'heroku publish'
-    })
+    jake.exec([
+        'git checkout prod',
+        'git merge master',
+        'git checkout master',
+        'git push heroku prod:master'
+    ])
 })

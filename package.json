@@ -1,6 +1,6 @@
 {
     "name": "snow-api",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "rest interface to snow",
     "dependencies": {
         "pg": "0.13.1",

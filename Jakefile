@@ -12,6 +12,7 @@ task('publish-prod', function() {
         'git checkout master'
     ])
 
+
     var config = require('./config')
     , aws2js = require('aws2js')
     , s3 = aws2js.load('s3', config('aws').accessKeyId, config('aws').secretAccessKey)

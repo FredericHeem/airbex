@@ -22,19 +22,36 @@ task('publish-prod', function() {
 
     s3.setBucket('www.snowco.in')
 
-    var scripts = [
-        { path: path.join(__dirname, 'vendor/bootstrap 2.2.1/js/bootstrap.min.js') },
-        { type: 'browserify', path: path.join(__dirname, 'lib/client/entry.js') }
-    ]
+    var b = require('browserify')()
+
+    var escapeLines = function(s) {
+        return s.replace(/[\r\n]/g, '').replace(/"/g, '\\"')
+    }
+
+    b.register('.ejs', function(body) {
+        return 'module.exports = "' + escapeLines(body) + '";\n'
+    })
+
+    fs.readdirSync(path.join(__dirname, 'assets/templates')).forEach(function(fn) {
+        b.require('./assets/templates/' + fn)
+    })
+
+    b.addEntry('lib/client/entry.js')
+    var script = b.bundle()
 
     var styles = [
         { path: 'assets/styles.less' }
+    ]
+
+    var scripts = [
+        { type: 'js', content: script }
     ]
 
     var statics = [{
         source: 'assets/index.html',
         dest: 'index.html'
     }]
+
 
     function compileScripts(cb) {
         async.map(scripts, sassets.load, function(err, srcs) {

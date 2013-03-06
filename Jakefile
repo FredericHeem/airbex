@@ -1,5 +1,4 @@
 process.env.DEBUG = ''
-process.env.NODE_ENV = 'testing'
 
 require('shelljs/global')
 var fs = require('fs')
@@ -10,8 +9,8 @@ task('publish-prod', function() {
     jake.exec([
     'git checkout prod',
     'git merge master,'
+    'git checkout master,'
     ])
-    process.env.NODE_ENV = 'prod'
 
     var config = require('./config')
     , aws2js = require('aws2js')

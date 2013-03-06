@@ -7,9 +7,9 @@ var fs = require('fs')
 
 task('publish-prod', function() {
     jake.exec([
-    'git checkout prod',
-    'git merge master,'
-    'git checkout master,'
+        'git checkout prod',
+        'git merge master',
+        'git checkout master'
     ])
 
     var config = require('./config')

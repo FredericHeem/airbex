@@ -20,7 +20,7 @@ task('publish-prod', function() {
     , sassets = require('sassets')
     , async = require('async')
 
-    s3.setBucket('www.snowco.in')
+    s3.setBucket('snowco.in')
 
     var b = require('browserify')()
 

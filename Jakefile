@@ -7,23 +7,25 @@ var fs = require('fs')
 , _ = require('underscore')
 
 task('publish-prod', function() {
-    jake.exec('git checkout prod')
+    jake.exec([
+    'git checkout prod',
+    'git merge master,'
+    ])
     process.env.NODE_ENV = 'prod'
 
     var config = require('./config')
     , aws2js = require('aws2js')
-    , s3 = aws2js.load('s3', config.aws.accessKeyId, config.aws.secretAccessKey)
+    , s3 = aws2js.load('s3', config('aws').accessKeyId, config('aws').secretAccessKey)
     , _ = require('underscore')
     , sassets = require('sassets')
     , async = require('async')
 
-    s3.setBucket('www.bunny.io')
+    s3.setBucket('www.snowco.in')
 
     var scripts = [
-        { path: path.join(__dirname, 'vendor/underscore-min.js') },
-        { path: path.join(__dirname, 'vendor/firebase.js') },
-        { path: path.join(__dirname, 'vendor/firebase-auth-client.js') },
-        { path: path.join(__dirname, 'vendor/jquery-1.9.1.min.js') },
+        { path: path.join(__dirname, 'vendor/alertify 0.1.1/alertify.min.js') },
+        { path: path.join(__dirname, 'vendor/bootstrap 2.2.1/js/bootstrap.min.js') },
+        { path: path.join(__dirname, 'vendor/jquery 1.8.2/jquery-1.8.2.js') },
         { type: 'browserify', path: path.join(__dirname, 'lib/client/entry.js') }
     ]
 
@@ -32,9 +34,6 @@ task('publish-prod', function() {
     ]
 
     var statics = [{
-        source: 'assets/media/cards.svg',
-        dest: 'media/cards.svg',
-    }, {
         source: 'assets/index.html',
         dest: 'index.html'
     }]
@@ -95,5 +94,6 @@ task('publish-prod', function() {
         }
     }, function(err) {
         if (err) throw err
+        jake.exec('git checkout master')
     })
 })

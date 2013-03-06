@@ -37,6 +37,7 @@ task('publish-prod', function() {
     })
 
     b.addEntry('lib/client/entry.js')
+    b.append(fs.readFileSync(path.join(__dirname, 'vendor/sjcl.js')))
     var script = b.bundle()
 
     var styles = [

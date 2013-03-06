@@ -23,9 +23,7 @@ task('publish-prod', function() {
     s3.setBucket('www.snowco.in')
 
     var scripts = [
-        { path: path.join(__dirname, 'vendor/alertify 0.1.1/alertify.min.js') },
         { path: path.join(__dirname, 'vendor/bootstrap 2.2.1/js/bootstrap.min.js') },
-        { path: path.join(__dirname, 'vendor/jquery 1.8.2/jquery-1.8.2.js') },
         { type: 'browserify', path: path.join(__dirname, 'lib/client/entry.js') }
     ]
 

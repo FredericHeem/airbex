@@ -40,7 +40,9 @@ task('publish-prod', function() {
     var script = b.bundle()
 
     var styles = [
-        { path: 'assets/styles.less' }
+        { path: 'assets/styles.less' },
+        { path: 'vendor/bootstrap 2.2.1/css/bootstrap.css' },
+        { path: 'vendor/bootstrap 2.2.1/css/bootstrap-responsive.css' }
     ]
 
     var scripts = [

@@ -1,1 +1,1 @@
-web: node node_modules/always/bin/always node/backend.js
+web: node node_modules/always/bin/always bin/backend.js

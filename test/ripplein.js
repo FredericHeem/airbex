@@ -9,7 +9,7 @@ describe('RippleIn', function() {
             RippleIn.prototype.cacheSecurities.call(ri)
             .then(function() {
                 expect(ri.securities['XRP']).to.be.ok()
-                expect(ri.securities['XRP'].scale).to.be(8)
+                expect(ri.securities['XRP'].scale).to.be(6)
                 ri.client.end()
                 done()
             })

@@ -24,6 +24,9 @@
         "aws2js": "x",
         "shelljs": "x"
     },
+    "scripts": {
+        "test": "jake test"
+    },
     "engines": {
         "node": "~0.8",
         "npm": "~1.1"

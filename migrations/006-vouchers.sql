@@ -128,27 +128,3 @@ BEGIN
 
         RETURN;
 END; $$ LANGUAGE plpgsql;
-
-/*
-BEGIN;
-        SAVEPOINT before;
-        SELECT test_voucher_create_inserts();
-        ROLLBACK TO SAVEPOINT before;
-        SELECT test_voucher_create_inserts_hold();
-        ROLLBACK TO SAVEPOINT before;
-        SELECT test_voucher_redeem_credits();
-        ROLLBACK TO SAVEPOINT before;
-ROLLBACK;
-*/
-
-
-
-
-
-
-
-
-
-
-
-

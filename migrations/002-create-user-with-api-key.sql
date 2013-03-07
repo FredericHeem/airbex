@@ -1,5 +1,3 @@
-DROP FUNCTION create_user();
-
 CREATE FUNCTION create_user (
         key varchar(100),
         secret varchar(100)

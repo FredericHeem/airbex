@@ -82,30 +82,7 @@ CREATE TABLE ripple_withdraw_request
   request_id integer NOT NULL primary key references withdraw_request(request_id)
       ON UPDATE NO ACTION ON DELETE CASCADE,
   address character varying(34) NOT NULL
-)
-
-/*
-CREATE TABLE withdraw_request
-(
-  request_id serial NOT NULL,
-  created date NOT NULL DEFAULT now(),
-  completed date,
-  method character varying(50) NOT NULL,
-  hold_id integer,
-  amount bigint NOT NULL,
-  account_id integer NOT NULL,
-  error text,
-  state character varying(50) DEFAULT 'requested'::character varying,
-  CONSTRAINT withdraw_request_pkey PRIMARY KEY (request_id),
-  CONSTRAINT withdraw_request_account_id_fkey FOREIGN KEY (account_id)
-      REFERENCES account (account_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT withdraw_request_hold_id_fkey FOREIGN KEY (hold_id)
-      REFERENCES hold (hold_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE SET NULL,
-  CONSTRAINT withdraw_request_amount_check CHECK (amount > 0)
-)
-*/
+);
 
 CREATE OR REPLACE FUNCTION pop_ripple_withdraw_requests()
   RETURNS SETOF record AS
@@ -171,10 +148,3 @@ DROP COLUMN account_id;
 
 ALTER TABLE ripple_account
 DROP CONSTRAINT check_address;
-
-INSERT INTO ripple_account (
-        address
-) VALUES (
-        'rJHygWcTLVpSXkowott6kzgZU6viQSVYM1'
-);
-

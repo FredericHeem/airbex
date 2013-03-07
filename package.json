@@ -1,0 +1,17 @@
+{
+    "name": "snow-db",
+    "description": "migration scripts for snow",
+    "version": "0.0.1",
+    "scripts": {
+        "test": "mocha",
+        "replay": "./bin/replay"
+    },
+    "devDependencies": {
+        "jake": "x",
+        "shelljs": "x",
+        "pg": "x",
+        "q": "x",
+        "optimist": "x",
+        "mocha": "x"
+    }
+}

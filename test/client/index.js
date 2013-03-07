@@ -3,4 +3,5 @@ Backbone.$ = jQuery;
 
 mocha.globals([ 'script*' ])
 
-require('./views/LoginView');
+require('./models')
+require('./views');

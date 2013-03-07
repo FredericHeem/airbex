@@ -1,7 +1,7 @@
 require('shelljs/global')
 
 task('test', function() {
-    jake.exec('mocha -R spec')
+    jake.exec('mocha -R spec --trace', { printStderr: true, printStdout: true } )
 })
 
 task('publish-prod', function() {

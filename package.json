@@ -18,7 +18,7 @@
         "browserify": "1.x.x",
         "sassets": "1.0.3",
         "express": "3.0.2",
-        "mocha": "1.7.0",
+        "mocha": "1.8.1",
         "expect.js": "0.2.0",
         "mocha-phantomjs": "1.0.1",
         "aws2js": "x",

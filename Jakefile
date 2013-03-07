@@ -5,6 +5,26 @@ var fs = require('fs')
 , path = require('path')
 , _ = require('underscore')
 
+task('test', ['test-node', 'test-browser'])
+
+task('test-node', function() {
+    jake.exec('mocha -R spec', { printStderr: true, printStdout: true })
+})
+
+task('test-browser', function() {
+    var app = require('express')()
+    , server = require('http').createServer(app)
+    require('./test/support/phantom-app.js')(app)
+    server.listen(9572, '127.0.0.1')
+
+    jake.exec('mocha-phantomjs -R spec http://localhost:9572', function() {
+        server.close()
+    }, {
+        printStdout: true,
+        printStderr: true
+    })
+})
+
 task('publish-prod', function() {
     jake.exec([
         'git checkout prod',

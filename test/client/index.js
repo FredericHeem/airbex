@@ -1,4 +1,6 @@
 var Backbone = require('backbone');
-Backbone.setDomLibrary(jQuery);
+Backbone.$ = jQuery;
 
-require('./views/View1');
+mocha.globals([ 'script*' ])
+
+require('./views/LoginView');

@@ -109,8 +109,9 @@ task('publish-prod', [
     ]
 
     async.forEach(files, function(f, next) {
-        s3.putFile(f, 'build/' + f, null, null, next)
-    }, function() {
+        console.log('uploadig %s', f)
+        s3.putFile(f, 'build/' + f, null, {}, next)
+    }, function(err) {
         if (err) throw err
     })
 })

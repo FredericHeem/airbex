@@ -115,6 +115,7 @@ task('publish-prod', [
         s3.putFile(f, 'build/' + f, 'public-read', {}, next)
     }, function(err) {
         if (err) throw err
+        console.log('uploads completed')
         complete()
     })
 }, { async: true })

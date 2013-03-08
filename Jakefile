@@ -1,15 +1,17 @@
 require('shelljs/global')
+var sever
 
 task('test-browser', ['test-browser-host'], function() {
     jake.exec('mocha-phantomjs -R spec http://localhost:5073/index.html', function(res) {
-        process.exit()
+        server.close()
+        complete()
     }, {
         printStdout: true
     })
-})
+}, { async: true })
 
 task('test-browser-host', ['build/test/index.html'], function() {
-    createServer('build/test')
+    server = createServer('build/test')
 })
 
 function addTemplatesToBundle(b) {

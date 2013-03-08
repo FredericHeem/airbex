@@ -81,9 +81,13 @@ file('build/styles.css', [
     .to('build/styles.css')
 })
 
-file('build/scripts.js', function() {
+file('build/scripts.js', [
+    'vendor/sjcl.js',
+    'lib/client/entry.js'
+], function() {
     var b = require('browserify')()
     addTemplatesToBundle(b)
+    b.append(cat('vendor/sjcl.js'))
 
     b.addEntry('lib/client/entry.js')
 

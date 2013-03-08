@@ -1,6 +1,7 @@
 require('../lib/rest')()
 
-require('../lib/bitcoinedge.txtrack')()
+var BitcoinIn = require('../lib/bitcoinin')
+, bitcoinIn = new BitcoinIn()
 
 var BitcoinOut = require('../lib/bitcoinout')
 , bitcoinOut = new BitcoinOut()

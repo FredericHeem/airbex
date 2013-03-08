@@ -115,8 +115,9 @@ task('publish-prod', [
         s3.putFile(f, 'build/' + f, 'public-read', {}, next)
     }, function(err) {
         if (err) throw err
+        complete()
     })
-})
+}, { async: true })
 
 file('build/bitcoin.otc.txt', function() {
     cp('-f', 'assets/bitcoin.otc.txt', 'build/')

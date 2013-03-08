@@ -12,3 +12,12 @@ task('publish-prod', function() {
         'git push prod prod:master'
     ], { printStderr: true })
 })
+
+task('bitcoind', function() {
+    var path = require('path')
+    , util = require('util')
+
+    jake.exec(util.format(
+        'bitcoind -datadir="%s" -txindex=1 -reindex=1',
+        path.join(__dirname, '../btc')))
+})

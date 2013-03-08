@@ -98,7 +98,6 @@ task('publish-prod', [
     , aws2js = require('aws2js')
     , s3 = aws2js.load('s3', config.aws.accessKeyId, config.aws.secretAccessKey)
     , _ = require('underscore')
-    , sassets = require('sassets')
     , async = require('async')
 
     s3.setBucket('snowco.in')

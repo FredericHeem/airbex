@@ -92,12 +92,6 @@ task('publish-prod', [
     'test',
     'build'
 ], function() {
-    jake.exec([
-        'git checkout prod',
-        'git merge master',
-        'git checkout master'
-    ])
-
     var config = require('./config.dev.json')
     , aws2js = require('aws2js')
     , s3 = aws2js.load('s3', config.aws.accessKeyId, config.aws.secretAccessKey)
@@ -117,7 +111,6 @@ task('publish-prod', [
     async.forEach(files, function(f, next) {
         s3.putFile(f, 'build/' + f, null, null, next)
     }, function() {
-        jake.exec('git checkout master')
         if (err) throw err
     })
 })

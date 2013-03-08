@@ -18,6 +18,7 @@ task('bitcoind', function() {
     , util = require('util')
 
     jake.exec(util.format(
-        'bitcoind -datadir="%s" -txindex=1 -reindex=1',
-        path.join(__dirname, '../btc')))
+        'bitcoind -datadir=%s -txindex=1 -reindex=1 --printtoconsole',
+        path.join(__dirname, '../btc')),
+        { printStderr: true, printStdout: true })
 })

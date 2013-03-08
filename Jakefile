@@ -33,9 +33,9 @@ task('publish-prod', function() {
     ])
 
 
-    var config = require('./config')
+    var config = require('./config.dev.json')
     , aws2js = require('aws2js')
-    , s3 = aws2js.load('s3', config('aws').accessKeyId, config('aws').secretAccessKey)
+    , s3 = aws2js.load('s3', config.aws.accessKeyId, config.aws.secretAccessKey)
     , _ = require('underscore')
     , sassets = require('sassets')
     , async = require('async')
@@ -134,4 +134,57 @@ task('publish-prod', function() {
         if (err) throw err
         jake.exec('git checkout master')
     })
+})
+
+task('build-styles', function() {
+    mkdir('build')
+
+    var files = [
+        'vendor/bootstrap-2.2.1/css/bootstrap.css',
+        'assets/styles.less'
+    ]
+
+    files.reduce(function(res, fn) {
+        return res + exec('lessc ' + fn, { silent: true }).output
+    }, '')
+    .to('build/styles.css')
+})
+
+task('build-scripts', function() {
+    mkdir('-p', 'build')
+    var b = require('browserify')()
+
+    var escapeLines = function(s) {
+        return s.replace(/[\r\n]/g, '').replace(/"/g, '\\"')
+    }
+
+    b.register('.ejs', function(body) {
+        return 'module.exports = "' + escapeLines(body) + '";\n'
+    })
+
+    fs.readdirSync('assets/templates').forEach(function(fn) {
+        b.require('./assets/templates/' + fn)
+    })
+
+    b.append(fs.readFileSync('vendor/jquery-1.8.2/jquery-1.8.2.js'))
+    b.append(fs.readFileSync('vendor/bootstrap-2.2.1/js/bootstrap.min.js'))
+    b.append(fs.readFileSync('vendor/alertify-0.1.1/alertify.min.js'))
+    b.append(fs.readFileSync('vendor/sjcl.js'))
+
+    b.addEntry('lib/client/entry.js')
+    var script = b.bundle()
+    script.to('build/scripts.js')
+})
+
+task('build', ['build-scripts', 'build-styles'], function() {
+    cp('assets/index.html', 'build/')
+    cp('assets/bitcoin.otc.txt', 'build/')
+})
+
+task('debug', ['build'], function() {
+    var express = require('express')
+    , app = express()
+    , server = require('http').createServer(app)
+    app.use(express.static('build'))
+    server.listen(5073)
 })

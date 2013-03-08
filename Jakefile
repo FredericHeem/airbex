@@ -106,16 +106,16 @@ task('publish-prod', [
 
     s3.setBucket('snowco.in')
 
-    var files = [
-        'scripts.js',
-        'styles.css',
-        'bitcoin.otc.txt',
-        'index.html'
-    ]
+    var files = {
+        'scripts.js': { 'content-type': 'application/javascript' }
+        'styles.css': { 'content-type': 'text/css' },
+        'bitcoin.otc.txt': { 'content-type: 'text/plain' },
+        'index.html': { 'content-type': 'application/html' }
+    }
 
-    async.forEach(files, function(f, next) {
+    async.forEach(_.keys(files), function(f, next) {
         console.log('uploadig %s', f)
-        s3.putFile(f, 'build/' + f, 'public-read', {}, next)
+        s3.putFile(f, 'build/' + f, 'public-read', files[f], next)
     }, function(err) {
         if (err) throw err
         console.log('uploads completed')

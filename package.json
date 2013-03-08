@@ -14,7 +14,8 @@
         "semaphore": "1.0.1",
         "always": "2.0.0",
         "q": "0.9.0",
-        "drop": "x"
+        "drop": "x",
+        "bitcoin": "x"
     },
     "scripts": {
         "test": "jake test"

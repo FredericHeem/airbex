@@ -107,9 +107,9 @@ task('publish-prod', [
     s3.setBucket('snowco.in')
 
     var files = {
-        'scripts.js': { 'content-type': 'application/javascript' }
+        'scripts.js': { 'content-type': 'application/javascript' },
         'styles.css': { 'content-type': 'text/css' },
-        'bitcoin.otc.txt': { 'content-type: 'text/plain' },
+        'bitcoin.otc.txt': { 'content-type': 'text/plain' },
         'index.html': { 'content-type': 'application/html' }
     }
 

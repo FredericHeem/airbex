@@ -5,10 +5,9 @@ var _ = require('underscore')
 delete argv.$0
 delete argv._
 
-module.exports = {
-}
+module.exports = _.clone(process.env)
 
-if (typeof process.env.NODE_ENV === 'undefined') {
+if (!_.isUndefined(process.env.NODE_ENV)) {
 	var fn = path.join(__dirname, 'config.' + (process.env.NODE_ENV || 'dev'))
 	if (fs.existsSync(fn + '.json')) {
 		_.extend(module.exports, require(fn + '.json'))

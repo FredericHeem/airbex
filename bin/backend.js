@@ -1,7 +1,5 @@
-require('../lib/rest')()
-
-var BitcoinIn = require('../lib/bitcoinin')
-, bitcoinIn = new BitcoinIn()
+require('./rest')
+require('./bitcoinin')
 
 var BitcoinOut = require('../lib/bitcoinout')
 , bitcoinOut = new BitcoinOut()

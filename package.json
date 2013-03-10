@@ -14,7 +14,8 @@
         "always": "2.0.0",
         "q": "0.9.0",
         "drop": "x",
-        "bitcoin": "x"
+        "bitcoin": "x",
+        "optimist": "x"
     },
     "scripts": {
         "test": "jake test"

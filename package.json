@@ -15,7 +15,8 @@
         "q": "0.9.0",
         "drop": "x",
         "bitcoin": "x",
-        "optimist": "x"
+        "optimist": "x",
+        "raven": "x"
     },
     "scripts": {
         "test": "jake test"

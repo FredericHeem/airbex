@@ -9,7 +9,7 @@ task('publish-prod', function() {
         'git checkout prod',
         'git merge master',
         'git checkout master',
-        'git push prod prod:master'
+        'git push origin prod'
     ], { printStderr: true })
 })
 

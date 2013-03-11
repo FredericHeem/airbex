@@ -4,12 +4,12 @@ task('test', function() {
     jake.exec('mocha -R spec', { printStderr: true, printStdout: true } )
 })
 
-task('publish-prod', function() {
+task('publish-production', function() {
     jake.exec([
-        'git checkout prod',
+        'git checkout production',
         'git merge master',
         'git checkout master',
-        'git push origin prod'
+        'git push origin production'
     ], { printStderr: true })
 })
 

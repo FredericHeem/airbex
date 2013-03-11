@@ -1,3 +1,7 @@
+console.log('environment:')
+console.log(require('util').inspect(process.env))
+console.log('end of environment')
+
 require('../lib/uncaught')
 require('./rest')
 

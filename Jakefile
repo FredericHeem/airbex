@@ -24,3 +24,12 @@ task('bitcoind', function() {
     console.log(p)
     ex.run()
 })
+
+task('publish-staging', function() {
+    jake.exec([
+        'git checkout staging',
+        'git merge master',
+        'git checkout master',
+        'git push origin staging'
+    ], { printStderr: true, printStdout: true })
+})

@@ -1,3 +1,4 @@
+require('../lib/uncaught')
 require('./rest')
 
 var BitcoinIn = require('../lib/bitcoinin')

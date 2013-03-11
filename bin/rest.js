@@ -1,1 +1,2 @@
-var rest = require('../lib/rest')()
+require('../lib/uncaught')
+require('../lib/rest')()

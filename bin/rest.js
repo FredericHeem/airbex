@@ -1,2 +1,2 @@
-require('../lib/uncaught')
+require('../lib/raven')
 require('../lib/rest')()

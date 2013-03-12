@@ -1,8 +1,4 @@
-console.log('environment:')
-console.log(require('util').inspect(process.env))
-console.log('end of environment')
-
-require('../lib/uncaught')
+require('../lib/raven')
 require('./rest')
 
 var BitcoinIn = require('../lib/bitcoinin')

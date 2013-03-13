@@ -9,7 +9,7 @@ task('publish-production', function() {
         'git checkout production',
         'git merge master',
         'git checkout master',
-        'git push origin production'
+        'git push production production:master'
     ], { printStderr: true })
 })
 

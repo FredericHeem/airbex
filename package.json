@@ -16,7 +16,8 @@
         "drop": "x",
         "bitcoin": "x",
         "optimist": "x",
-        "raven": "x"
+        "raven": "x",
+        "konfu": "x"
     },
     "scripts": {
         "test": "jake test"

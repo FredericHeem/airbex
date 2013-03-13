@@ -1,0 +1,5 @@
+require('./bin/bitcoinaddress')
+require('./bin/bitcoinin')
+require('./bin/bitcoinout')
+require('./bin/ripplein')
+require('./bin/rippleout')

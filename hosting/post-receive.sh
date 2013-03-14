@@ -1,6 +1,6 @@
 #!/bin/sh
-sudo git --work-tree=/var/www/snow-api --git-dir=/home/ubuntu/snow-api.git checkout -f
-cd /var/www/snow-api
-sudo npm install
+cd ~/snow-api
+git --work-tree=~./app --git-dir=./repo checkout -f
+npm install
 sudo stop snow-api
 sudo start snow-api

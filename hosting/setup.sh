@@ -10,23 +10,8 @@
 #
 
 
-install node
+install node (with binary support), npm, monit, pg bindings
 ```
 sudo add-apt-repository ppa:chris-lea/node.js -y
 sudo apt-get update  -y
-sudo apt-get install nodejs npm g++ make nodejs-dev -y
-```
-
-install git
-```
-sudo apt-get install git -y
-```
-
-install libpq-dev for postgres native
-```
-sudo apt-get install libpq-dev -y
-```
-
-monit
-```
-sudo apt-get install monit -y
+sudo apt-get install nodejs npm g++ make nodejs-dev git libpq-dev monit postfix -y

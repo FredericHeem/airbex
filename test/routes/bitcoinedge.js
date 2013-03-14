@@ -87,7 +87,8 @@ describe('routes', function() {
 						}
 
 						expect(handler).to.be.a('function')
-					}
+					},
+					get: function() {}
 				}
 
 				BitcoinEdge.prototype.configure.call(target, app)
@@ -102,7 +103,8 @@ describe('routes', function() {
 				}
 				, done
 				, app = {
-					post: function(url, handler) {
+					post: function() {},
+					get: function(url, handler) {
 						if (url.match(/\/private\/deposit\/QQQ\/address/)) {
 							done = true
 						}

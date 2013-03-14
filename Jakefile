@@ -110,7 +110,7 @@ task('publish-prod', [
         'scripts.js': { 'content-type': 'application/javascript' },
         'styles.css': { 'content-type': 'text/css' },
         'bitcoin.otc.txt': { 'content-type': 'text/plain' },
-        'index.html': { 'content-type': 'application/html' }
+        'index.html': { 'content-type': 'text/html' }
     }
 
     async.forEach(_.keys(files), function(f, next) {

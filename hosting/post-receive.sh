@@ -1,6 +1,8 @@
 #!/bin/sh
-cd ~/snow-api
-git --work-tree=~./app --git-dir=./repo checkout -f
+name=snow-api
+cd ~/$name
+git --work-tree=./app --git-dir=./repo checkout -f
+cd app
 npm install
-sudo stop snow-api
-sudo start snow-api
+sudo stop $name
+sudo start $name

@@ -5,7 +5,9 @@ var Backbone = require('backbone')
 describe('DepositBTCView', function() {
     describe('constructor', function() {
         it('exists', function() {
-            var view = new DepositBTCView()
+            var view = new DepositBTCView({ 
+            	model: new Backbone.Model() 
+            })
         })
     })
 })

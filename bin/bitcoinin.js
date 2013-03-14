@@ -7,4 +7,4 @@ var config = require('konfu')
     pass: config.btc_pass
 }
 , dbClient = require('../lib/db')(config.pg_url, config.pg_native)
-new BitcoinIn(bitcoinEndPoint, dbClient)
+new BitcoinIn(bitcoinEndPoint, dbClient, config.btc_minconf)

@@ -1,9 +1,5 @@
 require('shelljs/global')
 
-task('test', function() {
-    jake.exec('mocha -R tap', { printStderr: true, printStdout: true } )
-})
-
 task('publish-production', function() {
     jake.exec([
         'git checkout production',

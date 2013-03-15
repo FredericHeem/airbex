@@ -49,7 +49,7 @@ Books.depth = function(conn, req, res, next) {
         values: [req.params.id]
     })
     .then(function(cres) {
-        if (!req.query.grouped) {
+        if (!+req.query.grouped) {
             return cres.rows
         }
         return {

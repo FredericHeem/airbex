@@ -4,28 +4,19 @@
     "description": "rest interface to snow",
     "dependencies": {
         "pg": "0.13.1",
-        "async": "0.1.22",
         "underscore": "1.4.2",
         "express": "x",
-        "debug": "0.7.0",
-        "request": "2.12.0",
         "num": "0.2.0",
-        "semaphore": "1.0.1",
-        "always": "2.0.0",
         "q": "0.9.0",
-        "drop": "x",
-        "bitcoin": "x",
-        "optimist": "x",
         "raven": "x",
         "konfu": "x"
     },
     "scripts": {
-        "test": "jake test"
+        "test": "mocha"
     },
     "devDependencies": {
         "mocha": "1.7.0",
         "expect.js": "0.2.0",
-        "jake": "x",
         "shelljs": "x"
     },
     "engines": {

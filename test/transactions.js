@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, transactions = require(__filename.replace('test', 'lib'))
+, transactions = require('../transactions')
 
 describe('transactions', function() {
 	describe('configure', function() {

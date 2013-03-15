@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, users = require(__filename.replace('test', 'lib'))
+, users = require('../users')
 
 describe('users', function() {
 	describe('configure', function() {

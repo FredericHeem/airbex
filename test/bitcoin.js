@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, bitcoin = require(__filename.replace('test', 'lib'))
+, bitcoin = require('../bitcoin')
 
 describe('bitcoin', function() {
 	describe('configure', function() {

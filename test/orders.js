@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, orders = require('../../lib/routes/orders')
+, orders = require('../orders')
 
 describe('orders', function() {
 	describe('configure', function() {

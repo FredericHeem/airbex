@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, ripple = require(__filename.replace('test', 'lib'))
+, ripple = require('../ripple')
 
 describe('ripple', function() {
 	describe('configure', function() {

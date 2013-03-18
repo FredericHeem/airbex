@@ -11,9 +11,9 @@ describe('orders', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			orders.configure(app)
-			expect(routes).to.contain('del /private/orders/:id')
-			expect(routes).to.contain('post /private/orders')
-			expect(routes).to.contain('get /private/orders')
+			expect(routes).to.contain('del /orders/:id')
+			expect(routes).to.contain('post /orders')
+			expect(routes).to.contain('get /orders')
 		})
 	})
 

@@ -7,7 +7,7 @@ transactions.configure = function(app, conn, securityId) {
 }
 
 transactions.forUser = function(conn, req, res, next) {
-    var query = 'SELECT * FROM account_transactions ' +
+    var query = 'SELECT * FROM account_transaction ' +
         'WHERE user_id = $1'
     Q.ninvoke(conn, 'query', {
         text: query,
@@ -20,7 +20,7 @@ transactions.forUser = function(conn, req, res, next) {
 }
 
 transactions.forUserAccount = function(conn, req, res, next) {
-    var query = 'SELECT * FROM account_transactions ' +
+    var query = 'SELECT * FROM account_transaction ' +
         'WHERE account_id = $1 AND user_id = $2'
     Q.ninvoke(conn, 'query', {
         text: query,

@@ -19,7 +19,7 @@ describe('transactions', function() {
 		it('gets transactions for the user', function(done) {
 			var conn = {
 				query: function(q, cb) {
-					expect(q.text).to.be('SELECT * FROM account_transactions WHERE user_id = $1')
+					expect(q.text).to.be('SELECT * FROM account_transaction WHERE user_id = $1')
 					expect(q.values).to.eql([10])
 					cb(null, {
 						rows: [{
@@ -50,7 +50,7 @@ describe('transactions', function() {
 		it('gets transactions for the user account', function(done) {
 			var conn = {
 				query: function(q, cb) {
-					expect(q.text).to.be('SELECT * FROM account_transactions WHERE account_id = $1 AND user_id = $2')
+					expect(q.text).to.be('SELECT * FROM account_transaction WHERE account_id = $1 AND user_id = $2')
 					expect(q.values).to.eql([50, 10])
 					cb(null, {
 						rows: [{

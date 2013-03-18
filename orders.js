@@ -2,9 +2,9 @@ var Q = require('q')
 , orders = module.exports = {}
 
 orders.configure = function(app, conn) {
-    app.del('/private/orders/:id', orders.cancel.bind(orders, conn))
-    app.post('/private/orders', orders.create.bind(orders, conn))
-    app.get('/private/orders', orders.forUser.bind(orders, conn))
+    app.del('/orders/:id', orders.cancel.bind(orders, conn))
+    app.post('/orders', orders.create.bind(orders, conn))
+    app.get('/orders', orders.forUser.bind(orders, conn))
 }
 
 orders.create = function(conn, req, res, next) {

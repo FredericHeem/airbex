@@ -3,7 +3,7 @@
     "version": "0.0.2",
     "description": "rest interface to snow",
     "dependencies": {
-        "pg": "0.13.1",
+        "pg": "~0.14.0",
         "underscore": "1.4.2",
         "express": "x",
         "num": "0.2.0",

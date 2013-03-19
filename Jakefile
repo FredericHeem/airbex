@@ -94,6 +94,10 @@ file('build/scripts.js', [
     b.bundle().to('build/scripts.js')
 })
 
+file('build/jquery.min.js', function() {
+    cp('vendor/jquery.min.js', 'build/jquery.min.js')
+})
+
 task('publish-prod', [
     'test',
     'build'
@@ -138,7 +142,10 @@ task('build', [
     'build/bitcoin.otc.txt'
 ])
 
-task('host', ['build'], function() {
+task('host', [
+    'build',
+    'build/jquery.min.js'
+], function() {
     var express = require('express')
     , app = express()
     , server = require('http').createServer(app)

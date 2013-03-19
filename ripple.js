@@ -3,6 +3,16 @@ var Q = require('q')
 
 ripple.configure = function(app, conn) {
     app.post('/private/rippleout', ripple.withdraw.bind(ripple, conn))
+    app.get('/ripple/address', ripple.address.bind(ripple, conn))
+}
+
+ripple.address = function(conn, req, res, next) {
+    conn.query({
+        text: 'SELECT address FROM ripple_account'
+    }, function(err, dres) {
+        if (err) return next(err)
+        res.send({ address: dres.rows[0].address })
+    })
 }
 
 ripple.getUserSecurityAccount = function(conn, userId, securityId) {

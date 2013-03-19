@@ -1,9 +1,10 @@
 <td>Account #<%= account_id %></td>
-<td><%= security.security_id %></td>
-<td><%= availableDecimal.toString() %></td>
+<td><%= security_id %></td>
+<td><%= available_decimal %></td>
 <td>
-    <a href="#my/send!security=<%= security.security_id %>" class="btn">Send</a>
-    <a href="#my/deposit/<%= security.security_id %>" class="btn">Deposit</a>
-    <a href="#my/withdraw/<%= security.security_id %>" class="btn">Withdraw</a>
-    <a href="#my/rippleout/<%= security.security_id %>" class="btn">To Ripple</a>
+    <a href="#my/send!security=<%= security_id %>" class="btn">Send</a>
+    <a href="#my/deposit/<%= security_id %>" class="btn">Deposit</a>
+    <a href="#my/withdraw/<%= security_id %>" class="btn">Withdraw</a>
+    <a href="#my/rippleout/<%= security_id %>" class="btn">To Ripple</a>
+    <a href="https://ripple.com//send?to=<%= rippleAddress %>&dt=<%= account_id %>" target="_blank" class="btn">From Ripple</a>
 </td>

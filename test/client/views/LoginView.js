@@ -13,7 +13,7 @@ describe('LoginView', function() {
             var actual = view.hashes()
             expect(actual).to.eql({
                 key: 'M/8m25Zu1ynedQcvSK2D',
-                secret: 'M/8m25Zu1ynedQcvSK2D'
+                secret: 'Ez4xdbllzJJsS287FfyR'
             })
         })
     })

@@ -15,16 +15,17 @@ BEGIN
   RAISE NOTICE 'book id = %', bid;
 
   INSERT INTO "transaction" (debit_account_id, credit_account_id, amount)
-  VALUES (special_account('edge', 'BTC'), user_security_account(uid, 'BTC'), 500);
+  VALUES (special_account('edge', 'BTC'), user_security_account(uid, 'BTC'), 1e8);
 
   RAISE NOTICE 'balance %', (SELECT balance FROM "account" WHERE account_id = user_security_account(uid, 'BTC'));
 
   INSERT INTO "order" (book_id, side, price, volume, user_id)
-  VALUES (bid, 1, 100, 500, uid);
+  VALUES (bid, 1, 100, 1e8 / 1e3, uid);
 
   oid := currval('order_order_id_seq');
 
   RAISE NOTICE 'order #% created', oid;
+  RAISE NOTICE 'balance %', (SELECT balance-hold FROM "account" WHERE account_id = user_security_account(uid, 'BTC'));
 
 END; $$;
 

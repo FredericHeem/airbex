@@ -10,7 +10,7 @@ orders.configure = function(app, conn) {
 orders.create = function(conn, req, res, next) {
     var query = conn.build.insert('"order"', {
         user_id: req.security.userId,
-        book_id: req.body.bookId,
+        book_id: req.body.book_id,
         price: req.body.price,
         volume: req.body.volume,
         side: req.body.side

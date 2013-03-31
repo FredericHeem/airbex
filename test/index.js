@@ -4,7 +4,7 @@ var fs = require('fs')
 , url = process.argv[2]
 , Q = require('q')
 , argv = require('optimist')
-.default('db', process.env.NODE_ENV == 'travis' ? 'tcp://postgres@localhost/snow' : null)
+.default('db', 'tcp://postgres@localhost/snow')
 .argv
 
 if (!argv.db) {

@@ -98,6 +98,10 @@ file('build/jquery.min.js', function() {
     cp('vendor/jquery.min.js', 'build/jquery.min.js')
 })
 
+file('build/alertify.js', function() {
+    cp('vendor/alertify.js', 'build/alertify.js')
+})
+
 task('publish-prod', [
     'test',
     'build'
@@ -139,7 +143,8 @@ task('build', [
     'build/styles.css',
     'build/index.html',
     'build/scripts.js',
-    'build/bitcoin.otc.txt'
+    'build/bitcoin.otc.txt',
+    'build/alertify.js',
 ])
 
 task('host', [

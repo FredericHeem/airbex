@@ -1,5 +1,7 @@
 require('shelljs/global')
 
+task('pp', ['publish-production'])
+
 task('publish-production', function() {
     jake.exec([
         'git checkout production',

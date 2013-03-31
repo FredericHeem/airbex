@@ -27,6 +27,7 @@ var self = module.exports = function(url, native) {
     var pg = require('pg')
     if (native) pg = pg.native
     var client = new pg.Client(url)
+    client.build = build
     client.connect()
     return client
 }

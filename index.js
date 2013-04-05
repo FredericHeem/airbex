@@ -12,6 +12,7 @@ app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     res.header('Access-Control-Allow-Headers', 'snow-key,snow-sign,Content-Type')
+    res.header('Access-Control-Max-Age', 60 * 60 * 24 * 365)
     return req.method == 'OPTIONS' ? res.send(200) : next()
 })
 

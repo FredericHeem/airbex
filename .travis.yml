@@ -4,4 +4,4 @@ node_js:
   - 0.8
 before_script:
   - psql -c 'create database snow;' -U postgres
-  - node ./bin/replay
+  - node ./replay.js

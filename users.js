@@ -19,8 +19,8 @@ users.whoami = function(conn, req, res, next) {
 
 users.create = function(conn, req, res, next) {
     Q.ninvoke(conn, 'query', {
-        text: 'select create_user($1, $2) user_id',
-        values: [req.body.key, req.body.secret]
+        text: 'select create_user($1, $2, $3) user_id',
+        values: [req.body.email, req.body.key, req.body.secret]
     })
     .then(function(cres) {
         res.send(201, { user_id: cres.rows[0].user_id })

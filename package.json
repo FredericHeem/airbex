@@ -13,7 +13,8 @@
         "bitcoin": "1.6.2",
         "raven": "x",
         "konfu": "x",
-        "semaphore": "x"
+        "semaphore": "x",
+        "async": "x"
     },
     "scripts": {
         "test": "mocha"

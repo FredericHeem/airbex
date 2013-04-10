@@ -1,8 +1,109 @@
 require('shelljs/global')
-var sever
+config.silent = true
+var request = require('request')
+
+var exec = function() {
+    var result = global.exec.apply(this, arguments)
+    if (result.code) throw new Error(result.output)
+    return result.output
+}
+
+task('clean', function() {
+    rm('-Rf', 'public')
+})
+
+task('app', ['public/scripts.js', 'public/styles.css', 'public/index.html'])
+task('dist', ['public/scripts.min.js', 'public/styles.min.css', 'public/index.html'])
+
+directory('public')
+
+var vendor = ['public/jquery-1.9.1.min.js', 'public/sjcl.js', 'public/alertify.js', 'public/bootstrap.min.js']
+
+file('public/jquery-1.9.1.min.js', ['vendor/jquery-1.9.1.min.js'], function() {
+    cp(this.prereqs[0], this.name)
+})
+
+file('public/jquery-1.9.1.min.js', ['vendor/jquery-1.9.1.min.js'], cpTask)
+file('public/sjcl.js', ['vendor/sjcl.js'], cpTask)
+file('public/alertify.js', ['vendor/alertify.js'], cpTask)
+file('public/bootstrap.min.js', ['vendor/bootstrap.min.js'], cpTask)
+
+function cpTask() {
+    cp(this.prereqs[0], this.name)
+}
+
+file('public/scripts.min.js', ['public/scripts.js'], compressJs)
+file('public/styles.min.css', ['public/styles.css'], compressCss)
+
+file('public/index.html', function() {
+    cp('assets/index.html', this.name)
+})
+
+file('public/styles.css', ['public'], function() {
+    (cat('vendor/bootstrap-combined.min.css') +
+    exec('lessc assets/styles.less'))
+    .to(this.name)
+})
+
+file('public/scripts.js', ['public'].concat(vendor), function() {
+    var v = vendor.reduce(function(p, c) {
+        return p + ';' + cat(c)
+    }, '')
+    , bundle = exec('browserify -t ./node_modules/browserify-ejs ./lib/client/entry.js')
+    , scripts = v + ';' + bundle
+    scripts.to(this.name)
+})
+
+function compressCss() {
+    var inputFn = this.name.replace(/min\.css$/, 'css')
+    exec('cleancss ' + inputFn).to(this.name)
+}
+
+function compressJs() {
+    var inputFn = this.name.replace(/min\.js$/, 'js')
+    exec('uglifyjs ' + inputFn + ' --compress --mangle').to(this.name)
+}
+
+// hosting locally
+task('host', [
+    'app'
+], function() {
+    var express = require('express')
+    , app = express()
+    , server = require('http').createServer(app)
+    app.use(express.static('public'))
+    server.listen(5073)
+    return server
+})
+
+// publishing
+task('pp', ['publish-prod'])
+task('publish-prod', [
+    'app'
+], function() {
+    var async = require('async')
+    , files = [
+        'scripts.js',
+        'styles.css',
+        'index.html'
+    ]
+
+    async.forEach(files, function(fn, next) {
+        jake.exec('scp public/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/public/', next)
+    }, complete)
+}, { async: true })
+
+// testing
+task('test', ['test-node', 'test-browser'])
+
+task('test-node', function() {
+    jake.exec('mocha -R spec', { printStderr: true, printStdout: true })
+})
+
+var server
 
 task('test-browser', ['test-browser-host'], function() {
-    jake.exec('mocha-phantomjs -R spec http://localhost:5073/index.html', function(res) {
+    jake.exec('mocha-phantomjs -R spec http://localhost:5074/test.html', function(res) {
         server.close()
         complete()
     }, {
@@ -10,156 +111,27 @@ task('test-browser', ['test-browser-host'], function() {
     })
 }, { async: true })
 
-task('test-browser-host', ['build/test/index.html'], function() {
-    server = createServer('build/test')
-})
+file('public/test.html', ['test/support/tests.html'], cpTask)
+file('public/test.css', ['node_modules/mocha/mocha.css'], cpTask)
 
-function addTemplatesToBundle(b) {
-    var escapeLines = function(s) {
-        return s.replace(/[\r\n]/g, '').replace(/"/g, '\\"')
-    }
+cp('-f', 'test/support/tests.html', 'build/test/index.html')
 
-    b.register('.ejs', function(body) {
-        return 'module.exports = "' + escapeLines(body) + '";\n'
-    })
-
-    ls('assets/templates').forEach(function(fn) {
-        b.require('./assets/templates/' + fn)
-    })
-}
-
-file('build/test/styles.css', function() {
-    cp('-f', 'node_modules/mocha/mocha.css', 'build/test/styles.css')
-})
-
-file('build/test/index.html', [
-    'test/support/tests.html',
-    'build/test/scripts.js',
-    'build/test/styles.css'
-], function() {
-    cp('-f', 'test/support/tests.html', 'build/test/index.html')
-})
-
-file('build/test/scripts.js', function() {
-    var b = require('browserify')()
-    addTemplatesToBundle(b)
-
-    b.prepend(cat('node_modules/mocha/mocha.js'))
-    b.addEntry('test/client/index.js')
-
-    mkdir('-p', 'build/test')
-    b.bundle().to('build/test/scripts.js')
-})
-
-function createServer(dir, port) {
+task('test-browser-host', ['public/test.js', 'public/test.html'], function() {
     var express = require('express')
     , app = express()
-    , server = require('http').createServer(app)
-    app.use(express.static(dir))
-    server.listen(port || 5073)
-    return server
-}
-
-task('test', ['test-node', 'test-browser'])
-
-task('test-node', function() {
-    jake.exec('mocha -R spec', { printStderr: true, printStdout: true })
+    server = require('http').createServer(app)
+    app.use(express.static('public'))
+    server.listen(5074)
 })
 
-file('build/styles.css', [
-    'assets/styles.less'
-], function() {
-    var files = [
-        'assets/styles.less'
-    ]
+file('public/test.js', ['public'].concat(vendor), function() {
+    var deps = vendor.slice()
+    deps.push('./node_modules/mocha/mocha.js')
 
-    mkdir('-p', 'build')
-
-    files.reduce(function(res, fn) {
-        return res + exec('lessc ' + fn, { silent: true }).output
+    var v = deps.reduce(function(p, c) {
+        return p + ';' + cat(c)
     }, '')
-    .to('build/styles.css')
-})
-
-file('build/scripts.js', [
-    'vendor/sjcl.js',
-    'lib/client/entry.js'
-], function() {
-    var b = require('browserify')()
-    addTemplatesToBundle(b)
-    b.append(cat('vendor/sjcl.js'))
-
-    b.addEntry('lib/client/entry.js')
-
-    b.bundle().to('build/scripts.js')
-})
-
-file('build/jquery.min.js', function() {
-    cp('vendor/jquery.min.js', 'build/jquery.min.js')
-})
-
-file('build/alertify.js', function() {
-    cp('vendor/alertify.js', 'build/alertify.js')
-})
-
-task('publish-prod', [
-    'test',
-    'build'
-], function() {
-    var config = require('./config.dev.json')
-    , aws2js = require('aws2js')
-    , s3 = aws2js.load('s3', config.aws.accessKeyId, config.aws.secretAccessKey)
-    , _ = require('underscore')
-    , async = require('async')
-
-    s3.setBucket('snowco.in')
-
-    var files = {
-        'scripts.js': { 'content-type': 'application/javascript' },
-        'styles.css': { 'content-type': 'text/css' },
-        'bitcoin.otc.txt': { 'content-type': 'text/plain' },
-        'index.html': { 'content-type': 'text/html' }
-    }
-
-    async.forEach(_.keys(files), function(f, next) {
-        console.log('uploadig %s', f)
-        s3.putFile(f, 'build/' + f, 'public-read', files[f], next)
-    }, function(err) {
-        if (err) throw err
-        console.log('uploads completed')
-        complete()
-    })
-}, { async: true })
-
-file('build/bitcoin.otc.txt', function() {
-    cp('-f', 'assets/bitcoin.otc.txt', 'build/')
-})
-
-file('build/index.html', function() {
-    cp('-f', 'assets/index.html', 'build/')
-})
-
-task('build', [
-    'build/styles.css',
-    'build/index.html',
-    'build/scripts.js',
-    'build/bitcoin.otc.txt',
-    'build/alertify.js',
-])
-
-task('host', [
-    'build',
-    'build/jquery.min.js'
-], function() {
-    var express = require('express')
-    , app = express()
-    , server = require('http').createServer(app)
-    app.use(express.static('build'))
-    server.listen(5073)
-    return server
-})
-
-task('clean', function() {
-    rm('-Rf', 'build')
-    rm('-Rf', 'tmp')
+    , bundle = exec('browserify -t ./node_modules/browserify-ejs ./test/client/index.js')
+    , scripts = v + ';' + bundle
+    scripts.to(this.name)
 })

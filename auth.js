@@ -11,14 +11,16 @@ auth.sign = function(form, secret) {
 auth.verify = function(conn, req, res, next) {
     var key = req.headers['snow-key']
     if (!key) return next()
-    Q.ninvoke(conn, 'query', {
+
+    conn.query({
         text: 'SELECT user_id, secret FROM api_key WHERE api_key_id = $1',
         values: [key]
-    })
-    .then(function(dres) {
-        if (!dres.rowCount) throw new Error('unknown api key')
+    }, function(err, dres) {
+        if (err) return next(err)
+        if (!dres.rowCount) return res.send(401, 'no such api key')
         var sig = auth.sign(req.body, dres.rows[0].secret)
-        if (sig !== req.headers['snow-sign']) throw new Error('wrong message signature');
+        if (sig !== req.headers['snow-sign']) return res.send(401, 'wrong signature');
         (req.security || (req.security = {})).userId = dres.rows[0].user_id
-    }).then(next, next).done()
+        next()
+    })
 }

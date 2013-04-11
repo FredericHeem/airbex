@@ -1,0 +1,8 @@
+DELETE FROM btc_block;
+
+ALTER TABLE btc_block
+DROP COLUMN hash,
+ADD COLUMN id INT PRIMARY KEY NOT NULL DEFAULT(1) CHECK(id = 1),
+DROP CONSTRAINT btc_block_height_key;
+
+INSERT INTO btc_block (height) VALUES (230000);

@@ -24,6 +24,12 @@ users.create = function(conn, req, res, next) {
     })
     .then(function(cres) {
         res.send(201, { user_id: cres.rows[0].user_id })
-    }, next)
+    }, function(err) {
+        if (err.message === 'duplicate key value violates unique constraint "api_key_pkey"') {
+            return res.send(403, { code: 'EmailAlreadyInUse', message:'e-mail is already in use' })
+        }
+
+        next(err)
+    })
     .done()
 }

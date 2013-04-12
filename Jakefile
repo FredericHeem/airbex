@@ -73,6 +73,7 @@ task('host', [
     , server = require('http').createServer(app)
     app.use(express.static('public'))
     server.listen(5073)
+    console.log('hosting at http://localhost:5073')
     return server
 })
 

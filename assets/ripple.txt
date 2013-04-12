@@ -1,0 +1,8 @@
+[domain]
+snowco.in
+
+[federation_url]
+https://api.snowco.in/ripple/federation
+
+[accounts]
+rJHygWcTLVpSXkowott6kzgZU6viQSVYM1

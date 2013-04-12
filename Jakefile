@@ -13,7 +13,7 @@ task('clean', function() {
 })
 
 task('app', ['public/scripts.js', 'public/styles.css', 'public/index.html'])
-task('dist', ['public/scripts.min.js', 'public/styles.min.css', 'public/index.min.html'])
+task('dist', ['public/scripts.min.js', 'public/styles.min.css', 'public/index.min.html', 'public/ripple.txt'])
 
 directory('public')
 
@@ -27,6 +27,7 @@ file('public/jquery-1.9.1.min.js', ['vendor/jquery-1.9.1.min.js'], cpTask)
 file('public/sjcl.js', ['vendor/sjcl.js'], cpTask)
 file('public/alertify.js', ['vendor/alertify.js'], cpTask)
 file('public/bootstrap.min.js', ['vendor/bootstrap.min.js'], cpTask)
+file('public/ripple.txt', ['assets/ripple.txt'], cpTask)
 
 function cpTask() {
     cp(this.prereqs[0], this.name)
@@ -94,7 +95,8 @@ task('publish-prod', [
     , files = {
         'scripts.min.js': null,
         'styles.min.css': null,
-        'index.min.html': 'index.html'
+        'index.min.html': 'index.html',
+        'ripple.txt': 'ripple.txt'
     }
 
     async.forEach(Object.keys(files), function(fn, next) {

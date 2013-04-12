@@ -22,7 +22,7 @@ app.use(express.bodyParser())
 app.use(auth.verify.bind(auth, conn))
 
 var routes = ['accounts', 'books', 'orders', 'ripple',
-'securities', 'transactions', 'users']
+'securities', 'transactions', 'users', 'transfer']
 routes.forEach(function(name) {
 	require('./' + name).configure(app, conn)
 })

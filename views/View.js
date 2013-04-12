@@ -14,8 +14,6 @@ var Backbone = require('backbone')
     },
 
     dispose: function() {
-        console.log('disposing of view', this);
-
         // this will unbind all events that this view has bound to
         _.each(this.bindings, function(b) {
             b.target.unbind(b.name, b.callback);

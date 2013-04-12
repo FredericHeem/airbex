@@ -95,10 +95,7 @@ _ = require('underscore')
 
         collection.fetch({
             url: app.api.url + '/private/accounts',
-            headers: app.api.headers(),
-            success: function(d) {
-                console.log('accounts fetched', arguments)
-            }
+            headers: app.api.headers()
         });
 
         var view = new Views.UserAccountsView({ collection: collection });

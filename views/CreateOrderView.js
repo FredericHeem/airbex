@@ -107,8 +107,6 @@ var View = require('./View')
 
         var volume = Math.floor(+num(volumeDecimal).mul(Math.pow(10, volumeScale)));
         this.model.set('volume', volume);
-
-        console.log('new volume', volume);
     },
 
     changePrice: function() {
@@ -125,8 +123,6 @@ var View = require('./View')
 
         var price = Math.floor(+num(priceDecimal).mul(Math.pow(10, bookScale)));
         this.model.set('price', price);
-
-        console.log('new price', price);
     },
 
     clickBid: function(e) {

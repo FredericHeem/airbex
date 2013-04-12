@@ -10,6 +10,7 @@ var Backbone = require('backbone')
         render: function() {
             var vm = this.model.toJSON();
             vm.rippleAddress = app.rippleAddress
+            vm.userId = app.user.id,
             this.$el.html(require('../assets/templates/accounts-account.ejs')(vm));
             return this;
         }

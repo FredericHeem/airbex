@@ -7,6 +7,8 @@ var config = require('konfu')
 , raven = require('raven')
 , auth = require('./auth')
 
+app.config = config
+
 // access control headers (for hosting on s3)
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')

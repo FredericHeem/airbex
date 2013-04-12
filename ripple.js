@@ -4,6 +4,65 @@ var Q = require('q')
 ripple.configure = function(app, conn) {
     app.post('/private/rippleout', ripple.withdraw.bind(ripple, conn))
     app.get('/ripple/address', ripple.address.bind(ripple, conn))
+    app.get('/ripple/federation', ripple.federation.bind(ripple, app.config, conn))
+}
+
+ripple.federation = function(config, conn, req, res, next) {
+    var domain = req.query.domain
+    , tag = req.query.tag
+    , user = req.query.user
+    , errorMessages = {
+        'noSuchUser': 'The supplied user was not found.',
+        'noSuchTag': 'The supplied tag was not found.',
+        'noSuchDomain': 'The supplied domain is not served here.',
+        'invalidParams': 'Missing or conflicting parameters.',
+        'unavailable': 'Service is temporarily unavailable.'
+    }
+
+    var sendError = function(name) {
+        res.send({
+            result: 'error',
+            error: name,
+            error_message: errorMessages[name],
+            request: req.query
+        })
+    }
+
+    if (!domain) return sendError('invalidParams')
+    if (!user && !tag) return sendError('invalidParams')
+    if (user && tag) return sendError('invalidParams')
+        console.log(config)
+    if (domain !== config.ripple_federation.domain) return sendError('noSuchDomain')
+
+    var query = user ? {
+        text: 'SELECT user_id FROM "user" WHERE REPLACE(email_lower, \'@\', \'_\') = $1',
+        values: [user]
+    } : {
+        text: 'SELECT REPLACE(email_lower, \'@\', \'_\') username FROM "user" WHERE user_id = $1',
+        values: [tag]
+    }
+
+    Q.ninvoke(conn, 'query', query)
+    .then(function(dres) {
+        if (!dres.rows.length) return sendError(user ? 'noSuchUser' : 'noSuchTag')
+        var result = {
+            result: 'success',
+            federation_json: {
+                currencies: config.ripple_federation_currencies,
+                expires: Math.round(+new Date / 1e3) + 3600, // TODO: timezone?
+                domain: config.ripple_federation.domain,
+                signer: config.ripple_account // TODO: what's this?
+            },
+            federation_blob: null // TODO
+        }
+        if (user) result.federation_json.tag = dres.rows[0].user_id
+        else result.federation_json.user = dres.rows[0].username
+        res.send(result)
+    }, function(err) {
+        console.error(err)
+        sendError('unavailable')
+    })
+    .done()
 }
 
 ripple.address = function(conn, req, res, next) {

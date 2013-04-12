@@ -13,7 +13,7 @@ task('clean', function() {
 })
 
 task('app', ['public/scripts.js', 'public/styles.css', 'public/index.html'])
-task('dist', ['public/scripts.min.js', 'public/styles.min.css', 'public/index.html'])
+task('dist', ['public/scripts.min.js', 'public/styles.min.css', 'public/index.min.html'])
 
 directory('public')
 
@@ -35,8 +35,16 @@ function cpTask() {
 file('public/scripts.min.js', ['public/scripts.js'], compressJs)
 file('public/styles.min.css', ['public/styles.css'], compressCss)
 
-file('public/index.html', function() {
-    cp('assets/index.html', this.name)
+file('public/index.html', ['public'], function() {
+    var ejs = require('ejs')
+    ejs.render(cat('assets/index.ejs'), { minify: false })
+    .to(this.name)
+})
+
+file('public/index.min.html', ['public'], function() {
+    var ejs = require('ejs')
+    ejs.render(cat('assets/index.ejs'), { minify: true })
+    .to(this.name)
 })
 
 file('public/styles.css', ['public'], function() {
@@ -61,7 +69,7 @@ function compressCss() {
 
 function compressJs() {
     var inputFn = this.name.replace(/min\.js$/, 'js')
-    exec('uglifyjs ' + inputFn + ' --compress --mangle').to(this.name)
+    exec('uglifyjs ' + inputFn + ' --compress warnings=false --mangle').to(this.name)
 }
 
 // hosting locally
@@ -80,17 +88,18 @@ task('host', [
 // publishing
 task('pp', ['publish-prod'])
 task('publish-prod', [
-    'app'
+    'dist'
 ], function() {
     var async = require('async')
-    , files = [
-        'scripts.js',
-        'styles.css',
-        'index.html'
-    ]
+    , files = {
+        'scripts.min.js': null,
+        'styles.min.css': null,
+        'index.min.html': 'index.html'
+    }
 
-    async.forEach(files, function(fn, next) {
-        jake.exec('scp public/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/public/', next)
+    async.forEach(Object.keys(files), function(fn, next) {
+        var outName = files[fn] || fn
+        jake.exec('scp public/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/public/' + outName, next)
     }, complete)
 }, { async: true })
 

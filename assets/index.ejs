@@ -2,7 +2,11 @@
 <html>
     <head>
         <title>Snow</title>
-        <link href="styles.css" rel="stylesheet">
+        <% if (minify) { %>
+          <link href="styles.min.css" rel="stylesheet">
+        <% } else { %>
+          <link href="styles.css" rel="stylesheet">
+        <% } %>
 
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
@@ -36,6 +40,10 @@
 
         <div id="section"></section>
 
-        <script src="scripts.js"></script>
+        <% if (minify) { %>
+          <script src="scripts.min.js"></script>
+        <% } else { %>
+          <script src="scripts.js"></script>
+        <% } %>
     </body>
 </html>

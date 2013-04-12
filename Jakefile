@@ -49,7 +49,7 @@ file('public/scripts.js', ['public'].concat(vendor), function() {
     var v = vendor.reduce(function(p, c) {
         return p + ';' + cat(c)
     }, '')
-    , bundle = exec('browserify -t ./node_modules/browserify-ejs ./lib/client/entry.js')
+    , bundle = exec('browserify -t ./node_modules/browserify-ejs ./entry.js')
     , scripts = v + ';' + bundle
     scripts.to(this.name)
 })
@@ -95,15 +95,9 @@ task('publish-prod', [
 }, { async: true })
 
 // testing
-task('test', ['test-node', 'test-browser'])
-
-task('test-node', function() {
-    jake.exec('mocha -R spec', { printStderr: true, printStdout: true })
-})
-
 var server
 
-task('test-browser', ['test-browser-host'], function() {
+task('test', ['test-host'], function() {
     jake.exec('mocha-phantomjs -R spec http://localhost:5074/test.html', function(res) {
         server.close()
         complete()
@@ -117,7 +111,7 @@ file('public/test.css', ['node_modules/mocha/mocha.css'], cpTask)
 
 cp('-f', 'test/support/tests.html', 'build/test/index.html')
 
-task('test-browser-host', ['public/test.js', 'public/test.html'], function() {
+task('test-host', ['public/test.js', 'public/test.html'], function() {
     var express = require('express')
     , app = express()
     server = require('http').createServer(app)
@@ -132,7 +126,7 @@ file('public/test.js', ['public'].concat(vendor), function() {
     var v = deps.reduce(function(p, c) {
         return p + ';' + cat(c)
     }, '')
-    , bundle = exec('browserify -t ./node_modules/browserify-ejs ./test/client/index.js')
+    , bundle = exec('browserify -t ./node_modules/browserify-ejs ./test/index.js')
     , scripts = v + ';' + bundle
     scripts.to(this.name)
 })

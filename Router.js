@@ -7,34 +7,9 @@ _ = require('underscore')
 , Router = module.exports = Backbone.Router.extend({
     initialize: function() {
         var that = this
-        this.allSecurities = new Models.SecurityCollection();
-        this.allBooks = new Models.BookCollection();
 
-        async.series([
-            function(next) {
-                that.allSecurities.fetch({
-                    url: app.api.url + '/public/securities',
-                    success: function() { console.log('secs', arguments); next(); },
-                    error: function(e) { next(e); }
-                });
-            },
-            function(next) {
-                that.allBooks.fetch({
-                    url: app.api.url + '/public/books',
-                    success: function() { next(); },
-                    error: function(e) { next(e); }
-                });
-            }
-        ], function() {
-            console.log('starting history');
-            Backbone.history.start();
-        });
-
-        $.ajax(app.api.url + '/ripple/address')
-        .then(function(account) {
-            app.rippleAddress = account.address
-            console.log('ripple address of gateway cached, ' + account.address)
-        })
+        app.cache = require('./app.cache')
+        app.cache.reload()
 
         app.header = new Views.HeaderView();
         app.header.render();
@@ -43,6 +18,7 @@ _ = require('underscore')
         this.route(/^my\/send(?:\?security=(.+))?/, 'send');
 
         Backbone.wrapError = _.wrap(Backbone.wrapError, this.wrapError)
+        Backbone.history.start()
     },
 
     wrapError: function(inner, onError, originalModel, options) {
@@ -105,7 +81,7 @@ _ = require('underscore')
 
     books: function() {
         var view = new Views.BooksView({
-            collection: this.allBooks
+            collection: app.cache.books
         })
         app.section(view, true);
     },
@@ -209,7 +185,7 @@ _ = require('underscore')
     book: function(pair) {
         var split = pair.split('_');
 
-        var book = this.allBooks.fromPair(split[0], split[1]);
+        var book = app.cache.books.fromPair(split[0], split[1]);
 
         if (!book) {
             throw new Error('no book found for ' + split[0] + ' and ' + split[1]);
@@ -261,7 +237,7 @@ _ = require('underscore')
 
         var split = pair.split('_');
 
-        var book = this.allBooks.fromPair(split[0], split[1]);
+        var book = app.cache.books.fromPair(split[0], split[1]);
 
         if (!book) {
             throw new Error('no book found for ' + split[0] + ' and ' + split[1]);

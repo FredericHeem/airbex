@@ -8,7 +8,7 @@ users.configure = function(app, conn) {
 
 users.whoami = function(conn, req, res, next) {
 	conn.query({
-		text: 'SELECT email FROM "user" WHERE user_id = $1',
+		text: 'SELECT user_id, email FROM "user" WHERE user_id = $1',
 		values: [req.security.userId]
 	}, function(err, dres) {
 		if (err) return next(err)

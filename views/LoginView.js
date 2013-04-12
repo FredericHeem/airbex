@@ -18,7 +18,7 @@ var SectionView = require('./SectionView')
         , password = this.$el.find('.password').val()
 
         return {
-            key: sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(email)).slice(0, 20),
+            key: sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(email.toLowerCase())).slice(0, 20),
             secret: sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(password)).slice(0, 20)
         }
     },

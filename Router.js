@@ -15,7 +15,6 @@ _ = require('underscore')
         app.header.render();
 
         this.route(/^login(?:\?after=(.+))?/, 'login');
-        this.route(/^my\/send(?:\?security=(.+))?/, 'send');
 
         Backbone.wrapError = _.wrap(Backbone.wrapError, this.wrapError)
         Backbone.history.start()
@@ -63,6 +62,7 @@ _ = require('underscore')
         'my/withdraw/BTC': 'withdrawBTC',
         'my/deposit/BTC': 'depositBTC',
         'my/transactions': 'userTransactions',
+        'my/transfer': 'transfer',
         'my/rippleout/:sid': 'rippleOut',
         '*path': 'routeNotFound'
     },
@@ -130,21 +130,14 @@ _ = require('underscore')
         app.section(view, true)
     },
 
-    send: function(security_id) {
-        console.log('route: send')
-
+    transfer: function(security_id) {
         if (!app.authorize()) return
 
-        app.user.get('accounts').fetch({
-            headers: app.api.headers(),
-            success: function() {
-                var view = new Views.SendView({
-                    app: app,
-                    security_id: security_id || null
-                })
-                app.section(view, true)
-            }
+        var view = new Views.SendView({
+            app: app,
+            security_id: security_id || null
         })
+        app.section(view, true)
     },
 
     login: function(after) {

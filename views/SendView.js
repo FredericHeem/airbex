@@ -8,15 +8,9 @@ var View = require('./View')
     initialize: function(options) {
         this.vm = new Backbone.Model({
             amount: 0.0,
-            credit: null,
-            debit: null,
-            accounts: options.app.user.get('accounts').map(function(a) {
-                return {
-                    id: a.id,
-                    security: a.get('security').id,
-                    available: a.availableDecimal()
-                }
-            })
+            email: null,
+            securityId: 'null',
+            securities: options.app.cache.securities.pluck('security_id')
         })
     },
 
@@ -29,8 +23,8 @@ var View = require('./View')
     read: function() {
         this.vm.set({
             amount: +this.$amount.val(),
-            debit: +this.$debit.val(),
-            credit: +this.$credit.val()
+            email: this.$email.val(),
+            securityId: this.$security.val()
         })
     },
 
@@ -39,18 +33,26 @@ var View = require('./View')
 
         this.read()
 
-        this.$debit.add(this.$credit).add(this.$amount).add(this.$send).prop('disabled', true).addClass('disabled')
+        this.$email.add(this.$security).add(this.$amount).add(this.$send).prop('disabled', true).addClass('disabled')
 
-        var debit = Models.Account.findOrCreate(this.vm.get('debit'))
+        console.log(this.vm.get('securityId'))
+        console.log(this.vm.toJSON())
+        console.log('element', this.$security)
+        console.log('element val', this.$security.val())
 
-        var transaction = new Models.Transaction()
-        transaction.save({
-            debit_account_id: this.vm.get('debit'),
-            credit_account_id: this.vm.get('credit'),
-            amount: +num(this.vm.get('amount')).mul(Math.pow(10, debit.get('security').get('scale')))
-        }, {
+        var security = this.options.app.cache.securities.get(this.vm.get('securityId'))
+        , scale = security.get('scale')
+        , transaction = new Models.Transaction({
+            email: this.vm.get('email'),
+            security_id: this.vm.get('securityId'),
+            amount: +num(this.vm.get('amount')).mul(Math.pow(10, scale))
+        })
+
+        transaction.save({}, {
+            url: app.api.url + '/transfer',
+            headers: app.api.headers(transaction.toJSON()),
             success: function() {
-                Backbone.history.navigate('my/accounts', true)
+                Backbone.history.navigate('my/transactions', true)
             }
         })
     },
@@ -58,9 +60,9 @@ var View = require('./View')
     render: function() {
         this.$el.html(require('../assets/templates/send.ejs')(this.vm.toJSON()))
 
-        this.$debit = this.$el.find('select[data-binding="debit"]')
-        this.$credit = this.$el.find('input[data-binding="credit"]')
-        this.$amount = this.$el.find('input[data-binding="amount"]')
+        this.$email = this.$el.find('*[data-binding="email"]')
+        this.$security = this.$el.find('*[data-binding="security"]')
+        this.$amount = this.$el.find('*[data-binding="amount"]')
         this.$send = this.$el.find('*[data-action="send"]')
 
         return this

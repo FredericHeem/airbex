@@ -5,19 +5,19 @@
 
             <form class="form span4">
                 <div class="control-group">
-                    <label class="control-label" for="debit">From</label>
+                    <label class="control-label" for="security">Security</label>
                     <div class="controls">
-                        <select id="debit" data-binding="debit">
-                            <% _.each(accounts, function(a) { %>
-                                <option value="<%= a.id %>">Account #<%= a.id %> (<%= a.available %> <%= a.security %>)</option>
+                        <select id="security" data-binding="security">
+                            <% _.each(securities, function(s) { %>
+                                <option value="<%= s %>"><%= s %></option>
                             <% }) %>
                         </select>
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label" for="credit">To</label>
+                    <label class="control-label" for="email">To</label>
                     <div class="controls">
-                        <input type="text" class="span4" id="credit" data-binding="credit" placeholder="Account #" value="<%= credit || '' %>">
+                        <input type="text" class="span4" id="email" data-binding="email" placeholder="lucky@gmail.com" value="<%= email || '' %>">
                     </div>
                 </div>
                 <div class="control-group">

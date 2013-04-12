@@ -152,10 +152,9 @@ _ = require('underscore')
 
     login: function(after) {
         var that = this
+        after || (after = 'my/accounts')
 
-        var view = new Views.LoginView({
-            after: after || 'my/accounts'
-        })
+        var view = new Views.LoginView()
 
         view.on('login', function(e) {
             var user = new Models.User()

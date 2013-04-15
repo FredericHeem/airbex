@@ -58,7 +58,7 @@ var View = require('./View')
     },
 
     render: function() {
-        this.$el.html(require('../assets/templates/send.ejs')(this.vm.toJSON()))
+        this.$el.html(require('../templates/send.ejs')(this.vm.toJSON()))
 
         this.$email = this.$el.find('*[data-binding="email"]')
         this.$security = this.$el.find('*[data-binding="security"]')

@@ -38,7 +38,7 @@ var View = require('./View')
     },
 
     render: function() {
-        this.$el.html(require('../assets/templates/withdraw-btc.ejs')())
+        this.$el.html(require('../templates/withdraw-btc.ejs')())
         this.$address = this.$el.find('input[data-binding="address"]')
         this.$amount = this.$el.find('input[data-binding="amount"]')
         this.$withdraw = this.$el.find('*[data-action="withdraw"]')

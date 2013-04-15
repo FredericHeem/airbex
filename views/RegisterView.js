@@ -48,7 +48,7 @@ var SectionView = require('./SectionView')
     },
 
     render: function() {
-        this.$el.html(require('../assets/templates/register.ejs')())
+        this.$el.html(require('../templates/register.ejs')())
 
         return this;
     }

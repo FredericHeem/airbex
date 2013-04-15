@@ -35,7 +35,7 @@ var SectionView = require('./SectionView')
             vm.matchedDecimal = this.model.matchedDecimal();
             vm.cancelledDecimal = this.model.cancelledDecimal();
 
-            this.$el.html(require('../assets/templates/user-orders-order.ejs')(vm));
+            this.$el.html(require('../templates/user-orders-order.ejs')(vm));
 
             return this;
         }
@@ -72,7 +72,7 @@ var SectionView = require('./SectionView')
     },
 
     render: function() {
-        this.$el.html(require('../assets/templates/user-orders.ejs')());
+        this.$el.html(require('../templates/user-orders.ejs')());
         this.$children = this.$el.find('table.orders tbody')
         this.reset()
         return this

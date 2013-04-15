@@ -6,7 +6,7 @@ var SectionView = require('./SectionView')
     section: null,
 
     render: function() {
-        this.$el.html(require('../assets/templates/error.ejs')({
+        this.$el.html(require('../templates/error.ejs')({
             error: this.options.error
         }));
 

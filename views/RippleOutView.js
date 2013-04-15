@@ -39,7 +39,7 @@ var View = require('./View')
     },
 
     render: function() {
-        this.$el.html(require('../assets/templates/ripple-out.ejs')({
+        this.$el.html(require('../templates/ripple-out.ejs')({
             securityId: this.options.securityId
         }))
 

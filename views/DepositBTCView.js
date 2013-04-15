@@ -13,7 +13,7 @@ var View = require('./View')
     section: 'accounts',
 
     render: function() {
-        this.$el.html(require('../assets/templates/deposit-btc.ejs')(this.model.toJSON()))
+        this.$el.html(require('../templates/deposit-btc.ejs')(this.model.toJSON()))
         return this
     }
 })

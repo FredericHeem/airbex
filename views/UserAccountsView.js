@@ -11,7 +11,7 @@ var Backbone = require('backbone')
             var vm = this.model.toJSON();
             vm.rippleAddress = app.rippleAddress
             vm.userId = app.user.id
-            this.$el.html(require('../assets/templates/accounts-account.ejs')(vm))
+            this.$el.html(require('../templates/accounts-account.ejs')(vm))
             return this;
         }
     }),
@@ -37,7 +37,7 @@ var Backbone = require('backbone')
     },
 
     render: function() {
-        this.$el.html(require('../assets/templates/accounts.ejs')())
+        this.$el.html(require('../templates/accounts.ejs')())
         this.$children = this.$el.find('table.accounts tbody')
         this.reset()
 

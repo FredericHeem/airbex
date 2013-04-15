@@ -8,7 +8,7 @@ var SectionView = require('./SectionView')
 
         render: function() {
             var vm = this.model.toJSON();
-            this.$el.html(require('../assets/templates/book-depth.ejs')(vm))
+            this.$el.html(require('../templates/book-depth.ejs')(vm))
             return this;
         }
     }),
@@ -38,7 +38,7 @@ var SectionView = require('./SectionView')
     },
 
     render: function() {
-        this.$el.html(require('../assets/templates/book.ejs')())
+        this.$el.html(require('../templates/book.ejs')())
 
         this.$children = this.$el.find('table.books tbody')
         this.reset()

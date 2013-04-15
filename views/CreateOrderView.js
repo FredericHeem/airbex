@@ -9,7 +9,7 @@ var View = require('./View')
     initialize: function() {
         _.bindAll(this);
 
-        this.$el.html(require('../assets/templates/create-order.ejs')());
+        this.$el.html(require('../templates/create-order.ejs')());
         this.$bid = this.$el.find('button[data-action="bid"]');
         this.$ask = this.$el.find('button[data-action="ask"]');
         this.$explanation = this.$el.find('.explanation');

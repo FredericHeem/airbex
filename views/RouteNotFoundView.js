@@ -6,7 +6,7 @@ var SectionView = require('./SectionView')
     section: null,
 
     render: function() {
-        this.$el.html(require('../assets/templates/route-not-found.ejs')({
+        this.$el.html(require('../templates/route-not-found.ejs')({
             hash: window.location.hash
         }));
 

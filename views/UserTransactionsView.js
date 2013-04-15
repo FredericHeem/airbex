@@ -7,7 +7,7 @@ var SectionView = require('./SectionView')
 
         render: function() {
             var vm = this.model.toJSON()
-            this.$el.html(require('../assets/templates/user-transactions-transaction.ejs')(vm))
+            this.$el.html(require('../templates/user-transactions-transaction.ejs')(vm))
             return this
         }
     }),
@@ -34,7 +34,7 @@ var SectionView = require('./SectionView')
     },
 
     render: function() {
-        this.$el.html(require('../assets/templates/user-transactions.ejs')());
+        this.$el.html(require('../templates/user-transactions.ejs')());
         this.$children = this.$el.find('table.transactions tbody')
         this.reset()
         return this

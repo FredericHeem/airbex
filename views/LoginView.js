@@ -29,7 +29,7 @@ var SectionView = require('./SectionView')
     },
 
     render: function() {
-        this.$el.html(require('../assets/templates/login.ejs')());
+        this.$el.html(require('../templates/login.ejs')());
 
         return this;
     }

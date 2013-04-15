@@ -10,7 +10,7 @@ var SectionView = require('./SectionView')
             vm.bid = _.where(vm.depth, { side: 0 })[0] || null;
             vm.ask = _.where(vm.depth, { side: 1 })[0] || null;
 
-            var template = require('../assets/templates/books-book.ejs')
+            var template = require('../templates/books-book.ejs')
             this.$el.html(template(vm));
 
             return this;
@@ -38,7 +38,7 @@ var SectionView = require('./SectionView')
     },
 
     render: function() {
-        this.$el.html(require('../assets/templates/books.ejs')());
+        this.$el.html(require('../templates/books.ejs')());
         this.reset();
 
         return this;

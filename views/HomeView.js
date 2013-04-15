@@ -6,7 +6,7 @@ var SectionView = require('./SectionView')
     section: null,
 
     render: function() {
-    	var template = require('../assets/templates/home.ejs')
+    	var template = require('../templates/home.ejs')
         this.$el.html(template())
 
         return this;

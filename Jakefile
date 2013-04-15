@@ -17,7 +17,12 @@ task('dist', ['public/scripts.min.js', 'public/styles.min.css', 'public/index.mi
 
 directory('public')
 
-var vendor = ['public/jquery-1.9.1.min.js', 'public/sjcl.js', 'public/alertify.js', 'public/bootstrap.min.js']
+var vendor = [
+    'public/jquery-1.9.1.min.js',
+    'public/sjcl.js',
+    'public/alertify.js',
+    'public/bootstrap.min.js'
+]
 
 file('public/jquery-1.9.1.min.js', ['vendor/jquery-1.9.1.min.js'], function() {
     cp(this.prereqs[0], this.name)

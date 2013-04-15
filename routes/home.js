@@ -13,36 +13,6 @@ _ = require('underscore')
 
         app.header = new Views.HeaderView();
         app.header.render();
-
-        Backbone.wrapError = _.wrap(Backbone.wrapError, this.wrapError)
-    },
-
-    wrapError: function(inner, onError, originalModel, options) {
-        var onErrorWrap = function(model, xhr, options) {
-            xhr.body = xhr.responseText;
-
-            if (xhr.getAllResponseHeaders().match(/Content-Type: application\/json/i)) {
-                try {
-                    xhr.body = JSON.parse(xhr.responseText)
-                } catch (err) {
-
-                    console.error('failed to parse json error body', xhr.body, err)
-                }
-            }
-
-            if (!onError || !onError(model, xhr, options)) {
-                if (xhr.status == 401) {
-                    app.session.forget()
-                    return app.authorize()
-                } else {
-                    console.error('unhandled sync error', model, xhr, options)
-                    console.log('app', app)
-                    app.router.error(xhr.body)
-                }
-            }
-        }
-
-        return inner(onErrorWrap, originalModel, options)
     },
 
     home: function() {

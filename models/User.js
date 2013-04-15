@@ -1,4 +1,4 @@
-var Relational = require('backbone-rel')
+var Relational = require('backbone-relational')
 , Backbone = require('backbone')
 , num = require('num')
 , AccountCollection = require('./AccountCollection')

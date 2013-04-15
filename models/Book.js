@@ -1,4 +1,4 @@
-var Relational = require('backbone-rel')
+var Relational = require('backbone-relational')
 , Backbone = require('backbone')
 , Security = require('./Security')
 , Depth = require('./Depth')

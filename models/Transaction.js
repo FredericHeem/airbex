@@ -1,4 +1,4 @@
-var Relational = require('backbone-rel')
+var Relational = require('backbone-relational')
 , Account = require('./Account')
 , app = require('../app')
 , Transaction = module.exports = Relational.RelationalModel.extend({

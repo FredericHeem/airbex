@@ -25,6 +25,10 @@ users.create = function(conn, req, res, next) {
     .then(function(cres) {
         res.send(201, { user_id: cres.rows[0].user_id })
     }, function(err) {
+        if (err.message === 'new row for relation "user" violates check constraint "email_regex"') {
+            return res.send(403, { code: 'InvalidEmail', messge: 'e-mail is invalid' })
+        }
+
         if (err.message === 'duplicate key value violates unique constraint "api_key_pkey"') {
             return res.send(403, { code: 'EmailAlreadyInUse', message:'e-mail is already in use' })
         }

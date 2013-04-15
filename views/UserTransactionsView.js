@@ -16,6 +16,7 @@ var SectionView = require('./SectionView')
 
     initialize: function() {
         this.views = [];
+        this.bindTo(this.collection, 'add', this.add, this);
         this.bindTo(this.collection, 'reset', this.render, this);
         this.bindTo(this.collection, 'remove', this.remove, this);
     },

@@ -3,7 +3,7 @@ var Backbone = require('backbone')
 , Views = require('../views')
 , TransferRouter = module.exports = Backbone.Router.extend({
     routes: {
-        'my/deposit/BTC': 'depositBTC'
+        'my/transfer': 'transfer'
     },
 
     transfer: function(security_id) {

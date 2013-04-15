@@ -45,5 +45,3 @@ _ = require('underscore')
         app.section(view, true)
     }
 })
-
-Backbone.$ = jQuery

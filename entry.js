@@ -1,6 +1,7 @@
 process.env.DEBUG = '.*';
 var _ = require('underscore')
 , Backbone = require('backbone')
+Backbone.$ = jQuery
 
 var app = require('./app')
 // TODO: should be bootstrapped from index.js

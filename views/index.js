@@ -13,5 +13,6 @@ module.exports = {
     LoginView: require('./LoginView'),
     HomeView: require('./HomeView'),
     SendView: require('./SendView'),
-    RippleOutView: require('./RippleOutView')
+    RippleOutView: require('./RippleOutView'),
+    RegisterView: require('./RegisterView')
 }

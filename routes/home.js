@@ -1,23 +1,20 @@
 var Backbone = require('backbone')
 _ = require('underscore')
-, Models = require('./models')
-, Views = require('./views')
+, Models = require('../models')
+, Views = require('../views')
 , async = require('async')
-, app = require('./app')
+, app = require('../app')
 , Router = module.exports = Backbone.Router.extend({
     initialize: function() {
         var that = this
 
-        app.cache = require('./app.cache')
+        app.cache = require('../app.cache')
         app.cache.reload()
 
         app.header = new Views.HeaderView();
         app.header.render();
 
-        this.route(/^login(?:\?after=(.+))?/, 'login');
-
         Backbone.wrapError = _.wrap(Backbone.wrapError, this.wrapError)
-        Backbone.history.start()
     },
 
     wrapError: function(inner, onError, originalModel, options) {
@@ -138,37 +135,6 @@ _ = require('underscore')
             security_id: security_id || null
         })
         app.section(view, true)
-    },
-
-    login: function(after) {
-        var that = this
-        after || (after = 'my/accounts')
-
-        var view = new Views.LoginView()
-
-        view.on('login', function(e) {
-            var user = new Models.User()
-            user.fetch({
-                url: app.api.url + '/whoami',
-                headers: app.api.headers(null, e.hashes.key, e.hashes.secret),
-                success: function() {
-                    app.user = user
-                    _.extend(app.api, e.hashes)
-                    Backbone.history.navigate(after, true)
-                },
-                error: function(model, response, options) {
-                    if (response.status === 401) {
-                        alert('Wrong e-mail/password combination')
-                        return
-                    }
-
-                    alert('Login failed, please try again')
-                    console.log('login response', response)
-                }
-            })
-        })
-
-        app.section(view, true);
     },
 
     book: function(pair) {

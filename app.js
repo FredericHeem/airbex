@@ -23,6 +23,28 @@ var _ = require('underscore')
         }
     },
 
+    errorFromXhr: function(xhr) {
+        var body = xhr.responseText
+
+        if (xhr.getAllResponseHeaders().match(/Content-Type: application\/json/i)) {
+            try {
+                return JSON.parse(body)
+            } catch (err) {
+                return {
+                    name: 'ErrorBodyInvalid',
+                    message: 'Failed to parse JSON error body',
+                    body: body
+                }
+            }
+        }
+
+        return {
+            name: 'UnknownErrorFormat',
+            message: 'Error is not JSON',
+            body: body
+        }
+    },
+
     section: function(value, render) {
         if (!_.isUndefined(value) && value !== app.section.value) {
             if (app.section.value) {

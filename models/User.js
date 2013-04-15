@@ -6,6 +6,10 @@ var Relational = require('backbone-relational')
 , User = module.exports = Relational.RelationalModel.extend({
     idAttribute: 'user_id',
 
+    validate: function(attrs, options) {
+        if (!attrs.email.match(/^\S+@\S+$/)) return 'e-mail is invalid'
+    },
+
     relations: [{
         type: Relational.HasMany,
         key: 'accounts',

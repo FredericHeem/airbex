@@ -14,7 +14,7 @@ var async = require('async')
             function(next) {
                 that.securities.fetch({
                     url: app.api.url + '/public/securities',
-                    success: function() { console.log('secs', arguments); next(); },
+                    success: function() { next(); },
                     error: function(e) { next(e); }
                 });
             },
@@ -29,7 +29,6 @@ var async = require('async')
                 $.ajax(app.api.url + '/ripple/address')
                 .then(function(account) {
                     app.rippleAddress = account.address
-                    console.log('ripple address of gateway cached, ' + account.address)
                     next()
                 })
             }

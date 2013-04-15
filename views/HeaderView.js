@@ -22,7 +22,6 @@
     },
 
     sessionChange: function() {
-        console.log('header view rendering from session change. session is', app.session);
         this.render();
     },
 

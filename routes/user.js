@@ -9,8 +9,6 @@ var Backbone = require('backbone')
     },
 
     userAccounts: function() {
-        console.log('route: user accounts');
-
         if (!app.authorize()) return;
 
         var collection = new Backbone.Collection();
@@ -24,8 +22,6 @@ var Backbone = require('backbone')
     },
 
     userOrders: function() {
-        console.log('route: user orders');
-
         if (!app.authorize()) return;
 
         var collection = new Models.OrderCollection();

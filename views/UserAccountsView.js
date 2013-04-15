@@ -10,8 +10,8 @@ var Backbone = require('backbone')
         render: function() {
             var vm = this.model.toJSON();
             vm.rippleAddress = app.rippleAddress
-            vm.userId = app.user.id,
-            this.$el.html(require('../assets/templates/accounts-account.ejs')(vm));
+            vm.userId = app.user.id
+            this.$el.html(require('../assets/templates/accounts-account.ejs')(vm))
             return this;
         }
     }),
@@ -19,7 +19,9 @@ var Backbone = require('backbone')
     section: 'accounts',
 
     initialize: function() {
+        this.views = []
         this.collection.on('reset', this.reset, this);
+        this.collection.on('add', this.add, this);
     },
 
     add: function(model) {

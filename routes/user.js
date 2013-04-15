@@ -14,14 +14,13 @@ var Backbone = require('backbone')
         if (!app.authorize()) return;
 
         var collection = new Backbone.Collection();
+        var view = new Views.UserAccountsView({ collection: collection });
+        app.section(view, true);
 
         collection.fetch({
             url: app.api.url + '/private/accounts',
             headers: app.api.headers()
-        });
-
-        var view = new Views.UserAccountsView({ collection: collection });
-        app.section(view, true);
+        })
     },
 
     userOrders: function() {

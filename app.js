@@ -23,6 +23,13 @@ var _ = require('underscore')
         }
     },
 
+    hashCredentials: function(email, password) {
+        return {
+            key: sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(email.toLowerCase())).slice(0, 20),
+            secret: sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(password)).slice(0, 20)
+        }
+    },
+
     errorFromXhr: function(xhr) {
         var body = xhr.responseText
 

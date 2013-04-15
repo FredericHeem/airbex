@@ -7,9 +7,15 @@ var app = require('./app')
 app.api.url = window.location.hostname == 'localhost' ? 'http://localhost:5071' : 'https://api.snowco.in'
 
 // construct routers
-var routes = _.reduce(require('./routes'), function(p, v, k) {
-    p[k] = new v
-    return p
-}, {})
+var routes = {
+    home: new (require('./routes/home')),
+    login: new (require('./routes/login')),
+    register: new (require('./routes/register')),
+    books: new (require('./routes/books')),
+    withdraw: new (require('./routes/withdraw')),
+    deposit: new (require('./routes/deposit')),
+    transfer: new (require('./routes/transfer')),
+    user: new (require('./routes/user'))
+}
 
 Backbone.history.start()

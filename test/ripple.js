@@ -6,10 +6,13 @@ describe('ripple', function() {
 		it('adds expected routes', function() {
 			var routes = []
 			, app = {
-				post: function(url) { routes.push('post ' + url) }
+				post: function(url) { routes.push('post ' + url) },
+				get: function(url) { routes.push('get ' + url) }
 			}
 			ripple.configure(app, null)
 			expect(routes).to.contain('post /private/rippleout')
+			expect(routes).to.contain('get /ripple/address')
+			expect(routes).to.contain('get /ripple/federation')
 		})
 	})
 

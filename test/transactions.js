@@ -77,12 +77,4 @@ describe('transactions', function() {
 			transactions.forUserAccount(conn, req, res, done)
 		})
 	})
-
-	describe('create', function() {
-		it('is not implemented', function() {
-			expect(function() {
-				transactions.create()
-			}).to.throwError(/TODO/)
-		})
-	})
 })

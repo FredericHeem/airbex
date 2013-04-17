@@ -6,10 +6,12 @@ describe('users', function() {
 		it('adds expected routes', function() {
 			var routes = []
 			, app = {
-				post: function(url) { routes.push('post ' + url) }
+				post: function(url) { routes.push('post ' + url) },
+				get: function(url) { routes.push('get ' + url) }
 			}
 			users.configure(app)
 			expect(routes).to.contain('post /public/users')
+			expect(routes).to.contain('get /whoami')
 		})
 	})
 
@@ -18,12 +20,13 @@ describe('users', function() {
 			var conn = {
 				query: function(q, c) {
 					expect(q.text).to.match(/select create_user/i)
-					expect(q.values).to.eql(['key', 'secreto'])
+					expect(q.values).to.eql(['bob@bob.com', 'key', 'secreto'])
 					c(null, { rows: [{ user_id: 89 }] })
 				}
 			}
 			, req = {
 				body: {
+					email: 'bob@bob.com',
 					key: 'key',
 					secret: 'secreto'
 				}

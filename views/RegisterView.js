@@ -43,7 +43,7 @@ var SectionView = require('./SectionView')
                 return alert('The e-mail is already taken')
             }
 
-            alert(error)
+            alert(JSON.stringify(error, null, 4))
         })
     },
 

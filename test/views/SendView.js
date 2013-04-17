@@ -1,6 +1,7 @@
 var Backbone = require('backbone')
 , expect = require('expect.js')
 , SendView = require('../../views/SendView')
+, _ = require('underscore')
 
 describe('SendView', function() {
     describe('constructor', function() {
@@ -9,7 +10,10 @@ describe('SendView', function() {
                 app: {
                     user: new Backbone.Model({
                         accounts: new Backbone.Collection()
-                    })
+                    }),
+                    cache: {
+                        securities: _([{ security_id: 'BTC' }])
+                    }
                 }
             })
         })

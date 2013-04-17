@@ -44,5 +44,3 @@ BEGIN
 END; $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION match_insert()
-  OWNER TO postgres;

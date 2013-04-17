@@ -14,6 +14,7 @@
         "qs": "0.5.2",
         "num": "0.2.0",
         "ejs": "0.8.3",
+        "request": "~2.16.6",
         "always": "2.0.0",
         "browserify": "x",
         "express": "3.0.2",

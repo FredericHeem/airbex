@@ -43,12 +43,25 @@ var View = require('./View')
             amount: +num(this.vm.get('amount')).mul(Math.pow(10, scale))
         })
 
-        transaction.save({}, {
+        var result = transaction.save({}, {
             url: app.api.url + '/transfer',
-            headers: app.api.headers(transaction.toJSON()),
-            success: function() {
-                Backbone.history.navigate('my/transactions', true)
+            headers: app.api.headers(transaction.toJSON())
+        })
+
+        if (!result) {
+            return alert(this.model.validationError)
+        }
+
+        result.then(function() {
+            Backbone.history.navigate('my/transactions', true)
+        }, function(xhr) {
+            var error = app.errorFromXhr(xhr)
+
+            if (error.name == 'UserNotFound') {
+                return alert(error.message)
             }
+
+            alert(JSON.stringify(error, null, 4))
         })
     },
 

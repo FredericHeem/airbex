@@ -24,7 +24,8 @@
         "aws2js": "x",
         "jake": "x",
         "shelljs": "x",
-        "browserify-ejs": "x"
+        "browserify-ejs": "x",
+        "moment": "~2.0.0"
     },
     "scripts": {
         "test": "jake test"

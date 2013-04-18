@@ -1,12 +1,14 @@
 var SectionView = require('./SectionView')
 , _ = require('underscore')
 , View = require('./View')
+, moment = require('moment')
 , UserTransactionsView = module.exports = SectionView.extend({
     ItemView: View.extend({
         tagName: 'tr',
 
         render: function() {
             var vm = this.model.toJSON()
+            vm.created = moment(vm.created).format('MMMM Do YYYY, HH:mm')
             this.$el.html(require('../templates/user-transactions-transaction.ejs')(vm))
             return this
         }

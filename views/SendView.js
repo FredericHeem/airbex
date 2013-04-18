@@ -57,10 +57,6 @@ var View = require('./View')
         }, function(xhr) {
             var error = app.errorFromXhr(xhr)
 
-            if (error.name == 'UserNotFound') {
-                return alert(error.message)
-            }
-
             alert(JSON.stringify(error, null, 4))
         })
     },

@@ -19,7 +19,23 @@ orders.create = function(conn, req, res, next) {
     Q.ninvoke(conn, 'query', query)
     .then(function(cres) {
         res.send(201, { order_id: cres.rows[0].order_id })
-    }, next)
+    }, function(err) {
+        if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
+            return res.send(400, {
+                name: 'InvalidAmount',
+                message: 'The requested transfer amount is invalid/out of range'
+            })
+        }
+
+        if (err.message == 'new row for relation "account" violates check constraint "non_negative_available"') {
+            return res.send(400, {
+                name: 'InsufficientFunds',
+                message: 'Source account cannot fund the transfer'
+            })
+        }
+
+        return next(err)
+    })
     .done()
 }
 

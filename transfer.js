@@ -32,6 +32,13 @@ transfer.transfer = function(conn, req, res, next) {
                 })
             }
 
+            if (err.message == 'new row for relation "account" violates check constraint "non_negative_available"') {
+                res.send(400, {
+                    name: 'InsufficientFunds',
+                    message: 'Source account cannot fund the transfer'
+                })
+            }
+
             return next(err)
         }
 

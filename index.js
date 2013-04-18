@@ -4,7 +4,6 @@ var config = require('konfu')
 , http = require('http')
 , server = http.createServer(app)
 , conn = require('./db')(config.pg_url, config.pg_native)
-, raven = require('raven')
 , auth = require('./auth')
 
 app.config = config
@@ -34,5 +33,10 @@ app.use(function(req, res) {
 	res.send(404)
 })
 
-raven.middleware.connect(config.raven)
+if (config.raven && process.env.NODE_ENV === 'production') {
+    console.log('configuring raven to %s', config.raven)
+    var raven = require('raven')
+    raven.middleware.connect(config.raven)
+}
+
 server.listen(config.port)

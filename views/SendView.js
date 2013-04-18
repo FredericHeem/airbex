@@ -70,7 +70,7 @@ var View = require('./View')
         .add(this.$amount)
         .add(this.$send)
         .prop('disabled', !value)
-        .toggleClass('disabled')
+        .toggleClass('disabled', !value)
     },
 
     render: function() {

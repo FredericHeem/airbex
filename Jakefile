@@ -12,10 +12,26 @@ task('clean', function() {
     rm('-Rf', 'public')
 })
 
-task('app', ['public/scripts.js', 'public/styles.css', 'public/index.html'])
-task('dist', ['public/scripts.min.js', 'public/styles.min.css', 'public/index.min.html', 'public/ripple.txt'])
+task('app', [
+    'public/head.js',
+    'public/scripts.js',
+    'public/styles.css',
+    'public/index.html'
+])
+
+task('dist', [
+    'public/head.min.js',
+    'public/scripts.min.js',
+    'public/styles.min.css',
+    'public/index.min.html',
+    'public/ripple.txt'
+])
 
 directory('public')
+
+var head = [
+    'public/raven.min.js'
+]
 
 var vendor = [
     'public/jquery-1.9.1.min.js',
@@ -33,12 +49,14 @@ file('public/sjcl.js', ['vendor/sjcl.js'], cpTask)
 file('public/alertify.js', ['vendor/alertify.js'], cpTask)
 file('public/bootstrap.min.js', ['vendor/bootstrap.min.js'], cpTask)
 file('public/ripple.txt', ['assets/ripple.txt'], cpTask)
+file('public/raven.min.js', ['vendor/raven.min.js'], cpTask)
 
 function cpTask() {
     cp(this.prereqs[0], this.name)
 }
 
 file('public/scripts.min.js', ['public/scripts.js'], compressJs)
+file('public/head.min.js', ['public/head.js'], compressJs)
 file('public/styles.min.css', ['public/styles.css'], compressCss)
 
 file('public/index.html', ['public'], function() {
@@ -66,6 +84,13 @@ file('public/scripts.js', ['public'].concat(vendor), function() {
     , bundle = exec('browserify -t ./node_modules/browserify-ejs ./entry.js')
     , scripts = v + ';' + bundle
     scripts.to(this.name)
+})
+
+file('public/head.js', ['public'].concat(head), function() {
+    head.reduce(function(p, c) {
+        return p + ';' + cat(c)
+    }, '')
+    .to(this.name)
 })
 
 function compressCss() {
@@ -98,6 +123,7 @@ task('publish-prod', [
 ], function() {
     var async = require('async')
     , files = {
+        'head.min.js': null,
         'scripts.min.js': null,
         'styles.min.css': null,
         'index.min.html': 'index.html',

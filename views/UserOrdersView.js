@@ -13,7 +13,6 @@ var SectionView = require('./SectionView')
         clickCancelOrder: function(e) {
             var self = this
             e.preventDefault();
-            console.log('cancel order clicked');
 
             this.$el.find('*[data-action="cancel-order"]').prop('disabled', true).addClass('disabled');
 

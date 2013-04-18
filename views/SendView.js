@@ -29,11 +29,11 @@ var View = require('./View')
     },
 
     clickSend: function(e) {
+        var that = this
+
         e.preventDefault()
 
         this.read()
-
-        this.$email.add(this.$security).add(this.$amount).add(this.$send).prop('disabled', true).addClass('disabled')
 
         var security = this.options.app.cache.securities.get(this.vm.get('securityId'))
         , scale = security.get('scale')
@@ -52,13 +52,25 @@ var View = require('./View')
             return alert(this.model.validationError)
         }
 
+        this.toggleInteraction(false)
+
         result.then(function() {
+            alertify.success('Transfer sent to ' + transaction.get('email'))
             Backbone.history.navigate('my/transactions', true)
         }, function(xhr) {
             var error = app.errorFromXhr(xhr)
-
             alert(JSON.stringify(error, null, 4))
+            that.toggleInteraction(true)
         })
+    },
+
+    toggleInteraction: function(value) {
+        this.$email
+        .add(this.$security)
+        .add(this.$amount)
+        .add(this.$send)
+        .prop('disabled', !value)
+        .toggleClass('disabled')
     },
 
     render: function() {

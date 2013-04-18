@@ -8,7 +8,8 @@ transactions.configure = function(app, conn, securityId) {
 
 transactions.forUser = function(conn, req, res, next) {
     var query = 'SELECT * FROM account_transaction ' +
-        'WHERE user_id = $1'
+        'WHERE user_id = $1 ' +
+        'ORDER BY transaction_id DESC'
     Q.ninvoke(conn, 'query', {
         text: query,
         values: [req.security.userId]

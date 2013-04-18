@@ -8,11 +8,6 @@ var config = require('konfu')
 
 app.config = config
 
-if (config.raven) {
-    var raven = require('raven')
-    app.use(raven.middleware.express(config.raven))
-}
-
 // access control headers (for hosting on s3)
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
@@ -37,5 +32,10 @@ require('./bitcoin').configure(app, conn, 'BTC')
 app.use(function(req, res) {
 	res.send(404)
 })
+
+if (config.raven) {
+    var raven = require('raven')
+    app.use(raven.middleware.express(config.raven))
+}
 
 server.listen(config.port)

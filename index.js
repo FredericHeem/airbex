@@ -36,7 +36,7 @@ app.use(function(req, res) {
 if (config.raven && process.env.NODE_ENV === 'production') {
     console.log('configuring raven to %s', config.raven)
     var raven = require('raven')
-    raven.middleware.connect(config.raven)
+    app.error(raven.middleware.express(config.raven))
 }
 
 server.listen(config.port)

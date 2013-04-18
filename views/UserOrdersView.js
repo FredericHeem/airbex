@@ -22,7 +22,7 @@ var SectionView = require('./SectionView')
                 url: app.api.url + '/orders/' + self.model.id,
                 headers: app.api.headers(),
                 success: function() {
-                    alertify.success('Order #' + self.model.id + ' deleted')
+                    Alertify.log.success('Order #' + self.model.id + ' deleted')
                 }
             });
         },

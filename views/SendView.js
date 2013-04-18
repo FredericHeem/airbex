@@ -55,7 +55,7 @@ var View = require('./View')
         this.toggleInteraction(false)
 
         result.then(function() {
-            alertify.success('Transfer sent to ' + transaction.get('email'))
+            Alertify.log.success('Transfer sent to ' + transaction.get('email'))
             Backbone.history.navigate('my/transactions', true)
         }, function(xhr) {
             var error = app.errorFromXhr(xhr)

@@ -81,7 +81,7 @@ var View = require('./View')
                     this.model.get('book').get('quote_security').id
                 ].join(' ')
 
-                alertify.success('Order placed<br>' + summary)
+                Alertify.log.success('Order placed<br>' + summary)
 
                 console.log('order has been placed', res);
                 Backbone.history.navigate('/my/orders', true);

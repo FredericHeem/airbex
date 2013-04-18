@@ -36,7 +36,7 @@ var head = [
 var vendor = [
     'public/jquery-1.9.1.min.js',
     'public/sjcl.js',
-    'public/alertify.js',
+    'public/alertify.min.js',
     'public/bootstrap.min.js'
 ]
 
@@ -46,7 +46,7 @@ file('public/jquery-1.9.1.min.js', ['vendor/jquery-1.9.1.min.js'], function() {
 
 file('public/jquery-1.9.1.min.js', ['vendor/jquery-1.9.1.min.js'], cpTask)
 file('public/sjcl.js', ['vendor/sjcl.js'], cpTask)
-file('public/alertify.js', ['vendor/alertify.js'], cpTask)
+file('public/alertify.min.js', ['vendor/alertify/alertify.min.js'], cpTask)
 file('public/bootstrap.min.js', ['vendor/bootstrap.min.js'], cpTask)
 file('public/ripple.txt', ['assets/ripple.txt'], cpTask)
 file('public/raven.min.js', ['vendor/raven.min.js'], cpTask)
@@ -75,7 +75,8 @@ file('public/index.min.html', ['public'], function() {
 })
 
 file('public/styles.css', ['public'], function() {
-    (cat('vendor/bootstrap-combined.min.css') +
+    (cat('vendor/bootstrap-combined.min.css') + '\n' +
+    cat('vendor/alertify/alertify.bootstrap.css') + '\n' +
     exec('lessc assets/styles.less'))
     .to(this.name)
 })

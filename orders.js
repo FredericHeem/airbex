@@ -1,5 +1,7 @@
 var Q = require('q')
+, _ = require('underscore')
 , orders = module.exports = {}
+, validate = require('./validate')
 
 orders.configure = function(app, conn) {
     app.del('/orders/:id', orders.cancel.bind(orders, conn))
@@ -8,6 +10,8 @@ orders.configure = function(app, conn) {
 }
 
 orders.create = function(conn, req, res, next) {
+    if (!validate(req.body, 'order_create', res)) return
+
     var query = conn.build.insert('"order"', {
         user_id: req.security.userId,
         book_id: req.body.book_id,

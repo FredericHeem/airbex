@@ -1,0 +1,20 @@
+{
+    "type": "object",
+    "properties": {
+        "email": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\S+@\\S+$"
+        },
+        "key": {
+            "type": "string",
+            "required": true,
+            "minLength": 20
+        },
+        "secret": {
+            "type": "string",
+            "required": true,
+            "minLength": 20
+        }
+    }
+}

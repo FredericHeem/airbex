@@ -1,0 +1,25 @@
+{
+    "type": "object",
+    "properties": {
+        "book_id": {
+            "type": "integer",
+            "required": true,
+            "minimum": 1
+        },
+        "price": {
+            "type": "integer",
+            "required": true,
+            "minimum": 1
+        },
+        "volume": {
+            "type": "integer",
+            "required": true,
+            "minimum": 1
+        },
+        "side": {
+            "type": "integer",
+            "required": true,
+            "enum": [0, 1]
+        }
+    }
+}

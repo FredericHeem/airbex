@@ -40,53 +40,56 @@ var View = require('./View')
         'click *[data-action="cancel"]': 'cancel'
     },
 
+    toggleInteraction: function(value) {
+        this.$bid
+        .add(this.$ask)
+        .add(this.$price)
+        .add(this.$volume)
+        .add(this.$cancel)
+        .add(this.$placeOrder)
+        .toggleClass('disabled', !value)
+        .prop('disabled', !value)
+    },
+
     placeOrder: function() {
-        console.log('placing order');
+        var that = this
 
-        if (!this.model.isNew()) {
-            throw new Error('orders can not be updated');
-        }
-
-        this.$bid.prop('disabled', true);
-        this.$ask.prop('disabled', true);
-        this.$price.prop('disabled', true);
-        this.$volume.prop('disabled', true);
-        this.$cancel.addClass('disabled').prop('disabled', true);
-        this.$placeOrder.addClass('disabled').prop('disabled', true);
-        this.$explanation.html('Placing order...');
-
-        this.options.book.get('orders').add(this.model);
-
-        if (!this.model.get('book')) {
-            throw new Error('reverse relation is not working');
-        }
+        this.$explanation.html('Placing order...')
+        this.options.book.get('orders').add(this.model)
 
         console.log('order being placed', this.model.attributes);
 
-        this.model.save({}, {
+        var result = this.model.save({}, {
             url: app.api.url + '/orders',
-            headers: app.api.headers(this.model.toJSON()),
-            error: function(e) {
-                alert('Order could not be placed: ' + e.message);
-            },
+            headers: app.api.headers(this.model.toJSON())
+        })
 
-            success: _.bind(function(res) {
-                var summary = [
-                    'Order #' + this.model.id,
-                    (this.model.get('side') ? 'ASK' : 'BID'),
-                    this.model.volumeDecimal(),
-                    this.model.get('book').get('base_security').id,
-                    '@',
-                    this.model.priceDecimal(),
-                    this.model.get('book').get('quote_security').id
-                ].join(' ')
+        if (!result) {
+            return alert(this.model.validationError)
+        }
 
-                Alertify.log.success('Order placed<br>' + summary)
+        this.toggleInteraction(false)
 
-                console.log('order has been placed', res);
-                Backbone.history.navigate('/my/orders', true);
-            }, this)
-        });
+        result.then(function() {
+            Alertify.log.success('Order placed<br>' + that.orderSummary())
+            Backbone.history.navigate('/my/orders', true);
+        }, function(xhr) {
+            var error = app.errorFromXhr(xhr)
+            alert(JSON.stringify(error, null, 4))
+            that.toggleInteraction(true)
+        })
+    },
+
+    orderSummary: function() {
+        return [
+            'Order #' + this.model.id,
+            (this.model.get('side') ? 'ASK' : 'BID'),
+            this.model.volumeDecimal(),
+            this.model.get('book').get('base_security').id,
+            '@',
+            this.model.priceDecimal(),
+            this.model.get('book').get('quote_security').id
+        ].join(' ')
     },
 
     cancel: function() {

@@ -18,6 +18,20 @@ transfer.transfer = function(conn, req, res, next) {
                 })
             }
 
+            if (err.message == 'new row for relation "transaction" violates check constraint "transaction_debit_credit_not_same"') {
+                return res.send(400, {
+                    name: 'CannotTransferToSelf',
+                    message: 'Cannot transfer to yourself'
+                })
+            }
+
+            if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
+                return res.send(400, {
+                    name: 'InvalidTransferAmount',
+                    message: 'The requested transfer amount is invalid/out of range'
+                })
+            }
+
             return next(err)
         }
 

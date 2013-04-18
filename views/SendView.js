@@ -35,11 +35,6 @@ var View = require('./View')
 
         this.$email.add(this.$security).add(this.$amount).add(this.$send).prop('disabled', true).addClass('disabled')
 
-        console.log(this.vm.get('securityId'))
-        console.log(this.vm.toJSON())
-        console.log('element', this.$security)
-        console.log('element val', this.$security.val())
-
         var security = this.options.app.cache.securities.get(this.vm.get('securityId'))
         , scale = security.get('scale')
         , transaction = new Models.Transaction({

@@ -25,7 +25,7 @@ orders.create = function(conn, req, res, next) {
 
 orders.forUser = function(conn, req, res, next) {
     // TODO: extract view(s)
-    var query = 
+    var query =
         ['SELECT o.order_id, o.book_id, b.base_security_id, b.quote_security_id, o.volume, o.price, o.side',
         ', b.base_security_id || b.quote_security_id pair, o.original, o.cancelled, o.matched ',
         'FROM "order" o INNER JOIN book b ON o.book_id = b.book_id ',

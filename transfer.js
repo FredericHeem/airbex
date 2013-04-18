@@ -27,7 +27,7 @@ transfer.transfer = function(conn, req, res, next) {
 
             if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
                 return res.send(400, {
-                    name: 'InvalidTransferAmount',
+                    name: 'InvalidAmount',
                     message: 'The requested transfer amount is invalid/out of range'
                 })
             }

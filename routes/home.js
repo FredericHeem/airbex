@@ -5,16 +5,6 @@ _ = require('underscore')
 , async = require('async')
 , app = require('../app')
 , Router = module.exports = Backbone.Router.extend({
-    initialize: function() {
-        var that = this
-
-        app.cache = require('../app.cache')
-        app.cache.reload()
-
-        app.header = new Views.HeaderView();
-        app.header.render();
-    },
-
     home: function() {
         app.section(new Views.HomeView())
     },

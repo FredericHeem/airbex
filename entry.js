@@ -19,4 +19,10 @@ var routes = {
     user: new (require('./routes/user'))
 }
 
-Backbone.history.start()
+app.header = new Views.HeaderView();
+app.header.render();
+
+app.cache = require('./app.cache')
+app.cache.reload(function() {
+    Backbone.history.start()
+})

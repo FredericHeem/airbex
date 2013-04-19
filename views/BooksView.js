@@ -12,9 +12,9 @@ var SectionView = require('./SectionView')
             var bs = app.cache.securities.get(this.model.get('base_security').id)
             vm.bid = _.where(vm.depth, { side: 0 })[0] || null;
             vm.ask = _.where(vm.depth, { side: 1 })[0] || null;
-            vm.lastDecimal = vm.last ? num(vm.last, vm.scale).toString() : ''
-            vm.highDecimal = vm.high ? num(vm.high, vm.scale).toString() : ''
-            vm.lowDecimal = vm.low ? num(vm.low, vm.scale).toString() : ''
+            vm.lastDecimal = vm.last_price ? num(vm.last_price, vm.scale).toString() : ''
+            vm.highDecimal = vm.high_price ? num(vm.high_price, vm.scale).toString() : ''
+            vm.lowDecimal = vm.low_price ? num(vm.low_price, vm.scale).toString() : ''
             vm.volumeDecimal = vm.volume ? num(vm.volume, bs.get('scale') - vm.scale).toString() : ''
 
             var template = require('../templates/books-book.ejs')

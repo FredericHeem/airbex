@@ -35,7 +35,11 @@ Books.books = function(conn, req, res, next) {
                 base_security_id: row.base_security_id,
                 quote_security_id: row.quote_security_id,
                 depth: depth,
-                scale: row.scale
+                scale: row.scale,
+                last_price: row.last_price,
+                high_price: row.high_price,
+                low_price: row.low_price,
+                volume: row.volume
             }
         }))
     }, next)

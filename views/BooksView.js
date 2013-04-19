@@ -1,14 +1,21 @@
 var SectionView = require('./SectionView')
 , _ = require('underscore')
+, num = require('num')
+, app = require('../app')
 , View = require('./View')
 , BooksView = module.exports = SectionView.extend({
     ItemView: View.extend({
         tagName: 'tr',
 
         render: function() {
-            var vm = this.model.toJSON();
+            var vm = this.model.toJSON()
+            var bs = app.cache.securities.get(this.model.get('base_security').id)
             vm.bid = _.where(vm.depth, { side: 0 })[0] || null;
             vm.ask = _.where(vm.depth, { side: 1 })[0] || null;
+            vm.lastDecimal = vm.last ? num(vm.last, vm.scale).toString() : ''
+            vm.highDecimal = vm.high ? num(vm.high, vm.scale).toString() : ''
+            vm.lowDecimal = vm.low ? num(vm.low, vm.scale).toString() : ''
+            vm.volumeDecimal = vm.volume ? num(vm.volume, bs.get('scale') - vm.scale).toString() : ''
 
             var template = require('../templates/books-book.ejs')
             this.$el.html(template(vm));

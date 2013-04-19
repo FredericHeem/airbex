@@ -14,18 +14,18 @@ Books.books = function(conn, req, res, next) {
             var depth = [];
 
             if (row.bid_price) {
-                depth.push({ 
-                    price: row.bid_price, 
-                    volume: row.bid_volume, 
-                    side: 0 
+                depth.push({
+                    price: row.bid_price,
+                    volume: row.bid_volume,
+                    side: 0
                 })
             }
 
             if (row.ask_price) {
-                depth.push({ 
-                    price: row.ask_price, 
-                    volume: row.ask_volume, 
-                    side: 1 
+                depth.push({
+                    price: row.ask_price,
+                    volume: row.ask_volume,
+                    side: 1
                 })
             }
 

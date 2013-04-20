@@ -34,17 +34,17 @@ var head = [
 ]
 
 var vendor = [
-    'public/jquery-1.9.1.min.js',
+    'public/jquery-2.0.0.min.js',
     'public/sjcl.js',
     'public/alertify.min.js',
     'public/bootstrap.min.js'
 ]
 
-file('public/jquery-1.9.1.min.js', ['vendor/jquery-1.9.1.min.js'], function() {
+file('public/jquery-2.0.0.min.js', ['vendor/jquery-2.0.0.min.js'], function() {
     cp(this.prereqs[0], this.name)
 })
 
-file('public/jquery-1.9.1.min.js', ['vendor/jquery-1.9.1.min.js'], cpTask)
+file('public/jquery-2.0.0.min.js', ['vendor/jquery-2.0.0.min.js'], cpTask)
 file('public/sjcl.js', ['vendor/sjcl.js'], cpTask)
 file('public/alertify.min.js', ['vendor/alertify/alertify.min.js'], cpTask)
 file('public/bootstrap.min.js', ['vendor/bootstrap.min.js'], cpTask)

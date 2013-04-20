@@ -1,5 +1,7 @@
 var SectionView = require('./SectionView')
 , _ = require('underscore')
+, numeral = require('numeral')
+, num = require('num')
 , View = require('./View')
 , Models = require('../models')
 , BookView = module.exports = SectionView.extend({
@@ -7,7 +9,12 @@ var SectionView = require('./SectionView')
         tagName: 'tr',
 
         render: function() {
-            var vm = this.model.toJSON();
+            var vm = this.model.toJSON()
+            , book = this.model.get('book')
+            , scaleNumbers = ''
+            for (var i = 0; i < book.get('scale'); i++) scaleNumbers += '0'
+            vm.price = numeral(num(vm.price, book.get('scale'))).format('0,0[.' + scaleNumbers + ']')
+
             this.$el.html(require('../templates/book-depth.ejs')(vm))
             return this;
         }

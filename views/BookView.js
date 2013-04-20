@@ -21,8 +21,7 @@ var SectionView = require('./SectionView')
         this.model.get('depth').comparator = function(model) { return model.get('price') };
         this.model.get('depth').sort();
 
-        this.bindTo(this.model.get('depth'), 'reset', this.reset, this)
-        this.bindTo(this.model.get('depth'), 'add', this.add, this)
+        this.bindTo(this.model.get('depth'), 'all', this.reset, this)
     },
 
     add: function(model) {

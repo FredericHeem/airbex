@@ -21,7 +21,8 @@ app.use(express.bodyParser())
 app.use(auth.verify.bind(auth, conn))
 
 var routes = ['accounts', 'books', 'orders', 'ripple',
-'securities', 'transactions', 'users', 'transfer']
+'securities', 'transactions', 'users', 'transfer',
+'bitcoincharts']
 routes.forEach(function(name) {
 	require('./' + name).configure(app, conn)
 })

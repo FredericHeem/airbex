@@ -18,8 +18,8 @@ var SectionView = require('./SectionView')
 
             this.model.destroy({
                 wait: true,
-                url: app.api.url + '/orders/' + self.model.id,
-                headers: app.api.headers(),
+                url: app.apiUrl + '/orders/' + self.model.id,
+                headers: app.apiHeaders(),
                 success: function() {
                     Alertify.log.success('Order #' + self.model.id + ' deleted')
                 }

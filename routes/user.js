@@ -16,8 +16,8 @@ var Backbone = require('backbone')
         app.section(view, true);
 
         collection.fetch({
-            url: app.api.url + '/private/accounts',
-            headers: app.api.headers()
+            url: app.apiUrl + '/private/accounts',
+            headers: app.apiHeaders()
         })
     },
 
@@ -26,8 +26,8 @@ var Backbone = require('backbone')
 
         var collection = new Models.OrderCollection();
         collection.fetch({
-            url: app.api.url + '/orders',
-            headers: app.api.headers()
+            url: app.apiUrl + '/orders',
+            headers: app.apiHeaders()
         });
 
         var view = new Views.UserOrdersView({ collection: collection });
@@ -38,8 +38,8 @@ var Backbone = require('backbone')
         if (!app.authorize()) return
         var collection = new Models.TransactionCollection()
         collection.fetch({
-            url: app.api.url + '/accounts/transactions',
-            headers: app.api.headers()
+            url: app.apiUrl + '/accounts/transactions',
+            headers: app.apiHeaders()
         })
         var view = new Views.UserTransactionsView({
             collection: collection

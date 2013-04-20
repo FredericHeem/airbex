@@ -19,11 +19,13 @@ var Backbone = require('backbone')
         view.on('login', function(e) {
             var user = new Models.User()
             user.fetch({
-                url: app.api.url + '/whoami',
-                headers: app.api.headers(null, e.hashes.key, e.hashes.secret),
+                url: app.apiUrl + '/whoami',
+                headers: app.apiHeaders(null, e.hashes.key, e.hashes.secret),
                 success: function() {
                     app.user = user
-                    _.extend(app.api, e.hashes)
+                    app.credentials = e.hashes
+                    $('body').addClass('is-logged-in')
+                    $('#top .account-summary .logged-in .email').html(user.get('email'))
                     Backbone.history.navigate(after, true)
                 },
                 error: function(model, response, options) {

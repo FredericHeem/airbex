@@ -14,7 +14,7 @@ var SectionView = require('./SectionView')
 
     initialize: function() {
         this.model = new Models.User({}, {
-            url: app.api.url + '/public/users',
+            url: app.apiUrl + '/public/users',
         })
     },
 

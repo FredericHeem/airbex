@@ -13,20 +13,20 @@ var async = require('async')
         async.parallel([
             function(next) {
                 that.securities.fetch({
-                    url: app.api.url + '/public/securities',
+                    url: app.apiUrl + '/public/securities',
                     success: function() { next(); },
                     error: function(e) { next(e); }
                 });
             },
             function(next) {
                 that.books.fetch({
-                    url: app.api.url + '/public/books',
+                    url: app.apiUrl + '/public/books',
                     success: function() { next(); },
                     error: function(e) { next(e); }
                 });
             },
             function(next) {
-                $.ajax(app.api.url + '/ripple/address')
+                $.ajax(app.apiUrl + '/ripple/address')
                 .then(function(account) {
                     app.rippleAddress = account.address
                     next()

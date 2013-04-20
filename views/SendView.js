@@ -44,8 +44,8 @@ var View = require('./View')
         })
 
         var result = transaction.save({}, {
-            url: app.api.url + '/transfer',
-            headers: app.api.headers(transaction.toJSON())
+            url: app.apiUrl + '/transfer',
+            headers: app.apiHeaders(transaction.toJSON())
         })
 
         if (!result) {

@@ -29,8 +29,8 @@ var View = require('./View')
         this.$address.add(this.$amount, this.$withdraw).prop('disabled', true).addClass('disabled')
 
         withdraw.save({}, {
-            url: app.api.url + '/private/withdraw/BTC',
-            headers: app.api.headers(withdraw.toJSON()),
+            url: app.apiUrl + '/private/withdraw/BTC',
+            headers: app.apiHeaders(withdraw.toJSON()),
             success: function() {
                 Backbone.history.navigate('my/accounts', true)
             }

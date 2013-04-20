@@ -15,7 +15,7 @@ var Backbone = require('backbone')
         after || (after = 'my/accounts')
 
         var model = new Models.User({}, {
-            url: app.api.url + '/public/users'
+            url: app.apiUrl + '/public/users'
         })
         , view = new Views.RegisterView({
             model: model

@@ -60,8 +60,8 @@ var View = require('./View')
         console.log('order being placed', this.model.attributes);
 
         var result = this.model.save({}, {
-            url: app.api.url + '/orders',
-            headers: app.api.headers(this.model.toJSON())
+            url: app.apiUrl + '/orders',
+            headers: app.apiHeaders(this.model.toJSON())
         })
 
         if (!result) {

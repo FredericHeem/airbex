@@ -2,13 +2,7 @@
  , LoginView = require('./LoginView')
  , app = require('../app')
  , HeaderView = module.exports = View.extend({
-    el: '#header',
-
-    logout: function(e) {
-        e.preventDefault();
-        app.api.key = null
-        api.api.secret = null
-    },
+    el: '#top',
 
     section: function(id) {
         this.$el.find('.nav li').removeClass('active');
@@ -19,18 +13,21 @@
     },
 
     initialize:function () {
+        var that = this
+
+        app.on('login', function() {
+            that.render()
+        })
     },
 
     sessionChange: function() {
         this.render();
     },
 
-    render: function (eventName) {
-        /*
-        this.$el.find('#auth-status').html(templates('auth-status')({
-            session: app.session.toJSON()
-        }));
-        */
+    render: function () {
+        if (app.user) {
+            this.find('.account-summary .email').html(app.user.get('email'))
+        }
 
         return this;
     }

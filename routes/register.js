@@ -23,8 +23,10 @@ var Backbone = require('backbone')
 
         view.on('register', function(e) {
             var hashes = app.hashCredentials(e.email, e.password)
-            _.extend(app.api, hashes)
             app.user = model
+            app.credentials = hashes
+            $('body').addClass('is-logged-in')
+            $('#top .account-summary .logged-in .email').html(app.user.get('email'))
             Backbone.history.navigate(after, true)
         })
 

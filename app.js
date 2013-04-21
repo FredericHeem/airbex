@@ -1,8 +1,6 @@
 function sign(form, secret) {
-    var body = JSON.stringify(form)
-    body += secret
-
-    var bits = sjcl.hash.sha256.hash(body)
+    var body = JSON.stringify(form || {}) + secret
+    , bits = sjcl.hash.sha256.hash(body)
     return sjcl.codec.base64.fromBits(bits)
 }
 
@@ -23,7 +21,7 @@ App.prototype.apiHeaders = function(form, key, secret) {
 
     return {
         'snow-key': key,
-        'snow-sign': sign(form || {}, secret)
+        'snow-sign': sign(form, secret)
     }
 }
 

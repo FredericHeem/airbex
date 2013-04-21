@@ -13,14 +13,14 @@ var async = require('async')
         async.parallel([
             function(next) {
                 that.securities.fetch({
-                    url: app.apiUrl + '/public/securities',
+                    url: app.apiUrl + '/securities',
                     success: function() { next(); },
                     error: function(e) { next(e); }
                 });
             },
             function(next) {
                 that.books.fetch({
-                    url: app.apiUrl + '/public/books',
+                    url: app.apiUrl + '/books',
                     success: function() { next(); },
                     error: function(e) { next(e); }
                 });

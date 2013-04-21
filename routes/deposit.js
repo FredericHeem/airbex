@@ -14,7 +14,7 @@ var Backbone = require('backbone')
         })
 
         model.fetch({
-            url: app.apiUrl + '/private/deposit/BTC/address',
+            url: app.apiUrl + '/deposit/BTC/address',
             headers: app.apiHeaders()
         })
 

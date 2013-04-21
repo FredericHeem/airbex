@@ -25,7 +25,7 @@ var Backbone = require('backbone')
         }
 
         book.get('depth').fetch({
-            url: app.apiUrl + '/public/books/' + book.id + '/depth?grouped=0'
+            url: app.apiUrl + '/books/' + book.id + '/depth?grouped=0'
         });
 
         var view = new Views.BookView({
@@ -47,7 +47,7 @@ var Backbone = require('backbone')
         }
 
         book.get('depth').fetch({
-            url: app.apiUrl + '/public/books/' + book.id + '/depth?grouped=0'
+            url: app.apiUrl + '/books/' + book.id + '/depth?grouped=0'
         });
 
         var view = new Views.CreateOrderView({

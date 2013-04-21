@@ -16,7 +16,7 @@ var Backbone = require('backbone')
         app.section(view, true);
 
         collection.fetch({
-            url: app.apiUrl + '/private/accounts',
+            url: app.apiUrl + '/accounts',
             headers: app.apiHeaders()
         })
     },

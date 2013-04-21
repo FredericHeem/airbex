@@ -29,8 +29,13 @@ var SectionView = require('./SectionView')
     },
 
     render: function() {
+        var that = this
         this.$el.html(require('../templates/login.ejs')());
+
+        setTimeout(function() {
+            that.$el.find('.email').focus()
+        }, 0)
 
         return this;
     }
-});
+})

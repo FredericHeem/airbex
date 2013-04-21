@@ -16,8 +16,10 @@ var SectionView = require('./SectionView')
         return this.$el.find('.email').val().toLowerCase()
     },
 
-    register: function() {
+    register: function(e) {
         var that = this
+
+        e.preventDefault()
 
         if (this.$el.find('.password').val().length < 5) {
             return alert('Password is too short (minimum 5)')

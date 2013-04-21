@@ -35,7 +35,6 @@ var Backbone = require('backbone')
                     }
 
                     alert('Login failed, please try again')
-                    console.log('login response', response)
                 }
             })
         })

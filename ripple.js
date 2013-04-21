@@ -48,12 +48,14 @@ ripple.federation = function(config, conn, req, res, next) {
         var result = {
             result: 'success',
             federation_json: {
+                type: 'federation_record',
                 currencies: config.ripple_federation_currencies,
-                expires: Math.round(+new Date / 1e3) + 3600, // TODO: timezone?
+                expires: Math.round(+new Date / 1e3) + 3600 * 24 * 7,
                 domain: config.ripple_federation.domain,
-                signer: config.ripple_account // TODO: what's this?
+                signer: null
             },
-            federation_blob: null // TODO
+            public_key: null,
+            signature: null
         }
         if (user) result.federation_json.tag = dres.rows[0].user_id
         else result.federation_json.user = dres.rows[0].username

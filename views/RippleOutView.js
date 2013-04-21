@@ -18,6 +18,8 @@ var View = require('./View')
     clickWithdraw: function(e) {
         e.preventDefault()
 
+        var that = this
+
         var security = Models.Security.findOrCreate(this.options.securityId)
         if (!security) throw new Error('security ' + this.options.securityId + ' not found')
 
@@ -29,13 +31,32 @@ var View = require('./View')
 
         this.$address.add(this.$amount, this.$withdraw).prop('disabled', true).addClass('disabled')
 
-        withdraw.save({}, {
-            url: app.apiUrl + '/private/rippleout',
-            headers: app.apiHeaders(withdraw.toJSON()),
-            success: function() {
-                Backbone.history.navigate('my/accounts', true)
-            }
+        var result = withdraw.save({}, {
+            url: app.apiUrl + '/ripple/out',
+            headers: app.apiHeaders(withdraw.toJSON())
         })
+
+        if (!result) {
+            return alert(this.model.validationError)
+        }
+
+        this.toggleInteraction(false)
+
+        result.then(function() {
+            Alertify.log.success('Ripple withdraw of ' + that.$amount.val() + ' ' +
+                withdraw.get('securityId') + ' to ' + withdraw.get('address') + ' requested')
+            Backbone.history.navigate('my/accounts', true)
+        }, function(xhr) {
+            var error = app.errorFromXhr(xhr)
+            alert(JSON.stringify(error, null, 4))
+            that.toggleInteraction(true)
+        })
+    },
+
+    toggleInteraction: function(value) {
+        this.$el.find('input, button')
+        .prop('disabled', !value)
+        .toggleClass('disabled', !value)
     },
 
     render: function() {
@@ -46,6 +67,13 @@ var View = require('./View')
         this.$address = this.$el.find('input[data-binding="address"]')
         this.$amount = this.$el.find('input[data-binding="amount"]')
         this.$withdraw = this.$el.find('*[data-action="withdraw"]')
+
+        var that = this
+
+        setTimeout(function() {
+            that.$address.focus()
+        }, 0)
+
         return this
     }
 })

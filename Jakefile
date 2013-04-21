@@ -85,7 +85,7 @@ file('public/scripts.js', ['public'].concat(vendor), function() {
     var v = vendor.reduce(function(p, c) {
         return p + ';' + cat(c)
     }, '')
-    , bundle = exec('browserify -t ./node_modules/browserify-ejs ./entry.js')
+    , bundle = exec('browserify -d -t ./node_modules/browserify-ejs ./entry.js')
     , scripts = v + ';' + bundle
     scripts.to(this.name)
 })
@@ -172,7 +172,7 @@ file('public/test.js', ['public'].concat(vendor), function() {
     var v = deps.reduce(function(p, c) {
         return p + ';' + cat(c)
     }, '')
-    , bundle = exec('browserify -t ./node_modules/browserify-ejs ./test/index.js')
+    , bundle = exec('browserify -d -t ./node_modules/browserify-ejs ./test/index.js')
     , scripts = v + ';' + bundle
     scripts.to(this.name)
 })

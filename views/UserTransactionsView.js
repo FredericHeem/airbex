@@ -16,6 +16,8 @@ var SectionView = require('./SectionView')
 
     section: 'transactions',
 
+    className: 'user-transactions container',
+
     initialize: function() {
         this.views = [];
         this.bindTo(this.collection, 'add', this.add, this);

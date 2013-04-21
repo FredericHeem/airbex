@@ -6,7 +6,7 @@ securities.configure = function(app, conn) {
 }
 
 securities.securities = function(conn, req, res, next) {
-    var query = 
+    var query =
         'SELECT security_id, scale \
         FROM "security" ORDER BY security_id'
 

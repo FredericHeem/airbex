@@ -24,7 +24,7 @@ var SectionView = require('./SectionView')
         }
 
         var result = this.model.save(_.extend({
-            email: this.$el.find('.email').val(),
+            email: this.$el.find('.email').val()
         }, app.hashCredentials(this.email(), this.$el.find('.password').val())))
 
         if (!result) {

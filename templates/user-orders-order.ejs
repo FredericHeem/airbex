@@ -1,7 +1,11 @@
 <td>
-    Order #<%= order_id %>
+    #<%= order_id %>
+</td>
 <td>
-    <%= side == 0 ? 'Bid' : 'Ask' %>
+    <%= pair %>
+</td>
+<td>
+    <%= side == 0 ? 'Buy' : 'Sell' %> <%= base %>
 </td>
 <td>
     <%= priceDecimal %>
@@ -10,13 +14,7 @@
     <%= originalDecimal %>
 </td>
 <td>
-    <%= matchedDecimal %>
-</td>
-<td>
     <%= volumeDecimal %>
-</td>
-<td>
-    <%= cancelledDecimal %>
 </td>
 <td>
     <button class="btn" data-action="cancel-order">Cancel</button>

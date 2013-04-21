@@ -8,6 +8,10 @@ var Relational = require('backbone-relational')
 , Book = module.exports = Relational.RelationalModel.extend({
     idAttribute: 'book_id',
 
+    pair: function() {
+        return this.get('base_security').id + '/' + this.get('quote_security').id
+    },
+
     relations: [{
         type: Relational.HasMany,
         key: 'depth',

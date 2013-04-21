@@ -28,6 +28,8 @@ var SectionView = require('./SectionView')
 
         render: function() {
             var vm = this.model.toJSON();
+            vm.pair = this.model.get('book').pair()
+            vm.base = this.model.get('book').get('base_security').id
             vm.priceDecimal = this.model.priceDecimal();
             vm.volumeDecimal = this.model.volumeDecimal();
             vm.originalDecimal = this.model.originalDecimal();
@@ -41,6 +43,8 @@ var SectionView = require('./SectionView')
     }),
 
     section: 'orders',
+
+    className: 'user-orders section container',
 
     initialize: function() {
         this.views = [];

@@ -10,7 +10,7 @@ describe('ripple', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			ripple.configure(app, null)
-			expect(routes).to.contain('post /private/rippleout')
+			expect(routes).to.contain('post /ripple/out')
 			expect(routes).to.contain('get /ripple/address')
 			expect(routes).to.contain('get /ripple/federation')
 		})

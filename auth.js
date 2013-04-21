@@ -24,3 +24,11 @@ auth.verify = function(conn, req, res, next) {
         next()
     })
 }
+
+auth.demand = function(req, res) {
+    if (req.security && req.security.userId) return true
+    res.send(401, {
+        name: 'AuthenticationRequired',
+        message: 'must be authenticated to perform this action'
+    })
+}

@@ -1,5 +1,6 @@
 var Q = require('q')
 , _ = require('underscore')
+, auth = require('./auth')
 , orders = module.exports = {}
 , validate = require('./validate')
 
@@ -10,6 +11,7 @@ orders.configure = function(app, conn) {
 }
 
 orders.create = function(conn, req, res, next) {
+    if (!auth.demand(req, res)) return
     if (!validate(req.body, 'order_create', res)) return
 
     var query = conn.build.insert('"order"', {
@@ -44,6 +46,8 @@ orders.create = function(conn, req, res, next) {
 }
 
 orders.forUser = function(conn, req, res, next) {
+    if (!auth.demand(req, res)) return
+
     // TODO: extract view(s)
     var query =
         ['SELECT o.order_id, o.book_id, b.base_security_id, b.quote_security_id, o.volume, o.price, o.side',
@@ -62,6 +66,8 @@ orders.forUser = function(conn, req, res, next) {
 }
 
 orders.cancel = function(conn, req, res, next) {
+    if (!auth.demand(req, res)) return
+
     var q = 'UPDATE "order" SET cancelled = volume, volume = 0 WHERE order_id = $1 AND user_id = $2 AND volume > 0'
     Q.ninvoke(conn, 'query', {
         text: q,

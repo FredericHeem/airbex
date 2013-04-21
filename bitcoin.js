@@ -2,6 +2,7 @@ var Q = require('q')
 , _ = require('underscore')
 , util = require('util')
 , bitcoin = module.exports = {}
+, auth = require('./auth')
 
 bitcoin.configure = function(app, conn, securityId) {
     app.post('/withdraw/' + securityId, bitcoin.withdraw.bind(bitcoin, conn, securityId))
@@ -9,6 +10,8 @@ bitcoin.configure = function(app, conn, securityId) {
 }
 
 bitcoin.withdraw = function(conn, securityId, req, res, next) {
+    if (!auth.demand(req, res)) return
+
     console.log('processing withdraw request of %d %s from user #%s to %s',
         req.body.amount, securityId, req.security.userId, req.body.address)
 
@@ -36,6 +39,8 @@ bitcoin.withdraw = function(conn, securityId, req, res, next) {
 }
 
 bitcoin.address = function(conn, securityId, req, res, next) {
+    if (!auth.demand(req, res)) return
+
     Q.ninvoke(conn, 'query', {
         text: util.format(
             'SELECT address FROM %s_deposit_address WHERE account_id = user_security_account($1, $2)',

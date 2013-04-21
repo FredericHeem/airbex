@@ -1,4 +1,5 @@
 var Q = require('q')
+, auth = require('./auth')
 , ripple = module.exports = {}
 
 ripple.configure = function(app, conn) {
@@ -77,6 +78,8 @@ ripple.address = function(conn, req, res, next) {
 }
 
 ripple.withdraw = function(conn, req, res, next) {
+    if (!auth.demand(req, res)) return
+
     return Q.ninvoke(conn, 'query', {
         text: 'SELECT ripple_withdraw(user_security_account($1, $2), $3, $4)',
         values: [req.security.userId, req.body.securityId, req.body.address, req.body.amount]

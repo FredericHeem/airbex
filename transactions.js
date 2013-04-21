@@ -1,4 +1,5 @@
 var Q = require('q')
+, auth = require('./auth')
 , transactions = module.exports = {}
 
 transactions.configure = function(app, conn, securityId) {
@@ -7,6 +8,8 @@ transactions.configure = function(app, conn, securityId) {
 }
 
 transactions.forUser = function(conn, req, res, next) {
+    if (!auth.demand(req, res)) return
+
     var query = 'SELECT * FROM account_transaction ' +
         'WHERE user_id = $1 ' +
         'ORDER BY transaction_id DESC'
@@ -21,6 +24,8 @@ transactions.forUser = function(conn, req, res, next) {
 }
 
 transactions.forUserAccount = function(conn, req, res, next) {
+    if (!auth.demand(req, res)) return
+
     var query = 'SELECT * FROM account_transaction ' +
         'WHERE account_id = $1 AND user_id = $2'
     Q.ninvoke(conn, 'query', {

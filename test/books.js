@@ -9,8 +9,8 @@ describe('books', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			books.configure(app)
-			expect(routes).to.contain('get /public/books')
-			expect(routes).to.contain('get /public/books/:id/depth')
+			expect(routes).to.contain('get /books')
+			expect(routes).to.contain('get /books/:id/depth')
 		})
 	})
 

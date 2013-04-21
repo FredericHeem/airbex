@@ -3,8 +3,8 @@ var _ = require('underscore')
 , Books = module.exports = {}
 
 Books.configure = function(app, conn) {
-    app.get('/public/books', Books.books.bind(Books, conn))
-    app.get('/public/books/:id/depth', Books.depth.bind(Books, conn))
+    app.get('/books', Books.books.bind(Books, conn))
+    app.get('/books/:id/depth', Books.depth.bind(Books, conn))
 }
 
 Books.books = function(conn, req, res, next) {

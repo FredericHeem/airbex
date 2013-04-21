@@ -10,7 +10,7 @@ describe('users', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			users.configure(app)
-			expect(routes).to.contain('post /public/users')
+			expect(routes).to.contain('post /users')
 			expect(routes).to.contain('get /whoami')
 		})
 	})

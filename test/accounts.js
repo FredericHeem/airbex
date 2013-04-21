@@ -10,7 +10,7 @@ describe('accounts', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			accounts.configure(app, null, 'BTC')
-			expect(routes).to.contain('get /private/accounts')
+			expect(routes).to.contain('get /accounts')
 		})
 	})
 

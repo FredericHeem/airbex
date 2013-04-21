@@ -2,7 +2,7 @@ var Q = require('q')
 , securities = module.exports = {}
 
 securities.configure = function(app, conn) {
-    app.get('/public/securities', securities.securities.bind(securities, conn))
+    app.get('/securities', securities.securities.bind(securities, conn))
 }
 
 securities.securities = function(conn, req, res, next) {

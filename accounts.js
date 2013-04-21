@@ -2,7 +2,7 @@ var Q = require('q')
 , Accounts = module.exports = {}
 
 Accounts.configure = function(app, conn) {
-    app.get('/private/accounts', Accounts.forUser.bind(Accounts, conn))
+    app.get('/accounts', Accounts.forUser.bind(Accounts, conn))
 }
 
 Accounts.forUser = function(conn, req, res, next) {

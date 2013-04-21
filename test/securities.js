@@ -9,7 +9,7 @@ describe('securities', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			securities.configure(app)
-			expect(routes).to.contain('get /public/securities')
+			expect(routes).to.contain('get /securities')
 		})
 	})
 

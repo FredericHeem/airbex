@@ -4,8 +4,8 @@ var Q = require('q')
 , bitcoin = module.exports = {}
 
 bitcoin.configure = function(app, conn, securityId) {
-    app.post('/private/withdraw/' + securityId, bitcoin.withdraw.bind(bitcoin, conn, securityId))
-    app.get('/private/deposit/' + securityId + '/address', bitcoin.address.bind(bitcoin, conn, securityId))
+    app.post('/withdraw/' + securityId, bitcoin.withdraw.bind(bitcoin, conn, securityId))
+    app.get('/deposit/' + securityId + '/address', bitcoin.address.bind(bitcoin, conn, securityId))
 }
 
 bitcoin.withdraw = function(conn, securityId, req, res, next) {
@@ -22,7 +22,7 @@ bitcoin.withdraw = function(conn, securityId, req, res, next) {
         if (err.code === '23514' && err.message.match(/non_negative_available/)) {
             return res.send(500, {
                 code: 'ENOFUNDS',
-                message: 'insufficient funds available in source account' 
+                message: 'insufficient funds available in source account'
             })
         }
 

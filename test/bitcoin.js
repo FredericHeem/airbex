@@ -10,8 +10,8 @@ describe('bitcoin', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			bitcoin.configure(app, null, 'BTC')
-			expect(routes).to.contain('post /private/withdraw/BTC')
-			expect(routes).to.contain('get /private/deposit/BTC/address')
+			expect(routes).to.contain('post /withdraw/BTC')
+			expect(routes).to.contain('get /deposit/BTC/address')
 		})
 	})
 

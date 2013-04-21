@@ -4,7 +4,7 @@ var Q = require('q')
 
 users.configure = function(app, conn) {
     app.get('/whoami', users.whoami.bind(users, conn))
-    app.post('/public/users', users.create.bind(users, conn))
+    app.post('/users', users.create.bind(users, conn))
 }
 
 users.whoami = function(conn, req, res, next) {

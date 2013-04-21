@@ -94,5 +94,21 @@ ripple.withdraw = function(conn, req, res, next) {
         .then(function(cres) {
             res.send(201, { request_id: cres.rows[0].request_id })
         }, next)
-    }, next)
+    }, function(err) {
+        if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
+            return res.send(400, {
+                name: 'InvalidAmount',
+                message: 'The requested transfer amount is invalid/out of range'
+            })
+        }
+
+        if (err.message == 'new row for relation "account" violates check constraint "non_negative_available"') {
+            return res.send(400, {
+                name: 'InsufficientFunds',
+                message: 'Source account cannot fund the transfer'
+            })
+        }
+
+        next(err)
+    })
 }

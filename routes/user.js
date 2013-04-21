@@ -45,5 +45,5 @@ var Backbone = require('backbone')
             collection: collection
         })
         app.section(view, true)
-    },
+    }
 })

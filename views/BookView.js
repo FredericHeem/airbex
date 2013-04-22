@@ -44,7 +44,11 @@ var SectionView = require('./SectionView')
     },
 
     render: function() {
-        this.$el.html(require('../templates/book.ejs')())
+        var vm = {
+            pair: this.model.pair()
+        }
+
+        this.$el.html(require('../templates/book.ejs')(vm))
 
         this.$children = this.$el.find('table.books tbody')
         this.reset()

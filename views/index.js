@@ -8,6 +8,8 @@ module.exports = {
     CreateOrderView: require('./CreateOrderView'),
     WithdrawBTCView: require('./WithdrawBTCView'),
     DepositBTCView: require('./DepositBTCView'),
+    WithdrawLTCView: require('./WithdrawLTCView'),
+    DepositLTCView: require('./DepositLTCView'),
     RouteNotFoundView: require('./RouteNotFoundView'),
     ErrorView: require('./ErrorView'),
     LoginView: require('./LoginView'),

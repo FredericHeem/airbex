@@ -27,8 +27,8 @@ routes.forEach(function(name) {
 	require('./' + name).configure(app, conn)
 })
 
-// can be used for other bitcoin derived, such as litecoin
 require('./bitcoin').configure(app, conn, 'BTC')
+require('./bitcoin').configure(app, conn, 'LTC')
 
 app.use(function(req, res) {
 	res.send(404)

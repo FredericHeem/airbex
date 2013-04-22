@@ -14,7 +14,8 @@
         "raven": "x",
         "konfu": "~1.1.3",
         "semaphore": "x",
-        "async": "x"
+        "async": "x",
+        "multitransport-jsonrpc": "x"
     },
     "scripts": {
         "test": "mocha"

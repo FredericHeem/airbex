@@ -22,6 +22,18 @@ task('bitcoind', function() {
     ex.run()
 })
 
+task('litecoind', function() {
+    var path = require('path')
+    , util = require('util')
+
+    var p = util.format(
+        'litecoind -datadir=%s -txindex=1',
+        path.join(__dirname, '../ltc'))
+    , ex = jake.createExec([p])
+    console.log(p)
+    ex.run()
+})
+
 task('publish-staging', function() {
     jake.exec([
         'git checkout staging',

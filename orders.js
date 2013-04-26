@@ -15,8 +15,8 @@ orders.create = function(conn, req, res, next) {
     if (!validate(req.body, 'order_create', res)) return
 
     Q.ninvoke(conn, 'query', {
-        text: 'SELECT order_create($1, $2, $3, $4, $5)',
-        values: [req.security.user_id, req.body.book_id, req.body.side, req.body.price, req.body.volume]
+        text: 'SELECT create_order($1, $2, $3, $4, $5) order_id',
+        values: [req.security.userId, req.body.book_id, req.body.side, req.body.price, req.body.volume]
     })
     .then(function(cres) {
         res.send(201, { order_id: cres.rows[0].order_id })

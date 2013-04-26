@@ -81,7 +81,7 @@ ripple.withdraw = function(conn, req, res, next) {
     if (!auth.demand(req, res)) return
 
     return Q.ninvoke(conn, 'query', {
-        text: 'SELECT ripple_withdraw(user_security_account($1, $2), $3, $4)',
+        text: 'SELECT ripple_withdraw(user_security_account($1, $2), $3, from_decimal($4, $2))',
         values: [req.security.userId, req.body.securityId, req.body.address, req.body.amount]
     })
     .then(function(cres) {

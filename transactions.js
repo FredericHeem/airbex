@@ -10,9 +10,13 @@ transactions.configure = function(app, conn, securityId) {
 transactions.forUser = function(conn, req, res, next) {
     if (!auth.demand(req, res)) return
 
-    var query = 'SELECT * FROM account_transaction ' +
-        'WHERE user_id = $1 ' +
+    var query = [
+        'SELECT transaction_id, user_id, created, amount_decimal amount, security_id',
+        'FROM account_transaction',
+        'WHERE user_id = $1',
         'ORDER BY transaction_id DESC'
+    ].join('\n')
+
     Q.ninvoke(conn, 'query', {
         text: query,
         values: [req.security.userId]

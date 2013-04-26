@@ -7,14 +7,12 @@
             "minimum": 1
         },
         "price": {
-            "type": "integer",
-            "required": true,
-            "minimum": 1
+            "type": "string",
+            "required": true
         },
         "volume": {
-            "type": "integer",
-            "required": true,
-            "minimum": 1
+            "type": "string",
+            "required": true
         },
         "side": {
             "type": "integer",

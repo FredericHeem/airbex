@@ -10,7 +10,11 @@ Accounts.forUser = function(conn, req, res, next) {
     if (!auth.demand(req, res)) return
 
     Q.ninvoke(conn, 'query', {
-        text: 'SELECT account_id, security_id, type, balance, balance_decimal, hold, hold_decimal, available, available_decimal, user_id FROM account_view WHERE user_id = $1',
+        text: [
+            'SELECT account_id, security_id, type, balance_decimal balance,',
+            'hold_decimal "hold", available_decimal available',
+            'FROM account_view WHERE user_id = $1'
+        ].join('\n'),
         values: [req.security.userId]
     })
     .get('rows')

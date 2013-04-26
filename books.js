@@ -8,38 +8,21 @@ Books.configure = function(app, conn) {
 }
 
 Books.books = function(conn, req, res, next) {
-    Q.ninvoke(conn, 'query', 'SELECT * FROM books_overview')
+    Q.ninvoke(conn, 'query', 'SELECT * FROM book_view')
     .then(function(cres) {
         res.send(cres.rows.map(function(row) {
-            var depth = [];
-
-            if (row.bid_price) {
-                depth.push({
-                    price: row.bid_price,
-                    volume: row.bid_volume,
-                    side: 0
-                })
-            }
-
-            if (row.ask_price) {
-                depth.push({
-                    price: row.ask_price,
-                    volume: row.ask_volume,
-                    side: 1
-                })
-            }
-
             return {
                 book_id: row.book_id,
                 pair: row.base_security_id + '/' + row.quote_security_id,
                 base_security_id: row.base_security_id,
                 quote_security_id: row.quote_security_id,
-                depth: depth,
+                last: row.last_decimal,
+                high: row.high_decimal,
+                low: row.low_decimal,
                 scale: row.scale,
-                last_price: row.last_price,
-                high_price: row.high_price,
-                low_price: row.low_price,
-                volume: row.volume
+                volume: row.volume_decimal,
+                bid: row.bid_decimal,
+                ask: row.ask_decimal
             }
         }))
     }, next)
@@ -47,7 +30,11 @@ Books.books = function(conn, req, res, next) {
 }
 
 Books.depth = function(conn, req, res, next) {
-    var query = 'SELECT price, volume, side, book_id FROM order_depth WHERE book_id = $1'
+    var query = [
+        'SELECT price_decimal price, volume_decimal volume, side, book_id',
+        'FROM order_depth_view WHERE book_id = $1'
+    ].join('\n')
+
     Q.ninvoke(conn, 'query', {
         text: query,
         values: [req.params.id]

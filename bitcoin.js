@@ -16,8 +16,8 @@ bitcoin.withdraw = function(conn, securityId, req, res, next) {
         req.body.amount, securityId, req.security.userId, req.body.address)
 
     Q.ninvoke(conn, 'query', {
-        text: 'SELECT ' + securityId + '_withdraw ($1, $2, $3) request_id',
-        values: [req.security.userId, req.body.address, req.body.amount]
+        text: 'SELECT ' + securityId + '_withdraw ($1, $2, from_decimal($3, $4)) request_id',
+        values: [req.security.userId, req.body.address, req.body.amount, securityId]
     })
     .then(function(cres) {
         res.send(201, { request_id: cres.rows[0].request_id })

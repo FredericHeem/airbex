@@ -14,15 +14,10 @@ orders.create = function(conn, req, res, next) {
     if (!auth.demand(req, res)) return
     if (!validate(req.body, 'order_create', res)) return
 
-    var query = conn.build.insert('"order"', {
-        user_id: req.security.userId,
-        book_id: req.body.book_id,
-        price: req.body.price,
-        volume: req.body.volume,
-        side: req.body.side
-    }, 'order_id')
-
-    Q.ninvoke(conn, 'query', query)
+    Q.ninvoke(conn, 'query', {
+        text: 'SELECT order_create($1, $2, $3, $4, $5)',
+        values: [req.security.user_id, req.body.book_id, req.body.side, req.body.price, req.body.volume]
+    })
     .then(function(cres) {
         res.send(201, { order_id: cres.rows[0].order_id })
     }, function(err) {
@@ -48,15 +43,13 @@ orders.create = function(conn, req, res, next) {
 orders.forUser = function(conn, req, res, next) {
     if (!auth.demand(req, res)) return
 
-    // TODO: extract view(s)
-    var query =
-        ['SELECT o.order_id, o.book_id, b.base_security_id, b.quote_security_id, o.volume, o.price, o.side',
-        ', b.base_security_id || b.quote_security_id pair, o.original, o.cancelled, o.matched ',
-        'FROM "order" o INNER JOIN book b ON o.book_id = b.book_id ',
-        'WHERE user_id = $1 AND o.volume > 0'].join('')
-
     Q.ninvoke(conn, 'query', {
-        text: query,
+        text: [
+            'SELECT order_id, book_id, side, price_decimal price, volume_decimal volume,',
+            '   original_decimal original, matched_decimal matched',
+            'FROM order_view',
+            'WHERE user_id = $1 AND volume > 0'
+        ].join('\n'),
         values: [req.security.userId]
     })
     .then(function(r) {

@@ -4,6 +4,7 @@ var SectionView = require('./SectionView')
 , num = require('num')
 , View = require('./View')
 , Models = require('../models')
+, CreateOrderView = require('./CreateOrderView')
 , BookView = module.exports = SectionView.extend({
     ItemView: View.extend({
         tagName: 'tr',
@@ -13,14 +14,35 @@ var SectionView = require('./SectionView')
             , book = this.model.get('book')
             , scaleNumbers = ''
             for (var i = 0; i < book.get('scale'); i++) scaleNumbers += '0'
-            vm.price = numeral(num(vm.price, book.get('scale'))).format('0,0[.' + scaleNumbers + ']')
+            vm.price = numeral(vm.price).format('0,0[.' + scaleNumbers + ']')
 
             this.$el.html(require('../templates/book-depth.ejs')(vm))
             return this;
         }
     }),
 
+    className: 'container',
+
     section: 'books',
+
+    events: {
+        'click .btn.create-order': 'showCreateOrder'
+    },
+
+    showCreateOrder: function(e) {
+        e.preventDefault()
+
+        var view = new CreateOrderView({
+            book: this.model
+        })
+
+        var $button = this.$el.find('.create-order')
+
+        view.render().$el.insertAfter($button)
+        $button.hide()
+
+        this.createOrderView = view
+    },
 
     initialize: function() {
         this.views = [];
@@ -52,8 +74,6 @@ var SectionView = require('./SectionView')
 
         this.$children = this.$el.find('table.books tbody')
         this.reset()
-
-        this.$el.find('.create-order').attr('href', window.location.hash + '/new')
 
         return this
     },

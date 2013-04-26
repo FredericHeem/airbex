@@ -1,41 +1,39 @@
-<form class="well form form-horizontal create-order">
-    <fieldset>
-        <legend>New order</legend>
+<ul class="nav nav-pills side">
+    <li class="active buy"><a href="#">Buy <%= base_security %></a></li>
+    <li class="sell"><a href="#">Sell <%= base_security %></a></li>
+</ul>
 
-        <div class="control-group">
-            <label class="control-label">Side</label>
-            <div class="controls">
-                <div class="btn-group">
-                    <button type="button" class="btn" data-action="bid">Bid</button>
-                    <button type="button" class="btn" data-action="ask">Ask</button>
-                </div>
+<form class="well span9">
+    <div class="row">
+        <div class="span3">
+            <label>Amount to buy</label>
+            <div class="input-append">
+                <input class="input input-medium volume" type="text" />
+                <span class="add-on base-security"></span>
             </div>
         </div>
-
-        <div class="control-group">
-            <label class="control-label">Price</label>
-            <div class="controls">
-                <input class="input input-small price" type="text" />
+        <div class="span3">
+            <label>Price per</label>
+            <div class="input-append">
+                <input class="input input-medium price" type="text" />
+                <span class="add-on base-security"></span>
             </div>
         </div>
-
-        <div class="control-group">
-            <label class="control-label">Volume</label>
-            <div class="controls">
-                <div class="input-append">
-                    <input class="input input-small volume" type="text" />
-                    <span class="add-on base-security">?</span>
-                </div>
+        <div class="span3">
+            <div class="input-append">
+                <label>Order total</label>
+                <input class="input input-medium disabled" disabled="disabled" type="text" value="TODO" />
+                <span class="add-on base-security"></span>
             </div>
         </div>
-
-        <p class="explanation"></p>
-        
-        <div class="control-group">
-            <div class="controls">
-                <button type="submit" class="btn btn-success" data-action="place-order">Place order</button>
-                <button class="btn" data-action="cancel">Cancel</button>
-            </div>
-        </div>
-    </fieldset>
+    </div>
 </form>
+
+<p class="explanation"></p>
+
+<div class="control-group">
+    <div class="controls">
+        <button type="submit" class="btn btn-success" data-action="place-order">Place order</button>
+        <button class="btn" data-action="cancel">Cancel</button>
+    </div>
+</div>

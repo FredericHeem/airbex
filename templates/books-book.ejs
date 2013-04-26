@@ -1,13 +1,7 @@
 <td><a href="#books/<%= pair.replace('/', '_') %>"><%= pair %></a></td>
-<td><% if (bid) { %>
-    <%= bid.priceDecimal %> (<%= bid.volumeDecimal %>)
-    <% } %>
-</td>
-<td><% if (ask) { %>
-    <%= ask.priceDecimal %> (<%= ask.volumeDecimal %>)
-    <% } %>
-</td>
-<td><%= lastDecimal %></td>
-<td><%= highDecimal %></td>
-<td><%= lowDecimal %></td>
-<td><%= volumeDecimal %></td>
+<td><%= bid || '' %></td>
+<td><%= ask || '' %></td>
+<td><%= last || '' %></td>
+<td><%= high || '' %></td>
+<td><%= low || '' %></td>
+<td><%= volume || '' %></td>

@@ -30,11 +30,6 @@ var SectionView = require('./SectionView')
             var vm = this.model.toJSON();
             vm.pair = this.model.get('book').pair()
             vm.base = this.model.get('book').get('base_security').id
-            vm.priceDecimal = this.model.priceDecimal();
-            vm.volumeDecimal = this.model.volumeDecimal();
-            vm.originalDecimal = this.model.originalDecimal();
-            vm.matchedDecimal = this.model.matchedDecimal();
-            vm.cancelledDecimal = this.model.cancelledDecimal();
 
             this.$el.html(require('../templates/user-orders-order.ejs')(vm));
 

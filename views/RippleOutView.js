@@ -2,7 +2,6 @@ var View = require('./View')
 , Models = require('../models')
 , app = require('../app')
 , Backbone = require('backbone')
-, num = require('num')
 , Section = require('./SectionView')
 , _ = require('underscore')
 , RippleOutView = module.exports = Section.extend({
@@ -25,7 +24,7 @@ var View = require('./View')
 
         var withdraw = new Backbone.Model({
             address: this.$address.val(),
-            amount: Math.floor(num(this.$amount.val()).mul(Math.pow(10, security.get('scale')))),
+            amount: this.$amount.val(),
             securityId: this.options.securityId
         })
 

@@ -2,7 +2,6 @@ var View = require('./View')
 , Models = require('../models')
 , app = require('../app')
 , Backbone = require('backbone')
-, num = require('num')
 , Section = require('./SectionView')
 , _ = require('underscore')
 , WithdrawBTCView = module.exports = Section.extend({
@@ -19,11 +18,9 @@ var View = require('./View')
     clickWithdraw: function(e) {
         e.preventDefault()
 
-        // todo: hard coded scale
-
         var withdraw = new Backbone.Model({
             address: this.$address.val(),
-            amount: Math.floor(num(this.$amount.val()).mul(1e8))
+            amount: this.$amount.val()
         });
 
         this.$address.add(this.$amount, this.$withdraw).prop('disabled', true).addClass('disabled')

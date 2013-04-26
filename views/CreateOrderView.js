@@ -3,13 +3,18 @@ var View = require('./View')
 , app = require('../app')
 , Backbone = require('backbone')
 , num = require('num')
-, Section = require('./SectionView')
+, View = require('./View')
 , _ = require('underscore')
-, CreateOrderView = module.exports = Section.extend({
-    initialize: function() {
+, CreateOrderView = module.exports = View.extend({
+    initialize: function(options) {
         _.bindAll(this);
 
-        this.$el.html(require('../templates/create-order.ejs')());
+        var vm = {
+            base_security: options.book.get('base_security').id
+        }
+
+        this.$el.html(require('../templates/create-order.ejs')(vm))
+
         this.$bid = this.$el.find('button[data-action="bid"]');
         this.$ask = this.$el.find('button[data-action="ask"]');
         this.$explanation = this.$el.find('.explanation');
@@ -28,8 +33,6 @@ var View = require('./View')
 
         this.model.on('change', this.update);
     },
-
-    section: 'orders',
 
     events: {
         'click button[data-action="bid"]': 'clickBid',

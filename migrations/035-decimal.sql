@@ -121,10 +121,10 @@ CREATE OR REPLACE FUNCTION create_order (
 ) RETURNS int AS $$
 BEGIN
     INSERT INTO "order" (user_id, book_id, side, price, volume)
-    SELECT user_id, book_id, side, price * 10^b.scale, volume * 10^(bs.scale - b.scale)
+    SELECT user_id, b.book_id, side, price * 10^b.scale, volume * 10^(bs.scale - b.scale)
     FROM book b
     INNER JOIN "security" bs ON bs.security_id = b.base_security_id
-    WHERE book_id = create_order.book_id;
+    WHERE b.book_id = create_order.book_id;
 
     RETURN currval('order_order_id_seq');
 END; $$ LANGUAGE PLPGSQL;

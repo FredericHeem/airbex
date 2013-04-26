@@ -10,7 +10,6 @@ bitcoincharts.configure = function(app, conn) {
 bitcoincharts.trades = function(conn, req, res, next) {
     var since = req.query.since || 0
     Q.ninvoke(conn, 'query', {
-        // TODO: cast can be removed if upgrading to pg 1.0.0
         text:
             'SELECT ' +
             'price_decimal::varchar price, ' +
@@ -37,7 +36,7 @@ bitcoincharts.orderbook = function(conn, req, res, next) {
             'SELECT *',
             'FROM order_depth_view od',
             'INNER JOIN book b ON b.book_id = od.book_id',
-            'WHERE b.base_security = \'BTC\' AND b.quote_security_id = $1'
+            'WHERE b.base_security_id = \'BTC\' AND b.quote_security_id = $1'
         ].join('\n'),
         values: [req.params.securityId]
     })

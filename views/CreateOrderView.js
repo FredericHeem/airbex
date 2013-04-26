@@ -3,53 +3,39 @@ var View = require('./View')
 , app = require('../app')
 , Backbone = require('backbone')
 , num = require('num')
+, numeral = require('numeral')
 , View = require('./View')
+, util = require('util')
 , _ = require('underscore')
 , CreateOrderView = module.exports = View.extend({
-    initialize: function(options) {
-        _.bindAll(this);
-
-        var vm = {
-            base_security: options.book.get('base_security').id
-        }
-
-        this.$el.html(require('../templates/create-order.ejs')(vm))
-
-        this.$bid = this.$el.find('button[data-action="bid"]');
-        this.$ask = this.$el.find('button[data-action="ask"]');
-        this.$explanation = this.$el.find('.explanation');
-        this.$price = this.$el.find('.price');
-        this.$volume = this.$el.find('.volume');
-        this.$placeOrder = this.$el.find('*[data-action="place-order"]');
-        this.$cancel = this.$el.find('*[data-action="cancel"]');
-
-        if (!this.model) {
-            this.model = new Models.Order({
-                price: null,
-                volume: null,
-                side: 0
-            });
-        }
-
-        this.model.on('change', this.update);
+    events: {
+        'click .side a': 'toggleSide',
+        'keyup .price input': 'changePrice',
+        'keyup .volume input': 'changeVolume',
+        'click button.submit': 'placeOrder'
     },
 
-    events: {
-        'click button[data-action="bid"]': 'clickBid',
-        'click button[data-action="ask"]': 'clickAsk',
-        'keyup .price': 'changePrice',
-        'keyup .volume': 'changeVolume',
-        'click *[data-action="place-order"]': 'placeOrder',
-        'click *[data-action="cancel"]': 'cancel'
+    initialize: function(options) {
+        this.model = new Models.Order({
+            book: options.book,
+            side: 0,
+            price: '',
+            volume: ''
+        })
+
+        this.model.on('change', this.updateSummary, this)
+        this.model.on('change:side', this.updateSide, this)
+
+        var vm = _.extend({
+            base_security: options.book.get('base_security').id,
+            quote_security: options.book.get('base_security').id
+        }, this.model.toJSON())
+
+        this.$el.html(require('../templates/create-order.ejs')(vm))
     },
 
     toggleInteraction: function(value) {
-        this.$bid
-        .add(this.$ask)
-        .add(this.$price)
-        .add(this.$volume)
-        .add(this.$cancel)
-        .add(this.$placeOrder)
+        this.$el.find('input, button')
         .toggleClass('disabled', !value)
         .prop('disabled', !value)
     },
@@ -57,7 +43,7 @@ var View = require('./View')
     placeOrder: function() {
         var that = this
 
-        this.$explanation.html('Placing order...')
+        this.$el.find('.summary').html('Placing order...')
         this.options.book.get('orders').add(this.model)
 
         console.log('order being placed', this.model.attributes);
@@ -87,100 +73,62 @@ var View = require('./View')
         return [
             'Order #' + this.model.id,
             (this.model.get('side') ? 'ASK' : 'BID'),
-            this.model.volumeDecimal(),
+            this.model.get('volume'),
             this.model.get('book').get('base_security').id,
             '@',
-            this.model.priceDecimal(),
+            this.model.get('price'),
             this.model.get('book').get('quote_security').id
         ].join(' ')
     },
 
-    cancel: function() {
-        this.trigger('cancel');
-    },
-
     changeVolume: function() {
-        var baseScale = this.options.book.get('base_security').get('scale');
-        var bookScale = this.options.book.get('scale');
-        var volumeScale = baseScale - bookScale;
-
-        var volumeDecimal = +this.$volume.val();
-
-        if (!_.isNumber(volumeDecimal)) {
-            this.model.set('volume', null);
-            return;
-        }
-
-        var volume = Math.floor(+num(volumeDecimal).mul(Math.pow(10, volumeScale)));
-        this.model.set('volume', volume);
+        var value = this.$el.find('.volume input').val()
+        , valid = +value > 0
+        this.model.set('volume', valid ? value : null)
     },
 
     changePrice: function() {
-        var baseScale = this.options.book.get('base_security').get('scale');
-        var bookScale = this.options.book.get('scale');
-        var volumeScale = baseScale - bookScale;
-
-        var priceDecimal = +this.$price.val();
-
-        if (!_.isNumber(priceDecimal)) {
-            this.model.set('volume', null);
-            return;
-        }
-
-        var price = Math.floor(+num(priceDecimal).mul(Math.pow(10, bookScale)));
-        this.model.set('price', price);
+        var value = this.$el.find('.price input').val()
+        , valid = +value > 0
+        this.model.set('price', valid ? value : null)
     },
 
-    clickBid: function(e) {
-        this.model.set('side', 0);
+    toggleSide: function(e) {
+        e.preventDefault()
+        var $target = $(e.target)
+        , side = $target.parent().hasClass('bid') ? 0 : 1
+        this.model.set('side', side)
+        this.$el.find('.volume label').html('Amount to ' + (side ? 'sell' : 'buy'))
     },
 
-    clickAsk: function(e) {
-        this.model.set('side', 1);
+    updateSide: function() {
+        var $side = this.$el.find('.side')
+        , side = this.model.get('side')
+        $side.find('.bid').toggleClass('active', side === 0)
+        $side.find('.ask').toggleClass('active', side === 1)
     },
 
-    update: function() {
-        var explanation;
+    updateSummary: function() {
+        var summary
+        , total
+
+        // TODO: validate precision of price and volume
 
         if (this.model.get('price') && this.model.get('volume')) {
-            var baseScale = this.options.book.get('base_security').get('scale');
-            var bookScale = this.options.book.get('scale');
-            var volumeScale = baseScale - bookScale;
-            var quotePrice = num(this.model.get('volume'), volumeScale).mul(num(this.model.get('price'), bookScale));
-            var volumeDecimal = num(this.model.get('volume'), volumeScale);
-
-            if (this.$bid.hasClass('active')) {
-                explanation = 'You are buying ' +
-                    +volumeDecimal + ' ' +
-                    this.options.book.get('base_security').id + ' for ' +
-                    +quotePrice + ' ' +
-                    this.options.book.get('quote_security').id;
-            } else {
-                explanation = 'You are selling ' +
-                    +volumeDecimal + ' ' +
-                    this.options.book.get('base_security').id + ' for ' +
-                    +quotePrice + ' ' +
-                    this.options.book.get('quote_security').id;
-            }
+            total = num(this.model.get('price')).mul(this.model.get('volume'))
+            summary = util.format(
+                'You are %s %s for %s',
+                this.model.get('side') ? 'selling' : 'buying',
+                this.model.get('book').get('base_security').id,
+                this.model.get('price'),
+                this.model.get('book').get('quote_security').id)
         }
 
-        this.$bid.toggleClass('active', this.model.get('side') == 0);
-        this.$ask.toggleClass('active', this.model.get('side') == 1);
-
-        this.$explanation.html(explanation);
+        this.$el.find('.summary').html(summary || '')
+        this.$el.find('.total input').val(total ? numeral(+total).format('0,0[.000000000000]') : '')
     },
 
     render: function() {
-        var baseScale = this.options.book.get('base_security').get('scale');
-        var bookScale = this.options.book.get('scale');
-        var volumeScale = baseScale - bookScale;
-
-        this.$el.find('.base-security').html(this.options.book.get('base_security').id);
-        this.$price.val(this.model.get('price') ? num(this.model.get('price'), bookScale) : '');
-        this.$volume.val(this.model.get('volume') ? num(this.model.get('volume'), volumeScale) : '');
-
-        this.update();
-
         return this;
     }
-});
+})

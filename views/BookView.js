@@ -29,21 +29,6 @@ var SectionView = require('./SectionView')
         'click .btn.create-order': 'showCreateOrder'
     },
 
-    showCreateOrder: function(e) {
-        e.preventDefault()
-
-        var view = new CreateOrderView({
-            book: this.model
-        })
-
-        var $button = this.$el.find('.create-order')
-
-        view.render().$el.insertAfter($button)
-        $button.hide()
-
-        this.createOrderView = view
-    },
-
     initialize: function() {
         this.views = [];
 
@@ -75,6 +60,12 @@ var SectionView = require('./SectionView')
         this.$children = this.$el.find('table.books tbody')
         this.reset()
 
+        var view = new CreateOrderView({
+            book: this.model
+        })
+
+        view.render().$el.appendTo(this.$el.find('.place-order-container'))
+
         return this
     },
 
@@ -82,4 +73,4 @@ var SectionView = require('./SectionView')
         this.views && _.invoke(this.views, 'dispose')
         View.prototype.dispose.call(this)
     }
-});
+})

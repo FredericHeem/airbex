@@ -1,39 +1,46 @@
-<ul class="nav nav-pills side">
-    <li class="active buy"><a href="#">Buy <%= base_security %></a></li>
-    <li class="sell"><a href="#">Sell <%= base_security %></a></li>
-</ul>
+<div class="row">
+    <ul class="side nav nav-tabs">
+        <li class="bid <%= side === 0 ? 'active' : '' %>"><a href="#">Buy <%= base_security %></a></li>
+        <li class="ask <%= side === 1 ? 'active' : '' %>"><a href="#">Sell <%= base_security %></a></li>
+    </ul>
+</div>
 
-<form class="well span9">
-    <div class="row">
-        <div class="span3">
-            <label>Amount to buy</label>
-            <div class="input-append">
-                <input class="input input-medium volume" type="text" />
-                <span class="add-on base-security"></span>
+<div class="row">
+    <form class="span5">
+        <div class="row well">
+            <div class="volume span2">
+                <label>Amount to <%= side ? 'sell' : 'buy' %></label>
+                <div class="input-append">
+                    <input class="input input-small" type="text" value="<%= volume %>" />
+                    <span class="add-on"><%= base_security %></span>
+                </div>
+            </div>
+            <div class="price span2">
+                <label>Price per</label>
+                <div class="input-append">
+                    <input class="input input-small" type="text" value="<%= price %>" />
+                    <span class="add-on"><%= quote_security %></span>
+                </div>
+            </div>
+            <div class="total offset2 span2">
+                <div class="input-append">
+                    <label>Order total</label>
+                    <input class="input input-small disabled" disabled="disabled" type="text" value="" />
+                    <span class="add-on"><%= base_security %></span>
+                </div>
             </div>
         </div>
-        <div class="span3">
-            <label>Price per</label>
-            <div class="input-append">
-                <input class="input input-medium price" type="text" />
-                <span class="add-on base-security"></span>
-            </div>
-        </div>
-        <div class="span3">
-            <div class="input-append">
-                <label>Order total</label>
-                <input class="input input-medium disabled" disabled="disabled" type="text" value="TODO" />
-                <span class="add-on base-security"></span>
-            </div>
-        </div>
-    </div>
-</form>
+    </form>
+</div>
 
-<p class="explanation"></p>
+<div class="row">
+    <p class="summary"></p>
+</div>
 
-<div class="control-group">
-    <div class="controls">
-        <button type="submit" class="btn btn-success" data-action="place-order">Place order</button>
-        <button class="btn" data-action="cancel">Cancel</button>
+<div class="row">
+    <div class="control-group">
+        <div class="controls">
+            <button type="submit" class="submit btn btn-success">Place order</button>
+        </div>
     </div>
 </div>

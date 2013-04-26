@@ -21,7 +21,7 @@ var SectionView = require('./SectionView')
         }
     }),
 
-    className: 'container',
+    className: 'container book',
 
     section: 'books',
 

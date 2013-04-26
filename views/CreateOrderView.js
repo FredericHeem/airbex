@@ -8,6 +8,8 @@ var View = require('./View')
 , util = require('util')
 , _ = require('underscore')
 , CreateOrderView = module.exports = View.extend({
+    className: 'create-order',
+
     events: {
         'click .side a': 'toggleSide',
         'keyup .price input': 'changePrice',
@@ -28,7 +30,7 @@ var View = require('./View')
 
         var vm = _.extend({
             base_security: options.book.get('base_security').id,
-            quote_security: options.book.get('base_security').id
+            quote_security: options.book.get('quote_security').id
         }, this.model.toJSON())
 
         this.$el.html(require('../templates/create-order.ejs')(vm))
@@ -111,21 +113,24 @@ var View = require('./View')
     updateSummary: function() {
         var summary
         , total
+        , format = '0,0[.0][0][0][0][0][0][0][0][0]'
 
         // TODO: validate precision of price and volume
 
         if (this.model.get('price') && this.model.get('volume')) {
-            total = num(this.model.get('price')).mul(this.model.get('volume'))
+            total = +num(this.model.get('price')).mul(this.model.get('volume'))
+            console.log('total', total)
             summary = util.format(
-                'You are %s %s for %s',
+                'You are %s %s %s for %s %s',
                 this.model.get('side') ? 'selling' : 'buying',
+                this.model.get('volume'),
                 this.model.get('book').get('base_security').id,
-                this.model.get('price'),
+                numeral(total).format(format),
                 this.model.get('book').get('quote_security').id)
         }
 
         this.$el.find('.summary').html(summary || '')
-        this.$el.find('.total input').val(total ? numeral(+total).format('0,0[.000000000000]') : '')
+        this.$el.find('.total input').val(total ? numeral(total).format(format) : '')
     },
 
     render: function() {

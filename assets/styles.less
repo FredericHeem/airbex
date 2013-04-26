@@ -26,9 +26,15 @@ footer {
     }
 }
 
-body:not(.is-logged-in) #top {
-    .accounts, .orders, .transactions { display: none }
-    .account-summary .logged-in { display: none; }
+body:not(.is-logged-in) {
+    #top {
+        .accounts, .orders, .transactions { display: none }
+        .account-summary .logged-in { display: none; }
+    }
+
+    .container.book .place-order-container {
+        display: none;
+    }
 }
 
 body.is-logged-in #top {

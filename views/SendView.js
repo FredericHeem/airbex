@@ -7,7 +7,7 @@ var View = require('./View')
 , SendView = module.exports = Section.extend({
     initialize: function(options) {
         this.vm = new Backbone.Model({
-            amount: 0.0,
+            amount: '0.0',
             email: null,
             securityId: 'null',
             securities: options.app.cache.securities.pluck('security_id')
@@ -22,7 +22,7 @@ var View = require('./View')
 
     read: function() {
         this.vm.set({
-            amount: +this.$amount.val(),
+            amount: this.$amount.val(),
             email: this.$email.val(),
             securityId: this.$security.val()
         })

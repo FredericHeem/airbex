@@ -26,7 +26,8 @@
         "shelljs": "x",
         "browserify-ejs": "x",
         "moment": "~2.0.0",
-        "numeral": "1.4.8"
+        "numeral": "1.4.8",
+        "http-proxy": "~0.10.2"
     },
     "scripts": {
         "test": "jake test"

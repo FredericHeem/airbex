@@ -9,23 +9,47 @@ var SectionView = require('./SectionView')
     section: null,
 
     events: {
-        'click button.login': 'login'
+        'click button.login': 'login',
+        'click a[href="#replace-legacy-api-key"]': 'replaceLegacyApiKey'
     },
 
     initialize: function() {
         this.model = new Models.User()
     },
 
+    replaceLegacyApiKey: function(email, password) {
+        return $.ajax({
+            type: 'POST',
+            url: app.apiUrl + '/replaceLegacyApiKey',
+            dataType: 'json',
+            data: {
+                oldKey: sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(email.toLowerCase())).slice(0, 20),
+                oldSecret: sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(password)).slice(0, 20),
+                newKey: app.keyFromCredentials(email, password)
+            }
+        })
+        .then(function() {
+            Alertify.log.success('Your user account has been transitioned from the legacy login system. Yay!')
+        })
+    },
+
     login: function(e) {
-        e.preventDefault()
+        e && e.preventDefault()
+
+        if (app.user) {
+            console.error('The user is already logged in. Concurrency issues?')
+            return
+        }
 
         var that = this
-        , email = this.$el.find('.email').val().toLowerCase()
+        , email = this.$el.find('.email').val()
         , password = this.$el.find('.password').val()
-        , hashes = app.hashCredentials(email, password)
-        , result = this.model.fetch({
+        , apiKey = app.keyFromCredentials(email, password)
+
+        var result = this.model.fetch({
             url: app.apiUrl + '/whoami',
-            headers: app.apiHeaders(null, hashes.key, hashes.secret)
+            username: 'api',
+            password: apiKey
         })
 
         if (!result) {
@@ -36,7 +60,7 @@ var SectionView = require('./SectionView')
 
         result.then(function() {
             app.user = that.model
-            app.credentials = hashes
+            app.apiKey = apiKey
             $('body').addClass('is-logged-in')
             $('#top .account-summary .logged-in .email').html(that.model.get('email'))
 
@@ -46,11 +70,17 @@ var SectionView = require('./SectionView')
 
             var error = app.errorFromXhr(xhr)
 
-            if (error.code == 'UnknownApiKey' || error.code == 'BadMessageSignature') {
-                return alert('Wrong username/password')
+            if (xhr.status === 401) {
+                that.replaceLegacyApiKey(email, password)
+                .then(function() {
+                    that.login()
+                }, function() {
+                    console.log(arguments)
+                    return alert('Wrong username/password')
+                })
+            } else {
+                alert(JSON.stringify(error, null, 4))
             }
-
-            alert(JSON.stringify(error, null, 4))
         })
     },
 

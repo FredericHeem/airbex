@@ -25,9 +25,10 @@ var SectionView = require('./SectionView')
             return alert('Password is too short (minimum 5)')
         }
 
-        var result = this.model.save(_.extend({
-            email: this.$el.find('.email').val()
-        }, app.hashCredentials(this.email(), this.$el.find('.password').val())))
+        var result = this.model.save({
+            email: this.$el.find('.email').val(),
+            key: app.keyFromCredentials(this.email(), this.$el.find('.password').val())
+        })
 
         if (!result) {
             return alert(this.model.validationError)

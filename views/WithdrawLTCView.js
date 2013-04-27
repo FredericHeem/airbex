@@ -27,7 +27,8 @@ var View = require('./View')
 
         withdraw.save({}, {
             url: app.apiUrl + '/withdraw/LTC',
-            headers: app.apiHeaders(withdraw.toJSON()),
+            username: 'api',
+            password: app.apiKey,
             success: function() {
                 Backbone.history.navigate('my/accounts', true)
             }

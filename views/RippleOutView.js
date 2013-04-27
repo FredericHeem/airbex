@@ -32,7 +32,8 @@ var View = require('./View')
 
         var result = withdraw.save({}, {
             url: app.apiUrl + '/ripple/out',
-            headers: app.apiHeaders(withdraw.toJSON())
+            username: 'api',
+            password: app.apiKey
         })
 
         if (!result) {

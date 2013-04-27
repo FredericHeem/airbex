@@ -1,9 +1,3 @@
-function sign(form, secret) {
-    var body = JSON.stringify(form || {}) + secret
-    , bits = sjcl.hash.sha256.hash(body)
-    return sjcl.codec.base64.fromBits(bits)
-}
-
 var _ = require('underscore')
 , util = require('util')
 , EventEmitter = require('events').EventEmitter
@@ -13,23 +7,11 @@ var _ = require('underscore')
 
 util.inherits(App, EventEmitter)
 
-App.prototype.apiHeaders = function(form, key, secret) {
-    if (!key) {
-        if (!this.credentials) throw new Error('no credentials')
-        return this.apiHeaders(form, this.credentials.key, this.credentials.secret)
-    }
-
-    return {
-        'snow-key': key,
-        'snow-sign': sign(form, secret)
-    }
-}
-
-App.prototype.hashCredentials = function(email, password) {
-    return {
-        key: sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(email.toLowerCase())).slice(0, 20),
-        secret: sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(password)).slice(0, 20)
-    }
+App.prototype.keyFromCredentials = function(email, password) {
+    var concat = email.toLowerCase() + password
+    , bits = sjcl.hash.sha256.hash(concat)
+    , hex = sjcl.codec.hex.fromBits(bits)
+    return hex
 }
 
 App.prototype.errorFromXhr = function(xhr) {
@@ -70,7 +52,7 @@ App.prototype.section = function(value, render) {
 }
 
 App.prototype.authorize = function() {
-    if (this.credentials) return true
+    if (this.user) return true
     Backbone.history.navigate('login?after=' + window.location.hash.substr(1), true)
     return false
 }

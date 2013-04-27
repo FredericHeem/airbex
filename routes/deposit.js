@@ -16,7 +16,8 @@ var Backbone = require('backbone')
 
         model.fetch({
             url: app.apiUrl + '/deposit/BTC/address',
-            headers: app.apiHeaders()
+            username: 'api',
+            password: app.apiKey
         })
 
         var view = new Views.DepositBTCView({ model: model })
@@ -32,7 +33,8 @@ var Backbone = require('backbone')
 
         model.fetch({
             url: app.apiUrl + '/deposit/LTC/address',
-            headers: app.apiHeaders()
+            username: 'api',
+            password: app.apiKey
         })
 
         var view = new Views.DepositLTCView({ model: model })

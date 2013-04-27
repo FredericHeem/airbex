@@ -22,7 +22,7 @@ var Backbone = require('backbone')
         })
 
         view.on('register', function(e) {
-            var hashes = app.hashCredentials(e.email, e.password)
+            app.apiKey = app.keyFromCredentials(e.email, e.password)
             app.user = model
             app.credentials = hashes
             $('body').addClass('is-logged-in')

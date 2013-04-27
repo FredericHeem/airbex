@@ -52,7 +52,8 @@ var View = require('./View')
 
         var result = this.model.save({}, {
             url: app.apiUrl + '/orders',
-            headers: app.apiHeaders(this.model.toJSON())
+            username: 'api',
+            password: app.apiKey
         })
 
         if (!result) {

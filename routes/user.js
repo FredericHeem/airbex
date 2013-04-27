@@ -17,7 +17,8 @@ var Backbone = require('backbone')
 
         collection.fetch({
             url: app.apiUrl + '/accounts',
-            headers: app.apiHeaders()
+            username: 'api',
+            password: app.apiKey
         })
     },
 
@@ -27,7 +28,8 @@ var Backbone = require('backbone')
         var collection = new Models.OrderCollection();
         collection.fetch({
             url: app.apiUrl + '/orders',
-            headers: app.apiHeaders()
+            username: 'api',
+            password: app.apiKey
         });
 
         var view = new Views.UserOrdersView({ collection: collection });
@@ -39,7 +41,8 @@ var Backbone = require('backbone')
         var collection = new Models.TransactionCollection()
         collection.fetch({
             url: app.apiUrl + '/accounts/transactions',
-            headers: app.apiHeaders()
+            usename: 'api',
+            password: app.apiKey
         })
         var view = new Views.UserTransactionsView({
             collection: collection

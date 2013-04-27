@@ -45,7 +45,8 @@ var View = require('./View')
 
         var result = transaction.save({}, {
             url: app.apiUrl + '/transfer',
-            headers: app.apiHeaders(transaction.toJSON())
+            username: 'api',
+            password: app.apiKey
         })
 
         if (!result) {

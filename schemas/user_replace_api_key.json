@@ -1,0 +1,11 @@
+{
+    "type": "object",
+    "description": "Replace the currently used API key with the specified one. This is useful to change ones password in a web interface.",
+    "properties": {
+        "key": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9a-f]{64}$"
+        }
+    }
+}

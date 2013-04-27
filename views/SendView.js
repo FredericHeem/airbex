@@ -40,7 +40,7 @@ var View = require('./View')
         , transaction = new Models.Transaction({
             email: this.vm.get('email'),
             security_id: this.vm.get('securityId'),
-            amount: +num(this.vm.get('amount')).mul(Math.pow(10, scale))
+            amount: this.vm.get('amount')
         })
 
         var result = transaction.save({}, {

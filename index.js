@@ -12,7 +12,7 @@ app.use(express.bodyParser())
 
 var routes = ['accounts', 'books', 'orders', 'ripple',
 'securities', 'transactions', 'users', 'transfer',
-'bitcoincharts']
+'bitcoincharts', 'intercom']
 routes.forEach(function(name) {
 	require('./' + name).configure(app, conn, auth)
 })

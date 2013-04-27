@@ -9,12 +9,8 @@
         "key": {
             "type": "string",
             "required": true,
-            "minLength": 20
-        },
-        "secret": {
-            "type": "string",
-            "required": true,
-            "minLength": 20
+            "minLength": 64,
+            "maxLength": 64
         }
     }
 }

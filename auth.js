@@ -31,6 +31,7 @@ var sjcl = require('./vendor/sjcl')
             }
 
             req.user = dres.rows[0].user_id
+            req.key = password
 
             return next()
         })

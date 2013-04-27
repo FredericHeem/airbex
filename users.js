@@ -6,6 +6,7 @@ users.configure = function(app, conn, auth) {
     app.get('/whoami', auth, users.whoami.bind(users, conn))
     app.post('/users', users.create.bind(users, conn))
     app.post('/replaceLegacyApiKey', users.replaceLegacyApiKey.bind(users, conn))
+    app.post('/replaceApiKey', auth, users.replaceApiKey.bind(users, conn))
 }
 
 users.whoami = function(conn, req, res, next) {
@@ -53,6 +54,20 @@ users.replaceLegacyApiKey = function(conn, req, res, next) {
         if (err.message === 'The specified old_key/old_secret combination was not found') {
             return res.send(401)
         }
+        next(err)
+    })
+    .done()
+}
+
+users.replaceApiKey = function(conn, req, res, next) {
+    if (!validate(req.body, 'user_replace_api_key', res)) return
+    Q.ninvoke(conn, 'query', {
+        text: 'SELECT replace_api_key($1, $2)',
+        values: [req.key, req.body.key]
+    }).then(function(dres) {
+        res.send(200, {})
+    }, function(err) {
+        // TODO: error message when key does not exist.
         next(err)
     })
     .done()

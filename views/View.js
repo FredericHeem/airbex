@@ -13,6 +13,12 @@ var Backbone = require('backbone')
         target.bind(name, callback, context);
     },
 
+    toggleInteraction: function(value, selector) {
+        (selector || this.$el.find('input, button'))
+        .toggleClass('disabled', !value)
+        .prop('disabled', !value)
+    },
+
     dispose: function() {
         // this will unbind all events that this view has bound to
         _.each(this.bindings, function(b) {

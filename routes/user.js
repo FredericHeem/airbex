@@ -1,11 +1,13 @@
 var Backbone = require('backbone')
 , app = require('../app')
 , Views = require('../views')
+, ChangePasswordView = require('../views/ChangePasswordView')
 , UserRouter = module.exports = Backbone.Router.extend({
     routes: {
         'my/accounts': 'userAccounts',
         'my/orders': 'userOrders',
-        'my/transactions': 'userTransactions'
+        'my/transactions': 'userTransactions',
+        'my/changePassword': 'changePassword'
     },
 
     userAccounts: function() {
@@ -20,6 +22,11 @@ var Backbone = require('backbone')
             username: 'api',
             password: app.apiKey
         })
+    },
+
+    changePassword: function() {
+        if (!app.authorize()) return
+        app.section(new ChangePasswordView(), true)
     },
 
     userOrders: function() {

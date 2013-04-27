@@ -63,23 +63,21 @@ App.prototype.setUser = function(user, key) {
     $('body').addClass('is-logged-in')
     $('#top .account-summary .logged-in .email').html(user.get('email'))
 
-    console.log(window.Intercom)
-    console.log(window.snow)
-
-    if (!_.isUndefined(window.Intercom) && window.snow.intercomAppId) {
-        console.log('booting intercom')
-        Intercom('boot', {
-            app_id: snow.intercomAppId,
-            email: user.get('email'),
-            created_at: user.get('created') || null,
-            user_id: user.id
+    if (!_.isUndefined(window.Intercom)) {
+        $.ajax({
+            type: 'GET',
+            url: this.apiUrl + '/intercom',
+            username: 'api',
+            password: this.apiKey
         })
+        .then(function(res) {
+            console.log('booting intercom with', res)
+            Intercom('boot', res)
 
-        Backbone.history.bind('all', function() {
-            Intercom('update')
+            Backbone.history.bind('all', function() {
+                Intercom('update')
+            })
         })
-    } else {
-        console.log('no intercom')
     }
 }
 

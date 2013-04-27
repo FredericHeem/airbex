@@ -64,8 +64,7 @@ file('public/styles.min.css', ['public/styles.css'], compressCss)
 file('public/index.html', ['public'], function() {
     var ejs = require('ejs')
     ejs.render(cat('assets/index.ejs'), {
-        minify: false,
-        intercomAppId: '64463fba8faa8166444bfb3c00a5e40976bd622e'
+        minify: false
     })
     .to(this.name)
 })
@@ -74,8 +73,7 @@ file('public/index.min.html', ['public'], function() {
     var ejs = require('ejs')
     ejs.render(cat('assets/index.ejs'), {
         minify: true,
-        raven: 'https://bfadc2055bf84739b2f24f21a45d40af@app.getsentry.com/7528',
-        intercomAppId: '64463fba8faa8166444bfb3c00a5e40976bd622e'
+        raven: 'https://bfadc2055bf84739b2f24f21a45d40af@app.getsentry.com/7528'
     })
     .to(this.name)
 })

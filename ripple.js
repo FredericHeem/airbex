@@ -3,7 +3,7 @@ var Q = require('q')
 , ripple = module.exports = {}
 
 ripple.configure = function(app, conn) {
-    app.post('/ripple/out', ripple.withdraw.bind(ripple, conn))
+    app.post('/ripple/out', auth, ripple.withdraw.bind(ripple, conn))
     app.get('/ripple/address', ripple.address.bind(ripple, conn))
     app.get('/ripple/federation', ripple.federation.bind(ripple, app.config, conn))
 }
@@ -78,11 +78,9 @@ ripple.address = function(conn, req, res, next) {
 }
 
 ripple.withdraw = function(conn, req, res, next) {
-    if (!auth.demand(req, res)) return
-
     return Q.ninvoke(conn, 'query', {
         text: 'SELECT ripple_withdraw(user_security_account($1, $2), $3, from_decimal($4, $2))',
-        values: [req.security.userId, req.body.securityId, req.body.address, req.body.amount]
+        values: [req.user, req.body.securityId, req.body.address, req.body.amount]
     })
     .then(function(cres) {
         res.send(201, { request_id: cres.rows[0].request_id })

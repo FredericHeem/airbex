@@ -2,15 +2,16 @@ var Q = require('q')
 , users = module.exports = {}
 , validate = require('./validate')
 
-users.configure = function(app, conn) {
-    app.get('/whoami', users.whoami.bind(users, conn))
+users.configure = function(app, conn, auth) {
+    app.get('/whoami', auth, users.whoami.bind(users, conn))
     app.post('/users', users.create.bind(users, conn))
+    app.post('/replaceLegacyApiKey', users.replaceLegacyApiKey.bind(users, conn))
 }
 
 users.whoami = function(conn, req, res, next) {
 	conn.query({
 		text: 'SELECT user_id, email FROM "user" WHERE user_id = $1',
-		values: [req.security.userId]
+		values: [req.user]
 	}, function(err, dres) {
 		if (err) return next(err)
 		if (!dres.rows.length) return res.send(404)
@@ -37,6 +38,21 @@ users.create = function(conn, req, res, next) {
             return res.send(403, { name: 'EmailAlreadyInUse', message:'e-mail is already in use' })
         }
 
+        next(err)
+    })
+    .done()
+}
+
+users.replaceLegacyApiKey = function(conn, req, res, next) {
+    Q.ninvoke(conn, 'query', {
+        text: 'SELECT replace_legacy_api_key($1, $2, $3)',
+        values: [req.body.oldKey, req.body.oldSecret, req.body.newKey]
+    }).then(function(dres) {
+        res.send(200, {})
+    }, function(err) {
+        if (err.message === 'The specified old_key/old_secret combination was not found') {
+            return res.send(401)
+        }
         next(err)
     })
     .done()

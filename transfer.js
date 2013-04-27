@@ -1,14 +1,14 @@
 var Q = require('q')
 , transfer = module.exports = {}
 
-transfer.configure = function(app, conn, securityId) {
-    app.post('/transfer', transfer.transfer.bind(transfer, conn))
+transfer.configure = function(app, conn, auth) {
+    app.post('/transfer', auth, transfer.transfer.bind(transfer, conn))
 }
 
 transfer.transfer = function(conn, req, res, next) {
     conn.query({
         text: 'SELECT user_transfer_to_email($1, $2, $3, from_decimal($4, $3)) transaction_id',
-        values: [req.security.userId, req.body.email, req.body.security_id, req.body.amount]
+        values: [req.user, req.body.email, req.body.security_id, req.body.amount]
     }, function(err, dres) {
         if (err) {
             if (err.message.match(/^User with email/)) {

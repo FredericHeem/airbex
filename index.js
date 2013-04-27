@@ -4,31 +4,21 @@ var config = require('konfu')
 , http = require('http')
 , server = http.createServer(app)
 , conn = require('./db')(config.pg_url, config.pg_native)
-, auth = require('./auth')
+, auth = require('./auth')(conn)
 
 app.config = config
 
-// access control headers (for hosting on s3)
-app.use(function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*')
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
-    res.header('Access-Control-Allow-Headers', 'snow-key,snow-sign,Content-Type')
-    res.header('Access-Control-Max-Age', 60 * 60 * 24 * 365)
-    return req.method == 'OPTIONS' ? res.send(200) : next()
-})
-
 app.use(express.bodyParser())
-app.use(auth.verify.bind(auth, conn))
 
 var routes = ['accounts', 'books', 'orders', 'ripple',
 'securities', 'transactions', 'users', 'transfer',
 'bitcoincharts']
 routes.forEach(function(name) {
-	require('./' + name).configure(app, conn)
+	require('./' + name).configure(app, conn, auth)
 })
 
-require('./bitcoin').configure(app, conn, 'BTC')
-require('./bitcoin').configure(app, conn, 'LTC')
+require('./bitcoin').configure(app, conn, auth, 'BTC')
+require('./bitcoin').configure(app, conn, auth, 'LTC')
 
 app.use(function(req, res) {
 	res.send(404)

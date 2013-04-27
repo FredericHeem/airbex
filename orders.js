@@ -4,19 +4,18 @@ var Q = require('q')
 , orders = module.exports = {}
 , validate = require('./validate')
 
-orders.configure = function(app, conn) {
-    app.del('/orders/:id', orders.cancel.bind(orders, conn))
-    app.post('/orders', orders.create.bind(orders, conn))
-    app.get('/orders', orders.forUser.bind(orders, conn))
+orders.configure = function(app, conn, auth) {
+    app.del('/orders/:id', auth, orders.cancel.bind(orders, conn))
+    app.post('/orders', auth, orders.create.bind(orders, conn))
+    app.get('/orders', auth, orders.forUser.bind(orders, conn))
 }
 
 orders.create = function(conn, req, res, next) {
-    if (!auth.demand(req, res)) return
     if (!validate(req.body, 'order_create', res)) return
 
     Q.ninvoke(conn, 'query', {
         text: 'SELECT create_order($1, $2, $3, $4, $5) order_id',
-        values: [req.security.userId, req.body.book_id, req.body.side, req.body.price, req.body.volume]
+        values: [req.user, req.body.book_id, req.body.side, req.body.price, req.body.volume]
     })
     .then(function(cres) {
         res.send(201, { order_id: cres.rows[0].order_id })
@@ -41,8 +40,6 @@ orders.create = function(conn, req, res, next) {
 }
 
 orders.forUser = function(conn, req, res, next) {
-    if (!auth.demand(req, res)) return
-
     Q.ninvoke(conn, 'query', {
         text: [
             'SELECT order_id, book_id, side, price_decimal price, volume_decimal volume,',
@@ -50,7 +47,7 @@ orders.forUser = function(conn, req, res, next) {
             'FROM order_view',
             'WHERE user_id = $1 AND volume > 0'
         ].join('\n'),
-        values: [req.security.userId]
+        values: [req.user]
     })
     .then(function(r) {
         res.send(r.rows)
@@ -59,12 +56,10 @@ orders.forUser = function(conn, req, res, next) {
 }
 
 orders.cancel = function(conn, req, res, next) {
-    if (!auth.demand(req, res)) return
-
     var q = 'UPDATE "order" SET cancelled = volume, volume = 0 WHERE order_id = $1 AND user_id = $2 AND volume > 0'
     Q.ninvoke(conn, 'query', {
         text: q,
-        values: [+req.params.id, req.security.userId]
+        values: [+req.params.id, req.user]
     })
     .get('rowCount')
     .then(function(cancelled) {

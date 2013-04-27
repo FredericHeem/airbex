@@ -1,34 +1,38 @@
 var sjcl = require('./vendor/sjcl')
-, Q = require('q')
-, auth = module.exports = {}
+, connect = require('express/node_modules/connect')
+, util = require('util')
+, auth = module.exports = function(conn) {
+    return function(req, res, next) {
+        if (req.user) return next()
 
-auth.sign = function(form, secret) {
-    var body = JSON.stringify(form) + secret
-    , bits = sjcl.hash.sha256.hash(body)
-    return sjcl.codec.base64.fromBits(bits)
-}
+        var authorization = req.headers.authorization
 
-auth.verify = function(conn, req, res, next) {
-    var key = req.headers['snow-key']
-    if (!key) return next()
+        if (!authorization) {
+            res.header('www-authenticate', 'Basic realm="Authorization Required"')
+            return res.send(401)
+        }
 
-    conn.query({
-        text: 'SELECT user_id, secret FROM api_key WHERE api_key_id = $1',
-        values: [key]
-    }, function(err, dres) {
-        if (err) return next(err)
-        if (!dres.rowCount) return res.send(401, { code: 'UnknownApiKey', message: 'no such api key' })
-        var sig = auth.sign(req.body, dres.rows[0].secret)
-        if (sig !== req.headers['snow-sign']) return res.send(401, { code: 'BadMessageSignature', message: 'bad message signature' });
-        (req.security || (req.security = {})).userId = dres.rows[0].user_id
-        next()
-    })
-}
+        var parts = authorization.split(' ')
+        , scheme = parts[0]
+        , credentials = new Buffer(parts[1], 'base64').toString().split(':')
+        , username = credentials[0]
+        , password = credentials[1]
 
-auth.demand = function(req, res) {
-    if (req.security && req.security.userId) return true
-    res.send(401, {
-        name: 'AuthenticationRequired',
-        message: 'must be authenticated to perform this action'
-    })
+        if (scheme != 'Basic') return res.send(400)
+
+        conn.query({
+            text: 'SELECT user_id FROM api_key WHERE api_key_id = $1',
+            values: [password]
+        }, function(err, dres) {
+            if (err) return next(err)
+
+            if (!dres.rowCount) {
+                return res.send(401, { name: 'UnknownApiKey', message: 'Unknown API key' })
+            }
+
+            req.user = dres.rows[0].user_id
+
+            return next()
+        })
+    }
 }

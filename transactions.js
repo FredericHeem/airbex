@@ -2,14 +2,12 @@ var Q = require('q')
 , auth = require('./auth')
 , transactions = module.exports = {}
 
-transactions.configure = function(app, conn, securityId) {
-    app.get('/accounts/transactions', transactions.forUser.bind(transactions, conn))
-    app.get('/accounts/:id/transactions', transactions.forUserAccount.bind(transactions, conn))
+transactions.configure = function(app, conn, auth) {
+    app.get('/accounts/transactions', auth, transactions.forUser.bind(transactions, conn))
+    app.get('/accounts/:id/transactions', auth, transactions.forUserAccount.bind(transactions, conn))
 }
 
 transactions.forUser = function(conn, req, res, next) {
-    if (!auth.demand(req, res)) return
-
     var query = [
         'SELECT transaction_id, user_id, created, amount_decimal amount, security_id',
         'FROM account_transaction',
@@ -19,7 +17,7 @@ transactions.forUser = function(conn, req, res, next) {
 
     Q.ninvoke(conn, 'query', {
         text: query,
-        values: [req.security.userId]
+        values: [req.user]
     })
     .then(function(dres) {
         res.send(dres.rows)
@@ -28,13 +26,11 @@ transactions.forUser = function(conn, req, res, next) {
 }
 
 transactions.forUserAccount = function(conn, req, res, next) {
-    if (!auth.demand(req, res)) return
-
     var query = 'SELECT * FROM account_transaction ' +
         'WHERE account_id = $1 AND user_id = $2'
     Q.ninvoke(conn, 'query', {
         text: query,
-        values: [req.params.id, req.security.userId]
+        values: [req.params.id, req.user]
     })
     .then(function(dres) {
         res.send(dres.rows)

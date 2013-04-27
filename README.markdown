@@ -1,25 +1,30 @@
-snow
+Snow API
 =====
 
-The API is accessible from [https://snowco.in/api]
+The API is accessible from [https://snowco.in/api](https://snowco.in/api)
 
 Security
 ---
 
-Private methods require the user to be authenticated. This is done by sending two extra headers:
-`snow-key` and `snow-sign`
-
-This is the signing method:
-
-```
-function sign(form, secret) {
-    var body = JSON.stringify(form || {}) + secret
-    , bits = sjcl.hash.sha256.hash(body)
-    return sjcl.codec.base64.fromBits(bits)
-}
-```
+Private methods require the user to be authenticated. [Basic authentication](http://tools.ietf.org/html/rfc1945#section-10.16) is used.
+The username is "api" and the password is the API key.
 
 Methods
 ---
 
-
+<table>
+    <tr>
+        <th>Verb</th>
+        <th>Path</th>
+        <th>Authorization</th>
+        <th>Parameters</th>
+        <th>Remarks</th>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td>/accounts</td>
+        <td>Private</td>
+        <td></td>
+        <td>Will be replaced by /user/balances</td>
+    </tr>
+</table>

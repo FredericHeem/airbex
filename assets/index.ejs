@@ -67,6 +67,12 @@
         <a href="https://twitter.com/snow_coin" target="_blank">Twitter</a>
     </footer>
 
+    <script>
+        snow = {
+            intercomAppId: <%= typeof intercomAppId !== 'undefined' ? "'" + intercomAppId + "'" : 'null' %>
+        }
+    </script>
+
     <% if (minify) { %>
         <script src="scripts.min.js"></script>
     <% } else { %>

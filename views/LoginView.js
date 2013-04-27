@@ -59,11 +59,7 @@ var SectionView = require('./SectionView')
         this.toggleInteraction(false)
 
         result.then(function() {
-            app.user = that.model
-            app.apiKey = apiKey
-            $('body').addClass('is-logged-in')
-            $('#top .account-summary .logged-in .email').html(that.model.get('email'))
-
+            app.setUser(that.model, apiKey)
             Backbone.history.navigate('my/accounts', true)
         }, function(xhr) {
             that.toggleInteraction(true)

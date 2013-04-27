@@ -37,7 +37,8 @@ var vendor = [
     'public/jquery-2.0.0.min.js',
     'public/sjcl.js',
     'public/alertify.min.js',
-    'public/bootstrap.min.js'
+    'public/bootstrap.min.js',
+    'public/intercom.js'
 ]
 
 file('public/jquery-2.0.0.min.js', ['vendor/jquery-2.0.0.min.js'], function() {
@@ -46,6 +47,7 @@ file('public/jquery-2.0.0.min.js', ['vendor/jquery-2.0.0.min.js'], function() {
 
 file('public/jquery-2.0.0.min.js', ['vendor/jquery-2.0.0.min.js'], cpTask)
 file('public/sjcl.js', ['vendor/sjcl.js'], cpTask)
+file('public/intercom.js', ['vendor/intercom.js'], cpTask)
 file('public/alertify.min.js', ['vendor/alertify/alertify.min.js'], cpTask)
 file('public/bootstrap.min.js', ['vendor/bootstrap.min.js'], cpTask)
 file('public/ripple.txt', ['assets/ripple.txt'], cpTask)
@@ -61,7 +63,10 @@ file('public/styles.min.css', ['public/styles.css'], compressCss)
 
 file('public/index.html', ['public'], function() {
     var ejs = require('ejs')
-    ejs.render(cat('assets/index.ejs'), { minify: false })
+    ejs.render(cat('assets/index.ejs'), {
+        minify: false,
+        intercomAppId: '64463fba8faa8166444bfb3c00a5e40976bd622e'
+    })
     .to(this.name)
 })
 
@@ -69,7 +74,8 @@ file('public/index.min.html', ['public'], function() {
     var ejs = require('ejs')
     ejs.render(cat('assets/index.ejs'), {
         minify: true,
-        raven: 'https://bfadc2055bf84739b2f24f21a45d40af@app.getsentry.com/7528'
+        raven: 'https://bfadc2055bf84739b2f24f21a45d40af@app.getsentry.com/7528',
+        intercomAppId: '64463fba8faa8166444bfb3c00a5e40976bd622e'
     })
     .to(this.name)
 })

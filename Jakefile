@@ -73,7 +73,8 @@ file('public/index.min.html', ['public'], function() {
     var ejs = require('ejs')
     ejs.render(cat('assets/index.ejs'), {
         minify: true,
-        raven: 'https://bfadc2055bf84739b2f24f21a45d40af@app.getsentry.com/7528'
+        raven: 'https://bfadc2055bf84739b2f24f21a45d40af@app.getsentry.com/7528',
+        segment: 'bc0p8b3ul1'
     })
     .to(this.name)
 })

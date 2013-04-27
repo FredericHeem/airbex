@@ -23,7 +23,7 @@ intercom.intercom = function(conn, config, req, res, next) {
         res.send({
             app_id: config.intercom_app_id,
             user_hash: hmac.digest('hex'),
-            created: user.created
+            created_at: user.created
         })
     })
 }

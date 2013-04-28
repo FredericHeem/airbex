@@ -1,5 +1,3 @@
-BEGIN;
-
 DROP VIEW active_order;
 DROP VIEW order_depth_view;
 DROP VIEW book_view;

@@ -8,7 +8,7 @@ var async = require('async')
     reload: function(cb) {
         var that = this
         this.currencies = new Models.CurrencyCollection()
-        this.markets = new Models.BookCollection()
+        this.markets = new Models.MarketCollection()
 
         async.parallel([
             function(next) {

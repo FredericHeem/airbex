@@ -1,7 +1,7 @@
 var Backbone = require('backbone')
-, Book = require('./Book')
-, BookCollection = module.exports = Backbone.Collection.extend({
-    model: Book,
+, Market = require('./Market')
+, MarketCollection = module.exports = Backbone.Collection.extend({
+    model: Market,
 
     fromPair: function(base, quote) {
         return this.find(function(b) {

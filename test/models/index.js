@@ -1,5 +1,5 @@
 require('./Account')
-require('./Book')
+require('./Market')
 require('./Order')
 require('./Currency')
 require('./Transaction')

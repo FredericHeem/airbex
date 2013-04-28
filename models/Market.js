@@ -5,7 +5,7 @@ var Relational = require('backbone-relational')
 , DepthCollection = require('./DepthCollection')
 , Order = require('./Order')
 , OrderCollection = require('./OrderCollection')
-, Book = module.exports = Relational.RelationalModel.extend({
+, Market = module.exports = Relational.RelationalModel.extend({
     idAttribute: 'market_id',
 
     pair: function() {

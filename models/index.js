@@ -1,7 +1,7 @@
 module.exports = {
     Meta: require('./Meta'),
-    Book: require('./Book'),
-    BookCollection: require('./BookCollection'),
+    Market: require('./Market'),
+    MarketCollection: require('./MarketCollection'),
     Depth: require('./Depth'),
     Currency: require('./Currency'),
     CurrencyCollection: require('./CurrencyCollection'),

@@ -1,8 +1,9 @@
-BEGIN; DO $$
+BEGIN; DO $$ <<fn>>
 DECLARE
   uid int;
+  key varchar(64) := 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBB';
 BEGIN
-	uid := create_user('test@TEST.com', 'key', 'secret');
+	uid := create_user('test@TEST.com', fn.key);
 
 	IF (SELECT COUNT(*) FROM "user" WHERE email = 'test@TEST.com') <> 1 THEN
 		RAISE 'User not found by email';
@@ -12,7 +13,7 @@ BEGIN
 		RAISE 'User not found by email_lower';
 	END IF;
 
-	IF (SELECT COUNT(*) FROM api_key WHERE api_key_id = 'key' AND secret = 'secret' AND user_id = uid) <> 1 THEN
-		RAISE 'User first api key/secret not found';
+	IF (SELECT COUNT(*) FROM api_key WHERE api_key_id = fn.key AND secret IS NULL AND user_id = uid) <> 1 THEN
+		RAISE 'User first api key not found';
 	END IF;
 END; $$; ROLLBACK;

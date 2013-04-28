@@ -1,3 +1,5 @@
+BEGIN;
+
 DROP VIEW active_order;
 DROP VIEW order_depth_view;
 DROP VIEW book_view;
@@ -5,6 +7,9 @@ DROP VIEW order_view;
 DROP VIEW account_transaction;
 DROP VIEW transaction_view;
 DROP VIEW match_view;
+
+ALTER TABLE "security"
+    RENAME TO currency;
 
 ALTER TABLE book
     RENAME TO market;
@@ -18,23 +23,13 @@ ALTER TABLE market
 ALTER TABLE market
         RENAME quote_security_id TO quote_currency_id;
 
-ALTER TABLE market
-    RENAME CONSTRAINT book_base_security_id_fkey TO market_base_currency_id_fkey;
-
-ALTER TABLE market
-    RENAME CONSTRAINT book_quote_security_id_fkey TO market_quote_currency_id_fkey;
+ALTER TABLE market DROP CONSTRAINT book_base_security_id_fkey;
 
 ALTER INDEX book_pkey
     RENAME TO market_pkey;
 
 ALTER TABLE "order"
     RENAME book_id TO market_id;
-
-ALTER TABLE "order"
-    RENAME CONSTRAINT order_book_id_fkey TO order_market_id_fkey;
-
-ALTER TABLE "security"
-    RENAME TO currency;
 
 ALTER TABLE currency
     RENAME security_id TO currency_id;
@@ -148,11 +143,15 @@ CREATE VIEW active_order_view AS
 ALTER SEQUENCE book_book_id_seq
     RENAME TO market_market_id_seq;
 
-ALTER TABLE account
-    RENAME CONSTRAINT account_security_id_fkey TO account_currency_id_fkey;
+ALTER TABLE account DROP CONSTRAINT account_security_id_fkey;
 
-ALTER TABLE currency
-    RENAME CONSTRAINT security_pkey TO currency_pkey;
+ALTER TABLE account
+  ADD CONSTRAINT account_currency_id_fkey FOREIGN KEY (currency_id)
+      REFERENCES currency (currency_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER INDEX security_pkey
+    RENAME TO currency_pkey;
 
 ALTER TYPE security_id
     RENAME TO currency_id;
@@ -411,3 +410,20 @@ BEGIN
 END; $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+ALTER TABLE market
+  ADD CONSTRAINT market_base_currency_id_fkey FOREIGN KEY (base_currency_id)
+      REFERENCES currency (currency_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE market
+  ADD CONSTRAINT market_quote_currency_id_fkey FOREIGN KEY (quote_currency_id)
+      REFERENCES currency (currency_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE "order" DROP CONSTRAINT order_book_id_fkey;
+
+ALTER TABLE "order"
+  ADD CONSTRAINT order_market_id_fkey FOREIGN KEY (market_id)
+      REFERENCES market (market_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;

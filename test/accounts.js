@@ -24,7 +24,7 @@ describe('accounts', function() {
 				}
 			}
 			, req = {
-				security: { userId: 25 }
+				user: 25
 			}
 			, res = {
 				send: function(r) {

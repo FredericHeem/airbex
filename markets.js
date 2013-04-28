@@ -1,21 +1,21 @@
 var _ = require('underscore')
 , Q = require('q')
-, Books = module.exports = {}
+, Markets = module.exports = {}
 
-Books.configure = function(app, conn) {
-    app.get('/books', Books.books.bind(Books, conn))
-    app.get('/books/:id/depth', Books.depth.bind(Books, conn))
+Markets.configure = function(app, conn) {
+    app.get('/markets', Markets.markets.bind(Markets, conn))
+    app.get('/markets/:id/depth', Markets.depth.bind(Markets, conn))
 }
 
-Books.books = function(conn, req, res, next) {
-    Q.ninvoke(conn, 'query', 'SELECT * FROM book_view')
+Markets.markets = function(conn, req, res, next) {
+    Q.ninvoke(conn, 'query', 'SELECT * FROM market_view')
     .then(function(cres) {
         res.send(cres.rows.map(function(row) {
             return {
-                book_id: row.book_id,
-                pair: row.base_security_id + '/' + row.quote_security_id,
-                base_security_id: row.base_security_id,
-                quote_security_id: row.quote_security_id,
+                market_id: row.market_id,
+                pair: row.base_currency_id + '/' + row.quote_currency_id,
+                base_currency_id: row.base_currency_id,
+                quote_currency_id: row.quote_currency_id,
                 last: row.last_decimal,
                 high: row.high_decimal,
                 low: row.low_decimal,
@@ -29,10 +29,10 @@ Books.books = function(conn, req, res, next) {
     .done()
 }
 
-Books.depth = function(conn, req, res, next) {
+Markets.depth = function(conn, req, res, next) {
     var query = [
-        'SELECT price_decimal price, volume_decimal volume, side, book_id',
-        'FROM order_depth_view WHERE book_id = $1'
+        'SELECT price_decimal price, volume_decimal volume, side, market_id',
+        'FROM order_depth_view WHERE market_id = $1'
     ].join('\n')
 
     Q.ninvoke(conn, 'query', {

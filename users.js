@@ -21,7 +21,6 @@ users.whoami = function(conn, req, res, next) {
 }
 
 users.create = function(conn, req, res, next) {
-    console.log(req.body)
     if (!validate(req.body, 'user_create', res)) return
 
     Q.ninvoke(conn, 'query', {

@@ -15,7 +15,7 @@ orders.create = function(conn, req, res, next) {
 
     Q.ninvoke(conn, 'query', {
         text: 'SELECT create_order($1, $2, $3, $4, $5) order_id',
-        values: [req.user, req.body.book_id, req.body.side, req.body.price, req.body.volume]
+        values: [req.user, req.body.market_id, req.body.side, req.body.price, req.body.volume]
     })
     .then(function(cres) {
         res.send(201, { order_id: cres.rows[0].order_id })
@@ -42,8 +42,8 @@ orders.create = function(conn, req, res, next) {
 orders.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn, 'query', {
         text: [
-            'SELECT order_id, book_id, side, price_decimal price, volume_decimal volume,',
-            '   original_decimal original, matched_decimal matched',
+            'SELECT order_id id, market_id, side, price_decimal price, volume_decimal volume,',
+            '   original_decimal original, matched_decimal matched, base_security_id || \'/\' || quote_security_id pair',
             'FROM order_view',
             'WHERE user_id = $1 AND volume > 0'
         ].join('\n'),

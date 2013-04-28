@@ -21,31 +21,23 @@ describe('ripple', function() {
 			var conn = {
 				query: function(q, c) {
 					expect(q.text).to.match(/ripple_withdraw/i)
-					expect(q.values).to.eql([98, 'rsomeaddress', 503])
+					expect(q.values).to.eql([98, 'QQQ', 'rsomeaddress', '50.3'])
 					c(null, { rows: [{ request_id: 59 }] })
 				}
 			}
 			, req = {
-				security: { userId: 38 },
+				user: 98,
 				body: {
 					address: 'rsomeaddress',
-					amount: 503
+					amount: '50.3',
+					currencyId: 'QQQ'
 				}
 			}
 			, res = {
 				send: function(code, r) {
 					expect(code).to.be(201)
 					expect(r.request_id).to.be(59)
-					ripple.getUserSecurityAccount = gusa
 					done()
-				}
-			}
-			, gusa = ripple.getUserSecurityAccount
-			ripple.getUserSecurityAccount = function() {
-				return {
-					then: function(x) {
-						x(98)
-					}
 				}
 			}
 

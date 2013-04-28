@@ -1,7 +1,7 @@
 {
     "type": "object",
     "properties": {
-        "book_id": {
+        "market_id": {
             "type": "integer",
             "required": true,
             "minimum": 1

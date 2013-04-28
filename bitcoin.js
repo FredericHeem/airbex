@@ -4,18 +4,18 @@ var Q = require('q')
 , bitcoin = module.exports = {}
 , auth = require('./auth')
 
-bitcoin.configure = function(app, conn, auth, securityId) {
-    app.post('/withdraw/' + securityId, auth, bitcoin.withdraw.bind(bitcoin, conn, securityId))
-    app.get('/deposit/' + securityId + '/address', auth, bitcoin.address.bind(bitcoin, conn, securityId))
+bitcoin.configure = function(app, conn, auth, currencyId) {
+    app.post('/withdraw/' + currencyId, auth, bitcoin.withdraw.bind(bitcoin, conn, currencyId))
+    app.get('/deposit/' + currencyId + '/address', auth, bitcoin.address.bind(bitcoin, conn, currencyId))
 }
 
-bitcoin.withdraw = function(conn, securityId, req, res, next) {
+bitcoin.withdraw = function(conn, currencyId, req, res, next) {
     console.log('processing withdraw request of %d %s from user #%s to %s',
-        req.body.amount, securityId, req.user, req.body.address)
+        req.body.amount, currencyId, req.user, req.body.address)
 
     Q.ninvoke(conn, 'query', {
-        text: 'SELECT ' + securityId + '_withdraw ($1, $2, from_decimal($3, $4)) request_id',
-        values: [req.user, req.body.address, req.body.amount, securityId]
+        text: 'SELECT ' + currencyId + '_withdraw ($1, $2, from_decimal($3, $4)) request_id',
+        values: [req.user, req.body.address, req.body.amount, currencyId]
     })
     .then(function(cres) {
         res.send(201, { request_id: cres.rows[0].request_id })
@@ -36,12 +36,12 @@ bitcoin.withdraw = function(conn, securityId, req, res, next) {
     .done()
 }
 
-bitcoin.address = function(conn, securityId, req, res, next) {
+bitcoin.address = function(conn, currencyId, req, res, next) {
     Q.ninvoke(conn, 'query', {
         text: util.format(
             'SELECT address FROM %s_deposit_address WHERE account_id = user_security_account($1, $2)',
-            securityId),
-        values: [req.user, securityId]
+            currencyId),
+        values: [req.user, currencyId]
     })
     .then(function(cres) {
         var address = cres.rows.length ? cres.rows[0].address : null

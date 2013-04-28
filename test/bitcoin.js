@@ -9,7 +9,7 @@ describe('bitcoin', function() {
 				post: function(url) { routes.push('post ' + url) },
 				get: function(url) { routes.push('get ' + url) }
 			}
-			bitcoin.configure(app, null, 'BTC')
+			bitcoin.configure(app, null, null, 'BTC')
 			expect(routes).to.contain('post /withdraw/BTC')
 			expect(routes).to.contain('get /deposit/BTC/address')
 		})
@@ -25,7 +25,7 @@ describe('bitcoin', function() {
 				}
 			}
 			, req = {
-				security: { userId: 25 }
+				user: 25
 			}
 			, res = {
 				send: function(r) {
@@ -43,15 +43,15 @@ describe('bitcoin', function() {
 			var conn = {
 				query: function(q, c) {
 					expect(q.text).to.match(/btc_withdraw/i)
-					expect(q.values).to.eql([38, '1someaddress', 150])
+					expect(q.values).to.eql([38, '1someaddress', '0.15', 'BTC'])
 					c(null, { rows: [{ request_id: 59 }] })
 				}
 			}
 			, req = {
-				security: { userId: 38 },
+				user: 38,
 				body: {
 					address: '1someaddress',
-					amount: 150
+					amount: '0.15'
 				}
 			}
 			, res = {
@@ -62,7 +62,7 @@ describe('bitcoin', function() {
 				}
 			}
 
-			bitcoin.withdraw(conn, 'btc', req, res, done)
+			bitcoin.withdraw(conn, 'BTC', req, res, done)
 		})
 	})
 })

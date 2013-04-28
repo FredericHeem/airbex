@@ -16,19 +16,19 @@ describe('users', function() {
 	})
 
 	describe('create', function() {
-		it('returns users', function(done) {
-			var conn = {
+		it('returns user', function(done) {
+			var key = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBB'
+			, conn = {
 				query: function(q, c) {
 					expect(q.text).to.match(/select create_user/i)
-					expect(q.values).to.eql(['bob@bob.com', 'key', 'secreto'])
+					expect(q.values).to.eql(['bob@bob.com', key])
 					c(null, { rows: [{ user_id: 89 }] })
 				}
 			}
 			, req = {
 				body: {
 					email: 'bob@bob.com',
-					key: 'key',
-					secret: 'secreto'
+					key: key
 				}
 			}
 			, res = {

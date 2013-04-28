@@ -1,37 +1,37 @@
 var expect = require('expect.js')
-, books = require('../books')
+, markets = require('../markets')
 
-describe('books', function() {
+describe('markets', function() {
 	describe('configure', function() {
 		it('adds expected routes', function() {
 			var routes = []
 			, app = {
 				get: function(url) { routes.push('get ' + url) }
 			}
-			books.configure(app)
-			expect(routes).to.contain('get /books')
-			expect(routes).to.contain('get /books/:id/depth')
+			markets.configure(app)
+			expect(routes).to.contain('get /markets')
+			expect(routes).to.contain('get /markets/:id/depth')
 		})
 	})
 
-	describe('books', function() {
-		it('returns the books', function(done) {
+	describe('markets', function() {
+		it('returns the markets', function(done) {
 			var conn = {
 				query: function(q, c) {
-					expect(q).to.match(/books_overview/i)
-					c(null, { rows: [{ book_id: 93 }] })
+					expect(q).to.match(/market/i)
+					c(null, { rows: [{ market_id: 93 }] })
 				}
 			}
 			, req = {
 			}
 			, res = {
 				send: function(r) {
-					expect(r[0].book_id).to.be(93)
+					expect(r[0].market_id).to.be(93)
 					done()
 				}
 			}
 
-			books.books(conn, req, res, done)
+			markets.markets(conn, req, res, done)
 		})
 	})
 
@@ -57,7 +57,7 @@ describe('books', function() {
 				}
 			}
 
-			books.depth(conn, req, res, done)
+			markets.depth(conn, req, res, done)
 		})
 	})
 })

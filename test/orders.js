@@ -33,7 +33,7 @@ describe('orders', function() {
 				}
 			}
 			, req = {
-				security: { userId: 10 }
+				user: 10
 			}
 			, res = {
 				send: function(r) {
@@ -58,16 +58,17 @@ describe('orders', function() {
 				},
 
 				query: function(q, cb) {
-					expect(q).to.be('built')
+					expect(q.text).to.match(/create_order/i)
+					expect(q.values).to.eql([8, 7, 1, '12', '9'])
 					cb(null, { rows: [{ order_id: 17 }] })
 				}
 			}
 			, req = {
-				security: { userId: 8 },
+				user: 8,
 				body: {
-					book_id: 7,
-					volume: 9,
-					price: 12,
+					market_id: 7,
+					volume: '9',
+					price: '12',
 					side: 1
 				}
 			}
@@ -94,7 +95,7 @@ describe('orders', function() {
 				}
 			}
 			, req = {
-				security: { userId: 3 },
+				user: 3,
 				params: {
 					id: 9
 				}

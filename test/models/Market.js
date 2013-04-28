@@ -4,7 +4,7 @@ var expect = require('expect.js')
 describe('Book', function() {
     describe('asks', function() {
         it('has id-attribute _id', function() {
-            var target = new Book({ book_id: 123 });
+            var target = new Book({ market_id: 123 });
             expect(target.id).to.be(123);
         })
     })

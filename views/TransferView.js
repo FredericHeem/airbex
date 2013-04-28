@@ -4,13 +4,13 @@ var View = require('./View')
 , num = require('num')
 , Section = require('./SectionView')
 , _ = require('underscore')
-, SendView = module.exports = Section.extend({
+, TransferView = module.exports = Section.extend({
     initialize: function(options) {
         this.vm = new Backbone.Model({
             amount: '0.0',
             email: null,
-            securityId: 'null',
-            securities: options.app.cache.securities.pluck('security_id')
+            currencyId: 'null',
+            currencies: options.app.cache.currencies.pluck('currency_id')
         })
     },
 
@@ -24,7 +24,7 @@ var View = require('./View')
         this.vm.set({
             amount: this.$amount.val(),
             email: this.$email.val(),
-            securityId: this.$security.val()
+            currencyId: this.$currency.val()
         })
     },
 
@@ -35,11 +35,11 @@ var View = require('./View')
 
         this.read()
 
-        var security = this.options.app.cache.securities.get(this.vm.get('securityId'))
-        , scale = security.get('scale')
+        var currency = this.options.app.cache.currencies.get(this.vm.get('currencyId'))
+        , scale = currency.get('scale')
         , transaction = new Models.Transaction({
             email: this.vm.get('email'),
-            security_id: this.vm.get('securityId'),
+            currency_id: this.vm.get('currencyId'),
             amount: this.vm.get('amount')
         })
 
@@ -67,7 +67,7 @@ var View = require('./View')
 
     toggleInteraction: function(value) {
         this.$email
-        .add(this.$security)
+        .add(this.$currency)
         .add(this.$amount)
         .add(this.$send)
         .prop('disabled', !value)
@@ -78,7 +78,7 @@ var View = require('./View')
         this.$el.html(require('../templates/send.ejs')(this.vm.toJSON()))
 
         this.$email = this.$el.find('*[data-binding="email"]')
-        this.$security = this.$el.find('*[data-binding="security"]')
+        this.$currency = this.$el.find('*[data-binding="currency"]')
         this.$amount = this.$el.find('*[data-binding="amount"]')
         this.$send = this.$el.find('*[data-action="send"]')
 

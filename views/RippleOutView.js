@@ -19,13 +19,13 @@ var View = require('./View')
 
         var that = this
 
-        var security = Models.Security.findOrCreate(this.options.securityId)
-        if (!security) throw new Error('security ' + this.options.securityId + ' not found')
+        var currency = Models.Currency.findOrCreate(this.options.currencyId)
+        if (!currency) throw new Error('currency ' + this.options.currencyId + ' not found')
 
         var withdraw = new Backbone.Model({
             address: this.$address.val(),
             amount: this.$amount.val(),
-            securityId: this.options.securityId
+            currencyId: this.options.currencyId
         })
 
         this.$address.add(this.$amount, this.$withdraw).prop('disabled', true).addClass('disabled')
@@ -44,7 +44,7 @@ var View = require('./View')
 
         result.then(function() {
             Alertify.log.success('Ripple withdraw of ' + that.$amount.val() + ' ' +
-                withdraw.get('securityId') + ' to ' + withdraw.get('address') + ' requested')
+                withdraw.get('currencyId') + ' to ' + withdraw.get('address') + ' requested')
             Backbone.history.navigate('my/accounts', true)
         }, function(xhr) {
             var error = app.errorFromXhr(xhr)
@@ -61,7 +61,7 @@ var View = require('./View')
 
     render: function() {
         this.$el.html(require('../templates/ripple-out.ejs')({
-            securityId: this.options.securityId
+            currencyId: this.options.currencyId
         }))
 
         this.$address = this.$el.find('input[data-binding="address"]')

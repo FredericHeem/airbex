@@ -2,25 +2,25 @@ var async = require('async')
 , Models = require('./models')
 , app = require('./app')
 , cache = module.exports = {
-    securities: null,
-    books: null,
+    currencies: null,
+    markets: null,
 
     reload: function(cb) {
         var that = this
-        this.securities = new Models.SecurityCollection()
-        this.books = new Models.BookCollection()
+        this.currencies = new Models.CurrencyCollection()
+        this.markets = new Models.BookCollection()
 
         async.parallel([
             function(next) {
-                that.securities.fetch({
-                    url: app.apiUrl + '/securities',
+                that.currencies.fetch({
+                    url: app.apiUrl + '/currencies',
                     success: function() { next(); },
                     error: function(e) { next(e); }
                 });
             },
             function(next) {
-                that.books.fetch({
-                    url: app.apiUrl + '/books',
+                that.markets.fetch({
+                    url: app.apiUrl + '/markets',
                     success: function() { next(); },
                     error: function(e) { next(e); }
                 });

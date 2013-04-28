@@ -5,7 +5,7 @@ var Backbone = require('backbone')
 
     fromPair: function(base, quote) {
         return this.find(function(b) {
-            return b.get('base_security').id == base && b.get('quote_security').id == quote;
+            return b.get('base_currency').id == base && b.get('quote_currency').id == quote;
         });
     }
 });

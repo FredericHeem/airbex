@@ -5,25 +5,25 @@ var SectionView = require('./SectionView')
 , View = require('./View')
 , Models = require('../models')
 , CreateOrderView = require('./CreateOrderView')
-, BookView = module.exports = SectionView.extend({
+, MarketView = module.exports = SectionView.extend({
     ItemView: View.extend({
         tagName: 'tr',
 
         render: function() {
             var vm = this.model.toJSON()
-            , book = this.model.get('book')
+            , market = this.model.get('market')
             , scaleNumbers = ''
-            for (var i = 0; i < book.get('scale'); i++) scaleNumbers += '0'
+            for (var i = 0; i < market.get('scale'); i++) scaleNumbers += '0'
             vm.price = numeral(vm.price).format('0,0[.' + scaleNumbers + ']')
 
-            this.$el.html(require('../templates/book-depth.ejs')(vm))
+            this.$el.html(require('../templates/market-depth.ejs')(vm))
             return this;
         }
     }),
 
-    className: 'container book',
+    className: 'container market',
 
-    section: 'books',
+    section: 'markets',
 
     events: {
         'click .btn.create-order': 'showCreateOrder'
@@ -55,13 +55,13 @@ var SectionView = require('./SectionView')
             pair: this.model.pair()
         }
 
-        this.$el.html(require('../templates/book.ejs')(vm))
+        this.$el.html(require('../templates/market.ejs')(vm))
 
-        this.$children = this.$el.find('table.books tbody')
+        this.$children = this.$el.find('table.markets tbody')
         this.reset()
 
         var view = new CreateOrderView({
-            book: this.model
+            market: this.model
         })
 
         view.render().$el.appendTo(this.$el.find('.place-order-container'))

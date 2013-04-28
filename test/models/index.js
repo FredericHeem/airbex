@@ -1,6 +1,6 @@
 require('./Account')
 require('./Book')
 require('./Order')
-require('./Security')
+require('./Currency')
 require('./Transaction')
 require('./User')

@@ -5,10 +5,10 @@
 
             <form class="form span4">
                 <div class="control-group">
-                    <label class="control-label" for="security">Security</label>
+                    <label class="control-label" for="currency">Currency</label>
                     <div class="controls">
-                        <select id="security" data-binding="security">
-                            <% _.each(securities, function(s) { %>
+                        <select id="currency" data-binding="currency">
+                            <% _.each(currencies, function(s) { %>
                                 <option value="<%= s %>"><%= s %></option>
                             <% }) %>
                         </select>
@@ -25,7 +25,7 @@
                     <div class="controls">
                         <div class="input-append">
                             <input class="input input-small volume" for="amount" data-binding="amount" type="text" value="<%= amount %>" />
-                            <!--<span class="add-on security"><%= 'TODO' %></span>-->
+                            <!--<span class="add-on currency"><%= 'TODO' %></span>-->
                         </div>
                     </div>
                 </div>

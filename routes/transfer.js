@@ -6,12 +6,12 @@ var Backbone = require('backbone')
         'my/transfer': 'transfer'
     },
 
-    transfer: function(security_id) {
+    transfer: function(currency_id) {
         if (!app.authorize()) return
 
-        var view = new Views.SendView({
+        var view = new Views.TransferView({
             app: app,
-            security_id: security_id || null
+            currency_id: currency_id || null
         })
         app.section(view, true)
     }

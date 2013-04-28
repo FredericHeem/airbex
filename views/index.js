@@ -1,6 +1,6 @@
 module.exports = {
-    BooksView: require('./BooksView'),
-    BookView: require('./BookView'),
+    MarketsView: require('./MarketsView'),
+    MarketView: require('./MarketView'),
     HeaderView: require('./HeaderView'),
     UserAccountsView: require('./UserAccountsView'),
     UserOrdersView: require('./UserOrdersView'),
@@ -14,7 +14,7 @@ module.exports = {
     ErrorView: require('./ErrorView'),
     LoginView: require('./LoginView'),
     HomeView: require('./HomeView'),
-    SendView: require('./SendView'),
+    TransferView: require('./TransferView'),
     RippleOutView: require('./RippleOutView'),
     RegisterView: require('./RegisterView')
 }

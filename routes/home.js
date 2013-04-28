@@ -30,7 +30,7 @@ _ = require('underscore')
     rippleOut: function(sid) {
         if (!app.authorize()) return
         var view = new Views.RippleOutView({
-            securityId: sid
+            currencyId: sid
         })
         app.section(view, true)
     }

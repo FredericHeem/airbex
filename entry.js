@@ -13,7 +13,7 @@ var routes = {
     home: new (require('./routes/home')),
     login: new (require('./routes/login')),
     register: new (require('./routes/register')),
-    books: new (require('./routes/books')),
+    markets: new (require('./routes/markets')),
     withdraw: new (require('./routes/withdraw')),
     deposit: new (require('./routes/deposit')),
     transfer: new (require('./routes/transfer')),

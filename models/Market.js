@@ -1,15 +1,15 @@
 var Relational = require('backbone-relational')
 , Backbone = require('backbone')
-, Security = require('./Security')
+, Currency = require('./Currency')
 , Depth = require('./Depth')
 , DepthCollection = require('./DepthCollection')
 , Order = require('./Order')
 , OrderCollection = require('./OrderCollection')
 , Book = module.exports = Relational.RelationalModel.extend({
-    idAttribute: 'book_id',
+    idAttribute: 'market_id',
 
     pair: function() {
-        return this.get('base_security').id + '/' + this.get('quote_security').id
+        return this.get('base_currency').id + '/' + this.get('quote_currency').id
     },
 
     relations: [{
@@ -19,28 +19,28 @@ var Relational = require('backbone-relational')
         collectionType: DepthCollection,
         includeInJSON: true,
         reverseRelation: {
-            key: 'book',
-            keySource: 'book_id'
+            key: 'market',
+            keySource: 'market_id'
         }
     }, {
         type: Relational.HasOne,
-        key: 'base_security',
-        keySource: 'base_security_id',
-        relatedModel: Security
+        key: 'base_currency',
+        keySource: 'base_currency_id',
+        relatedModel: Currency
     }, {
         type: Relational.HasOne,
-        key: 'quote_security',
-        keySource: 'quote_security_id',
-        relatedModel: Security
+        key: 'quote_currency',
+        keySource: 'quote_currency_id',
+        relatedModel: Currency
     }, {
         type: Relational.HasMany,
         key: 'orders',
         relatedModel: Order,
         collectionType: OrderCollection,
         reverseRelation: {
-            key: 'book',
-            keySource: 'book_id',
-            includeInJSON: 'book_id'
+            key: 'market',
+            keySource: 'market_id',
+            includeInJSON: 'market_id'
         }
     }]
 });

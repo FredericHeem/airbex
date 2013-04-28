@@ -29,8 +29,8 @@ var SectionView = require('./SectionView')
 
         render: function() {
             var vm = this.model.toJSON();
-            vm.pair = this.model.get('book').pair()
-            vm.base = this.model.get('book').get('base_security').id
+            vm.pair = this.model.get('market').pair()
+            vm.base = this.model.get('market').get('base_currency').id
 
             this.$el.html(require('../templates/user-orders-order.ejs')(vm));
 

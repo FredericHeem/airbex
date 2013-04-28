@@ -1,19 +1,19 @@
 var Relational = require('backbone-relational')
 , Backbone = require('backbone')
-, Security = require('./Security')
+, Currency = require('./Currency')
 , num = require('num')
 , Account = module.exports = Relational.RelationalModel.extend({
     idAttribute: 'account_id',
 
     availableDecimal: function() {
-        return +num(this.get('available'), this.get('security').get('scale'));
+        return +num(this.get('available'), this.get('currency').get('scale'));
     },
 
     relations: [{
         type: Relational.HasOne,
-        key: 'security',
-        keySource: 'security_id',
-        keyDestination: 'security',
-        relatedModel: Security
+        key: 'currency',
+        keySource: 'currency_id',
+        keyDestination: 'currency',
+        relatedModel: Currency
     }]
 })

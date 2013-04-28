@@ -16,6 +16,26 @@ describe('ripple', function() {
 		})
 	})
 
+	describe('address', function() {
+		it('throws if there is no ripple account', function(done) {
+			var conn = {
+				query: function(q, c) {
+					c(null, { rows: [] })
+				}
+			}
+			, req = {
+			}
+			, res = {
+				send: function(code, r) {
+					expect(code).to.be(500)
+					done()
+				}
+			}
+
+			ripple.address(conn, req, res, done)
+		})
+	})
+
 	describe('withdraw', function() {
 		it('enqueues', function(done) {
 			var conn = {

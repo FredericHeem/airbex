@@ -3,8 +3,8 @@ var _ = require('underscore')
 , bitcoincharts = module.exports = {}
 
 bitcoincharts.configure = function(app, conn) {
-    app.get('/bitcoincharts/:securityId/trades.json', bitcoincharts.trades.bind(bitcoincharts, conn))
-    app.get('/bitcoincharts/:securityId/orderbook.json', bitcoincharts.orderbook.bind(bitcoincharts, conn))
+    app.get('/bitcoincharts/:currencyId/trades.json', bitcoincharts.trades.bind(bitcoincharts, conn))
+    app.get('/bitcoincharts/:currencyId/orderbook.json', bitcoincharts.orderbook.bind(bitcoincharts, conn))
 }
 
 bitcoincharts.trades = function(conn, req, res, next) {
@@ -19,10 +19,10 @@ bitcoincharts.trades = function(conn, req, res, next) {
             'FROM match_view m ' +
             'INNER JOIN "order" bo ON bo.order_id = m.bid_order_id ' +
             'INNER JOIN "book" b ON b.book_id = bo.book_id ' +
-            'INNER JOIN "security" bs ON b.base_security_id = bs.security_id ' +
-            'WHERE b.quote_security_id = $1 AND m.match_id > $2 ' +
+            'INNER JOIN "currency" bs ON b.base_currency_id = bs.currency_id ' +
+            'WHERE b.quote_currency_id = $1 AND m.match_id > $2 ' +
             'ORDER BY m.match_id ASC;',
-        values: [req.params.securityId, since]
+        values: [req.params.currencyId, since]
     })
     .then(function(cres) {
         res.send(cres.rows)
@@ -36,9 +36,9 @@ bitcoincharts.orderbook = function(conn, req, res, next) {
             'SELECT *',
             'FROM order_depth_view od',
             'INNER JOIN book b ON b.book_id = od.book_id',
-            'WHERE b.base_security_id = \'BTC\' AND b.quote_security_id = $1'
+            'WHERE b.base_currency_id = \'BTC\' AND b.quote_currency_id = $1'
         ].join('\n'),
-        values: [req.params.securityId]
+        values: [req.params.currencyId]
     })
     .then(function(dres) {
         return res.send({

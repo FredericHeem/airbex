@@ -39,7 +39,7 @@ bitcoin.withdraw = function(conn, currencyId, req, res, next) {
 bitcoin.address = function(conn, currencyId, req, res, next) {
     Q.ninvoke(conn, 'query', {
         text: util.format(
-            'SELECT address FROM %s_deposit_address WHERE account_id = user_security_account($1, $2)',
+            'SELECT address FROM %s_deposit_address WHERE account_id = user_currency_account($1, $2)',
             currencyId),
         values: [req.user, currencyId]
     })

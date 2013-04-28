@@ -18,7 +18,8 @@ describe('transactions', function() {
 		it('gets transactions for the user', function(done) {
 			var conn = {
 				query: function(q, cb) {
-					expect(q.text).to.match(/account_transaction/i)
+					expect(q.text).to.match(/currency_id/i)
+					expect(q.text).to.match(/account_transaction_view/i)
 					expect(q.text).to.match(/\$1/i)
 					expect(q.values).to.eql([10])
 					cb(null, {

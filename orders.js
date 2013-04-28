@@ -43,7 +43,7 @@ orders.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn, 'query', {
         text: [
             'SELECT order_id id, market_id, side, price_decimal price, volume_decimal volume,',
-            '   original_decimal original, matched_decimal matched, base_security_id || \'/\' || quote_security_id pair',
+            '   original_decimal original, matched_decimal matched',
             'FROM order_view',
             'WHERE user_id = $1 AND volume > 0'
         ].join('\n'),

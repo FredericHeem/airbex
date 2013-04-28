@@ -19,6 +19,7 @@ describe('accounts', function() {
 			var conn = {
 				query: function(q, c) {
 					expect(q.text).to.match(/from account_view/i)
+					expect(q.text).to.match(/currency_id/i)
 					expect(q.values).to.eql([25])
 					c(null, { rows: [{ account_id: 301 }] })
 				}

@@ -19,6 +19,7 @@ describe('bitcoin', function() {
 		it('returns address', function(done) {
 			var conn = {
 				query: function(q, c) {
+					expect(q.text).to.match(/user_currency_account/i)
 					expect(q.text).to.match(/from btc_deposit_address/i)
 					expect(q.values).to.eql([25, 'BTC'])
 					c(null, { rows: [{ address: '1someaddress' }] })

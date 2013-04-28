@@ -8,7 +8,7 @@ Accounts.configure = function(app, conn, auth) {
 Accounts.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn, 'query', {
         text: [
-            'SELECT account_id, security_id, type, balance_decimal balance,',
+            'SELECT account_id, currency_id, type, balance_decimal balance,',
             'hold_decimal "hold", available_decimal available',
             'FROM account_view WHERE user_id = $1'
         ].join('\n'),

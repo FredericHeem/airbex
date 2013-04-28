@@ -8,7 +8,7 @@ Markets.configure = function(app, conn) {
 }
 
 Markets.markets = function(conn, req, res, next) {
-    Q.ninvoke(conn, 'query', 'SELECT * FROM market_view')
+    Q.ninvoke(conn, 'query', 'SELECT * FROM market_summary_view')
     .then(function(cres) {
         res.send(cres.rows.map(function(row) {
             return {

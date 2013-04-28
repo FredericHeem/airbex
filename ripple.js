@@ -73,13 +73,17 @@ ripple.address = function(conn, req, res, next) {
         text: 'SELECT address FROM ripple_account'
     }, function(err, dres) {
         if (err) return next(err)
+        if (!dres.rows.length) {
+            console.error('Ripple account missing from database')
+            return res.send(500)
+        }
         res.send({ address: dres.rows[0].address })
     })
 }
 
 ripple.withdraw = function(conn, req, res, next) {
     return Q.ninvoke(conn, 'query', {
-        text: 'SELECT ripple_withdraw(user_security_account($1, $2), $3, from_decimal($4, $2))',
+        text: 'SELECT ripple_withdraw(user_currency_account($1, $2), $3, from_decimal($4, $2))',
         values: [req.user, req.body.currencyId, req.body.address, req.body.amount]
     })
     .then(function(cres) {

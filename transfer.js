@@ -8,7 +8,7 @@ transfer.configure = function(app, conn, auth) {
 transfer.transfer = function(conn, req, res, next) {
     conn.query({
         text: 'SELECT user_transfer_to_email($1, $2, $3, from_decimal($4, $3)) transaction_id',
-        values: [req.user, req.body.email, req.body.security_id, req.body.amount]
+        values: [req.user, req.body.email, req.body.currency_id, req.body.amount]
     }, function(err, dres) {
         if (err) {
             if (err.message.match(/^User with email/)) {

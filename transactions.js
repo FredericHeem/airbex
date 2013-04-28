@@ -8,8 +8,8 @@ transactions.configure = function(app, conn, auth) {
 
 transactions.forUser = function(conn, req, res, next) {
     var query = [
-        'SELECT transaction_id, user_id, created, amount_decimal amount, security_id',
-        'FROM account_transaction',
+        'SELECT transaction_id, user_id, created, amount_decimal amount, currency_id',
+        'FROM account_transaction_view',
         'WHERE user_id = $1',
         'ORDER BY transaction_id DESC'
     ].join('\n')

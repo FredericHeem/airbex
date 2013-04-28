@@ -425,3 +425,29 @@ ALTER TABLE "order"
   ADD CONSTRAINT order_market_id_fkey FOREIGN KEY (market_id)
       REFERENCES market (market_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+DROP VIEW account_view;
+
+DROP FUNCTION to_decimal(bigint, currency_id);
+
+CREATE OR REPLACE FUNCTION to_decimal(i bigint, c currency_id)
+  RETURNS numeric AS
+$BODY$
+BEGIN
+    RETURN (SELECT i / 10^scale FROM currency WHERE currency_id = c);
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+CREATE OR REPLACE VIEW account_view AS
+ SELECT a.account_id, a.security_id, a.balance, a.hold, a.type, a.user_id, a.available, to_decimal(a.balance, a.security_id) AS balance_decimal, to_decimal(a.available, a.security_id) AS available_decimal, to_decimal(a.hold, a.security_id) AS hold_decimal
+   FROM ( SELECT account.account_id, account.currency_id AS security_id, account.balance, account.hold, account.type, account.user_id, account.balance - account.hold AS available
+           FROM account) a;
+
+DROP VIEW account_view;
+
+CREATE OR REPLACE VIEW account_view AS
+ SELECT a.account_id, a.currency_id, a.balance, a.hold, a.type, a.user_id, a.available, to_decimal(a.balance, a.currency_id) AS balance_decimal, to_decimal(a.available, a.currency_id) AS available_decimal, to_decimal(a.hold, a.currency_id) AS hold_decimal
+   FROM ( SELECT account.account_id, account.currency_id AS currency_id, account.balance, account.hold, account.type, account.user_id, account.balance - account.hold AS available
+           FROM account) a;
+

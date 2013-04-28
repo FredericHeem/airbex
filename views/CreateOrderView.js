@@ -19,7 +19,7 @@ var View = require('./View')
 
     initialize: function(options) {
         this.model = new Models.Order({
-            book: options.book,
+            market: options.market,
             side: 0,
             price: '',
             volume: ''
@@ -29,8 +29,8 @@ var View = require('./View')
         this.model.on('change:side', this.updateSide, this)
 
         var vm = _.extend({
-            base_security: options.book.get('base_security').id,
-            quote_security: options.book.get('quote_security').id
+            base_currency: options.market.get('base_currency').id,
+            quote_currency: options.market.get('quote_currency').id
         }, this.model.toJSON())
 
         this.$el.html(require('../templates/create-order.ejs')(vm))
@@ -46,7 +46,7 @@ var View = require('./View')
         var that = this
 
         this.$el.find('.summary').html('Placing order...')
-        this.options.book.get('orders').add(this.model)
+        this.options.market.get('orders').add(this.model)
 
         console.log('order being placed', this.model.attributes);
 
@@ -77,10 +77,10 @@ var View = require('./View')
             'Order #' + this.model.id,
             (this.model.get('side') ? 'ASK' : 'BID'),
             this.model.get('volume'),
-            this.model.get('book').get('base_security').id,
+            this.model.get('market').get('base_currency').id,
             '@',
             this.model.get('price'),
-            this.model.get('book').get('quote_security').id
+            this.model.get('market').get('quote_currency').id
         ].join(' ')
     },
 
@@ -125,9 +125,9 @@ var View = require('./View')
                 'You are %s %s %s for %s %s',
                 this.model.get('side') ? 'selling' : 'buying',
                 this.model.get('volume'),
-                this.model.get('book').get('base_security').id,
+                this.model.get('market').get('base_currency').id,
                 numeral(total).format(format),
-                this.model.get('book').get('quote_security').id)
+                this.model.get('market').get('quote_currency').id)
         }
 
         this.$el.find('.summary').html(summary || '')

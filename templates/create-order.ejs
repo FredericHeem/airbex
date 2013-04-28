@@ -1,7 +1,7 @@
 <div class="row">
     <ul class="side nav nav-tabs">
-        <li class="bid <%= side === 0 ? 'active' : '' %>"><a href="#">Buy <%= base_security %></a></li>
-        <li class="ask <%= side === 1 ? 'active' : '' %>"><a href="#">Sell <%= base_security %></a></li>
+        <li class="bid <%= side === 0 ? 'active' : '' %>"><a href="#">Buy <%= base_currency %></a></li>
+        <li class="ask <%= side === 1 ? 'active' : '' %>"><a href="#">Sell <%= base_currency %></a></li>
     </ul>
 </div>
 
@@ -12,21 +12,21 @@
                 <label>Amount to <%= side ? 'sell' : 'buy' %></label>
                 <div class="input-append">
                     <input class="input input-small" type="text" value="<%= volume %>" />
-                    <span class="add-on"><%= base_security %></span>
+                    <span class="add-on"><%= base_currency %></span>
                 </div>
             </div>
             <div class="price span2">
                 <label>Price per</label>
                 <div class="input-append">
                     <input class="input input-small" type="text" value="<%= price %>" />
-                    <span class="add-on"><%= quote_security %></span>
+                    <span class="add-on"><%= quote_currency %></span>
                 </div>
             </div>
             <div class="total offset2 span2">
                 <div class="input-append">
                     <label>Order total</label>
                     <input class="input input-small disabled" disabled="disabled" type="text" value="" />
-                    <span class="add-on"><%= quote_security %></span>
+                    <span class="add-on"><%= quote_currency %></span>
                 </div>
             </div>
         </div>

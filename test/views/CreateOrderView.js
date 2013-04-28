@@ -5,7 +5,12 @@ var Backbone = require('backbone')
 describe('CreateOrderView', function() {
     describe('constructor', function() {
         it('exists', function() {
-            var view = new CreateOrderView()
+            var view = new CreateOrderView({
+                market: new Backbone.Model({
+                    base_currency: new Backbone.Model(),
+                    quote_currency: new Backbone.Model()
+                })
+            })
         })
     })
 })

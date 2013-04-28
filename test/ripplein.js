@@ -2,21 +2,21 @@ var expect = require('expect.js')
 , RippleIn = require('../lib/ripplein')
 
 describe('RippleIn', function() {
-    describe('cacheSecurities', function() {
-        it('fetches all securities', function(done) {
+    describe('cacheCurrencies', function() {
+        it('fetches all currencies', function(done) {
             var ri = {
                 client: {
                     query: function(text, cb) {
-                        expect(text).to.match(/from "security/i)
-                        cb(null, { rows: [{ security_id: 'XRP', scale: 6 }] })
+                        expect(text).to.match(/from "currency/i)
+                        cb(null, { rows: [{ currency_id: 'XRP', scale: 6 }] })
                     }
                 }
             }
 
-            RippleIn.prototype.cacheSecurities.call(ri)
+            RippleIn.prototype.cacheCurrencies.call(ri)
             .then(function() {
-                expect(ri.securities['XRP']).to.be.ok()
-                expect(ri.securities['XRP'].scale).to.be(6)
+                expect(ri.currencies['XRP']).to.be.ok()
+                expect(ri.currencies['XRP'].scale).to.be(6)
                 done()
             })
             .done()

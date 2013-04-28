@@ -451,3 +451,74 @@ CREATE OR REPLACE VIEW account_view AS
    FROM ( SELECT account.account_id, account.currency_id AS currency_id, account.balance, account.hold, account.type, account.user_id, account.balance - account.hold AS available
            FROM account) a;
 
+CREATE OR REPLACE FUNCTION pop_btc_withdraw_requests()
+  RETURNS SETOF record AS
+$BODY$
+DECLARE
+        rec record;
+BEGIN
+        DROP TABLE IF EXISTS pop_btc_withdraw_requests;
+
+        CREATE TABLE pop_btc_withdraw_requests AS
+        SELECT
+                wr.request_id,
+                wr.amount,
+                c.scale,
+                bwr.address
+        FROM btc_withdraw_request bwr
+        INNER JOIN withdraw_request wr ON bwr.request_id = wr.request_id
+        INNER JOIN account a ON a.account_id = wr.account_id
+        INNER JOIN currency c ON c.currency_id = a.currency_id
+        WHERE wr.state = 'requested';
+
+        UPDATE withdraw_request SET state = 'processing'
+        WHERE request_id IN (SELECT request_id FROM pop_btc_withdraw_requests);
+
+        FOR rec IN (SELECT * FROM pop_btc_withdraw_requests) LOOP
+                RETURN NEXT rec;
+        END LOOP;
+
+        DROP TABLE pop_btc_withdraw_requests;
+
+        RETURN;
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+
+
+CREATE OR REPLACE FUNCTION pop_ltc_withdraw_requests()
+  RETURNS SETOF record AS
+$BODY$
+DECLARE
+        rec record;
+BEGIN
+        DROP TABLE IF EXISTS pop_ltc_withdraw_requests;
+
+        CREATE TABLE pop_ltc_withdraw_requests AS
+        SELECT
+                wr.request_id,
+                wr.amount,
+                c.scale,
+                bwr.address
+        FROM ltc_withdraw_request bwr
+        INNER JOIN withdraw_request wr ON bwr.request_id = wr.request_id
+        INNER JOIN account a ON a.account_id = wr.account_id
+        INNER JOIN currency c ON c.currency_id = a.currency_id
+        WHERE wr.state = 'requested';
+
+        UPDATE withdraw_request SET state = 'processing'
+        WHERE request_id IN (SELECT request_id FROM pop_ltc_withdraw_requests);
+
+        FOR rec IN (SELECT * FROM pop_ltc_withdraw_requests) LOOP
+                RETURN NEXT rec;
+        END LOOP;
+
+        DROP TABLE pop_ltc_withdraw_requests;
+
+        RETURN;
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+

@@ -522,3 +522,102 @@ END; $BODY$
   COST 100
   ROWS 1000;
 
+CREATE OR REPLACE FUNCTION btc_withdraw(uid integer, a character, amount bigint)
+  RETURNS integer AS
+$BODY$
+DECLARE
+        hid int;
+        rid int;
+BEGIN
+        INSERT INTO hold (account_id, amount)
+        VALUES (user_currency_account(uid, 'BTC'), amount);
+
+        hid := currval('hold_hold_id_seq');
+
+        INSERT INTO withdraw_request(method, hold_id, account_id, amount)
+        VALUES ('BTC', hid, user_currency_account(uid, 'BTC'), amount);
+
+        rid := currval('withdraw_request_request_id_seq');
+
+        INSERT INTO BTC_withdraw_request (request_id, address)
+        VALUES (rid, a);
+
+        RETURN rid;
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+CREATE OR REPLACE FUNCTION ltc_withdraw(uid integer, a character, amount bigint)
+  RETURNS integer AS
+$BODY$
+DECLARE
+        hid int;
+        rid int;
+BEGIN
+        INSERT INTO hold (account_id, amount)
+        VALUES (user_currency_account(uid, 'LTC'), amount);
+
+        hid := currval('hold_hold_id_seq');
+
+        INSERT INTO withdraw_request(method, hold_id, account_id, amount)
+        VALUES ('LTC', hid, user_currency_account(uid, 'LTC'), amount);
+
+        rid := currval('withdraw_request_request_id_seq');
+
+        INSERT INTO ltc_withdraw_request (request_id, address)
+        VALUES (rid, a);
+
+        RETURN rid;
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+CREATE OR REPLACE FUNCTION confirm_withdraw(rid integer)
+  RETURNS integer AS
+$BODY$
+DECLARE
+        aid int;
+        hmnt bigint;
+        itid int;
+        hid int;
+        cid currency_id;
+BEGIN
+        SELECT h.account_id, h.amount, h.hold_id, a.currency_id INTO aid, hmnt, hid, cid
+        FROM withdraw_request wr
+        INNER JOIN hold h ON wr.hold_id = h.hold_id
+        INNER JOIN account a ON h.account_id = a.account_id
+        WHERE wr.request_id = rid;
+
+        IF NOT FOUND THEN
+                RAISE EXCEPTION 'request/hold not found';
+        END IF;
+
+        UPDATE withdraw_request
+        SET hold_id = NULL, completed = current_timestamp
+        WHERE request_id = rid;
+
+        DELETE from hold WHERE hold_id = hid;
+
+        INSERT INTO transaction (debit_account_id, credit_account_id, amount)
+        VALUES (aid, special_account('edge', cid), hmnt);
+
+        itid := currval('transaction_transaction_id_seq');
+
+        RETURN itid;
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+DROP FUNCTION from_decimal(numeric, currency_id);
+
+CREATE OR REPLACE FUNCTION from_decimal(d numeric, c currency_id)
+  RETURNS bigint AS
+$BODY$
+BEGIN
+    -- The following implicit cast to bigint causes an error if the
+    -- amount is too precise for the scale of the currency. See PostgreSQL's
+    -- documentation under Type Conversion.
+    RETURN (SELECT d * 10^scale FROM currency WHERE currency_id = c);
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

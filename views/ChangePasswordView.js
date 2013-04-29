@@ -39,7 +39,7 @@ var _ = require('underscore')
         .then(function() {
             app.apiKey = newKey
             Alertify.log.success('Your password has been changed')
-            Backbone.history.navigate('my/accounts', true)
+            Backbone.history.navigate('my/balances', true)
         }, function(xhr) {
             var error = app.errorFromXhr(xhr)
             alert(JSON.stringify(error, null, 4))

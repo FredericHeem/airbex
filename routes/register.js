@@ -12,7 +12,7 @@ var Backbone = require('backbone')
 
     register: function(after) {
         var that = this
-        after || (after = 'my/accounts')
+        after || (after = 'my/balances')
 
         var model = new Models.User({}, {
             url: app.apiUrl + '/users'

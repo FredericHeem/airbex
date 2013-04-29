@@ -9,7 +9,7 @@ var View = require('./View')
         _.bindAll(this);
     },
 
-    section: 'accounts',
+    section: 'balances',
 
     events: {
         'click *[data-action="withdraw"]': 'clickWithdraw'
@@ -30,7 +30,7 @@ var View = require('./View')
             username: 'api',
             password: app.apiKey,
             success: function() {
-                Backbone.history.navigate('my/accounts', true)
+                Backbone.history.navigate('my/balances', true)
             }
         })
     },

@@ -12,7 +12,7 @@ var Backbone = require('backbone')
 
     login: function(after) {
         var that = this
-        after || (after = 'my/accounts')
+        after || (after = 'my/balances')
 
         var view = new Views.LoginView()
         app.section(view)

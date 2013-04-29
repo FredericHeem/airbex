@@ -2,23 +2,25 @@ var Backbone = require('backbone')
 , app = require('../app')
 , Views = require('../views')
 , ChangePasswordView = require('../views/ChangePasswordView')
+, BalancesView = require('../views/BalancesView')
+, ActivitiesView = require('../views/ActivitiesView')
 , UserRouter = module.exports = Backbone.Router.extend({
     routes: {
-        'my/accounts': 'userAccounts',
+        'my/balances': 'balances',
         'my/orders': 'userOrders',
-        'my/transactions': 'userTransactions',
+        'my/activities': 'activities',
         'my/changePassword': 'changePassword'
     },
 
-    userAccounts: function() {
+    balances: function() {
         if (!app.authorize()) return;
 
         var collection = new Backbone.Collection();
-        var view = new Views.UserAccountsView({ collection: collection });
+        var view = new BalancesView({ collection: collection });
         app.section(view, true);
 
         collection.fetch({
-            url: app.apiUrl + '/accounts',
+            url: app.apiUrl + '/balances',
             username: 'api',
             password: app.apiKey
         })
@@ -43,15 +45,15 @@ var Backbone = require('backbone')
         app.section(view, true);
     },
 
-    userTransactions: function() {
+    activities: function() {
         if (!app.authorize()) return
-        var collection = new Models.TransactionCollection()
+        var collection = new Backbone.Collection()
         collection.fetch({
-            url: app.apiUrl + '/accounts/transactions',
+            url: app.apiUrl + '/activities',
             usename: 'api',
             password: app.apiKey
         })
-        var view = new Views.UserTransactionsView({
+        var view = new ActivitiesView({
             collection: collection
         })
         app.section(view, true)

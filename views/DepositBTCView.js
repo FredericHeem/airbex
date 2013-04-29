@@ -10,7 +10,7 @@ var View = require('./View')
         this.bindTo(this.model, 'change', this.render, this)
     },
 
-    section: 'accounts',
+    section: 'balances',
 
     render: function() {
         this.$el.html(require('../templates/deposit-btc.ejs')(this.model.toJSON()))

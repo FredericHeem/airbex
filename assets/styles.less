@@ -28,7 +28,7 @@ footer {
 
 body:not(.is-logged-in) {
     #top {
-        .accounts, .orders, .transactions { display: none }
+        .balances, .orders, .activities { display: none }
         .account-summary .logged-in { display: none; }
     }
 
@@ -41,9 +41,9 @@ body.is-logged-in #top {
     .account-summary .not-logged-in { display: none; }
 }
 
-#accounts a[href="#my/withdraw/XRP"] { display: none; }
-#accounts a[href="#my/deposit/XRP"] { display: none; }
-#accounts a[href^="#my/send"] { display: none; }
+#balances a[href="#my/withdraw/XRP"] { display: none; }
+#balances a[href="#my/deposit/XRP"] { display: none; }
+#balances a[href^="#my/send"] { display: none; }
 
 /* Main marketing message and sign up button */
       .jumbotron {

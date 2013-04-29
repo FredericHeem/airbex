@@ -8,7 +8,7 @@ var View = require('./View')
     initialize: function() {
     },
 
-    section: 'accounts',
+    section: 'balances',
 
     events: {
         'click *[data-action="withdraw"]': 'clickWithdraw'
@@ -45,7 +45,7 @@ var View = require('./View')
         result.then(function() {
             Alertify.log.success('Ripple withdraw of ' + that.$amount.val() + ' ' +
                 withdraw.get('currencyId') + ' to ' + withdraw.get('address') + ' requested')
-            Backbone.history.navigate('my/accounts', true)
+            Backbone.history.navigate('my/balances', true)
         }, function(xhr) {
             var error = app.errorFromXhr(xhr)
             alert(JSON.stringify(error, null, 4))

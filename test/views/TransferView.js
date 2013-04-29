@@ -9,7 +9,7 @@ describe('TransferView', function() {
             var view = new TransferView({
                 app: {
                     user: new Backbone.Model({
-                        accounts: new Backbone.Collection()
+                        balances: new Backbone.Collection()
                     }),
                     cache: {
                         currencies: _([{ currency_id: 'BTC' }])

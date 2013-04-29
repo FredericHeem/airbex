@@ -2,21 +2,26 @@ var SectionView = require('./SectionView')
 , _ = require('underscore')
 , View = require('./View')
 , moment = require('moment')
-, UserTransactionsView = module.exports = SectionView.extend({
+, ActivitiesView = module.exports = SectionView.extend({
     ItemView: View.extend({
         tagName: 'tr',
+
+        explanation: function() {
+            return this.model.get('type') + ' ' + JSON.stringify(this.model.get('details'))
+        },
 
         render: function() {
             var vm = this.model.toJSON()
             vm.created = moment(vm.created).format('MMMM Do YYYY, HH:mm')
-            this.$el.html(require('../templates/user-transactions-transaction.ejs')(vm))
+            vm.explanation = this.explanation()
+            this.$el.html(require('../templates/activities-item.ejs')(vm))
             return this
         }
     }),
 
-    section: 'transactions',
+    section: 'activities',
 
-    className: 'user-transactions container',
+    className: 'activities container',
 
     initialize: function() {
         this.views = [];
@@ -38,8 +43,8 @@ var SectionView = require('./SectionView')
     },
 
     render: function() {
-        this.$el.html(require('../templates/user-transactions.ejs')());
-        this.$children = this.$el.find('table.transactions tbody')
+        this.$el.html(require('../templates/activities.ejs')());
+        this.$children = this.$el.find('table.activities tbody')
         this.reset()
         return this
     },

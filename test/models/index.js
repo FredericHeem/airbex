@@ -1,6 +1,6 @@
-require('./Account')
+require('./Balance')
 require('./Market')
 require('./Order')
 require('./Currency')
-require('./Transaction')
+require('./Activity')
 require('./User')

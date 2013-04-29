@@ -3,7 +3,7 @@ var Backbone = require('backbone')
 , _ = require('underscore')
 , View = require('./View')
 , app = require('../app')
-, UserAccountsView = module.exports = SectionView.extend({
+, BalancesView = module.exports = SectionView.extend({
     ItemView: View.extend({
         tagName: 'tr',
 
@@ -11,12 +11,12 @@ var Backbone = require('backbone')
             var vm = this.model.toJSON();
             vm.rippleAddress = app.rippleAddress
             vm.userId = app.user.id
-            this.$el.html(require('../templates/accounts-account.ejs')(vm))
+            this.$el.html(require('../templates/balances-balance.ejs')(vm))
             return this;
         }
     }),
 
-    section: 'accounts',
+    section: 'balances',
 
     initialize: function() {
         this.views = []
@@ -37,8 +37,8 @@ var Backbone = require('backbone')
     },
 
     render: function() {
-        this.$el.html(require('../templates/accounts.ejs')())
-        this.$children = this.$el.find('table.accounts tbody')
+        this.$el.html(require('../templates/balances.ejs')())
+        this.$children = this.$el.find('table.balances tbody')
         this.reset()
 
         return this

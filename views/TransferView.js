@@ -14,7 +14,7 @@ var View = require('./View')
         })
     },
 
-    section: 'accounts',
+    section: 'balances',
 
     events: {
         'click *[data-action="send"]': 'clickSend'
@@ -37,13 +37,13 @@ var View = require('./View')
 
         var currency = this.options.app.cache.currencies.get(this.vm.get('currencyId'))
         , scale = currency.get('scale')
-        , transaction = new Models.Transaction({
+        , model = new Backbone.Model({
             email: this.vm.get('email'),
             currency_id: this.vm.get('currencyId'),
             amount: this.vm.get('amount')
         })
 
-        var result = transaction.save({}, {
+        var result = model.save({}, {
             url: app.apiUrl + '/transfer',
             username: 'api',
             password: app.apiKey
@@ -56,8 +56,8 @@ var View = require('./View')
         this.toggleInteraction(false)
 
         result.then(function() {
-            Alertify.log.success('Transfer sent to ' + transaction.get('email'))
-            Backbone.history.navigate('my/transactions', true)
+            Alertify.log.success('Transfer sent to ' + model.get('email'))
+            Backbone.history.navigate('my/activities', true)
         }, function(xhr) {
             var error = app.errorFromXhr(xhr)
             alert(JSON.stringify(error, null, 4))

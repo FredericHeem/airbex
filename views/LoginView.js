@@ -60,7 +60,7 @@ var SectionView = require('./SectionView')
 
         result.then(function() {
             app.setUser(that.model, apiKey)
-            Backbone.history.navigate('my/accounts', true)
+            Backbone.history.navigate('my/balances', true)
         }, function(xhr) {
             that.toggleInteraction(true)
 

@@ -5,11 +5,9 @@ module.exports = {
     Depth: require('./Depth'),
     Currency: require('./Currency'),
     CurrencyCollection: require('./CurrencyCollection'),
-    Account: require('./Account'),
+    Balance: require('./Balance'),
     OrderCollection: require('./OrderCollection'),
     Order: require('./Order'),
-    AccountCollection: require('./AccountCollection'),
-    Transaction: require('./Transaction'),
-    TransactionCollection: require('./TransactionCollection'),
+    Activity: require('./Activity'),
     User: require('./User')
 }

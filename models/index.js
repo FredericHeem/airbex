@@ -5,7 +5,6 @@ module.exports = {
     Depth: require('./Depth'),
     Currency: require('./Currency'),
     CurrencyCollection: require('./CurrencyCollection'),
-    Balance: require('./Balance'),
     OrderCollection: require('./OrderCollection'),
     Order: require('./Order'),
     Activity: require('./Activity'),

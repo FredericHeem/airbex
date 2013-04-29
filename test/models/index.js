@@ -1,4 +1,3 @@
-require('./Balance')
 require('./Market')
 require('./Order')
 require('./Currency')

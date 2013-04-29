@@ -17,10 +17,12 @@ intercom.intercom = function(conn, config, req, res, next) {
         if (err) return next(err)
         var hmac = crypto.createHmac('sha256', config.intercom_secret)
         , user = dres.rows[0]
-        hmac.update(user.email_lower)
+        hmac.update('' + user.user_id)
 
         res.send({
             app_id: config.intercom_app_id,
+            user_id: user.user_id,
+            email: user.email_lower,
             user_hash: hmac.digest('hex'),
             created_at: user.created
         })

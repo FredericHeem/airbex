@@ -14,14 +14,14 @@ bitcoincharts.trades = function(conn, req, res, next) {
             'SELECT ' +
             'price_decimal::varchar price, ' +
             'volume_decimal::varchar amount, ' +
-            'extract(epoch from m.created)::int date, ' +
+            'extract(epoch from om.created)::int date, ' +
             'match_id tid ' +
-            'FROM match_view m ' +
-            'INNER JOIN "order" bo ON bo.order_id = m.bid_order_id ' +
+            'FROM match_view om ' +
+            'INNER JOIN "order" bo ON bo.order_id = om.bid_order_id ' +
             'INNER JOIN market m ON m.market_id = bo.market_id ' +
             'INNER JOIN "currency" bs ON m.base_currency_id = bs.currency_id ' +
-            'WHERE m.quote_currency_id = $1 AND m.match_id > $2 ' +
-            'ORDER BY m.match_id ASC;',
+            'WHERE m.quote_currency_id = $1 AND om.match_id > $2 ' +
+            'ORDER BY om.match_id ASC;',
         values: [req.params.currencyId, since]
     })
     .then(function(cres) {

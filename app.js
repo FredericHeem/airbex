@@ -63,7 +63,7 @@ App.prototype.setUser = function(user, key) {
     $('body').addClass('is-logged-in')
     $('#top .account-summary .logged-in .email').html(user.get('email'))
 
-    if (!_.isUndefined(window.Intercom)) {
+    if (!_.isUndefined(window.Intercom) && window.location.hostname !== 'localhost') {
         $.ajax({
             type: 'GET',
             url: this.apiUrl + '/intercom',
@@ -71,9 +71,7 @@ App.prototype.setUser = function(user, key) {
             password: this.apiKey
         })
         .then(function(res) {
-            console.log('booting intercom with', res)
             Intercom('boot', res)
-
             Backbone.history.bind('all', function() {
                 Intercom('update')
             })

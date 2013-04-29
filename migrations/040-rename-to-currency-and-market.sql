@@ -680,7 +680,7 @@ END; $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
---DROP FUNCTION pop_ripple_withdraw_requests();
+DROP FUNCTION pop_ripple_withdraw_requests();
 
 CREATE OR REPLACE FUNCTION pop_ripple_withdraw_requests()
   RETURNS TABLE (

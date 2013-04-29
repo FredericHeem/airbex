@@ -660,3 +660,111 @@ BEGIN
 END; $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+CREATE OR REPLACE FUNCTION ripple_credit(h character varying, s currency_id, u integer, amnt bigint)
+  RETURNS integer AS
+$BODY$
+DECLARE
+        tid int;
+BEGIN
+        INSERT INTO transaction (debit_account_id, credit_account_id, amount)
+        VALUES (special_account('edge', s), user_currency_account(u, s), amnt);
+
+        tid := currval('transaction_transaction_id_seq');
+
+        INSERT INTO ripple_credited (hash, transaction_id)
+        VALUES (h, tid);
+
+        RETURN tid;
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+--DROP FUNCTION pop_ripple_withdraw_requests();
+
+CREATE OR REPLACE FUNCTION pop_ripple_withdraw_requests()
+  RETURNS TABLE (
+    request_id int,
+    amount bigint,
+    currency_id currency_id,
+    scale int,
+    address varchar) AS
+$BODY$
+BEGIN
+    RETURN QUERY
+    UPDATE withdraw_request wr
+    SET state = 'processing'
+    FROM
+        ripple_withdraw_request rwr,
+        account a,
+        currency c
+    WHERE
+        wr.request_id = rwr.request_id AND
+        a.account_id = wr.account_id AND
+        c.currency_id = a.currency_id AND
+        wr.state = 'requested'
+    RETURNING
+        wr.request_id,
+        wr.amount,
+        c.currency_id::currency_id,
+        c.scale,
+        rwr.address;
+END; $BODY$ LANGUAGE plpgsql;
+
+DROP FUNCTION pop_btc_withdraw_requests();
+
+CREATE OR REPLACE FUNCTION pop_btc_withdraw_requests()
+  RETURNS TABLE (
+    request_id int,
+    amount bigint,
+    scale int,
+    address varchar) AS
+$BODY$
+BEGIN
+    RETURN QUERY
+    UPDATE withdraw_request wr
+    SET state = 'processing'
+    FROM
+        btc_withdraw_request bwr,
+        account a,
+        currency c
+    WHERE
+        wr.request_id = bwr.request_id AND
+        a.account_id = wr.account_id AND
+        c.currency_id = a.currency_id AND
+        wr.state = 'requested'
+    RETURNING
+        wr.request_id,
+        wr.amount,
+        c.scale,
+        bwr.address;
+END; $BODY$ LANGUAGE plpgsql;
+
+DROP FUNCTION pop_ltc_withdraw_requests();
+
+CREATE OR REPLACE FUNCTION pop_ltc_withdraw_requests()
+  RETURNS TABLE (
+    request_id int,
+    amount bigint,
+    scale int,
+    address varchar) AS
+$BODY$
+BEGIN
+    RETURN QUERY
+    UPDATE withdraw_request wr
+    SET state = 'processing'
+    FROM
+        ltc_withdraw_request lwr,
+        account a,
+        currency c
+    WHERE
+        wr.request_id = lwr.request_id AND
+        a.account_id = wr.account_id AND
+        c.currency_id = a.currency_id AND
+        wr.state = 'requested'
+    RETURNING
+        wr.request_id,
+        wr.amount,
+        c.scale,
+        lwr.address;
+END; $BODY$ LANGUAGE plpgsql;

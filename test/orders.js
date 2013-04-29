@@ -25,9 +25,9 @@ describe('orders', function() {
 					expect(q.values).to.eql([10])
 					cb(null, {
 						rows: [{
-							order_id: 1
+							id: 1
 						}, {
-							order_id: 7
+							id: 7
 						}]
 					})
 				}
@@ -38,8 +38,8 @@ describe('orders', function() {
 			, res = {
 				send: function(r) {
 					expect(r).to.be.an('array')
-					expect(r[0].order_id).to.be(1)
-					expect(r[1].order_id).to.be(7)
+					expect(r[0].id).to.be(1)
+					expect(r[1].id).to.be(7)
 					done()
 				}
 			}
@@ -58,18 +58,18 @@ describe('orders', function() {
 				},
 
 				query: function(q, cb) {
+					if (q.text.match(/activity/)) return
 					expect(q.text).to.match(/create_order/i)
-					expect(q.values).to.eql([8, 7, 1, '12', '9'])
 					cb(null, { rows: [{ order_id: 17 }] })
 				}
 			}
 			, req = {
 				user: 8,
 				body: {
-					market_id: 7,
+					market: 'AABB',
 					volume: '9',
 					price: '12',
-					side: 1
+					side: 'ask'
 				}
 			}
 			, res = {

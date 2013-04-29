@@ -19,14 +19,14 @@ describe('markets', function() {
 			var conn = {
 				query: function(q, c) {
 					expect(q).to.match(/market/i)
-					c(null, { rows: [{ market_id: 93 }] })
+					c(null, { rows: [{ base_currency_id: 'DRP', quote_currency_id: 'HRP'  }] })
 				}
 			}
 			, req = {
 			}
 			, res = {
 				send: function(r) {
-					expect(r[0].market_id).to.be(93)
+					expect(r[0].id).to.be('DRPHRP')
 					done()
 				}
 			}

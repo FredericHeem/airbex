@@ -14,13 +14,23 @@ orders.create = function(conn, req, res, next) {
     if (!validate(req.body, 'order_create', res)) return
 
     Q.ninvoke(conn, 'query', {
-        text: 'SELECT create_order($1, $2, $3, $4, $5) order_id, m.base_currency_id || m.quote_currency_id pair FROM market m WHERE m.market_id = $2',
-        values: [req.user, req.body.market_id, req.body.side, req.body.price, req.body.volume]
+        text: [
+            'SELECT create_order($1, m.market_id, $3, $4, $5) order_id',
+            'FROM market m',
+            'WHERE m.base_currency_id || m.quote_currency_id = $2',
+        ].join('\n'),
+        values: [
+            req.user,
+            req.body.market,
+            req.body.side == 'buy' ? 0 : 1,
+            req.body.price,
+            req.body.volume
+        ]
     })
     .then(function(dres) {
         activities.log(conn, req.user, 'CreateOrder', {
-            market: dres.rows[0].pair,
-            side: req.body.side ? 'ask' : 'bid',
+            market: req.body.market,
+            side: req.body.side,
             price: req.body.price,
             volume: req.body.volume,
             address: req.body.address,
@@ -50,15 +60,18 @@ orders.create = function(conn, req, res, next) {
 orders.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn, 'query', {
         text: [
-            'SELECT order_id id, market_id, side, price_decimal price, volume_decimal volume,',
-            '   original_decimal original, matched_decimal matched',
+            'SELECT order_id id, base_currency_id || quote_currency_id market, side, price_decimal price, volume_decimal volume,',
+            '   original_decimal original',
             'FROM order_view',
             'WHERE user_id = $1 AND volume > 0'
         ].join('\n'),
         values: [req.user]
     })
     .then(function(r) {
-        res.send(r.rows)
+        res.send(r.rows.map(function(row) {
+            row.side = row.side ? 'ask' : 'buy'
+            return row
+        }))
     }, next)
     .done()
 }

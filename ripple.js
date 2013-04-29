@@ -92,7 +92,7 @@ ripple.withdraw = function(conn, req, res, next) {
             amount: req.body.amount,
             currency: req.body.currencyId
         })
-        res.send(201, { request_id: cres.rows[0].request_id })
+        res.send(201, { id: cres.rows[0].request_id })
     }, function(err) {
         if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
             return res.send(400, {

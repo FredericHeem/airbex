@@ -12,10 +12,7 @@ Markets.markets = function(conn, req, res, next) {
     .then(function(cres) {
         res.send(cres.rows.map(function(row) {
             return {
-                market_id: row.market_id,
-                pair: row.base_currency_id + '/' + row.quote_currency_id,
-                base_currency_id: row.base_currency_id,
-                quote_currency_id: row.quote_currency_id,
+                id: row.base_currency_id + row.quote_currency_id,
                 last: row.last_decimal,
                 high: row.high_decimal,
                 low: row.low_decimal,
@@ -31,8 +28,8 @@ Markets.markets = function(conn, req, res, next) {
 
 Markets.depth = function(conn, req, res, next) {
     var query = [
-        'SELECT price_decimal price, volume_decimal volume, side, market_id',
-        'FROM order_depth_view WHERE market_id = $1'
+        'SELECT price_decimal price, volume_decimal volume, side, base_currency_id || quote_currency_id id',
+        'FROM order_depth_view WHERE base_currency_id || quote_currency_id = $1'
     ].join('\n')
 
     Q.ninvoke(conn, 'query', {

@@ -7,7 +7,7 @@ currencies.configure = function(app, conn) {
 
 currencies.currencies = function(conn, req, res, next) {
     var query =
-        'SELECT currency_id, scale \
+        'SELECT currency_id id, scale \
         FROM "currency" ORDER BY currency_id'
 
     Q.ninvoke(conn, 'query', query)

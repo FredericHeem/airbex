@@ -60,6 +60,6 @@ transfer.transfer = function(conn, req, res, next) {
             currency: req.body.currency_id
         })
 
-        res.send({ transaction_id: dres.rows[0].transaction_id })
+        res.send(200, { id: dres.rows[0].transaction_id })
     })
 }

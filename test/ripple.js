@@ -40,6 +40,7 @@ describe('ripple', function() {
 		it('enqueues', function(done) {
 			var conn = {
 				query: function(q, c) {
+					if (q.text.match(/activity/)) return
 					expect(q.text).to.match(/ripple_withdraw/i)
 					expect(q.values).to.eql([98, 'QQQ', 'rsomeaddress', '50.3'])
 					c(null, { rows: [{ request_id: 59 }] })
@@ -56,7 +57,7 @@ describe('ripple', function() {
 			, res = {
 				send: function(code, r) {
 					expect(code).to.be(201)
-					expect(r.request_id).to.be(59)
+					expect(r.id).to.be(59)
 					done()
 				}
 			}

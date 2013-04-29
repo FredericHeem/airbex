@@ -43,6 +43,7 @@ describe('bitcoin', function() {
 		it('enqueues', function(done) {
 			var conn = {
 				query: function(q, c) {
+					if (q.text.match(/activity/)) return
 					expect(q.text).to.match(/btc_withdraw/i)
 					expect(q.values).to.eql([38, '1someaddress', '0.15', 'BTC'])
 					c(null, { rows: [{ request_id: 59 }] })
@@ -58,7 +59,7 @@ describe('bitcoin', function() {
 			, res = {
 				send: function(code, r) {
 					expect(code).to.be(201)
-					expect(r.request_id).to.be(59)
+					expect(r.id).to.be(59)
 					done()
 				}
 			}

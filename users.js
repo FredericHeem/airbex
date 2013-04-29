@@ -12,7 +12,7 @@ users.configure = function(app, conn, auth) {
 
 users.whoami = function(conn, req, res, next) {
 	conn.query({
-		text: 'SELECT user_id, email FROM "user" WHERE user_id = $1',
+		text: 'SELECT user_id id, email FROM "user" WHERE user_id = $1',
 		values: [req.user]
 	}, function(err, dres) {
 		if (err) return next(err)
@@ -30,7 +30,7 @@ users.create = function(conn, req, res, next) {
     })
     .then(function(cres) {
         activities.log(conn, req.user, 'Created', {})
-        res.send(201, { user_id: cres.rows[0].user_id })
+        res.send(201, { id: cres.rows[0].user_id })
     }, function(err) {
         if (err.message === 'new row for relation "user" violates check constraint "email_regex"') {
             return res.send(403, { name: 'InvalidEmail', messge: 'e-mail is invalid' })

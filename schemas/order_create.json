@@ -1,10 +1,9 @@
 {
     "type": "object",
     "properties": {
-        "market_id": {
-            "type": "integer",
-            "required": true,
-            "minimum": 1
+        "market": {
+            "type": "string",
+            "required": true
         },
         "price": {
             "type": "string",
@@ -15,9 +14,9 @@
             "required": true
         },
         "side": {
-            "type": "integer",
+            "type": "string",
             "required": true,
-            "enum": [0, 1]
+            "enum": ["bid", "ask"]
         }
     }
 }

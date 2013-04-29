@@ -1,5 +1,4 @@
 var crypto = require('crypto')
-, auth = require('./auth')
 , intercom = module.exports = {}
 
 intercom.configure = function(app, conn, auth) {

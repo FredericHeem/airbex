@@ -1,5 +1,4 @@
 var Q = require('q')
-, auth = require('./auth')
 , transactions = module.exports = {}
 
 transactions.configure = function(app, conn, auth) {

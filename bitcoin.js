@@ -2,7 +2,6 @@ var Q = require('q')
 , _ = require('underscore')
 , util = require('util')
 , bitcoin = module.exports = {}
-, auth = require('./auth')
 
 bitcoin.configure = function(app, conn, auth, currencyId) {
     app.post('/withdraw/' + currencyId, auth, bitcoin.withdraw.bind(bitcoin, conn, currencyId))

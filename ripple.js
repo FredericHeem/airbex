@@ -1,8 +1,7 @@
 var Q = require('q')
-, auth = require('./auth')
 , ripple = module.exports = {}
 
-ripple.configure = function(app, conn) {
+ripple.configure = function(app, conn, auth) {
     app.post('/ripple/out', auth, ripple.withdraw.bind(ripple, conn))
     app.get('/ripple/address', ripple.address.bind(ripple, conn))
     app.get('/ripple/federation', ripple.federation.bind(ripple, app.config, conn))
@@ -82,7 +81,7 @@ ripple.address = function(conn, req, res, next) {
 }
 
 ripple.withdraw = function(conn, req, res, next) {
-    return Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn, 'query', {
         text: 'SELECT ripple_withdraw(user_currency_account($1, $2), $3, from_decimal($4, $2))',
         values: [req.user, req.body.currencyId, req.body.address, req.body.amount]
     })
@@ -105,4 +104,5 @@ ripple.withdraw = function(conn, req, res, next) {
 
         next(err)
     })
+    .done()
 }

@@ -1,6 +1,5 @@
 var Q = require('q')
 , _ = require('underscore')
-, auth = require('./auth')
 , orders = module.exports = {}
 , validate = require('./validate')
 
@@ -18,7 +17,7 @@ orders.create = function(conn, req, res, next) {
         values: [req.user, req.body.market_id, req.body.side, req.body.price, req.body.volume]
     })
     .then(function(cres) {
-        res.send(201, { order_id: cres.rows[0].order_id })
+        res.send(201, { id: cres.rows[0].order_id })
     }, function(err) {
         if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
             return res.send(400, {

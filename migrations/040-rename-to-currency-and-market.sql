@@ -643,3 +643,20 @@ BEGIN
 END; $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+DROP FUNCTION create_order(integer, integer, integer, numeric, numeric);
+
+CREATE OR REPLACE FUNCTION create_order(user_id integer, market_id integer, side integer, price numeric, volume numeric)
+  RETURNS integer AS
+$BODY$
+BEGIN
+    INSERT INTO "order" (user_id, market_id, side, price, volume)
+    SELECT user_id, m.market_id, side, price * 10^m.scale, volume * 10^(bc.scale - m.scale)
+    FROM market m
+    INNER JOIN "currency" bc ON bc.currency_id = m.base_currency_id
+    WHERE m.market_id = create_order.market_id;
+
+    RETURN currval('order_order_id_seq');
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

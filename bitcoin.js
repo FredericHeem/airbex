@@ -1,4 +1,5 @@
 var Q = require('q')
+, activities = require('./activities')
 , _ = require('underscore')
 , util = require('util')
 , bitcoin = module.exports = {}
@@ -17,12 +18,16 @@ bitcoin.withdraw = function(conn, currencyId, req, res, next) {
         values: [req.user, req.body.address, req.body.amount, currencyId]
     })
     .then(function(cres) {
+        activities.log(conn, req.user, currencyId + 'Withdraw', {
+            address: req.body.address,
+            amount: req.body.amount
+        })
         res.send(201, { request_id: cres.rows[0].request_id })
     }, function(err) {
         if (err.code === '23514' && err.message.match(/non_negative_available/)) {
             return res.send(500, {
                 code: 'ENOFUNDS',
-                message: 'insufficient funds available in source account'
+                message: 'insufficient funds'
             })
         }
 

@@ -1,7 +1,7 @@
 var expect = require('expect.js')
-, accounts = require('../accounts')
+, balances = require('../balances')
 
-describe('accounts', function() {
+describe('balances', function() {
 	describe('configure', function() {
 		it('adds expected routes', function() {
 			var routes = []
@@ -9,19 +9,19 @@ describe('accounts', function() {
 				post: function(url) { routes.push('post ' + url) },
 				get: function(url) { routes.push('get ' + url) }
 			}
-			accounts.configure(app, null, 'BTC')
-			expect(routes).to.contain('get /accounts')
+			balances.configure(app, null, 'BTC')
+			expect(routes).to.contain('get /balances')
 		})
 	})
 
 	describe('forUser', function() {
-		it('returns accounts', function(done) {
+		it('returns balances', function(done) {
 			var conn = {
 				query: function(q, c) {
 					expect(q.text).to.match(/from account_view/i)
 					expect(q.text).to.match(/currency_id/i)
 					expect(q.values).to.eql([25])
-					c(null, { rows: [{ account_id: 301 }] })
+					c(null, { rows: [{ account_id: 301, currency_id: 'XRP', available: '1.2' }] })
 				}
 			}
 			, req = {
@@ -30,12 +30,13 @@ describe('accounts', function() {
 			, res = {
 				send: function(r) {
 					expect(r).to.be.an('array')
-					expect(r[0].account_id).to.be(301)
+					expect(r[0].currency_id).to.be('XRP')
+					expect(r[0].available).to.be('1.2')
 					done()
 				}
 			}
 
-			accounts.forUser(conn, req, res, done)
+			balances.forUser(conn, req, res, done)
 		})
 	})
 })

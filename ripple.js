@@ -1,4 +1,5 @@
 var Q = require('q')
+, activities = require('./activities')
 , ripple = module.exports = {}
 
 ripple.configure = function(app, conn, auth) {
@@ -86,6 +87,11 @@ ripple.withdraw = function(conn, req, res, next) {
         values: [req.user, req.body.currencyId, req.body.address, req.body.amount]
     })
     .then(function(cres) {
+        activities.log(conn, req.user, 'RippleWithdraw', {
+            address: req.body.address,
+            amount: req.body.amount,
+            currency: req.body.currencyId
+        })
         res.send(201, { request_id: cres.rows[0].request_id })
     }, function(err) {
         if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
@@ -98,7 +104,7 @@ ripple.withdraw = function(conn, req, res, next) {
         if (err.message == 'new row for relation "account" violates check constraint "non_negative_available"') {
             return res.send(400, {
                 name: 'InsufficientFunds',
-                message: 'Source account cannot fund the transfer'
+                message: 'Insufficient funds'
             })
         }
 

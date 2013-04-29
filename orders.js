@@ -2,6 +2,7 @@ var Q = require('q')
 , _ = require('underscore')
 , orders = module.exports = {}
 , validate = require('./validate')
+, activities = require('./activities')
 
 orders.configure = function(app, conn, auth) {
     app.del('/orders/:id', auth, orders.cancel.bind(orders, conn))
@@ -13,11 +14,19 @@ orders.create = function(conn, req, res, next) {
     if (!validate(req.body, 'order_create', res)) return
 
     Q.ninvoke(conn, 'query', {
-        text: 'SELECT create_order($1, $2, $3, $4, $5) order_id',
+        text: 'SELECT create_order($1, $2, $3, $4, $5) order_id, m.base_currency_id || m.quote_currency_id pair FROM market m WHERE m.market_id = $2',
         values: [req.user, req.body.market_id, req.body.side, req.body.price, req.body.volume]
     })
-    .then(function(cres) {
-        res.send(201, { id: cres.rows[0].order_id })
+    .then(function(dres) {
+        activities.log(conn, req.user, 'CreateOrder', {
+            market: dres.rows[0].pair,
+            side: req.body.side ? 'ask' : 'bid',
+            price: req.body.price,
+            volume: req.body.volume,
+            address: req.body.address,
+            amount: req.body.amount
+        })
+        res.send(201, { id: dres.rows[0].order_id })
     }, function(err) {
         if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
             return res.send(400, {
@@ -29,7 +38,7 @@ orders.create = function(conn, req, res, next) {
         if (err.message == 'new row for relation "account" violates check constraint "non_negative_available"') {
             return res.send(400, {
                 name: 'InsufficientFunds',
-                message: 'Source account cannot fund the transfer'
+                message: 'insufficient funds'
             })
         }
 
@@ -62,8 +71,9 @@ orders.cancel = function(conn, req, res, next) {
     })
     .get('rowCount')
     .then(function(cancelled) {
-        if (!cancelled) return res.send(404);
-        res.send(204);
+        if (!cancelled) return res.send(404)
+        res.send(204)
+        activities.log(conn, req.user, 'CancelOrder', { id: +req.params.id })
     }, next)
     .done()
 }

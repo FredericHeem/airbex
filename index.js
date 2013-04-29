@@ -10,8 +10,8 @@ app.config = config
 
 app.use(express.bodyParser())
 
-var routes = ['accounts', 'markets', 'orders', 'ripple',
-'currencies', 'transactions', 'users', 'transfer',
+var routes = ['balances', 'markets', 'orders', 'ripple',
+'currencies', 'activities', 'users', 'transfer',
 'bitcoincharts', 'intercom']
 routes.forEach(function(name) {
 	require('./' + name).configure(app, conn, auth)

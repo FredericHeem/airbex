@@ -75,7 +75,7 @@ describe('orders', function() {
 			, res = {
 				send: function(code, r) {
 					expect(code).to.be(201)
-					expect(r).to.eql({ order_id: 17 })
+					expect(r).to.eql({ id: 17 })
 					done()
 				}
 			}
@@ -88,6 +88,7 @@ describe('orders', function() {
 		it('cancels the order', function(done) {
 			var conn = {
 				query: function(q, cb) {
+					if (q.text.match(/activity/)) return
 					expect(q.text).to.match(/UPDATE "order"/)
 					expect(q.text).to.match(/cancelled = volume/)
 					expect(q.values)

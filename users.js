@@ -1,4 +1,5 @@
 var Q = require('q')
+, activities = require('./activities')
 , users = module.exports = {}
 , validate = require('./validate')
 
@@ -28,6 +29,7 @@ users.create = function(conn, req, res, next) {
         values: [req.body.email, req.body.key]
     })
     .then(function(cres) {
+        activities.log(conn, req.user, 'Created', {})
         res.send(201, { user_id: cres.rows[0].user_id })
     }, function(err) {
         if (err.message === 'new row for relation "user" violates check constraint "email_regex"') {

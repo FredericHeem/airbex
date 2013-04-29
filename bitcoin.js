@@ -22,7 +22,7 @@ bitcoin.withdraw = function(conn, currencyId, req, res, next) {
             address: req.body.address,
             amount: req.body.amount
         })
-        res.send(201, { request_id: cres.rows[0].request_id })
+        res.send(201, { id: cres.rows[0].request_id })
     }, function(err) {
         if (err.code === '23514' && err.message.match(/non_negative_available/)) {
             return res.send(500, {

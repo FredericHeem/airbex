@@ -1,0 +1,153 @@
+#!/usr/bin/env node
+var num = require('num')
+, fs = require('fs')
+, Table = require('cli-table')
+, optimist = require('optimist')
+, argv = optimist
+.usage([
+    'Access to Snow',
+    'Usage:',
+    'snow APIKEY               Write API key to config',
+    'snow url <url>            Write endpoint to config (debugging)',
+    'snow markets              List markets',
+    'snow orders               List my orders',
+    'snow depth <market>       List order depth. Example: snow depth BTCXRP',
+    'snow cancel <order id>    Cancel exchange order'
+].join('\n'))
+.describe('u', 'API url to use')
+.describe('k', 'API key to use')
+.alias('u', 'url')
+.alias('k', 'key')
+.argv
+, method = argv._[0]
+, path = require('path')
+if (!method) return usage()
+
+function usage() {
+    optimist.showHelp()
+}
+
+var configFn = path.join(__dirname, '../settings.json')
+, config = fs.existsSync(configFn) ? require(configFn) : {}
+
+if (method.length == 64) {
+    config.key = method
+    fs.writeFileSync(configFn, JSON.stringify(config, null, 4))
+    return console.log('API key %s written to configuration', method)
+}
+
+if (method == 'url') {
+    config.url = argv._[1]
+    fs.writeFileSync(configFn, JSON.stringify(config, null, 4))
+    if (config.url) console.log('API url %s written to configuration', config.url)
+    else console.log('API url removed from configuration')
+    return
+}
+
+if (argv.url) config.url = argv.url
+
+function demandApiKey() {
+    console.error('API key not set\n')
+    usage()
+}
+
+var client = new (require('../index'))(config.key, config.url)
+
+if (method == 'orders') {
+    return client.orders(function(err, orders) {
+        if (err) throw err
+        var table = new Table({
+            head: ['#', 'Market', 'Side', 'Volume', 'Price', 'Total'],
+            colWidths: [8, 10, 6, 20, 20, 20]
+        })
+
+        orders.forEach(function(order) {
+            var pair = [order.market.substr(0, 3), order.market.substr(3)]
+            table.push([
+                order.id,
+                order.market,
+                order.side.toUpperCase(),
+                order.volume + ' ' + pair[0],
+                order.price + ' ' + pair[1],
+                num(order.volume).mul(order.price) + ' ' + pair[1]
+            ])
+        })
+
+        console.log(table.toString())
+    })
+}
+
+if (method == 'markets') {
+    return client.markets(function(err, markets) {
+        if (err) throw err
+        var table = new Table({
+            head: ['Market', 'Bid', 'Ask', 'Last', 'High', 'Low', 'Volume'],
+            colWidths: [8, 12, 12, 12, 12, 12, 12]
+        })
+
+        markets.forEach(function(market) {
+            table.push([
+                market.id,
+                market.bid || '',
+                market.ask || '',
+                market.last || '',
+                market.high || '',
+                market.low || '',
+                market.volume || '0'
+            ])
+        })
+
+        console.log(table.toString())
+    })
+}
+
+if (method == 'depth') {
+    var market = argv._[1]
+    if (!market) return usage()
+    return client.depth(market, function(err, depth) {
+        if (err) throw err
+        var table = new Table({
+            head: [
+                'Bid volume',
+                'Price per',
+                'Ask volume'
+            ],
+            colWidths: [18, 18, 18]
+        })
+
+        depth.forEach(function(row) {
+            table.push([
+                row.side == 'bid' ? row.volume + ' ' + market.substr(0, 3) : '',
+                row.price + ' ' + market.substr(3),
+                row.side == 'ask' ? row.volume + ' ' + market.substr(0, 3) : ''
+            ])
+        })
+
+        console.log(table.toString())
+    })
+}
+
+if (method == 'cancel') {
+    if  (!argv._[1]) return usage()
+    if (!config.key) return demandApiKey()
+    return client.cancel(+argv._[1], function(err) {
+        if (err) throw err
+        console.log('Order #%s cancelled', argv._[1])
+    })
+}
+
+if (method == 'bid' || method == 'ask') {
+    if (argv._.length != 5) return usage()
+    if (!config.key) return demandApiKey()
+    return client.order({
+        market: argv._[2].toUpperCase() + argv._[4].toUpperCase(),
+        side: method,
+        price: argv._[3] + '',
+        volume: argv._[1] + ''
+    }, function(err, id) {
+        if (err) throw err
+        console.log('Order #%s placed', id)
+    })
+}
+
+usage()

@@ -9,7 +9,8 @@ describe('TransferView', function() {
             var view = new TransferView({
                 app: {
                     cache: {
-                        balances: new Backbone.Collection()
+                        balances: new Backbone.Collection(),
+                        currencies: new Backbone.Collection()
                     }
                 }
             })

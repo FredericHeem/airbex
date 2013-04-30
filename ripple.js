@@ -84,13 +84,13 @@ ripple.address = function(conn, req, res, next) {
 ripple.withdraw = function(conn, req, res, next) {
     Q.ninvoke(conn, 'query', {
         text: 'SELECT ripple_withdraw(user_currency_account($1, $2), $3, from_decimal($4, $2))',
-        values: [req.user, req.body.currencyId, req.body.address, req.body.amount]
+        values: [req.user, req.body.currency, req.body.address, req.body.amount]
     })
     .then(function(cres) {
         activities.log(conn, req.user, 'RippleWithdraw', {
             address: req.body.address,
             amount: req.body.amount,
-            currency: req.body.currencyId
+            currency: req.body.currency
         })
         res.send(201, { id: cres.rows[0].request_id })
     }, function(err) {

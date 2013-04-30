@@ -22,7 +22,7 @@ orders.create = function(conn, req, res, next) {
         values: [
             req.user,
             req.body.market,
-            req.body.side == 'buy' ? 0 : 1,
+            req.body.side == 'bid' ? 0 : 1,
             req.body.price,
             req.body.volume
         ]
@@ -33,8 +33,7 @@ orders.create = function(conn, req, res, next) {
             side: req.body.side,
             price: req.body.price,
             volume: req.body.volume,
-            address: req.body.address,
-            amount: req.body.amount
+            address: req.body.address
         })
         res.send(201, { id: dres.rows[0].order_id })
     }, function(err) {
@@ -62,14 +61,15 @@ orders.forUser = function(conn, req, res, next) {
         text: [
             'SELECT order_id id, base_currency_id || quote_currency_id market, side, price_decimal price, volume_decimal volume,',
             '   original_decimal original',
-            'FROM order_view',
+            'FROM order_view o',
+            'INNER JOIN market m ON m.market_id = o.market_id',
             'WHERE user_id = $1 AND volume > 0'
         ].join('\n'),
         values: [req.user]
     })
     .then(function(r) {
         res.send(r.rows.map(function(row) {
-            row.side = row.side ? 'ask' : 'buy'
+            row.side = row.side ? 'ask' : 'bid'
             return row
         }))
     }, next)

@@ -28,8 +28,10 @@ Markets.markets = function(conn, req, res, next) {
 
 Markets.depth = function(conn, req, res, next) {
     var query = [
-        'SELECT price_decimal price, volume_decimal volume, side, base_currency_id || quote_currency_id id',
-        'FROM order_depth_view WHERE base_currency_id || quote_currency_id = $1'
+        'SELECT price_decimal price, volume_decimal volume, side, m.base_currency_id || m.quote_currency_id id',
+        'FROM order_depth_view odv',
+        'INNER JOIN market m ON m.market_id = odv.market_id',
+        'WHERE m.base_currency_id || m.quote_currency_id = $1'
     ].join('\n')
 
     Q.ninvoke(conn, 'query', {
@@ -37,13 +39,10 @@ Markets.depth = function(conn, req, res, next) {
         values: [req.params.id]
     })
     .then(function(cres) {
-        if (!+req.query.grouped) {
-            return cres.rows
-        }
-        return {
-            bids: _.where(cres.rows, { side: 0 }),
-            asks: _.where(cres.rows, { side: 1 })
-        }
+        return cres.rows.map(function(row) {
+            row.side = row.side ? 'ask' : 'bid'
+            return row
+        })
     }, next)
     .then(function(depth) {
         res.send(depth)

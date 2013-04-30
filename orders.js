@@ -28,6 +28,8 @@ orders.create = function(conn, req, res, next) {
         ]
     })
     .then(function(dres) {
+        var row = dres.rows[0]
+        if (!row) return res.send(404, { name: 'MarketNotFound', message: 'Market not found' })
         activities.log(conn, req.user, 'CreateOrder', {
             market: req.body.market,
             side: req.body.side,
@@ -35,7 +37,7 @@ orders.create = function(conn, req, res, next) {
             volume: req.body.volume,
             address: req.body.address
         })
-        res.send(201, { id: dres.rows[0].order_id })
+        res.send(201, { id: row.order_id })
     }, function(err) {
         if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
             return res.send(400, {

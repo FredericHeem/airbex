@@ -2,7 +2,7 @@ var SectionView = require('./SectionView')
 , _ = require('underscore')
 , app = require('../app')
 , View = require('./View')
-, UserOrdersView = module.exports = SectionView.extend({
+, OrdersView = module.exports = SectionView.extend({
     ItemView: View.extend({
         tagName: 'tr',
 
@@ -28,9 +28,10 @@ var SectionView = require('./SectionView')
         },
 
         render: function() {
-            var vm = this.model.toJSON();
-            vm.pair = this.model.get('market').pair()
-            vm.base = this.model.get('market').get('base_currency').id
+            var vm = this.model.toJSON()
+            , market = this.options.app.cache.markets.get(this.model.get('market'))
+            vm.base = market.base()
+            vm.quote = market.quote()
 
             this.$el.html(require('../templates/user-orders-order.ejs')(vm));
 
@@ -50,7 +51,7 @@ var SectionView = require('./SectionView')
     },
 
     add: function(model) {
-        var view = new this.ItemView({ model: model });
+        var view = new this.ItemView({ model: model, app: this.options.app })
         this.views.push(view)
         this.$children.append(view.render().$el)
     },
@@ -81,4 +82,4 @@ var SectionView = require('./SectionView')
         _.invoke(this.views, 'dispose')
         View.prototype.dispose.call(this)
     }
-});
+})

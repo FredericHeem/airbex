@@ -1,6 +1,9 @@
 var Backbone = require('backbone')
 , app = require('../app')
-, Views = require('../views')
+, MarketsView = require('../views/MarketsView')
+, MarketView = require('../views/MarketView')
+, Market = require('../models/Market')
+, CreateOrderView = require('../views/CreateOrderView')
 , MarketsRouter = module.exports = Backbone.Router.extend({
     routes: {
         'markets': 'markets',
@@ -9,28 +12,23 @@ var Backbone = require('backbone')
     },
 
     markets: function() {
-        var view = new Views.MarketsView({
+        var view = new MarketsView({
             collection: app.cache.markets
         })
         app.section(view, true);
     },
 
-    market: function(pair) {
-        var split = pair.split('_');
+    market: function(id) {
+        var depth = new Backbone.Collection()
+        , market = app.cache.markets.get(id)
+        , view = new MarketView({
+            model: market,
+            collection: depth
+         })
 
-        var market = app.cache.markets.fromPair(split[0], split[1]);
-
-        if (!market) {
-            throw new Error('no market found for ' + split[0] + ' and ' + split[1]);
-        }
-
-        market.get('depth').fetch({
-            url: app.apiUrl + '/markets/' + market.id + '/depth?grouped=0'
-        });
-
-        var view = new Views.MarketView({
-            model: market
-         });
+        depth.fetch({
+            url: app.apiUrl + '/markets/' + id + '/depth'
+        }, { reset: true })
 
         app.section(view, true);
     },
@@ -47,10 +45,10 @@ var Backbone = require('backbone')
         }
 
         market.get('depth').fetch({
-            url: app.apiUrl + '/markets/' + market.id + '/depth?grouped=0'
+            url: app.apiUrl + '/markets/' + market.id + '/depth'
         });
 
-        var view = new Views.CreateOrderView({
+        var view = new CreateOrderView({
             market: market
         });
 

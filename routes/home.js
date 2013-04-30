@@ -1,12 +1,14 @@
 var Backbone = require('backbone')
 _ = require('underscore')
-, Models = require('../models')
-, Views = require('../views')
 , async = require('async')
 , app = require('../app')
+, HomeView = require('../views/HomeView')
+, ErrorView = require('../views/ErrorView')
+, RouteNotFoundView = require('../views/RouteNotFoundView')
+, RippleOutView = require('../views/RippleOutView')
 , Router = module.exports = Backbone.Router.extend({
     home: function() {
-        app.section(new Views.HomeView())
+        app.section(new HomeView())
     },
 
     routes: {
@@ -16,7 +18,7 @@ _ = require('underscore')
     },
 
     error: function(error) {
-        var view = new Views.ErrorView({
+        var view = new ErrorView({
             error: error
         })
         app.section(view)
@@ -24,13 +26,13 @@ _ = require('underscore')
 
     routeNotFound: function() {
         console.log('route not found for', window.location.hash)
-        app.section(new Views.RouteNotFoundView(), true)
+        app.section(new RouteNotFoundView(), true)
     },
 
-    rippleOut: function(sid) {
+    rippleOut: function(currency) {
         if (!app.authorize()) return
-        var view = new Views.RippleOutView({
-            currencyId: sid
+        var view = new RippleOutView({
+            currency: currency
         })
         app.section(view, true)
     }

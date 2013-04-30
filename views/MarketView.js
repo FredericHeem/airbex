@@ -3,7 +3,6 @@ var SectionView = require('./SectionView')
 , numeral = require('numeral')
 , num = require('num')
 , View = require('./View')
-, Models = require('../models')
 , CreateOrderView = require('./CreateOrderView')
 , MarketView = module.exports = SectionView.extend({
     ItemView: View.extend({
@@ -11,11 +10,6 @@ var SectionView = require('./SectionView')
 
         render: function() {
             var vm = this.model.toJSON()
-            , market = this.model.get('market')
-            , scaleNumbers = ''
-            for (var i = 0; i < market.get('scale'); i++) scaleNumbers += '0'
-            vm.price = numeral(vm.price).format('0,0[.' + scaleNumbers + ']')
-
             this.$el.html(require('../templates/market-depth.ejs')(vm))
             return this;
         }
@@ -32,10 +26,11 @@ var SectionView = require('./SectionView')
     initialize: function() {
         this.views = [];
 
-        this.model.get('depth').comparator = function(model) { return model.get('price') };
-        this.model.get('depth').sort();
+        this.collection.comparator = function(model) {
+            return model.get('price')
+        }
 
-        this.bindTo(this.model.get('depth'), 'all', this.reset, this)
+        this.bindTo(this.collection, 'all', this.reset, this)
     },
 
     add: function(model) {
@@ -47,12 +42,12 @@ var SectionView = require('./SectionView')
     reset: function() {
         _.invoke(this.views, 'dispose')
         this.views = []
-        this.model.get('depth').each(this.add, this)
+        this.collection.each(this.add, this)
     },
 
     render: function() {
         var vm = {
-            pair: this.model.pair()
+            id: this.model.id
         }
 
         this.$el.html(require('../templates/market.ejs')(vm))

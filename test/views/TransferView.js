@@ -8,11 +8,8 @@ describe('TransferView', function() {
         it('exists', function() {
             var view = new TransferView({
                 app: {
-                    user: new Backbone.Model({
-                        balances: new Backbone.Collection()
-                    }),
                     cache: {
-                        currencies: _([{ currency_id: 'BTC' }])
+                        balances: new Backbone.Collection()
                     }
                 }
             })

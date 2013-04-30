@@ -1,5 +1,4 @@
 var View = require('./View')
-, Models = require('../models')
 , app = require('../app')
 , Backbone = require('backbone')
 , num = require('num')
@@ -18,9 +17,9 @@ var View = require('./View')
     },
 
     initialize: function(options) {
-        this.model = new Models.Order({
-            market: options.market,
-            side: 0,
+        this.model = new Backbone.Model({
+            market: options.market.id,
+            side: 'bid',
             price: '',
             volume: ''
         })
@@ -29,26 +28,17 @@ var View = require('./View')
         this.model.on('change:side', this.updateSide, this)
 
         var vm = _.extend({
-            base_currency: options.market.get('base_currency').id,
-            quote_currency: options.market.get('quote_currency').id
+            base_currency: options.market.base(),
+            quote_currency: options.market.quote()
         }, this.model.toJSON())
 
         this.$el.html(require('../templates/create-order.ejs')(vm))
-    },
-
-    toggleInteraction: function(value) {
-        this.$el.find('input, button')
-        .toggleClass('disabled', !value)
-        .prop('disabled', !value)
     },
 
     placeOrder: function() {
         var that = this
 
         this.$el.find('.summary').html('Placing order...')
-        this.options.market.get('orders').add(this.model)
-
-        console.log('order being placed', this.model.attributes);
 
         var result = this.model.save({}, {
             url: app.apiUrl + '/orders',
@@ -75,12 +65,12 @@ var View = require('./View')
     orderSummary: function() {
         return [
             'Order #' + this.model.id,
-            (this.model.get('side') ? 'ASK' : 'BID'),
+            (this.model.get('side').toUpperCase()),
             this.model.get('volume'),
-            this.model.get('market').get('base_currency').id,
+            this.options.market.base(),
             '@',
             this.model.get('price'),
-            this.model.get('market').get('quote_currency').id
+            this.options.market.quote()
         ].join(' ')
     },
 
@@ -99,16 +89,16 @@ var View = require('./View')
     toggleSide: function(e) {
         e.preventDefault()
         var $target = $(e.target)
-        , side = $target.parent().hasClass('bid') ? 0 : 1
+        , side = $target.parent().hasClass('bid') ? 'bid' : 'ask'
         this.model.set('side', side)
-        this.$el.find('.volume label').html('Amount to ' + (side ? 'sell' : 'buy'))
+        this.$el.find('.volume label').html('Amount to ' + (side == 'ask' ? 'sell' : 'buy'))
     },
 
     updateSide: function() {
         var $side = this.$el.find('.side')
         , side = this.model.get('side')
-        $side.find('.bid').toggleClass('active', side === 0)
-        $side.find('.ask').toggleClass('active', side === 1)
+        $side.find('.bid').toggleClass('active', side === 'bid')
+        $side.find('.ask').toggleClass('active', side === 'ask')
     },
 
     updateSummary: function() {
@@ -120,14 +110,13 @@ var View = require('./View')
 
         if (this.model.get('price') && this.model.get('volume')) {
             total = +num(this.model.get('price')).mul(this.model.get('volume'))
-            console.log('total', total)
             summary = util.format(
                 'You are %s %s %s for %s %s',
-                this.model.get('side') ? 'selling' : 'buying',
+                this.model.get('side') == 'ask' ? 'selling' : 'buying',
                 this.model.get('volume'),
-                this.model.get('market').get('base_currency').id,
+                this.options.market.base(),
                 numeral(total).format(format),
-                this.model.get('market').get('quote_currency').id)
+                this.options.market.quote())
         }
 
         this.$el.find('.summary').html(summary || '')

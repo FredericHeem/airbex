@@ -1,12 +1,12 @@
 var Backbone = require('backbone')
 , expect = require('expect.js')
-, UserOrdersView = require('../../views/UserOrdersView')
+, OrdersView = require('../../views/OrdersView')
 
-describe('UserOrdersView', function() {
+describe('OrdersView', function() {
     describe('constructor', function() {
         it('exists', function() {
             var coll = new Backbone.Collection()
-            var view = new UserOrdersView({ collection: coll })
+            var view = new OrdersView({ collection: coll })
         })
     })
 })

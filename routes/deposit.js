@@ -1,6 +1,7 @@
 var Backbone = require('backbone')
 , app = require('../app')
-, Views = require('../views')
+, DepositBTCView = require('../views/DepositBTCView')
+, DepositLTCView = require('../views/DepositLTCView')
 , DepositRouter = module.exports = Backbone.Router.extend({
     routes: {
         'my/deposit/BTC': 'depositBTC',
@@ -20,7 +21,7 @@ var Backbone = require('backbone')
             password: app.apiKey
         })
 
-        var view = new Views.DepositBTCView({ model: model })
+        var view = new DepositBTCView({ model: model })
         app.section(view, true)
     },
 
@@ -37,7 +38,7 @@ var Backbone = require('backbone')
             password: app.apiKey
         })
 
-        var view = new Views.DepositLTCView({ model: model })
+        var view = new DepositLTCView({ model: model })
         app.section(view, true)
     }
 })

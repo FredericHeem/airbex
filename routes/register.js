@@ -1,7 +1,7 @@
 var Backbone = require('backbone')
 , app = require('../app')
-, Models = require('../models')
-, Views = require('../views')
+, RegisterView = require('../views/RegisterView')
+, User = require('../models/User')
 , RegisterRoute = module.exports = Backbone.Router.extend({
     routes: {
     },
@@ -14,10 +14,10 @@ var Backbone = require('backbone')
         var that = this
         after || (after = 'my/balances')
 
-        var model = new Models.User({}, {
+        var model = new User({}, {
             url: app.apiUrl + '/users'
         })
-        , view = new Views.RegisterView({
+        , view = new RegisterView({
             model: model
         })
 

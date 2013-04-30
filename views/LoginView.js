@@ -2,9 +2,9 @@ var SectionView = require('./SectionView')
 , app = require('../app')
 , Backbone = require('backbone')
 , _ = require('underscore')
-, Models = require('../models')
 , app = require('../app')
 , sjcl = require('../vendor/sjcl')
+, User = require('../models/User')
 , LoginView = module.exports = SectionView.extend({
     section: null,
 
@@ -14,7 +14,7 @@ var SectionView = require('./SectionView')
     },
 
     initialize: function() {
-        this.model = new Models.User()
+        this.model = new User
     },
 
     replaceLegacyApiKey: function(email, password) {
@@ -71,7 +71,6 @@ var SectionView = require('./SectionView')
                 .then(function() {
                     that.login()
                 }, function() {
-                    console.log(arguments)
                     return alert('Wrong username/password')
                 })
             } else {

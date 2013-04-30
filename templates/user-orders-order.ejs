@@ -2,19 +2,19 @@
     #<%= id %>
 </td>
 <td>
-    <%= pair %>
+    <%= market %>
 </td>
 <td>
-    <%= side == 0 ? 'Buy' : 'Sell' %> <%= base %>
+    <%= side == 'bid' ? 'Buy' : 'Sell' %> <%= base %>
 </td>
 <td>
-    <%= price %>
+    <%= price %> <%= quote %>
 </td>
 <td>
-    <%= original %>
+    <%= original %> <%= base %>
 </td>
 <td>
-    <%= volume %>
+    <%= volume %> <%= base %>
 </td>
 <td>
     <button class="btn" data-action="cancel-order">Cancel</button>

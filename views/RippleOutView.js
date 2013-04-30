@@ -1,5 +1,4 @@
 var View = require('./View')
-, Models = require('../models')
 , app = require('../app')
 , Backbone = require('backbone')
 , Section = require('./SectionView')
@@ -19,13 +18,10 @@ var View = require('./View')
 
         var that = this
 
-        var currency = Models.Currency.findOrCreate(this.options.currencyId)
-        if (!currency) throw new Error('currency ' + this.options.currencyId + ' not found')
-
         var withdraw = new Backbone.Model({
             address: this.$address.val(),
             amount: this.$amount.val(),
-            currencyId: this.options.currencyId
+            currency: this.options.currency
         })
 
         this.$address.add(this.$amount, this.$withdraw).prop('disabled', true).addClass('disabled')
@@ -44,7 +40,7 @@ var View = require('./View')
 
         result.then(function() {
             Alertify.log.success('Ripple withdraw of ' + that.$amount.val() + ' ' +
-                withdraw.get('currencyId') + ' to ' + withdraw.get('address') + ' requested')
+                withdraw.get('currency') + ' to ' + withdraw.get('address') + ' requested')
             Backbone.history.navigate('my/balances', true)
         }, function(xhr) {
             var error = app.errorFromXhr(xhr)
@@ -53,15 +49,9 @@ var View = require('./View')
         })
     },
 
-    toggleInteraction: function(value) {
-        this.$el.find('input, button')
-        .prop('disabled', !value)
-        .toggleClass('disabled', !value)
-    },
-
     render: function() {
         this.$el.html(require('../templates/ripple-out.ejs')({
-            currencyId: this.options.currencyId
+            currencyId: this.options.currency
         }))
 
         this.$address = this.$el.find('input[data-binding="address"]')

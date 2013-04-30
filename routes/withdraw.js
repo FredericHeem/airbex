@@ -1,6 +1,7 @@
 var Backbone = require('backbone')
 , app = require('../app')
-, Views = require('../views')
+, WithdrawBTCView = require('../views/WithdrawBTCView')
+, WithdrawLTCView = require('../views/WithdrawLTCView')
 , WithdrawRouter = module.exports = Backbone.Router.extend({
     routes: {
         'my/withdraw/BTC': 'withdrawBTC',
@@ -9,13 +10,13 @@ var Backbone = require('backbone')
 
     withdrawBTC: function() {
         if (!app.authorize()) return
-        var view = new Views.WithdrawBTCView()
+        var view = new WithdrawBTCView()
         app.section(view, true)
     },
 
     withdrawLTC: function() {
         if (!app.authorize()) return
-        var view = new Views.WithdrawLTCView()
+        var view = new WithdrawLTCView()
         app.section(view, true)
     }
 })

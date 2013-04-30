@@ -2,7 +2,6 @@ var SectionView = require('./SectionView')
 , app = require('../app')
 , Backbone = require('backbone')
 , _ = require('underscore')
-, Models = require('../models')
 , app = require('../app')
 , sjcl = require('../vendor/sjcl')
 , RegisterView = module.exports = SectionView.extend({

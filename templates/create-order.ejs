@@ -1,7 +1,7 @@
 <div class="row">
     <ul class="side nav nav-tabs">
-        <li class="bid <%= side === 0 ? 'active' : '' %>"><a href="#">Buy <%= base_currency %></a></li>
-        <li class="ask <%= side === 1 ? 'active' : '' %>"><a href="#">Sell <%= base_currency %></a></li>
+        <li class="bid <%= side === 'bid' ? 'active' : '' %>"><a href="#">Buy <%= base_currency %></a></li>
+        <li class="ask <%= side === 'ask' ? 'active' : '' %>"><a href="#">Sell <%= base_currency %></a></li>
     </ul>
 </div>
 

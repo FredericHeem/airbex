@@ -1,5 +1,4 @@
 var View = require('./View')
-, Models = require('../models')
 , app = require('../app')
 , Backbone = require('backbone')
 , Section = require('./SectionView')

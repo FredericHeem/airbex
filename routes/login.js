@@ -1,7 +1,6 @@
 var Backbone = require('backbone')
 , app = require('../app')
-, Models = require('../models')
-, Views = require('../views')
+, LoginView = require('../views/LoginView')
 , LoginRoute = module.exports = Backbone.Router.extend({
     routes: {
     },
@@ -14,7 +13,7 @@ var Backbone = require('backbone')
         var that = this
         after || (after = 'my/balances')
 
-        var view = new Views.LoginView()
+        var view = new LoginView()
         app.section(view)
     }
 })

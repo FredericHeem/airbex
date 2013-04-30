@@ -1,5 +1,4 @@
 var View = require('./View')
-, Models = require('../models')
 , Backbone = require('backbone')
 , num = require('num')
 , Section = require('./SectionView')
@@ -9,8 +8,10 @@ var View = require('./View')
         this.vm = new Backbone.Model({
             amount: '0.0',
             email: null,
-            currencyId: 'null',
-            currencies: options.app.cache.currencies.pluck('currency_id')
+            currency: this.options.currency,
+            currencies: this.options.app.cache.currencies.map(function(x) {
+                return x.id
+            })
         })
     },
 
@@ -24,7 +25,7 @@ var View = require('./View')
         this.vm.set({
             amount: this.$amount.val(),
             email: this.$email.val(),
-            currencyId: this.$currency.val()
+            currency: this.$currency.val()
         })
     },
 
@@ -35,18 +36,16 @@ var View = require('./View')
 
         this.read()
 
-        var currency = this.options.app.cache.currencies.get(this.vm.get('currencyId'))
-        , scale = currency.get('scale')
-        , model = new Backbone.Model({
+        var model = new Backbone.Model({
             email: this.vm.get('email'),
-            currency_id: this.vm.get('currencyId'),
+            currency: this.vm.get('currency'),
             amount: this.vm.get('amount')
         })
 
         var result = model.save({}, {
-            url: app.apiUrl + '/transfer',
+            url: this.options.app.apiUrl + '/transfer',
             username: 'api',
-            password: app.apiKey
+            password: this.options.app.apiKey
         })
 
         if (!result) {
@@ -59,7 +58,7 @@ var View = require('./View')
             Alertify.log.success('Transfer sent to ' + model.get('email'))
             Backbone.history.navigate('my/activities', true)
         }, function(xhr) {
-            var error = app.errorFromXhr(xhr)
+            var error = that.options.app.errorFromXhr(xhr)
             alert(JSON.stringify(error, null, 4))
             that.toggleInteraction(true)
         })

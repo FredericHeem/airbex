@@ -1,14 +1,17 @@
 var async = require('async')
-, Models = require('./models')
+, Backbone = require('backbone')
 , app = require('./app')
+, Market = require('./models/Market')
 , cache = module.exports = {
     currencies: null,
     markets: null,
 
     reload: function(cb) {
         var that = this
-        this.currencies = new Models.CurrencyCollection()
-        this.markets = new Models.MarketCollection()
+        this.currencies = new Backbone.Collection()
+        this.markets = new (Backbone.Collection.extend({
+            model: Market
+        }))()
 
         async.parallel([
             function(next) {

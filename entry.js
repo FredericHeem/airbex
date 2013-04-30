@@ -20,7 +20,8 @@ var routes = {
     user: new (require('./routes/user'))
 }
 
-app.header = new Views.HeaderView();
+var HeaderView = require('./views/HeaderView')
+app.header = new HeaderView();
 app.header.render();
 
 app.cache = require('./app.cache')

@@ -1,9 +1,9 @@
 var Backbone = require('backbone')
 , app = require('../app')
-, Views = require('../views')
 , ChangePasswordView = require('../views/ChangePasswordView')
 , BalancesView = require('../views/BalancesView')
 , ActivitiesView = require('../views/ActivitiesView')
+, OrdersView = require('../views/OrdersView')
 , UserRouter = module.exports = Backbone.Router.extend({
     routes: {
         'my/balances': 'balances',
@@ -34,14 +34,18 @@ var Backbone = require('backbone')
     userOrders: function() {
         if (!app.authorize()) return;
 
-        var collection = new Models.OrderCollection();
+        var collection = new Backbone.Collection()
         collection.fetch({
             url: app.apiUrl + '/orders',
             username: 'api',
             password: app.apiKey
         });
 
-        var view = new Views.UserOrdersView({ collection: collection });
+        var view = new OrdersView({
+            collection: collection,
+            app: app
+        })
+
         app.section(view, true);
     },
 

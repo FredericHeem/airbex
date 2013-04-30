@@ -48,4 +48,4 @@ var SectionView = require('./SectionView')
 
         return View.prototype.dispose.apply(this, arguments);
     }
-});
+})

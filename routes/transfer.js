@@ -1,18 +1,19 @@
 var Backbone = require('backbone')
 , app = require('../app')
-, Views = require('../views')
+, TransferView = require('../views/TransferView')
 , TransferRouter = module.exports = Backbone.Router.extend({
     routes: {
         'my/transfer': 'transfer'
     },
 
-    transfer: function(currency_id) {
+    transfer: function(currency) {
         if (!app.authorize()) return
 
-        var view = new Views.TransferView({
+        var view = new TransferView({
             app: app,
-            currency_id: currency_id || null
+            currency: currency || null
         })
+
         app.section(view, true)
     }
 })

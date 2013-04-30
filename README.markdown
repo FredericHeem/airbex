@@ -5,7 +5,7 @@ Installation
 ---
 
 ```
-npm install -g snow
+npm install -g snow-client
 ```
 
 Usage (command line)

@@ -29,7 +29,7 @@ users.create = function(conn, req, res, next) {
         values: [req.body.email, req.body.key]
     })
     .then(function(cres) {
-        activities.log(conn, req.user, 'Created', {})
+        activities.log(conn, cres.rows[0].user_id, 'Created', {})
         res.send(201, { id: cres.rows[0].user_id })
     }, function(err) {
         if (err.message === 'new row for relation "user" violates check constraint "email_regex"') {

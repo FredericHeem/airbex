@@ -51,7 +51,7 @@ describe('ripple', function() {
 				body: {
 					address: 'rsomeaddress',
 					amount: '50.3',
-					currencyId: 'QQQ'
+					currency: 'QQQ'
 				}
 			}
 			, res = {

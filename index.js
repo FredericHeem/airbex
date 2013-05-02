@@ -3,7 +3,7 @@ var debug = require('debug')('snow')
 , request = require('request')
 , util = require('util')
 , Snow = module.exports = function(key, ep) {
-    var u = url.parse(ep || 'https://snowco.in/api')
+    var u = url.parse(ep || 'https://snowco.in/api/')
     u.auth = 'api:' + key
     this.url = url.format(u)
 }
@@ -26,12 +26,27 @@ Snow.prototype.markets = function(cb) {
     })
 }
 
+// Groups depth from array to bids and asks
 Snow.prototype.depth = function(market, cb) {
     request(this.url + 'markets/' + market + '/depth', {
         json: true
     }, function(err, res, body) {
         if (res.statusCode !== 200) throw new Error(body)
-        cb(err, body)
+
+        var bids = [], asks = []
+
+        body.forEach(function(o) {
+            (o.side == 'bid' ? bids : asks)
+            .push({
+                price: o.price,
+                volume: o.volume
+            })
+        })
+
+        cb(err, {
+            bids: bids,
+            asks: asks
+        })
     })
 }
 

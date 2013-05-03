@@ -33,13 +33,63 @@ describe('orders', function() {
 				}
 			}
 			, req = {
-				user: 10
+				user: 10,
+				app: {
+					cache: {
+						formatOrderVolume: function() {
+							return 'formatted-v'
+						},
+						formatOrderPrice: function() {
+							return 'formatted-p'
+						}
+					}
+				}
 			}
 			, res = {
 				send: function(r) {
 					expect(r).to.be.an('array')
 					expect(r[0].id).to.be(1)
 					expect(r[1].id).to.be(7)
+					done()
+				}
+			}
+
+			orders.forUser(conn, req, res, done)
+		})
+
+		it('formats numbers', function(done) {
+			var conn = {
+				query: function(q, cb) {
+					expect(q.text).to.match(/user_id = \$1/)
+					expect(q.values).to.eql([10])
+					cb(null, {
+						rows: [{
+							id: 1,
+							price: '1.2',
+							volume: '1.34'
+						}]
+					})
+				}
+			}
+			, req = {
+				user: 10,
+				app: {
+					cache: {
+						formatOrderVolume: function() {
+							return 'formatted-v'
+						},
+						formatOrderPrice: function() {
+							return 'formatted-p'
+						}
+					}
+				}
+			}
+			, res = {
+				send: function(r) {
+					expect(r).to.be.an('array')
+					expect(r[0].id).to.be(1)
+					expect(r[0].volume).to.be('formatted-v')
+					expect(r[0].price).to.be('formatted-p')
 					done()
 				}
 			}

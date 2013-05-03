@@ -21,17 +21,26 @@ describe('balances', function() {
 					expect(q.text).to.match(/from account_view/i)
 					expect(q.text).to.match(/currency_id/i)
 					expect(q.values).to.eql([25])
-					c(null, { rows: [{ account_id: 301, currency_id: 'XRP', available: '1.2' }] })
+					c(null, { rows: [{ account_id: 301, currency: 'XRP', available: '1.2' }] })
 				}
 			}
 			, req = {
-				user: 25
+				user: 25,
+				app: {
+					cache: {
+						formatCurrency: function(v, c) {
+							expect(v).to.be('1.2')
+							expect(c).to.be('XRP')
+							return 'formatted'
+						}
+					}
+				}
 			}
 			, res = {
 				send: function(r) {
 					expect(r).to.be.an('array')
-					expect(r[0].currency_id).to.be('XRP')
-					expect(r[0].available).to.be('1.2')
+					expect(r[0].currency).to.be('XRP')
+					expect(r[0].available).to.be('formatted')
 					done()
 				}
 			}

@@ -23,6 +23,16 @@ describe('markets', function() {
 				}
 			}
 			, req = {
+				app: {
+					cache: {
+						formatOrderPrice: function() {
+							return 'formatted'
+						},
+						formatOrderVolume: function() {
+							return 'formatted'
+						},
+					}
+				}
 			}
 			, res = {
 				send: function(r) {
@@ -48,11 +58,21 @@ describe('markets', function() {
 				params: {
 					id: 8
 				},
-				query: {}
+				query: {},
+				app: {
+					cache: {
+						formatOrderPrice: function(v) {
+							expect(v).to.be(9)
+							return 'formatted'
+						},
+						formatOrderVolume: function(v) {
+						},
+					}
+				}
 			}
 			, res = {
 				send: function(r) {
-					expect(r[0].price).to.be(9)
+					expect(r[0].price).to.be('formatted')
 					done()
 				}
 			}

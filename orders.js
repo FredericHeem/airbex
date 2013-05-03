@@ -61,8 +61,8 @@ orders.create = function(conn, req, res, next) {
 orders.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn, 'query', {
         text: [
-            'SELECT order_id id, base_currency_id || quote_currency_id market, side, price_decimal price, volume_decimal volume,',
-            '   original_decimal original',
+            'SELECT order_id id, base_currency_id || quote_currency_id market, side, price, volume,',
+            'original',
             'FROM order_view o',
             'INNER JOIN market m ON m.market_id = o.market_id',
             'WHERE user_id = $1 AND volume > 0'
@@ -72,6 +72,9 @@ orders.forUser = function(conn, req, res, next) {
     .then(function(r) {
         res.send(r.rows.map(function(row) {
             row.side = row.side ? 'ask' : 'bid'
+            row.price = req.app.cache.formatOrderPrice(row.price, row.market)
+            row.volume = req.app.cache.formatOrderVolume(row.volume, row.market)
+            row.original = req.app.cache.formatOrderVolume(row.original, row.market)
             return row
         }))
     }, next)

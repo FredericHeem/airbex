@@ -7,7 +7,7 @@ var util = require('util')
 , Position = require('./position')
 , debug = require('debug')('margin')
 , Margin = module.exports = function(market, from, to, options) {
-    if (!options.volume) throw new Error('volume not set')
+    if (typeof options.volume == 'undefined') throw new Error('volume not set')
 
     this.market = market
     this.from = from

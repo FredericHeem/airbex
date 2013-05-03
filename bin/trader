@@ -1,4 +1,41 @@
-//var Snow = require('snow')
+var config = require('konfu')
+, hail = require('hail')
+, Fx = require('../fx')
+, Flip = require('../flip')
+
+var Margin = require('../index')
+
+//var gox = new hail.MtGox(config.mtgox)
+var snow = new hail.Snow(config.snow.key, config.snow.url)
+/*
+var btce = new hail.Btce(config.btce)
+var flip = new Flip(btce)
+
+, margin = new Margin('BTCLTC', flip, snow, {
+    volume: 0.1,
+    margin: 0.05
+})
+*/
+
+var gox = new hail.MtGox(config.mtgox)
+var ripple = new hail.Ripple(config.ripple)
+var margin = new Margin('BTCXRP', ripple, snow, {
+    volume: 0.1,
+    margin: 0.05
+})
+
+/*
+var Snow = require('snow-client')
+, snow = new Snow(config.snow)
+*/
+
+
+/*
+
+
+
+
+
 //, Bitfloor = require('bitfloor')
 var Margin = require('../lib/margin')
 , debug = require('debug')('snow:trader')
@@ -8,7 +45,6 @@ var Margin = require('../lib/margin')
 , Combiner = require('../lib/combiner')
 , config = require('../config')
 
-var gox = new MtGox(config('mtgox'))
 //var snow = new Snow(config('snow'))
 //var bitfloor = new Bitfloor(config('bitfloor'))
 
@@ -47,7 +83,7 @@ var combiner = new Combiner([
             quote: { currency: 'XRP' }
         },
         client: snow
-    }*/
+    }*//*
 ])
 
 var traders = [
@@ -78,3 +114,4 @@ var traders = [
         margin: 0.01
     })
 ]
+*/

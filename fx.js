@@ -11,7 +11,7 @@ _ = require('underscore')
     this.ref = ref;
 };
 
-fx.prototype.depth = function(pair, cb) {
+fx.prototype.depth = function(market, cb) {
     var rate, depth;
 
     async.parallel({
@@ -45,18 +45,18 @@ fx.prototype.depth = function(pair, cb) {
 
         if (bid) {
             outputs.bids.push({
-                price: bid.price.mul(rate),
-                volume: bid.volume.mul(rate)
+                price: num(bid.price).mul(rate).toString(),
+                volume: num(bid.volume).mul(rate).toString()
             });
         }
 
         if (ask) {
             outputs.asks.push({
-                price: ask.price.mul(rate),
-                volume: ask.volume.mul(rate)
+                price: num(ask.price).mul(rate).toString(),
+                volume: num(ask.volume).mul(rate).toString()
             });
         }
 
         cb(null, outputs);
-    });
-};
+    })
+}

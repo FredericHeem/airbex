@@ -28,10 +28,11 @@ Markets.markets = function(conn, req, res, next) {
 
 Markets.depth = function(conn, req, res, next) {
     var query = [
-        'SELECT price_decimal price, volume_decimal volume, side, m.base_currency_id || m.quote_currency_id id',
+        'SELECT price_decimal price, volume_decimal volume, side',
         'FROM order_depth_view odv',
         'INNER JOIN market m ON m.market_id = odv.market_id',
-        'WHERE m.base_currency_id || m.quote_currency_id = $1'
+        'WHERE m.base_currency_id || m.quote_currency_id = $1',
+        'ORDER BY price_decimal'
     ].join('\n')
 
     Q.ninvoke(conn, 'query', {

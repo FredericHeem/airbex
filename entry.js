@@ -1,3 +1,46 @@
+var markets = require('./controllers/markets')
+, orders = require('./controllers/orders')
+, balances = require('./controllers/balances')
+, login = require('./controllers/login')
+, activities = require('./controllers/activities')
+, market = require('./controllers/market')
+, api = require('./api')()
+, router = require('./router')()
+, $section = $('#section')
+, $app = $('body')
+
+router
+.add(/markets$/, function() {
+    var page = markets(api)
+    $section.html(page.$el)
+})
+.add(/markets\/(.+)$/, function(id) {
+    var page = market(api, id)
+    $section.html(page.$el)
+})
+.add(/activities$/, function() {
+    var page = activities(api)
+    $section.html(page.$el)
+})
+.add(/login$/, function() {
+    var page = login(api)
+    $section.html(page.$el)
+})
+.add(/balances$/, function() {
+    var page = balances(api)
+    $section.html(page.$el)
+})
+.add(/orders$/, function() {
+    var page = orders(api)
+    $section.html(page.$el)
+})
+
+api.on('login', function(e, user) {
+    $app.data('user', user).addClass('is-logged-in')
+    $('.account-summary .email').html(user.email)
+})
+
+/*
 process.env.DEBUG = '.*';
 var _ = require('underscore')
 , Backbone = require('backbone')
@@ -30,3 +73,4 @@ app.cache = require('./app.cache')
 app.cache.reload(function() {
     Backbone.history.start()
 })
+*/

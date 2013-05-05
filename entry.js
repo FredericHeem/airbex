@@ -6,7 +6,9 @@ $.support.cors = true
 
 var app = require('./app')
 // TODO: should be bootstrapped from index.js
-app.apiUrl = window.location.hostname == 'localhost' ? 'http://localhost:5073/api' : 'https://snowco.in/api'
+app.apiUrl = window.location.hostname == 'localhost' ?
+    'http://localhost:5073/api' :
+    window.location.protocol + '//' + window.location.hostname + '/api'
 
 // construct routers
 var routes = {

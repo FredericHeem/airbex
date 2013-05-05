@@ -3,7 +3,7 @@ var debug = require('debug')('snow')
 , request = require('request')
 , util = require('util')
 , Snow = module.exports = function(key, ep) {
-    var u = url.parse(ep || 'https://snowco.in/api/')
+    var u = url.parse(ep || 'https://justcoin.com/api/')
     u.auth = 'api:' + key
     this.url = url.format(u)
 }

@@ -1,8 +1,8 @@
 [domain]
-snowco.in
+justcoin.com
 
 [federation_url]
-https://api.snowco.in/ripple/federation
+https://api.justcoin.com/ripple/federation
 
 [accounts]
 rJHygWcTLVpSXkowott6kzgZU6viQSVYM1

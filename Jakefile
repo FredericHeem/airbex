@@ -9,7 +9,7 @@ var exec = function() {
 }
 
 task('clean', function() {
-    rm('-Rf', 'public')
+    rm('-Rf', 'public/*')
 })
 
 task('app', [
@@ -114,7 +114,7 @@ function compressJs() {
 
 // hosting locally
 task('host', [
-    'app'
+    'clean', 'app'
 ], function() {
     var express = require('express')
     , app = express()

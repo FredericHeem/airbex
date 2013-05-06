@@ -29,7 +29,7 @@ transfer.transfer = function(conn, req, res, next) {
         activities.log(conn, req.user, 'SendToUser', {
             to: req.body.email,
             amount: req.body.amount,
-            currency: req.body.currenc
+            currency: req.body.currency
         })
 
         activities.log(conn, row.receiver_user_id, 'ReceiveFomUser', {

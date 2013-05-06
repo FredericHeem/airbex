@@ -1,8 +1,7 @@
+var app = require('./app')
+
 module.exports = function() {
     var api = {}
-    , callbacks = $.Callbacks()
-    api.on = callbacks.add
-    api.emit = callbacks.fire
 
     function keyFromCredentials(email, password) {
         var concat = email.toLowerCase() + password
@@ -24,22 +23,30 @@ module.exports = function() {
             settings.password = options.key ||api.key
         }
 
-        if (options.method) settings.method = options.method
+        if (options.type) settings.type = options.type
+        else if (data) settings.type = 'POST'
 
-        if ($.isPlainObject(data)) {
-            settings.data = data
-        } else if (data) {
-            settings.url += '/' + data
-        }
+        settings.data = data
 
         return $.ajax(settings)
     }
 
     api.login = function(email, password) {
         return api.call('whoami', null, { key: keyFromCredentials(email, password) })
-        .then(function(user) {
-            api.emit('login', user)
+        .then(app.user.bind(app))
+    }
+
+    api.register = function(email, password) {
+        return api.call('users', {
+            email: email,
+            key: keyFromCredentials(email, password)
         })
+        .then(api.login.bind(api, email, password))
+    }
+
+    api.balances = function() {
+        api.call('balances')
+        .done(app.balances.bind(app))
     }
 
     return api

@@ -1,38 +1,37 @@
-module.exports = function(api) {
+module.exports = function(app, api) {
     var itemTemplate = require('./item.html')
     , controller = {
         $el: $(require('./template.html')())
     }
-    , $items = controller.$el.find('tbody')
+    , $items = controller.$el.find('.items')
 
     function itemsChanged(items) {
         $items.append($.map(items, function(item) {
             var $el = $(itemTemplate(item))
-            $el.data('item', item)
+            $el.attr('data-id', item.id)
             return $el
         }))
-
-        console.log($items.find('button.cancel'))
     }
 
     function refresh() {
-        api.call('orders').then(itemsChanged).done()
+        api.call('orders').done(itemsChanged)
     }
 
     $items.on('click', 'button.cancel', function(e) {
         e.preventDefault()
-        var $item = $(e.target).parents('tr:first')
-        , item = $item.data('item')
+        var $item = $(e.target).closest('.item')
 
-        api.call('orders/' + item.id, null, { method: 'DELETE' })
-        .then(function() {
+        api.call('orders/' + $item.attr('data-id'), null, { type: 'DELETE' })
+        .fail(app.alertXhrError)
+        .done(function() {
+            api.balances()
             $item.remove()
         })
     })
 
-    window.$temp = $items.find('button.cancel')
-
     refresh()
+
+    app.section('markets')
 
     return controller
 }

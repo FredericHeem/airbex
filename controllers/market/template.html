@@ -1,5 +1,65 @@
-<h1><%= id %></h1>
+<div class="market container">
+    <h3><%= id.substr(0, 3) + ' / ' + id.substr(3) %></h3>
 
-<table>
-    <tbody></tbody>
-</table>
+    <div class="row">
+        <form class="buy span5 well">
+            <h4>Buy Bitcoin</h4>
+
+            <div>
+                <label for="volume">Amount</label>
+                <input type="text" name="volume" />
+            </div>
+
+            <div>
+                <label for="price">Price</label>
+                <input type="text" name="price" />
+            </div>
+
+            <div class="summary">
+            </div>
+
+            <div>
+                <input type="submit" class="btn btn-success btn-large" value="Buy Bitcoin" />
+            </div>
+        </form>
+
+        <form class="sell well span5 offset1">
+            <h4>Sell Bitcoin</h4>
+
+            <div>
+                <label for="volume">Amount</label>
+                <input type="text" name="volume" />
+            </div>
+
+            <div>
+                <label for="price">Price</label>
+                <input type="text" name="price" />
+            </div>
+
+            <div class="summary">
+            </div>
+
+            <div>
+                <input type="submit" class="sell btn btn-primary btn-large" value="Sell Bitcoin" />
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="span5">
+            <h3>Market prices</h3>
+
+            <table class="depth table table-bordered table-striped table-compact">
+                <thead>
+                    <tr>
+                        <th>Buy volume (<%= id.substr(0, 3) %>)</th>
+                        <th>Price (<%= id.substr(3) %>)</th>
+                        <th>Sell volume (<%= id.substr(0, 3) %>)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

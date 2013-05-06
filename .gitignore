@@ -1,6 +1,6 @@
 npm-debug.log
 node_modules/
 phantomjs.exe
-tmp/
-public/
+build/
 config.dev.json
+components/

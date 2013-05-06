@@ -1,20 +1,38 @@
-var _ = require('underscore')
-, util = require('util')
-, EventEmitter = require('events').EventEmitter
-, Backbone = require('backbone')
-, App = function() {
+var EventEmitter = require('events').EventEmitter
+, _ = require('lodash')
+, app = module.exports = new EventEmitter()
+
+app.user = function(value) {
+    if (!_.isUndefined(value)) {
+        app._user = value
+        app.emit('user', value)
+    }
+    return app._user
 }
 
-util.inherits(App, EventEmitter)
-
-App.prototype.keyFromCredentials = function(email, password) {
-    var concat = email.toLowerCase() + password
-    , bits = sjcl.hash.sha256.hash(concat)
-    , hex = sjcl.codec.hex.fromBits(bits)
-    return hex
+app.section = function(name) {
+    $('.header .nav .' + name).addClass('active').siblings().removeClass('active')
 }
 
-App.prototype.errorFromXhr = function(xhr) {
+app.balances = function(value) {
+    if (!_.isUndefined(value)) {
+        app._balances = value
+        app.emit('balances', value)
+    }
+    return app._balances
+}
+
+app.alertXhrError = function(err) {
+    alert(JSON.stringify(app.errorFromXhr(err), null, 4))
+}
+
+app.authorize = function() {
+    if (app._user) return true
+    window.location.hash = '#login?after=' + window.location.hash.substr(1)
+    return false
+}
+
+app.errorFromXhr = function(xhr) {
     var body = xhr.responseText
 
     if (xhr.getAllResponseHeaders().match(/Content-Type: application\/json/i)) {
@@ -35,48 +53,3 @@ App.prototype.errorFromXhr = function(xhr) {
         body: body
     }
 }
-
-App.prototype.section = function(value, render) {
-    if (!_.isUndefined(value) && value !== app.section.value) {
-        if (app.section.value) {
-            app.section.value.dispose();
-        }
-
-        app.section.value = value;
-        value.show(value);
-
-        $('#section').html(value.$el);
-    }
-
-    return app.section.value || null;
-}
-
-App.prototype.authorize = function() {
-    if (this.user) return true
-    Backbone.history.navigate('login?after=' + window.location.hash.substr(1), true)
-    return false
-}
-
-App.prototype.setUser = function(user, key) {
-    this.user = user
-    this.apiKey = key
-    $('body').addClass('is-logged-in')
-    $('#top .account-summary .logged-in .email').html(user.get('email'))
-
-    if (!_.isUndefined(window.Intercom) && window.location.hostname !== 'localhost') {
-        $.ajax({
-            type: 'GET',
-            url: this.apiUrl + '/intercom',
-            username: 'api',
-            password: this.apiKey
-        })
-        .then(function(res) {
-            Intercom('boot', res)
-            Backbone.history.bind('all', function() {
-                Intercom('update')
-            })
-        })
-    }
-}
-
-module.exports = new App()

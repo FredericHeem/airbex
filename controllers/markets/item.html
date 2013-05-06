@@ -1,1 +1,9 @@
-<%= id %>
+<tr class="item">
+    <td><a href="#markets/<%= id %>"><%= id.substr(0,3) + ' / ' + id.substr(3) %></a></td>
+    <td class="last"><%= last %></td>
+    <td class="bid"><%= bid %></td>
+    <td class="ask"><%= ask %></td>
+    <td class="high"><%= high %></td>
+    <td class="low"><%= low %></td>
+    <td class="volume"><%= volume %></td>
+</tr>

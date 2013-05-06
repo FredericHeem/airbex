@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!--[if lte IE 8]>
-    <h4 color="red">Your browser is too old</h4><p><a href="http://browsehappy.com">Upgrade now</a></p>
+        <h4 color="red">Your browser is too old</h4><p><a href="http://browsehappy.com">Upgrade now</a></p>
     <![endif]-->
 
     <% if (minify) { %>
@@ -33,34 +33,7 @@
 </head>
 
 <body>
-    <div class="navbar navbar-fixed-top" id="top">
-        <div class="navbar-inner">
-            <div class="container">
-                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="brand" href="#">Justcoin</a>
-                <div class="nav-collapse collapse">
-                    <ul class="nav">
-                        <li class="active markets"><a href="#markets">Markets</a></li>
-                        <li class="balances"><a href="#my/balances">Funds</a></li>
-                        <li class="activities"><a href="#my/activities">History</a></li>
-                        <li class="orders"><a href="#my/orders">Orders</a></li>
-                    </ul>
-                    <div class="pull-right account-summary">
-                        <div class="logged-in">
-                            Logged in as <span class="email"></span>. <a href="/">Sign out</a>
-                        </div>
-                        <div class="not-logged-in">
-                            <a href="#login">Existing user</a> | <a href="#register">New user</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="header"></div>
 
     <div id="section"></div>
 
@@ -73,11 +46,6 @@
         <a href="mailto:help@snowco.in" target="_blank">help@snowco.in</a> |
         <a href="https://twitter.com/just_coin" target="_blank">Twitter</a>
     </footer>
-
-    <script>
-        snow = {
-        }
-    </script>
 
     <% if (minify) { %>
         <script src="scripts.min.js"></script>

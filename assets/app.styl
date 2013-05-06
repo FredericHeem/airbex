@@ -1,0 +1,134 @@
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+
+footer {
+    text-align: center;
+}
+
+.sidebar-nav {
+    padding: 9px 0;
+}
+
+.create-order {
+    @labelWidth: 80px;
+
+    .control-group {
+        .control-label {
+            width: @labelWidth;
+            text-align: left;
+        }
+
+        .controls {
+            margin-left: @labelWidth + 30;
+        }
+    }
+}
+
+body:not(.is-logged-in) {
+    #top {
+        .balances, .orders, .activities { display: none }
+        .account-summary .logged-in { display: none; }
+    }
+
+    .container.market .place-order-container {
+        display: none;
+    }
+}
+
+body.is-logged-in #top {
+    .account-summary .not-logged-in { display: none; }
+}
+
+#balances a[href="#my/withdraw/XRP"] { display: none; }
+#balances a[href="#my/deposit/XRP"] { display: none; }
+#balances a[href^="#my/send"] { display: none; }
+
+/* Main marketing message and sign up button */
+.jumbotron {
+    margin: 80px 0;
+    text-align: center;
+}
+.jumbotron h1 {
+    font-size: 100px;
+    line-height: 1;
+}
+.jumbotron .lead {
+    font-size: 24px;
+    line-height: 1.25;
+}
+.jumbotron .btn {
+    font-size: 21px;
+    padding: 14px 24px;
+}
+
+/* Supporting marketing content */
+.marketing {
+    margin: 60px 0;
+}
+.marketing p + h4 {
+    margin-top: 28px;
+}
+
+.dashboard
+    .balances
+        .balance
+            td
+                padding 15px 20px 10px 20px
+        .available
+            font-size 2em
+            color #555
+            text-align right
+
+.activities
+    .activity
+        .when
+            width 120px
+        .what
+            word-wrap: break-word
+
+.deposit-btc, .deposit-ltc
+    .address
+        font-size 1.6em
+        padding-top 20px
+        padding-bottom 20px
+        text-align center
+        border solid 1px #ccc
+    .disclaimer
+        font-size 0.85em
+
+// http://twitter.github.io/bootstrap/examples/signin.html
+.container.login, .container.register
+    > *
+        max-width: 300px
+        padding: 19px 29px 29px
+        margin: 0 auto 20px
+        background-color: #fff
+        border: 1px solid #e5e5e5
+        border-radius: 5px
+        box-shadow: 0 1px 2px rgba(0,0,0,.05)
+
+        .heading
+            margin-bottom: 10px
+
+        .email
+        .password
+            font-size: 16px
+            height: auto
+            margin-bottom: 15px
+            padding: 7px 9px
+
+.container.market
+    .price
+        .bid, .price, .ask
+            text-align: right
+    .summary
+        height: 30px
+        padding-top: 10px
+        padding-bottom: 10px
+
+.container.markets
+    .item
+        .last, .bid, .ask, .low, .high, .volume
+            text-align right

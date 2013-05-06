@@ -1,38 +1,38 @@
 {
-    "name": "snow-web",
-    "description": "web interface",
-    "version": "0.0.3",
-    "dependencies": {
-    },
-    "devDependencies": {
-        "underscore": "~1.4.4",
-        "nconf": "0.6.5",
-        "backbone": "~1.0.0",
-        "debug": "0.7.0",
-        "async": "0.1.22",
-        "qs": "0.5.2",
-        "num": "0.2.0",
-        "ejs": "0.8.3",
-        "request": "~2.16.6",
-        "always": "2.0.0",
-        "browserify": "x",
-        "express": "3.0.2",
-        "mocha": "1.8.1",
-        "expect.js": "0.2.0",
-        "mocha-phantomjs": "1.0.1",
-        "aws2js": "x",
-        "jake": "x",
-        "shelljs": "x",
-        "browserify-ejs": "x",
-        "moment": "~2.0.0",
-        "numeral": "1.4.8",
-        "http-proxy": "~0.10.2"
-    },
-    "scripts": {
-        "test": "jake test"
-    },
-    "engines": {
-        "node": "~0.8",
-        "npm": "~1.1"
-    }
+  "name": "snow-web",
+  "description": "web interface",
+  "version": "0.0.3",
+  "dependencies": {},
+  "devDependencies": {
+    "underscore": "~1.4.4",
+    "nconf": "0.6.5",
+    "backbone": "~1.0.0",
+    "debug": "0.7.0",
+    "async": "0.1.22",
+    "qs": "0.5.2",
+    "num": "0.2.0",
+    "ejs": "0.8.3",
+    "request": "~2.16.6",
+    "always": "2.0.0",
+    "browserify": "x",
+    "express": "3.0.2",
+    "mocha": "1.8.1",
+    "expect.js": "0.2.0",
+    "mocha-phantomjs": "1.0.1",
+    "aws2js": "x",
+    "jake": "x",
+    "shelljs": "x",
+    "browserify-ejs": "x",
+    "moment": "~2.0.0",
+    "numeral": "1.4.8",
+    "http-proxy": "~0.10.2",
+    "lodash": "~1.2.1"
+  },
+  "scripts": {
+    "test": "jake test"
+  },
+  "engines": {
+    "node": "~0.8",
+    "npm": "~1.1"
+  }
 }

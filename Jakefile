@@ -9,59 +9,55 @@ var exec = function() {
 }
 
 task('clean', function() {
-    rm('-Rf', 'public/*')
+    rm('-Rf', 'build/*')
 })
 
 task('app', [
-    'public/head.js',
-    'public/scripts.js',
-    'public/styles.css',
-    'public/index.html'
+    'build/head.js',
+    'build/scripts.js',
+    'build/styles.css',
+    'build/index.html'
 ])
 
 task('dist', [
-    'public/head.min.js',
-    'public/scripts.min.js',
-    'public/styles.min.css',
-    'public/index.min.html',
-    'public/ripple.txt'
+    'build/head.min.js',
+    'build/scripts.min.js',
+    'build/styles.min.css',
+    'build/index.min.html',
+    'build/ripple.txt'
 ])
 
-directory('public')
+directory('build')
 
 var head = [
-    'public/raven.min.js'
+    'build/raven.min.js'
 ]
 
 var vendor = [
-    'public/jquery-2.0.0.min.js',
-    'public/sjcl.js',
-    'public/alertify.min.js',
-    'public/bootstrap.min.js',
-    'public/intercom.js'
+    'build/jquery.min.js',
+    'build/sjcl.js',
+    'build/alertify.min.js',
+    'build/bootstrap.min.js',
+    'build/intercom.js'
 ]
 
-file('public/jquery-2.0.0.min.js', ['vendor/jquery-2.0.0.min.js'], function() {
-    cp(this.prereqs[0], this.name)
-})
-
-file('public/jquery-2.0.0.min.js', ['vendor/jquery-2.0.0.min.js'], cpTask)
-file('public/sjcl.js', ['vendor/sjcl.js'], cpTask)
-file('public/intercom.js', ['vendor/intercom.js'], cpTask)
-file('public/alertify.min.js', ['vendor/alertify/alertify.min.js'], cpTask)
-file('public/bootstrap.min.js', ['vendor/bootstrap.min.js'], cpTask)
-file('public/ripple.txt', ['assets/ripple.txt'], cpTask)
-file('public/raven.min.js', ['vendor/raven.min.js'], cpTask)
+file('build/jquery.min.js', ['components/jquery/jquery.min.js'], cpTask)
+file('build/sjcl.js', ['vendor/sjcl.js'], cpTask)
+file('build/intercom.js', ['vendor/intercom.js'], cpTask)
+file('build/alertify.min.js', ['vendor/alertify/alertify.min.js'], cpTask)
+file('build/bootstrap.min.js', ['components/bootstrap/js/bootstrap.min.js'], cpTask)
+file('build/ripple.txt', ['assets/ripple.txt'], cpTask)
+file('build/raven.min.js', ['vendor/raven.min.js'], cpTask)
 
 function cpTask() {
     cp(this.prereqs[0], this.name)
 }
 
-file('public/scripts.min.js', ['public/scripts.js'], compressJs)
-file('public/head.min.js', ['public/head.js'], compressJs)
-file('public/styles.min.css', ['public/styles.css'], compressCss)
+file('build/scripts.min.js', ['build/scripts.js'], compressJs)
+file('build/head.min.js', ['build/head.js'], compressJs)
+file('build/styles.min.css', ['build/styles.css'], compressCss)
 
-file('public/index.html', ['public'], function() {
+file('build/index.html', ['build'], function() {
     var ejs = require('ejs')
     ejs.render(cat('assets/index.ejs'), {
         minify: false
@@ -69,7 +65,7 @@ file('public/index.html', ['public'], function() {
     .to(this.name)
 })
 
-file('public/index.min.html', ['public'], function() {
+file('build/index.min.html', ['build'], function() {
     var ejs = require('ejs')
     ejs.render(cat('assets/index.ejs'), {
         minify: true,
@@ -79,14 +75,16 @@ file('public/index.min.html', ['public'], function() {
     .to(this.name)
 })
 
-file('public/styles.css', ['public'], function() {
-    (cat('vendor/bootstrap-combined.min.css') + '\n' +
+file('build/styles.css', ['build'], function() {
+    exec('stylus assets/app.styl -o build');
+    (cat('components/bootstrap/css/bootstrap.min.css') + '\n' +
     cat('vendor/alertify/alertify.bootstrap.css') + '\n' +
-    exec('lessc assets/styles.less'))
+    cat('vendor/alertify/alertify.bootstrap.css') + '\n' +
+    cat('build/app.css') + '\n')
     .to(this.name)
 })
 
-file('public/scripts.js', ['public'].concat(vendor), function() {
+file('build/scripts.js', ['build'].concat(vendor), function() {
     var v = vendor.reduce(function(p, c) {
         return p + ';' + cat(c)
     }, '')
@@ -95,7 +93,7 @@ file('public/scripts.js', ['public'].concat(vendor), function() {
     scripts.to(this.name)
 })
 
-file('public/head.js', ['public'].concat(head), function() {
+file('build/head.js', ['build'].concat(head), function() {
     head.reduce(function(p, c) {
         return p + ';' + cat(c)
     }, '')
@@ -113,9 +111,7 @@ function compressJs() {
 }
 
 // hosting locally
-task('host', [
-    'clean', 'app'
-], function() {
+task('host', ['app'], function() {
     var express = require('express')
     , app = express()
     , server = require('http').createServer(app)
@@ -134,7 +130,7 @@ task('host', [
         })
     })
     proxy.listen(5073)
-    app.use(express.static('public'))
+    app.use(express.static('build'))
     server.listen(5072)
     console.log('hosting at http://localhost:5073')
     return server
@@ -156,7 +152,7 @@ task('publish-prod', [
 
     async.forEach(Object.keys(files), function(fn, next) {
         var outName = files[fn] || fn
-        jake.exec('scp public/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/public/' + outName, next)
+        jake.exec('scp build/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/build/' + outName, next)
     }, complete)
 }, { async: true })
 
@@ -172,20 +168,20 @@ task('test', ['test-host'], function() {
     })
 }, { async: true })
 
-file('public/test.html', ['test/support/tests.html'], cpTask)
-file('public/test.css', ['node_modules/mocha/mocha.css'], cpTask)
+file('build/test.html', ['test/support/tests.html'], cpTask)
+file('build/test.css', ['node_modules/mocha/mocha.css'], cpTask)
 
 cp('-f', 'test/support/tests.html', 'build/test/index.html')
 
-task('test-host', ['public/test.js', 'public/test.html'], function() {
+task('test-host', ['build/test.js', 'build/test.html'], function() {
     var express = require('express')
     , app = express()
     server = require('http').createServer(app)
-    app.use(express.static('public'))
+    app.use(express.static('build'))
     server.listen(5074)
 })
 
-file('public/test.js', ['public'].concat(vendor), function() {
+file('build/test.js', ['build'].concat(vendor), function() {
     var deps = vendor.slice()
     deps.push('./node_modules/mocha/mocha.js')
 
@@ -196,3 +192,5 @@ file('public/test.js', ['public'].concat(vendor), function() {
     , scripts = v + ';' + bundle
     scripts.to(this.name)
 })
+
+task('default', ['clean', 'app'])

@@ -1,20 +1,32 @@
-module.exports = function(api) {
+module.exports = function(app, api, after) {
     var controller = {
         $el: $(require('./template.html')())
     }
-    , $form = controller.$el.filter('form')
-    , $email = $form.find('input.email')
-    , $password = $form.find('input.password')
+    , $form = controller.$el.find('form')
+    , $email = $form.find('.email')
+    , $password = $form.find('.password')
 
     $form.on('submit', function(e) {
         e.preventDefault()
         api.login($email.val(), $password.val())
-        .then(function() {
-            console.error('TODO redirect')
-        }, function(err) {
-            window.location.hash = '#balances'
-        }).done()
+        .fail(function(err) {
+            var error = app.errorFromXhr(err)
+
+            if (error.name == 'UnknownApiKey') {
+                alert('Wrong e-mail/password combination')
+                return
+            }
+
+            app.alertXhrError(err)
+        })
+        .done(function() {
+            window.location.hash = '#' + (after || 'dashboard')
+        })
     })
+
+    setTimeout(function() {
+        $email.focus()
+    }, 250)
 
     return controller
 }

@@ -1,7 +1,7 @@
 Snow API
 =====
 
-The API is accessible from [https://snowco.in/api](https://snowco.in/api)
+The API is accessible from [https://justcoin.com/api](https://justcoin.com/api)
 
 Security
 ---
@@ -22,9 +22,9 @@ Methods
     </tr>
     <tr>
         <td>GET</td>
-        <td>/accounts</td>
+        <td>/balances</td>
         <td>Private</td>
         <td></td>
-        <td>Will be replaced by /user/balances</td>
+        <td></td>
     </tr>
 </table>

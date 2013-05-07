@@ -4,7 +4,10 @@ var api = require('./api')()
 , app = require('./app')
 
 require('./routes')(app, api, router)
-require('./intercom')(app, api)
+
+if (window.analytics) {
+    require('./segment')(app, api, window.analytics)
+}
 
 app.on('user', function(user) {
     $app.toggleClass('is-logged-in', !!user)

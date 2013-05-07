@@ -37,13 +37,11 @@ var vendor = [
     'build/jquery.min.js',
     'build/sjcl.js',
     'build/alertify.min.js',
-    'build/bootstrap.min.js',
-    'build/intercom.js'
+    'build/bootstrap.min.js'
 ]
 
 file('build/jquery.min.js', ['components/jquery/jquery.min.js'], cpTask)
 file('build/sjcl.js', ['vendor/sjcl.js'], cpTask)
-file('build/intercom.js', ['vendor/intercom.js'], cpTask)
 file('build/alertify.min.js', ['vendor/alertify/alertify.min.js'], cpTask)
 file('build/bootstrap.min.js', ['components/bootstrap/js/bootstrap.min.js'], cpTask)
 file('build/ripple.txt', ['assets/ripple.txt'], cpTask)
@@ -60,7 +58,8 @@ file('build/styles.min.css', ['build/styles.css'], compressCss)
 file('build/index.html', ['build'], function() {
     var ejs = require('ejs')
     ejs.render(cat('assets/index.ejs'), {
-        minify: false
+        minify: false,
+        segment: '70kmerb0ik'
     })
     .to(this.name)
 })
@@ -69,7 +68,6 @@ file('build/index.min.html', ['build'], function() {
     var ejs = require('ejs')
     ejs.render(cat('assets/index.ejs'), {
         minify: true,
-        raven: 'https://8216b316efe943d993cd010a6bf22824@app.getsentry.com/6306',
         segment: 'bc0p8b3ul1'
     })
     .to(this.name)

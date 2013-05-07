@@ -20,14 +20,11 @@
         <script src="head.js"></script>
     <% } %>
 
-    <% if (typeof raven !== 'undefined') { %>
-        <script>Raven.config('<%= raven %>').install();</script>
-    <% } %>
-
     <% if (typeof segment !== 'undefined' && segment) { %>
         <script type="text/javascript">
           var analytics=analytics||[];analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);var r=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}},i=["identify","track","trackLink","trackForm","trackClick","trackSubmit","pageview","ab","alias","ready"];for(var s=0;s<i.length;s++)analytics[i[s]]=r(i[s])};
           analytics.load("<%= segment %>");
+          window.analytics = analytics
         </script>
     <% } %>
 </head>
@@ -40,11 +37,9 @@
     <hr>
 
     <footer>
-        <a href="http://snowcoin.freshdesk.com/" target="_blank">Support</a> |
-        <a href="http://snowcoin.freshdesk.com/support/solutions/folders/133420" target="_blank">FAQ</a> |
-        <a href="http://snowcoin.freshdesk.com/support/discussions" target="_blank">Forum</a> |
-        <a href="mailto:help@snowco.in" target="_blank">help@snowco.in</a> |
-        <a href="https://twitter.com/just_coin" target="_blank">Twitter</a>
+        <div class="container">
+            <a id="Intercom" href="mailto:64463fba8faa8166444bfb3c00a5e40976bd622e@incoming.intercom.io">Support</a>
+        </div>
     </footer>
 
     <% if (minify) { %>

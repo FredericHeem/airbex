@@ -31,7 +31,7 @@ module.exports = function(app, api) {
 
     refresh()
 
-    app.section('markets')
+    app.section('orders')
 
     return controller
 }

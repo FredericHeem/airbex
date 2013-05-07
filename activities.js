@@ -10,7 +10,8 @@ activities.activities = function(conn, req, res, next) {
         'SELECT created, "type", details',
         'FROM activity',
         'WHERE user_id = $1',
-        'ORDER BY activity_id DESC'
+        'ORDER BY activity_id DESC',
+        'LIMIT 20'
     ].join('\n')
 
     Q.ninvoke(conn, 'query', {

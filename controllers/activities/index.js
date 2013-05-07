@@ -42,7 +42,6 @@ module.exports = function(app, api) {
 
             return itemTemplate(item)
         }))
-        console.log($items)
     }
 
     function refresh() {

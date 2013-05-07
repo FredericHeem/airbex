@@ -6,7 +6,7 @@ var api = require('./api')()
 require('./routes')(app, api, router)
 
 if (window.analytics) {
-    require('./segment')(app, api, window.analytics)
+    require('./segment')(app, api)
 }
 
 app.on('user', function(user) {

@@ -150,7 +150,7 @@ task('publish-prod', [
 
     async.forEach(Object.keys(files), function(fn, next) {
         var outName = files[fn] || fn
-        jake.exec('scp build/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/build/' + outName, next)
+        jake.exec('scp build/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/public/' + outName, next)
     }, complete)
 }, { async: true })
 

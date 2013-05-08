@@ -1,10 +1,11 @@
 var Q = require('q')
 , activities = require('./activities')
+, validate = require('./validate')
 , ripple = module.exports = {}
 
 ripple.configure = function(app, conn, auth) {
-    app.post('/ripple/out', auth, ripple.withdraw.bind(ripple, conn))
-    app.get('/ripple/address', ripple.address.bind(ripple, conn))
+    app.post('/v1/ripple/out', auth, ripple.withdraw.bind(ripple, conn))
+    app.get('/v1/ripple/address', ripple.address.bind(ripple, conn))
     app.get('/ripple/federation', ripple.federation.bind(ripple, app.config, conn))
 }
 
@@ -32,7 +33,6 @@ ripple.federation = function(config, conn, req, res, next) {
     if (!domain) return sendError('invalidParams')
     if (!user && !tag) return sendError('invalidParams')
     if (user && tag) return sendError('invalidParams')
-        console.log(config)
     if (domain !== config.ripple_federation.domain) return sendError('noSuchDomain')
 
     var query = user ? {
@@ -77,11 +77,13 @@ ripple.address = function(conn, req, res, next) {
             console.error('Ripple account missing from database')
             return res.send(500)
         }
-        res.send({ address: dres.rows[0].address })
+        res.send(200, { address: dres.rows[0].address })
     })
 }
 
 ripple.withdraw = function(conn, req, res, next) {
+    if (!validate(req.body, 'ripple_out', res)) return
+
     Q.ninvoke(conn, 'query', {
         text: 'SELECT ripple_withdraw(user_currency_account($1, $2), $3, from_decimal($4, $2))',
         values: [req.user, req.body.currency, req.body.address, req.body.amount]

@@ -4,10 +4,10 @@ var Q = require('q')
 , validate = require('./validate')
 
 users.configure = function(app, conn, auth) {
-    app.get('/whoami', auth, users.whoami.bind(users, conn))
-    app.post('/users', users.create.bind(users, conn))
-    app.post('/replaceLegacyApiKey', users.replaceLegacyApiKey.bind(users, conn))
-    app.post('/replaceApiKey', auth, users.replaceApiKey.bind(users, conn))
+    app.get('/v1/whoami', auth, users.whoami.bind(users, conn))
+    app.post('/v1/users', users.create.bind(users, conn))
+    app.post('/v1/replaceLegacyApiKey', users.replaceLegacyApiKey.bind(users, conn))
+    app.post('/v1/replaceApiKey', auth, users.replaceApiKey.bind(users, conn))
 }
 
 users.whoami = function(conn, req, res, next) {

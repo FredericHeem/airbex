@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, users = require('../users')
+, users = require('../../v1/users')
 
 describe('users', function() {
 	describe('configure', function() {
@@ -10,8 +10,8 @@ describe('users', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			users.configure(app)
-			expect(routes).to.contain('post /users')
-			expect(routes).to.contain('get /whoami')
+			expect(routes).to.contain('post /v1/users')
+			expect(routes).to.contain('get /v1/whoami')
 		})
 	})
 

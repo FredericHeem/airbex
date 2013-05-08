@@ -3,17 +3,20 @@
     "properties": {
         "market": {
             "type": "string",
-            "required": true
+            "required": true,
+            "pattern": "^[A-Z]{6}$"
         },
         "price": {
             "type": "string",
-            "required": true
+            "required": true,
+            "pattern": "^\\d+\\.?\\d*$"
         },
-        "volume": {
+        "amount": {
             "type": "string",
-            "required": true
+            "required": true,
+            "pattern": "^\\d+\\.?\\d*$"
         },
-        "side": {
+        "type": {
             "type": "string",
             "required": true,
             "enum": ["bid", "ask"]

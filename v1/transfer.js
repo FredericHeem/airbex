@@ -1,12 +1,15 @@
 var Q = require('q')
 , activities = require('./activities')
+, validate = require('./validate')
 , transfer = module.exports = {}
 
 transfer.configure = function(app, conn, auth) {
-    app.post('/transfer', auth, transfer.transfer.bind(transfer, conn))
+    app.post('/v1/transfer', auth, transfer.transfer.bind(transfer, conn))
 }
 
 transfer.transfer = function(conn, req, res, next) {
+    if (!validate(req.body, 'transfer', res)) return
+
     Q.ninvoke(conn, 'query', {
         text: [
             'SELECT user_transfer_to_email($1, $2, $3, from_decimal($4, $3)) transaction_id, su.email sender_email, ru.email receiver_email,',
@@ -38,7 +41,7 @@ transfer.transfer = function(conn, req, res, next) {
             currency: req.body.currency
         })
 
-        res.send(200, { id: dres.rows[0].transaction_id })
+        res.send(204)
     }, function(err) {
         if (err.message.match(/^User with email/)) {
             return res.send(400, {

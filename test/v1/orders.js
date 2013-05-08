@@ -1,19 +1,19 @@
 var expect = require('expect.js')
-, orders = require('../orders')
+, orders = require('../../v1/orders')
 
 describe('orders', function() {
 	describe('configure', function() {
 		it('adds expected routes', function() {
 			var routes = []
 			, app = {
-				del: function(url) { routes.push('del ' + url) },
+				del: function(url) { routes.push('delete ' + url) },
 				post: function(url) { routes.push('post ' + url) },
 				get: function(url) { routes.push('get ' + url) }
 			}
 			orders.configure(app)
-			expect(routes).to.contain('del /orders/:id')
-			expect(routes).to.contain('post /orders')
-			expect(routes).to.contain('get /orders')
+			expect(routes).to.contain('delete /v1/orders/:id')
+			expect(routes).to.contain('post /v1/orders')
+			expect(routes).to.contain('get /v1/orders')
 		})
 	})
 
@@ -66,7 +66,7 @@ describe('orders', function() {
 						rows: [{
 							id: 1,
 							price: '1.2',
-							volume: '1.34'
+							amount: '1.34'
 						}]
 					})
 				}
@@ -88,7 +88,7 @@ describe('orders', function() {
 				send: function(r) {
 					expect(r).to.be.an('array')
 					expect(r[0].id).to.be(1)
-					expect(r[0].volume).to.be('formatted-v')
+					expect(r[0].amount).to.be('formatted-v')
 					expect(r[0].price).to.be('formatted-p')
 					done()
 				}
@@ -116,16 +116,16 @@ describe('orders', function() {
 			, req = {
 				user: 8,
 				body: {
-					market: 'AABB',
-					volume: '9',
+					market: 'BTCUSD',
+					amount: '9',
 					price: '12',
-					side: 'ask'
+					type: 'ask'
 				}
 			}
 			, res = {
 				send: function(code, r) {
 					expect(code).to.be(201)
-					expect(r).to.eql({ id: 17 })
+					expect(r.id).to.be(17)
 					done()
 				}
 			}

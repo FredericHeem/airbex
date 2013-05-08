@@ -6,21 +6,14 @@ var config = require('konfu')
 , conn = require('./db')(config.pg_url, config.pg_native)
 , Cache = require('./cache')
 
-var auth = require('./auth')(conn)
-
 app.config = config
 
 app.use(express.bodyParser())
 
-var routes = ['balances', 'markets', 'orders', 'ripple',
-'currencies', 'activities', 'users', 'transfer',
-'bitcoincharts', 'intercom']
+var routes = ['bitcoincharts', 'v1']
 routes.forEach(function(name) {
-    require('./' + name).configure(app, conn, auth)
+    require('./' + name).configure(app, conn)
 })
-
-require('./bitcoin').configure(app, conn, auth, 'BTC')
-require('./bitcoin').configure(app, conn, auth, 'LTC')
 
 app.use(function(req, res) {
     res.send(404)

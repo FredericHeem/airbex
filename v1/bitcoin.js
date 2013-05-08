@@ -2,14 +2,17 @@ var Q = require('q')
 , activities = require('./activities')
 , _ = require('underscore')
 , util = require('util')
+, validate = require('./validate')
 , bitcoin = module.exports = {}
 
 bitcoin.configure = function(app, conn, auth, currencyId) {
-    app.post('/withdraw/' + currencyId, auth, bitcoin.withdraw.bind(bitcoin, conn, currencyId))
-    app.get('/deposit/' + currencyId + '/address', auth, bitcoin.address.bind(bitcoin, conn, currencyId))
+    app.post('/v1/' + currencyId + '/out', auth, bitcoin.withdraw.bind(bitcoin, conn, currencyId))
+    app.get('/v1/' + currencyId + '/address', auth, bitcoin.address.bind(bitcoin, conn, currencyId))
 }
 
 bitcoin.withdraw = function(conn, currencyId, req, res, next) {
+    if (!validate(req.body, currencyId + '_out', res)) return
+
     console.log('processing withdraw request of %d %s from user #%s to %s',
         req.body.amount, currencyId, req.user, req.body.address)
 
@@ -49,7 +52,7 @@ bitcoin.address = function(conn, currencyId, req, res, next) {
     })
     .then(function(cres) {
         var address = cres.rows.length ? cres.rows[0].address : null
-        res.send({ address: address })
+        res.send(200, { address: address })
     }, next)
     .done()
 }

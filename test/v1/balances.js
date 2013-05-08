@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, balances = require('../balances')
+, balances = require('../../v1/balances')
 
 describe('balances', function() {
 	describe('configure', function() {
@@ -10,7 +10,7 @@ describe('balances', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			balances.configure(app, null, 'BTC')
-			expect(routes).to.contain('get /balances')
+			expect(routes).to.contain('get /v1/balances')
 		})
 	})
 
@@ -21,7 +21,7 @@ describe('balances', function() {
 					expect(q.text).to.match(/from account_view/i)
 					expect(q.text).to.match(/currency_id/i)
 					expect(q.values).to.eql([25])
-					c(null, { rows: [{ account_id: 301, currency: 'XRP', available: '1.2' }] })
+					c(null, { rows: [{ currency: 'XRP', available: '1.2' }] })
 				}
 			}
 			, req = {

@@ -3,8 +3,8 @@ var _ = require('underscore')
 , Markets = module.exports = {}
 
 Markets.configure = function(app, conn) {
-    app.get('/markets', Markets.markets.bind(Markets, conn))
-    app.get('/markets/:id/depth', Markets.depth.bind(Markets, conn))
+    app.get('/v1/markets', Markets.markets.bind(Markets, conn))
+    app.get('/v1/markets/:id/depth', Markets.depth.bind(Markets, conn))
 }
 
 Markets.markets = function(conn, req, res, next) {
@@ -44,16 +44,20 @@ Markets.depth = function(conn, req, res, next) {
         text: query,
         values: [req.params.id]
     })
-    .then(function(cres) {
-        return cres.rows.map(function(row) {
-            row.side = row.side ? 'ask' : 'bid'
-            row.price = req.app.cache.formatOrderPrice(row.price, req.params.id)
-            row.volume = req.app.cache.formatOrderVolume(row.volume, req.params.id)
-            return row
+    .then(function(dres) {
+        return res.send({
+            bids: dres.rows.filter(function(row) {
+                return row.side == 'bid'
+            }).map(function(row) {
+                return [req.app.cache.formatOrderPrice(row.price, req.params.id), req.app.cache.formatOrderVolume(row.volume, req.params.id)]
+            }),
+
+            asks: dres.rows.filter(function(row) {
+                return row.side == 'ask'
+            }).map(function(row) {
+                return [req.app.cache.formatOrderPrice(row.price, req.params.id), req.app.cache.formatOrderVolume(row.volume, req.params.id)]
+            })
         })
     }, next)
-    .then(function(depth) {
-        res.send(depth)
-    })
     .done()
 }

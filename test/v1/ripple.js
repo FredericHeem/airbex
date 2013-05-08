@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, ripple = require('../ripple')
+, ripple = require('../../v1/ripple')
 
 describe('ripple', function() {
 	describe('configure', function() {
@@ -10,8 +10,8 @@ describe('ripple', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			ripple.configure(app, null)
-			expect(routes).to.contain('post /ripple/out')
-			expect(routes).to.contain('get /ripple/address')
+			expect(routes).to.contain('post /v1/ripple/out')
+			expect(routes).to.contain('get /v1/ripple/address')
 			expect(routes).to.contain('get /ripple/federation')
 		})
 	})
@@ -42,14 +42,14 @@ describe('ripple', function() {
 				query: function(q, c) {
 					if (q.text.match(/activity/)) return
 					expect(q.text).to.match(/ripple_withdraw/i)
-					expect(q.values).to.eql([98, 'QQQ', 'rsomeaddress', '50.3'])
+					expect(q.values).to.eql([98, 'QQQ', 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT', '50.3'])
 					c(null, { rows: [{ request_id: 59 }] })
 				}
 			}
 			, req = {
 				user: 98,
 				body: {
-					address: 'rsomeaddress',
+					address: 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT',
 					amount: '50.3',
 					currency: 'QQQ'
 				}

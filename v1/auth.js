@@ -1,28 +1,19 @@
-var sjcl = require('./vendor/sjcl')
+var sjcl = require('../vendor/sjcl')
 , connect = require('express/node_modules/connect')
 , util = require('util')
 , auth = module.exports = function(conn) {
     return function(req, res, next) {
+        console.log('------------------------------------------- AUTH')
+        console.log(req.path)
         if (req.user) return next()
-
-        var authorization = req.headers.authorization
-
-        if (!authorization) {
-            res.header('www-authenticate', 'Basic realm="Authorization Required"')
-            return res.send(401)
-        }
-
-        var parts = authorization.split(' ')
-        , scheme = parts[0]
-        , credentials = new Buffer(parts[1], 'base64').toString().split(':')
-        , username = credentials[0]
-        , password = credentials[1]
-
-        if (scheme != 'Basic') return res.send(400)
+        if (!req.query.key) return res.send(401, {
+            name: 'KeyMissing',
+            message:'key parameter missing from query string'
+        })
 
         conn.query({
             text: 'SELECT user_id FROM api_key WHERE api_key_id = $1',
-            values: [password]
+            values: [req.query.key]
         }, function(err, dres) {
             if (err) return next(err)
 
@@ -31,7 +22,7 @@ var sjcl = require('./vendor/sjcl')
             }
 
             req.user = dres.rows[0].user_id
-            req.key = password
+            req.key = req.query.key
 
             return next()
         })

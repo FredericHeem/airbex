@@ -5,15 +5,15 @@ var Q = require('q')
 , activities = require('./activities')
 
 orders.configure = function(app, conn, auth) {
-    app.del('/orders/:id', auth, orders.cancel.bind(orders, conn))
-    app.post('/orders', auth, orders.create.bind(orders, conn))
-    app.get('/orders', auth, orders.forUser.bind(orders, conn))
+    app.del('/v1/orders/:id', auth, orders.cancel.bind(orders, conn))
+    app.post('/v1/orders', auth, orders.create.bind(orders, conn))
+    app.get('/v1/orders', auth, orders.forUser.bind(orders, conn))
 }
 
 orders.create = function(conn, req, res, next) {
     if (!validate(req.body, 'order_create', res)) return
 
-    Q.ninvoke(conn, 'query', {
+    var query = {
         text: [
             'SELECT create_order($1, m.market_id, $3, $4, $5) order_id',
             'FROM market m',
@@ -22,47 +22,54 @@ orders.create = function(conn, req, res, next) {
         values: [
             req.user,
             req.body.market,
-            req.body.side == 'bid' ? 0 : 1,
+            req.body.type == 'bid' ? 0 : 1,
             req.body.price,
-            req.body.volume
+            req.body.amount
         ]
-    })
-    .then(function(dres) {
-        var row = dres.rows[0]
-        if (!row) return res.send(404, { name: 'MarketNotFound', message: 'Market not found' })
+    }
+
+    conn.query(query, function(err, dr) {
+        if (err) {
+            if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
+                return res.send(400, {
+                    name: 'InvalidAmount',
+                    message: 'The requested transfer amount is invalid/out of range'
+                })
+            }
+
+            if (err.message == 'new row for relation "account" violates check constraint "non_negative_available"') {
+                return res.send(400, {
+                    name: 'InsufficientFunds',
+                    message: 'insufficient funds'
+                })
+            }
+
+            return next(err)
+        }
+
+        var row = dr.rows[0]
+
+        if (!row) {
+            return res.send(404, { name: 'MarketNotFound', message: 'Market not found' })
+        }
+
         activities.log(conn, req.user, 'CreateOrder', {
             market: req.body.market,
-            side: req.body.side,
+            type: req.body.type,
             price: req.body.price,
-            volume: req.body.volume,
+            amount: req.body.amount,
             address: req.body.address
         })
+
         res.send(201, { id: row.order_id })
-    }, function(err) {
-        if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
-            return res.send(400, {
-                name: 'InvalidAmount',
-                message: 'The requested transfer amount is invalid/out of range'
-            })
-        }
-
-        if (err.message == 'new row for relation "account" violates check constraint "non_negative_available"') {
-            return res.send(400, {
-                name: 'InsufficientFunds',
-                message: 'insufficient funds'
-            })
-        }
-
-        return next(err)
     })
-    .done()
 }
 
 orders.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn, 'query', {
         text: [
             'SELECT order_id id, base_currency_id || quote_currency_id market, side, price, volume,',
-            'original',
+            'original - volume remaining',
             'FROM order_view o',
             'INNER JOIN market m ON m.market_id = o.market_id',
             'WHERE user_id = $1 AND volume > 0'
@@ -71,10 +78,10 @@ orders.forUser = function(conn, req, res, next) {
     })
     .then(function(r) {
         res.send(r.rows.map(function(row) {
-            row.side = row.side ? 'ask' : 'bid'
+            row.type = row.type ? 'ask' : 'bid'
             row.price = req.app.cache.formatOrderPrice(row.price, row.market)
-            row.volume = req.app.cache.formatOrderVolume(row.volume, row.market)
-            row.original = req.app.cache.formatOrderVolume(row.original, row.market)
+            row.amount = req.app.cache.formatOrderVolume(row.volume, row.market)
+            row.remaining = req.app.cache.formatOrderVolume(row.remaining, row.market)
             return row
         }))
     }, next)

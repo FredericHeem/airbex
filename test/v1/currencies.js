@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, currencies = require('../currencies')
+, currencies = require('../../v1/currencies')
 
 describe('currencies', function() {
 	describe('configure', function() {
@@ -9,7 +9,7 @@ describe('currencies', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			currencies.configure(app)
-			expect(routes).to.contain('get /currencies')
+			expect(routes).to.contain('get /v1/currencies')
 		})
 	})
 
@@ -18,14 +18,14 @@ describe('currencies', function() {
 			var conn = {
 				query: function(q, c) {
 					expect(q).to.match(/from "currency"/i)
-					c(null, { rows: [{ currency_id: 'QQQ' }] })
+					c(null, { rows: [{ currency: 'QQQ' }] })
 				}
 			}
 			, req = {
 			}
 			, res = {
 				send: function(r) {
-					expect(r[0].currency_id).to.be('QQQ')
+					expect(r[0].currency).to.be('QQQ')
 					done()
 				}
 			}

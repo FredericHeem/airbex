@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, activities = require('../activities')
+, activities = require('../../v1/activities')
 
 describe('activities', function() {
 	describe('configure', function() {
@@ -9,7 +9,7 @@ describe('activities', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			activities.configure(app)
-			expect(routes).to.contain('get /activities')
+			expect(routes).to.contain('get /v1/activities')
 		})
 	})
 

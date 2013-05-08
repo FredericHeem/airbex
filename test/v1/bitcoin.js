@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, bitcoin = require('../bitcoin')
+, bitcoin = require('../../v1/bitcoin')
 
 describe('bitcoin', function() {
 	describe('configure', function() {
@@ -10,8 +10,8 @@ describe('bitcoin', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			bitcoin.configure(app, null, null, 'BTC')
-			expect(routes).to.contain('post /withdraw/BTC')
-			expect(routes).to.contain('get /deposit/BTC/address')
+			expect(routes).to.contain('post /v1/BTC/out')
+			expect(routes).to.contain('get /v1/BTC/address')
 		})
 	})
 
@@ -29,8 +29,9 @@ describe('bitcoin', function() {
 				user: 25
 			}
 			, res = {
-				send: function(r) {
-					expect(r.address).to.eql('1someaddress')
+				send: function(code, r) {
+					expect(code).to.be(200)
+					expect(r.address).to.be('1someaddress')
 					done()
 				}
 			}
@@ -45,14 +46,14 @@ describe('bitcoin', function() {
 				query: function(q, c) {
 					if (q.text.match(/activity/)) return
 					expect(q.text).to.match(/btc_withdraw/i)
-					expect(q.values).to.eql([38, '1someaddress', '0.15', 'BTC'])
+					expect(q.values).to.eql([38, '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt', '0.15', 'BTC'])
 					c(null, { rows: [{ request_id: 59 }] })
 				}
 			}
 			, req = {
 				user: 38,
 				body: {
-					address: '1someaddress',
+					address: '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt',
 					amount: '0.15'
 				}
 			}

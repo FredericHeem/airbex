@@ -2,7 +2,7 @@ var Q = require('q')
 , activities = module.exports = {}
 
 activities.configure = function(app, conn, auth) {
-    app.get('/activities', auth, activities.activities.bind(activities, conn))
+    app.get('/v1/activities', auth, activities.activities.bind(activities, conn))
 }
 
 activities.activities = function(conn, req, res, next) {

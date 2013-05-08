@@ -1,30 +1,6 @@
 Snow API
 =====
 
-The API is accessible from [https://justcoin.com/api](https://justcoin.com/api)
+The API is accessible from [https://api.justcoin.com](https://api.justcoin.com).
 
-Security
----
-
-Private methods require the user to be authenticated. [Basic authentication](http://tools.ietf.org/html/rfc1945#section-10.16) is used.
-The username is "api" and the password is the API key.
-
-Methods
----
-
-<table>
-    <tr>
-        <th>Verb</th>
-        <th>Path</th>
-        <th>Authorization</th>
-        <th>Parameters</th>
-        <th>Remarks</th>
-    </tr>
-    <tr>
-        <td>GET</td>
-        <td>/balances</td>
-        <td>Private</td>
-        <td></td>
-        <td></td>
-    </tr>
-</table>
+Documentation for API calls: [http://docs.snow.apiary.io/](http://docs.snow.apiary.io)

@@ -2,7 +2,7 @@ var Q = require('q')
 , currencies = module.exports = {}
 
 currencies.configure = function(app, conn) {
-    app.get('/currencies', currencies.currencies.bind(currencies, conn))
+    app.get('/v1/currencies', currencies.currencies.bind(currencies, conn))
 }
 
 currencies.currencies = function(conn, req, res, next) {

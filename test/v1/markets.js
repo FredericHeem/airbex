@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-, markets = require('../markets')
+, markets = require('../../v1/markets')
 
 describe('markets', function() {
 	describe('configure', function() {
@@ -9,8 +9,8 @@ describe('markets', function() {
 				get: function(url) { routes.push('get ' + url) }
 			}
 			markets.configure(app)
-			expect(routes).to.contain('get /markets')
-			expect(routes).to.contain('get /markets/:id/depth')
+			expect(routes).to.contain('get /v1/markets')
+			expect(routes).to.contain('get /v1/markets/:id/depth')
 		})
 	})
 
@@ -51,7 +51,11 @@ describe('markets', function() {
 				query: function(q, c) {
 					expect(q.text).to.match(/order_depth/i)
 					expect(q.values).to.eql([8])
-					c(null, { rows: [{ price: 9 }] })
+					c(null, { rows: [
+						{ price: 9, volume: 123, side: 'bid' },
+						{ price: 9.5, volume: 55, side: 'bid' },
+						{ price: 8.5, volume: 87, side: 'ask' },
+					]})
 				}
 			}
 			, req = {
@@ -62,17 +66,30 @@ describe('markets', function() {
 				app: {
 					cache: {
 						formatOrderPrice: function(v) {
-							expect(v).to.be(9)
-							return 'formatted'
+							return v.toString()
 						},
 						formatOrderVolume: function(v) {
+							return v.toString()
 						},
 					}
 				}
 			}
 			, res = {
 				send: function(r) {
-					expect(r[0].price).to.be('formatted')
+					expect(r.bids).to.be.an('array')
+					expect(r.bids).to.have.length(2)
+					expect(r.bids[0]).to.be.an('array')
+					expect(r.bids[0]).to.have.length(2)
+					expect(r.bids[0][0]).to.be('9')
+					expect(r.bids[0][1]).to.be('123')
+
+					expect(r.asks).to.be.an('array')
+					expect(r.asks).to.have.length(1)
+					expect(r.asks[0]).to.be.an('array')
+					expect(r.asks[0]).to.have.length(2)
+					expect(r.asks[0][0]).to.be('8.5')
+					expect(r.asks[0][1]).to.be('87')
+
 					done()
 				}
 			}

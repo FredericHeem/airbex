@@ -3,7 +3,7 @@ var Q = require('q')
 , Balances = module.exports = {}
 
 Balances.configure = function(app, conn, auth) {
-    app.get('/balances', auth, Balances.forUser.bind(Balances, conn))
+    app.get('/v1/balances', auth, Balances.forUser.bind(Balances, conn))
 }
 
 Balances.forUser = function(conn, req, res, next) {

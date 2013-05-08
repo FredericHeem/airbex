@@ -18,7 +18,7 @@ app.bitcoinAddress = (function() {
     return function() {
         var d = $.Deferred()
         if (address) d.resolve(address)
-        return api.call('deposit/BTC/address')
+        return api.call('BTC/address')
         .then(function(result) {
             return result.address
         })
@@ -30,7 +30,7 @@ app.litecoinAddress = (function() {
     return function() {
         var d = $.Deferred()
         if (address) d.resolve(address)
-        return api.call('deposit/LTC/address')
+        return api.call('LTC/address')
         .then(function(result) {
             return result.address
         })

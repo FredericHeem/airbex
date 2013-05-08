@@ -44,7 +44,9 @@ module.exports = function() {
             email: email,
             key: keyFromCredentials(email, password)
         })
-        .then(api.login.bind(api, email, password))
+        .then(function() {
+            return api.login(email, password)
+        })
     }
 
     api.balances = function() {

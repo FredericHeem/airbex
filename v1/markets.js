@@ -33,7 +33,7 @@ Markets.markets = function(conn, req, res, next) {
 
 Markets.depth = function(conn, req, res, next) {
     var query = [
-        'SELECT price, volume, side',
+        'SELECT price, volume, side "type"',
         'FROM order_depth_view odv',
         'INNER JOIN market m ON m.market_id = odv.market_id',
         'WHERE m.base_currency_id || m.quote_currency_id = $1',
@@ -47,15 +47,21 @@ Markets.depth = function(conn, req, res, next) {
     .then(function(dres) {
         return res.send({
             bids: dres.rows.filter(function(row) {
-                return row.side == 'bid'
+                return row.type == 0
             }).map(function(row) {
-                return [req.app.cache.formatOrderPrice(row.price, req.params.id), req.app.cache.formatOrderVolume(row.volume, req.params.id)]
+                return [
+                    req.app.cache.formatOrderPrice(row.price, req.params.id),
+                    req.app.cache.formatOrderVolume(row.volume, req.params.id)
+                ]
             }),
 
             asks: dres.rows.filter(function(row) {
-                return row.side == 'ask'
+                return row.type == 1
             }).map(function(row) {
-                return [req.app.cache.formatOrderPrice(row.price, req.params.id), req.app.cache.formatOrderVolume(row.volume, req.params.id)]
+                return [
+                    req.app.cache.formatOrderPrice(row.price, req.params.id),
+                    req.app.cache.formatOrderVolume(row.volume, req.params.id)
+                ]
             })
         })
     }, next)

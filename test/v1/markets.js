@@ -52,9 +52,9 @@ describe('markets', function() {
 					expect(q.text).to.match(/order_depth/i)
 					expect(q.values).to.eql([8])
 					c(null, { rows: [
-						{ price: 9, volume: 123, side: 'bid' },
-						{ price: 9.5, volume: 55, side: 'bid' },
-						{ price: 8.5, volume: 87, side: 'ask' },
+						{ price: 9, volume: 123, type: 0 },
+						{ price: 9.5, volume: 55, type: 0 },
+						{ price: 8.5, volume: 87, type: 1 },
 					]})
 				}
 			}

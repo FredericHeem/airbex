@@ -11,7 +11,7 @@ bitcoin.configure = function(app, conn, auth, currencyId) {
 }
 
 bitcoin.withdraw = function(conn, currencyId, req, res, next) {
-    if (!validate(req.body, currencyId + '_out', res)) return
+    if (!validate(req.body, currencyId.toLowerCase() + '_out', res)) return
 
     console.log('processing withdraw request of %d %s from user #%s to %s',
         req.body.amount, currencyId, req.user, req.body.address)

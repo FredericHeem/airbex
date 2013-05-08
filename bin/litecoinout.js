@@ -1,5 +1,5 @@
 var config = require('konfu')
-, LitecoinOut = require('../lib/litecoinout')
+, BitcoinOut = require('../lib/bitcoinout')
 , ep = {
     host: config.ltc_host,
     port: config.ltc_port,
@@ -8,4 +8,4 @@ var config = require('konfu')
     ssl: config.ltc_ssl || false
 }
 , dbClient = require('../lib/db')(config.pg_url, config.pg_native)
-new LitecoinOut(ep, dbClient)
+new BitcoinOut('ltc', ep, dbClient)

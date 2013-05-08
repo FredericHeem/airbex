@@ -8,4 +8,4 @@ var config = require('konfu')
     ssl: config.btc_ssl || false
 }
 , dbClient = require('../lib/db')(config.pg_url, config.pg_native)
-new BitcoinOut(bitcoinEndPoint, dbClient)
+new BitcoinOut('btc', bitcoinEndPoint, dbClient)

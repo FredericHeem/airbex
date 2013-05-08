@@ -12,15 +12,14 @@ module.exports = function() {
 
     api.call = function(method, data, options) {
         var settings = {
-            url: '/api/' + method,
+            url: '/api/v1/' + method,
             dataType: 'json'
         }
 
         options = options || {}
 
         if (options.key || api.key) {
-            settings.username = 'api'
-            settings.password = options.key ||api.key
+            settings.url += '?key=' + (options.key || api.key)
         }
 
         if (options.type) settings.type = options.type
@@ -32,8 +31,12 @@ module.exports = function() {
     }
 
     api.login = function(email, password) {
-        return api.call('whoami', null, { key: keyFromCredentials(email, password) })
-        .then(app.user.bind(app))
+        var key = keyFromCredentials(email, password)
+        return api.call('whoami', null, { key: key })
+        .then(function(user) {
+            api.key = key
+            app.user(user)
+        })
     }
 
     api.register = function(email, password) {

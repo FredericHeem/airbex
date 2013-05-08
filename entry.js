@@ -19,8 +19,8 @@ app.bitcoinAddress = (function() {
         var d = $.Deferred()
         if (address) d.resolve(address)
         return api.call('deposit/BTC/address')
-        .then(function(res) {
-            return res.address
+        .then(function(result) {
+            return result.address
         })
     }
 })()
@@ -31,8 +31,8 @@ app.litecoinAddress = (function() {
         var d = $.Deferred()
         if (address) d.resolve(address)
         return api.call('deposit/LTC/address')
-        .then(function(res) {
-            return res.address
+        .then(function(result) {
+            return result.address
         })
     }
 })()
@@ -43,8 +43,8 @@ app.rippleAddress = (function() {
         var d = $.Deferred()
         if (address) d.resolve(address)
         return api.call('ripple/address')
-        .then(function(res) {
-            return res.address
+        .then(function(result) {
+            return result.address
         })
     }
 })()

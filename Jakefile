@@ -137,8 +137,12 @@ task('host', ['app'], function() {
 // publishing
 task('pp', ['publish-prod'])
 task('publish-prod', [
-    'dist'
+    'clean', 'dist'
 ], function() {
+    jake.exec('npm version patch')
+    var version = require('./package.json').version
+    jake.exec('git tag production-' + version)
+
     var async = require('async')
     , files = {
         'head.min.js': null,

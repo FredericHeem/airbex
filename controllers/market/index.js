@@ -9,9 +9,9 @@ module.exports = function(app, api, id) {
     , controller = {
         $el: $(require('./template.html')({
             id: id,
-            side: 'bid',
+            type: 'bid',
             price: '',
-            volume: '',
+            amount: '',
             base_currency: base,
             quote_currency: quote
         }))
@@ -19,50 +19,52 @@ module.exports = function(app, api, id) {
     , $depth = controller.$el.find('.depth')
     , $buy = controller.$el.find('.buy')
     , $buyPrice = $buy.find('*[name="price"]')
-    , $buyVolume = $buy.find('*[name="volume"]')
+    , $buyAmount = $buy.find('*[name="amount"]')
     , $buySummary = $buy.find('.summary')
     , $sell = controller.$el.find('.sell')
     , $sellPrice = $sell.find('*[name="price"]')
-    , $sellVolume = $sell.find('*[name="volume"]')
+    , $sellAmount = $sell.find('*[name="amount"]')
     , $sellSummary = $sell.find('.summary')
 
-    function flash($e) {
-        $e.stop()
-        .css({'background-color': '#FFFF9C' })
-
-        setTimeout(function() {
-            $e.stop()
-            .css({'background-color': '' })
-        }, 750)
-    }
-
     function depthChanged(depth) {
-        depth.sort(function(a, b) {
+        var combined = []
+
+        depth.bids.forEach(function(x) {
+            combined.push({
+                type: 'bid',
+                price: x[0],
+                volume: x[1]
+            })
+        })
+
+        depth.asks.forEach(function(x) {
+            combined.push({
+                type: 'ask',
+                price: x[0],
+                volume: x[1]
+            })
+        })
+
+        combined.sort(function(a, b) {
             return a.price - b.price
         })
 
-        $depth.find('tbody').html($.map(depth, function(item) {
+        $depth.find('tbody').html($.map(combined, function(item) {
             return priceTemplate(item)
         }))
 
         var ask, bid
 
         if (!$buyPrice.hasClass('is-changed')) {
-            ask = _.find(depth, { side: 'ask'})
+            ask = _.find(combined, { type: 'ask'})
             if (ask) {
-                if ($buyPrice.val().length && $buyPrice.val() != ask.price) {
-                    flash($buyPrice)
-                }
                 $buyPrice.val(ask.price)
             }
         }
 
         if (!$sellPrice.hasClass('is-changed')) {
-            bid = _.last(_.where(depth, { side: 'bid'}))
+            bid = _.last(_.where(combined, { type: 'bid'}))
             if (bid) {
-                if ($sellPrice.val().length && $sellPrice.val() != bid.price) {
-                    flash($sellPrice)
-                }
                 $sellPrice.val(bid.price)
             }
         }
@@ -75,10 +77,10 @@ module.exports = function(app, api, id) {
     }
 
     function updateBuySummary() {
-        var total = num($buyPrice.val()).mul($buyVolume.val())
+        var total = num($buyPrice.val()).mul($buyAmount.val())
         $buySummary.html([
             'You are buying',
-            $buyVolume.val(),
+            $buyAmount.val(),
             base,
             'for',
             total.toString(),
@@ -87,10 +89,10 @@ module.exports = function(app, api, id) {
     }
 
     function updateSellSummary() {
-        var total = num($sellPrice.val()).mul($sellVolume.val())
+        var total = num($sellPrice.val()).mul($sellAmount.val())
         $sellSummary.html([
             'You are selling',
-            $sellVolume.val(),
+            $sellAmount.val(),
             base,
             'for',
             total.toString(),
@@ -102,9 +104,9 @@ module.exports = function(app, api, id) {
         e.preventDefault()
         api.call('orders', {
             market: id,
-            side: 'bid',
+            type: 'bid',
             price: $buyPrice.val(),
-            volume: $buyVolume.val()
+            amount: $buyAmount.val()
         })
         .fail(app.alertXhrError)
         .done(function(order) {
@@ -118,9 +120,9 @@ module.exports = function(app, api, id) {
         e.preventDefault()
         api.call('orders', {
             market: id,
-            side: 'ask',
+            type: 'ask',
             price: $sellPrice.val(),
-            volume: $sellVolume.val()
+            amount: $sellAmount.val()
         }).done(function(order) {
             api.balances()
             alert('Order ' + order.id + ' placed')
@@ -133,7 +135,7 @@ module.exports = function(app, api, id) {
         updateBuySummary()
     })
 
-    $buyVolume.on('keyup change', function(e) {
+    $buyAmount.on('keyup change', function(e) {
         updateBuySummary()
     })
 
@@ -142,7 +144,7 @@ module.exports = function(app, api, id) {
         updateSellSummary()
     })
 
-    $sellVolume.on('keyup change', function(e) {
+    $sellAmount.on('keyup change', function(e) {
         updateSellSummary()
     })
 

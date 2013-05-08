@@ -1,6 +1,6 @@
 {
   "name": "snow-workers",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "workers for snow",
   "dependencies": {
     "underscore": "~1.4.4",

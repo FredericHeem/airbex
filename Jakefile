@@ -6,7 +6,8 @@ task('publish-production', function() {
         'git checkout production',
         'git merge master',
         'git checkout master',
-        'git push production production:master'
+        'git push production production:master',
+        'npm version patch',
     ], { printStderr: true })
 })
 

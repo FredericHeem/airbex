@@ -162,6 +162,7 @@ task('publish-prod', [
         exec('npm version patch', { silent: false })
         var version = require('./package.json').version
         console.log('??? ' + version)
+        console.log('git tag production-' + version)
         exec('git tag production-' + version, { silent: false })
         complete()
     })

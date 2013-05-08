@@ -7,13 +7,13 @@
         <h4 color="red">Your browser is too old</h4><p><a href="http://browsehappy.com">Upgrade now</a></p>
     <![endif]-->
 
-    <% if (minify) { %>
+    <% if (minifyCss) { %>
         <link href="styles.min.css" rel="stylesheet">
     <% } else { %>
         <link href="styles.css" rel="stylesheet">
     <% } %>
 
-    <% if (minify) { %>
+    <% if (minifyHead) { %>
         <script src="head.min.js"></script>
     <% } else { %>
         <script src="head.js"></script>
@@ -41,7 +41,7 @@
         </div>
     </footer>
 
-    <% if (minify) { %>
+    <% if (minifyScripts) { %>
         <script src="scripts.min.js"></script>
     <% } else { %>
         <script src="scripts.js"></script>

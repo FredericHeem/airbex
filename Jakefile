@@ -58,7 +58,9 @@ file('build/styles.min.css', ['build/styles.css'], compressCss)
 file('build/index.html', ['build'], function() {
     var ejs = require('ejs')
     ejs.render(cat('assets/index.ejs'), {
-        minify: false,
+        minifyHead: false,
+        minifyScripts: false,
+        minifyCss: false,
         segment: '70kmerb0ik'
     })
     .to(this.name)
@@ -67,7 +69,9 @@ file('build/index.html', ['build'], function() {
 file('build/index.min.html', ['build'], function() {
     var ejs = require('ejs')
     ejs.render(cat('assets/index.ejs'), {
-        minify: true,
+        minifyHead: true,
+        minifyScripts: false,
+        minifyCss: true,
         segment: 'bc0p8b3ul1'
     })
     .to(this.name)
@@ -143,7 +147,7 @@ task('publish-prod', [
     var async = require('async')
     , files = {
         'head.min.js': null,
-        'scripts.min.js': null,
+        'scripts.js': null,
         'styles.min.css': null,
         'index.min.html': 'index.html',
         'ripple.txt': 'ripple.txt'
@@ -151,11 +155,12 @@ task('publish-prod', [
 
     async.forEach(Object.keys(files), function(fn, next) {
         var outName = files[fn] || fn
-        jake.exec('scp build/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/public/' + outName, next)
+        , cmd = 'scp build/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/public/' + outName
+        jake.exec(cmd, { printStdout: true, printStderr: true }, next)
     }, function(err) {
         if (err) return complete(err)
-        jake.exec('npm version patch')
-        jake.exec('git tag production-' + require('./package.json').version)
+        jake.exec('npm version patch', { printStdout: true, printStderr: true })
+        jake.exec('git tag production-' + require('./package.json').version, { printStdout: true, printStderr: true })
         complete()
     })
 }, { async: true })

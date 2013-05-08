@@ -159,8 +159,8 @@ task('publish-prod', [
         jake.exec(cmd, { printStdout: true, printStderr: true }, next)
     }, function(err) {
         if (err) return complete(err)
-        jake.exec('npm version patch', { printStdout: true, printStderr: true })
-        jake.exec('git tag production-' + require('./package.json').version, { printStdout: true, printStderr: true })
+        exec('npm version patch', { silent: false })
+        exec('git tag production-' + require('./package.json').version, { silent: false })
         complete()
     })
 }, { async: true })

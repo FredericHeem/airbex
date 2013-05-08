@@ -13,8 +13,8 @@ module.exports = function(app, api) {
         $items.html($.map(items, function(item) {
             if (item.type == 'CreateOrder') {
                 item.text =  util.format('You created an order to %s %s %s for %s %s',
-                item.details.side == 'bid' ? 'buy' : 'sell',
-                item.details.volume,
+                (item.details.side || item.details.type) == 'bid' ? 'buy' : 'sell',
+                item.details.volume || item.details.amount,
                 item.details.market.substr(0, 3),
                 num(item.details.price).mul(item.details.volume).toString(),
                 item.details.market.substr(3))

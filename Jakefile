@@ -4,6 +4,7 @@ task('pp', ['publish-production'])
 
 task('publish-production', function() {
     jake.exec([
+        'npm version patch',
         'git checkout production',
         'git merge master',
         'git checkout master',

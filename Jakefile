@@ -76,6 +76,7 @@ file('build/index.min.html', ['build'], function() {
 file('build/styles.css', ['build'], function() {
     exec('stylus assets/app.styl -o build');
     (cat('components/bootstrap/css/bootstrap.min.css') + '\n' +
+    cat('components/bootstrap/css/bootstrap-responsive.min.css') + '\n' +
     cat('vendor/alertify/alertify.bootstrap.css') + '\n' +
     cat('vendor/alertify/alertify.bootstrap.css') + '\n' +
     cat('build/app.css') + '\n')
@@ -139,10 +140,6 @@ task('pp', ['publish-prod'])
 task('publish-prod', [
     'clean', 'dist'
 ], function() {
-    jake.exec('npm version patch')
-    var version = require('./package.json').version
-    jake.exec('git tag production-' + version)
-
     var async = require('async')
     , files = {
         'head.min.js': null,
@@ -155,7 +152,12 @@ task('publish-prod', [
     async.forEach(Object.keys(files), function(fn, next) {
         var outName = files[fn] || fn
         jake.exec('scp build/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/public/' + outName, next)
-    }, complete)
+    }, function(err) {
+        if (err) return complete(err)
+        jake.exec('npm version patch')
+        jake.exec('git tag production-' + require('./package.json').version)
+        complete()
+    })
 }, { async: true })
 
 // testing

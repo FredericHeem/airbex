@@ -160,7 +160,9 @@ task('publish-prod', [
     }, function(err) {
         if (err) return complete(err)
         exec('npm version patch', { silent: false })
-        exec('git tag production-' + require('./package.json').version, { silent: false })
+        var version = require('./package.json').version
+        console.log('??? ' + version)
+        exec('git tag production-' + version, { silent: false })
         complete()
     })
 }, { async: true })

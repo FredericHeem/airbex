@@ -7,10 +7,16 @@ WHERE
     hold_id IS NULL;
 
 ALTER TABLE withdraw_request
-ADD CONSTRAINT completed_state CHECK (completed IS NULL OR state = 'completed');
+ADD CONSTRAINT state_check CHECK (state IN ('requested', 'processing', 'cancelled', 'completed'));
+
+ALTER TABLE withdraw_request
+ADD CONSTRAINT completed_state CHECK (completed IS NULL OR state IN ('completed', 'cancelled'));
 
 ALTER TABLE withdraw_request
 ADD CONSTRAINT error_state CHECK (error IS NULL OR state = 'cancelled');
+
+ALTER TABLE withdraw_request
+ADD CONSTRAINT hold_released CHECK (hold_id IS NULL OR state IN ('requested', 'processing'));
 
 CREATE OR REPLACE FUNCTION confirm_withdraw(rid integer)
   RETURNS integer AS

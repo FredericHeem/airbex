@@ -26,7 +26,9 @@ task('dist', [
     'build/scripts.min.js',
     'build/styles.min.css',
     'build/index.min.html',
-    'build/ripple.txt'
+    'build/ripple.txt',
+    'build/img',
+    'build/img/registerbg.jpg'
 ])
 
 directory('build')

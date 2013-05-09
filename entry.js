@@ -51,3 +51,15 @@ app.rippleAddress = (function() {
 
 var header = require('./controllers/header')(app, api)
 $app.find('.header').replaceWith(header.$el)
+
+$.fn.field = function(name, value) {
+    var $fields = $(this).find('[name="' + name + '"]')
+
+    if (value !== undefined) {
+        $fields.each(function() {
+            $(this).val(value)
+        })
+    }
+
+    return $fields
+}

@@ -16,7 +16,9 @@ task('app', [
     'build/head.js',
     'build/scripts.js',
     'build/styles.css',
-    'build/index.html'
+    'build/index.html',
+    'build/img',
+    'build/img/registerbg.jpg'
 ])
 
 task('dist', [
@@ -28,6 +30,7 @@ task('dist', [
 ])
 
 directory('build')
+directory('build/img')
 
 var head = [
     'build/raven.min.js'
@@ -46,6 +49,7 @@ file('build/alertify.min.js', ['vendor/alertify/alertify.min.js'], cpTask)
 file('build/bootstrap.min.js', ['components/bootstrap/js/bootstrap.min.js'], cpTask)
 file('build/ripple.txt', ['assets/ripple.txt'], cpTask)
 file('build/raven.min.js', ['vendor/raven.min.js'], cpTask)
+file('build/img/registerbg.jpg', ['assets/img/registerbg.jpg'], cpTask)
 
 function cpTask() {
     cp(this.prereqs[0], this.name)
@@ -150,12 +154,13 @@ task('publish-prod', [
         'scripts.js': null,
         'styles.min.css': null,
         'index.min.html': 'index.html',
-        'ripple.txt': 'ripple.txt'
+        'ripple.txt': 'ripple.txt',
+        'img/registerbg.jpg': null
     }
 
     async.forEach(Object.keys(files), function(fn, next) {
         var outName = files[fn] || fn
-        , cmd = 'scp build/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/public/' + outName
+        , cmd = 'scp -C build/' + fn + ' ubuntu@54.228.224.255:/home/ubuntu/snow-web/public/' + outName
         jake.exec(cmd, { printStdout: true, printStderr: true }, next)
     }, function(err) {
         if (err) return complete(err)

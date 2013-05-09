@@ -12,6 +12,7 @@ var markets = require('./controllers/markets')
 , dashboard = require('./controllers/dashboard')
 , depositbtc = require('./controllers/depositbtc')
 , depositltc = require('./controllers/depositltc')
+, $app = $('body')
 
 module.exports = function(app, api, router) {
     var $section = $('#section')
@@ -31,6 +32,7 @@ module.exports = function(app, api, router) {
     })
     .add(/^register$/, function() {
         $section.html(register(app, api).$el)
+        $app.addClass('is-section-register')
     })
     .add(/^login(?:\?after=(.+))?$/, function(after) {
         $section.html(login(app, api, after).$el)

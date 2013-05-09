@@ -37,7 +37,7 @@ users.create = function(conn, req, res, next) {
         }
 
         if (err.message === 'duplicate key value violates unique constraint "api_key_pkey"' ||
-            er.message === 'duplicate key value violates unique constraint "email_lower_unique"') {
+            err.message === 'duplicate key value violates unique constraint "email_lower_unique"') {
             return res.send(403, { name: 'EmailAlreadyInUse', message:'e-mail is already in use' })
         }
 

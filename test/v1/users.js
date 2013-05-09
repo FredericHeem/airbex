@@ -17,7 +17,9 @@ describe('users', function() {
 
 	describe('create', function() {
 		it('returns user', function(done) {
-			var key = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBB'
+			var emailExistence = require('email-existence')
+			, check = emailExistence.check
+			, key = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBB'
 			, conn = {
 				query: function(q, c) {
 					if (q.text.match(/activity/)) return
@@ -38,6 +40,11 @@ describe('users', function() {
 					expect(r.id).to.be(89)
 					done()
 				}
+			}
+
+			emailExistence.check = function(email, cb) {
+				emailExistence.check = check
+				cb(null, true)
 			}
 
 			users.create(conn, req, res, done)

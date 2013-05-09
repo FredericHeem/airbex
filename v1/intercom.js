@@ -6,9 +6,6 @@ intercom.configure = function(app, conn, auth) {
 }
 
 intercom.intercom = function(conn, config, req, res, next) {
-    console.log('------------------------------------------- INTERCOM')
-    console.log(req.path)
-
     conn.query({
         text: [
             'SELECT user_id, email_lower, FLOOR(EXTRACT(epoch FROM created))::int created',

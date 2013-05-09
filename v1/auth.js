@@ -3,8 +3,6 @@ var sjcl = require('../vendor/sjcl')
 , util = require('util')
 , auth = module.exports = function(conn) {
     return function(req, res, next) {
-        console.log('------------------------------------------- AUTH')
-        console.log(req.path)
         if (req.user) return next()
         if (!req.query.key) return res.send(401, {
             name: 'KeyMissing',

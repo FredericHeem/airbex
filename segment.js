@@ -5,9 +5,6 @@ module.exports = function(app, api) {
         console.log('Fetching Intercom settings')
         api.call('intercom')
         .done(function(settings) {
-            settings.widget = {
-                activator: '#IntercomDefaultWidget'
-            }
             console.log('Intercom settings', settings)
             console.log('Identifying with segment.io')
 

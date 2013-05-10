@@ -1,9 +1,8 @@
 var Q = require('q')
 , activities = require('./activities')
+, verifyemail = require('../verifyemail')
 , users = module.exports = {}
 , validate = require('./validate')
-, async = require('async')
-, emailExistence = require('email-existence')
 
 users.configure = function(app, conn, auth) {
     app.get('/v1/whoami', auth, users.whoami.bind(users, conn))
@@ -26,38 +25,37 @@ users.whoami = function(conn, req, res, next) {
 users.create = function(conn, req, res, next) {
     if (!validate(req.body, 'user_create', res)) return
 
-    async.series([
-        function(next) {
-            emailExistence.check(req.body.email, function(err, exists) {
-                if (err) return next(err)
-                if (exists) return next()
-                return res.send(403, { name: 'InvalidEmail', message: 'e-mail does not exist or mail sever is down' })
-            })
-        },
-
-        function(next) {
-            conn.query({
-                text: 'SELECT create_user($1, $2) user_id',
-                values: [req.body.email, req.body.key]
-            }, function(err, cres) {
-                if (!err) {
-                    activities.log(conn, cres.rows[0].user_id, 'Created', {})
-                    return res.send(201, { id: cres.rows[0].user_id })
-                }
-
-                if (err.message === 'new row for relation "user" violates check constraint "email_regex"') {
-                    return res.send(403, { name: 'InvalidEmail', message: 'e-mail is invalid' })
-                }
-
-                if (err.message === 'duplicate key value violates unique constraint "api_key_pkey"' ||
-                    err.message === 'duplicate key value violates unique constraint "email_lower_unique"') {
-                    return res.send(403, { name: 'EmailAlreadyInUse', message:'e-mail is already in use' })
-                }
-
-                next(err)
-            })
+    verifyemail(req.body.email, function(err, ok) {
+        console.log(arguments)
+        if (!err && !ok) {
+            return res.send(403, { name: 'EmailFailedCheck', message: 'E-mail did not pass validation' })
         }
-    ], next)
+
+        if (err) {
+            console.error('E-mail validation failed for %s:\n', req.body.email, err)
+        }
+
+        conn.query({
+            text: 'SELECT create_user($1, $2) user_id',
+            values: [req.body.email, req.body.key]
+        }, function(err, cres) {
+            if (!err) {
+                activities.log(conn, cres.rows[0].user_id, 'Created', {})
+                return res.send(201, { id: cres.rows[0].user_id })
+            }
+
+            if (err.message === 'new row for relation "user" violates check constraint "email_regex"') {
+                return res.send(403, { name: 'InvalidEmail', message: 'e-mail is invalid' })
+            }
+
+            if (err.message === 'duplicate key value violates unique constraint "api_key_pkey"' ||
+                err.message === 'duplicate key value violates unique constraint "email_lower_unique"') {
+                return res.send(403, { name: 'EmailAlreadyInUse', message:'e-mail is already in use' })
+            }
+
+            cb(err)
+        })
+    })
 }
 
 users.replaceLegacyApiKey = function(conn, req, res, next) {

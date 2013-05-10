@@ -47,8 +47,6 @@ module.exports = function(app, api) {
     .on('keyup', function(e) {
         if (e.which == 13 || e.which == 9) return
 
-        console.log('reverting', e.target, 'because of', e.which)
-
         // Revert to the original hint
         var group = $(this).closest('.control-group')
         group.removeClass('error warning success is-valid')
@@ -169,19 +167,29 @@ module.exports = function(app, api) {
             if ($e.hasClass('is-valid')) return
             $submit.shake()
             $e.find('input').focus()
-            console.log('cannot submit because', $e, 'is invalid')
             return invalid = true
         })
 
         if (invalid) return
 
+        $submit.prop('disabled', true).addClass('is-loading')
+
         api.register($email.find('input').val(), $password.find('input').val())
         .always(function() {
-            $submit.prop('disabled', false)
+            $submit.prop('disabled', false).removeClass('is-loading')
         }).done(function() {
             window.location.hash = '#dashboard'
         }).fail(function(xhr) {
             var err = app.errorFromXhr(xhr)
+
+            if (err.name == 'EmailFailedCheck') {
+                $email.addClass('error')
+                .find('.help-inline').html('No fake/disposable emails please!')
+                $submit.shake()
+                $email.find('input').focus()
+                return
+            }
+
             alert(JSON.stringify(err, null, 4))
         })
     })

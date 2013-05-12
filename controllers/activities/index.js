@@ -11,6 +11,7 @@ module.exports = function(app, api) {
 
     function itemsChanged(items) {
         $items.html($.map(items, function(item) {
+            console.log(item)
             if (item.type == 'CreateOrder') {
                 item.text =  util.format('You created an order to %s %s %s for %s %s',
                 (item.details.side || item.details.type) == 'bid' ? 'buy' : 'sell',

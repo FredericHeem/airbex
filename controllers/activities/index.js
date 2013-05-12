@@ -11,13 +11,12 @@ module.exports = function(app, api) {
 
     function itemsChanged(items) {
         $items.html($.map(items, function(item) {
-            console.log(item)
             if (item.type == 'CreateOrder') {
                 item.text =  util.format('You created an order to %s %s %s for %s %s',
                 (item.details.side || item.details.type) == 'bid' ? 'buy' : 'sell',
                 item.details.volume || item.details.amount,
                 item.details.market.substr(0, 3),
-                num(item.details.price).mul(item.details.volume).toString(),
+                num(item.details.price).mul(item.details.volume || item.details.amount).toString(),
                 item.details.market.substr(3))
             } else if (item.type == 'CancelOrder') {
                 item.text = util.format('You cancelled order #%s', item.details.id)

@@ -1,6 +1,6 @@
 # Index
 slaven=1
-masterip="10.0.1.172"
+masterip=10.0.1.20
 
 # Change computer name
 echo "127.0.0.1 pgs${slaven}" | sudo tee -a /etc/hosts
@@ -26,17 +26,18 @@ sudo apt-get update
 # Install pg
 sudo apt-get -y install postgresql-9.2 postgresql-client-9.2 postgresql-contrib-9.2 postgresql-server-dev-9.2 libpq-dev
 
-# Stop pg before reconfiguring
-sudo /etc/init.d/postgresql stop
+sudo service postgresql stop
 
+# PostgreSQL config
 sudo tee /etc/postgresql/9.2/main/postgresql.conf << EOL
 data_directory = '/data/main'
 listen_addresses = '*'
 unix_socket_directory = '/var/run/postgresql'
 password_encryption = on
+hot_standby = on
 EOL
 
-# pg access rules
+# PostgreSQL ACL
 sudo tee /etc/postgresql/9.2/main/pg_hba.conf << EOL
 local all postgres              peer
 host  all all 127.0.0.1/32      md5
@@ -46,11 +47,20 @@ host  all all 10.0.0.184/32     md5
 host  all all ::1/128           md5
 EOL
 
-# Optionally, move data directory
-'''
-sudo mv /var/lib/postgresql/9.2/main /data
-'''
+# ---------------------------------------------------------------------------------
+# RECOVERY
+# ---------------------------------------------------------------------------------
 
-# Start pg
-sudo /etc/init.d/postgresql start
+# PostgreSQL recovery
+sudo -u postgres -g postgres mkdir -m 0700 /data/main
 
+# Copy data directory
+sudo -u postgres -g postgres pg_basebackup -h ${masterip} -D /data/main -U postgres
+
+# recovery.conf
+sudo -g postgres -u postgres tee /data/main/recovery.conf << EOL
+standby_mode = 'on'
+primary_conninfo = 'host=${masterip} port=5432 user=postgres password=postgres'
+EOL
+
+sudo service postgresql start

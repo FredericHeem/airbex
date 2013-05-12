@@ -16,9 +16,11 @@ describe('currencies', function() {
 	describe('currencies', function() {
 		it('returns the currencies', function(done) {
 			var conn = {
-				query: function(q, c) {
-					expect(q).to.match(/from "currency"/i)
-					c(null, { rows: [{ currency: 'QQQ' }] })
+				read: {
+					query: function(q, c) {
+						expect(q).to.match(/from "currency"/i)
+						c(null, { rows: [{ currency: 'QQQ' }] })
+					}
 				}
 			}
 			, req = {

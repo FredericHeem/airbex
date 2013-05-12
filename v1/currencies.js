@@ -1,5 +1,4 @@
-var Q = require('q')
-, currencies = module.exports = {}
+var currencies = module.exports = {}
 
 currencies.configure = function(app, conn) {
     app.get('/v1/currencies', currencies.currencies.bind(currencies, conn))
@@ -10,9 +9,8 @@ currencies.currencies = function(conn, req, res, next) {
         'SELECT currency_id id, scale \
         FROM "currency" ORDER BY currency_id'
 
-    Q.ninvoke(conn, 'query', query)
-    .then(function(cres) {
-        res.send(cres.rows)
-    }, next)
-    .done()
+    conn.read.query(query, function(err, dr) {
+        if (err) return next(err)
+        res.send(dr.rows)
+    })
 }

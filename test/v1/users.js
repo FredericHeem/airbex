@@ -21,11 +21,13 @@ describe('users', function() {
 			, check = emailExistence.check
 			, key = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBB'
 			, conn = {
-				query: function(q, c) {
-					if (q.text.match(/activity/)) return
-					expect(q.text).to.match(/select create_user/i)
-					expect(q.values).to.eql(['bob@bob.com', key])
-					c(null, { rows: [{ user_id: 89 }] })
+				write: {
+					query: function(q, c) {
+						if (q.text.match(/activity/)) return
+						expect(q.text).to.match(/select create_user/i)
+						expect(q.values).to.eql(['bob@bob.com', key])
+						c(null, { rows: [{ user_id: 89 }] })
+					}
 				}
 			}
 			, req = {

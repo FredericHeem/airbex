@@ -5,7 +5,7 @@ var async = require('async')
     var that = this
     async.parallel({
         currencies: function(cb) {
-            conn.query({
+            conn.read.query({
                 text: 'SELECT currency_id, scale FROM currency'
             }, function(err, res) {
                 if (err) return cb(err)
@@ -13,7 +13,7 @@ var async = require('async')
             })
         },
         markets: function(cb) {
-            conn.query({
+            conn.read.query({
                 text: 'SELECT market_id, scale, base_currency_id || quote_currency_id pair FROM market'
             }, function(err, res) {
                 if (err) return cb(err)

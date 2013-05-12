@@ -14,7 +14,7 @@ activities.activities = function(conn, req, res, next) {
         'LIMIT 20'
     ].join('\n')
 
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.read, 'query', {
         text: query,
         values: [req.user]
     })
@@ -29,7 +29,7 @@ activities.activities = function(conn, req, res, next) {
 
 activities.log = function(conn, userId, type, details, retry) {
     console.log('user #%d activity: %s %j', userId, type, details)
-    conn.query({
+    conn.write.query({
         text: 'INSERT INTO activity (user_id, "type", details) VALUES ($1, $2, $3)',
         values: [userId, type, JSON.stringify(details)]
     }, function(err) {

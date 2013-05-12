@@ -17,9 +17,11 @@ describe('markets', function() {
 	describe('markets', function() {
 		it('returns the markets', function(done) {
 			var conn = {
-				query: function(q, c) {
-					expect(q).to.match(/market/i)
-					c(null, { rows: [{ base_currency_id: 'DRP', quote_currency_id: 'HRP'  }] })
+				read: {
+					query: function(q, c) {
+						expect(q).to.match(/market/i)
+						c(null, { rows: [{ base_currency_id: 'DRP', quote_currency_id: 'HRP'  }] })
+					}
 				}
 			}
 			, req = {
@@ -48,14 +50,16 @@ describe('markets', function() {
 	describe('depth', function() {
 		it('returns the depth', function(done) {
 			var conn = {
-				query: function(q, c) {
-					expect(q.text).to.match(/order_depth/i)
-					expect(q.values).to.eql([8])
-					c(null, { rows: [
-						{ price: 9, volume: 123, type: 0 },
-						{ price: 9.5, volume: 55, type: 0 },
-						{ price: 8.5, volume: 87, type: 1 },
-					]})
+				read: {
+					query: function(q, c) {
+						expect(q.text).to.match(/order_depth/i)
+						expect(q.values).to.eql([8])
+						c(null, { rows: [
+							{ price: 9, volume: 123, type: 0 },
+							{ price: 9.5, volume: 55, type: 0 },
+							{ price: 8.5, volume: 87, type: 1 },
+						]})
+					}
 				}
 			}
 			, req = {

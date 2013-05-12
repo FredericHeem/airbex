@@ -20,16 +20,18 @@ describe('orders', function() {
 	describe('forUser', function() {
 		it('gets orders for the user', function(done) {
 			var conn = {
-				query: function(q, cb) {
-					expect(q.text).to.match(/user_id = \$1/)
-					expect(q.values).to.eql([10])
-					cb(null, {
-						rows: [{
-							id: 1
-						}, {
-							id: 7
-						}]
-					})
+				read: {
+					query: function(q, cb) {
+						expect(q.text).to.match(/user_id = \$1/)
+						expect(q.values).to.eql([10])
+						cb(null, {
+							rows: [{
+								id: 1
+							}, {
+								id: 7
+							}]
+						})
+					}
 				}
 			}
 			, req = {
@@ -59,16 +61,18 @@ describe('orders', function() {
 
 		it('formats numbers', function(done) {
 			var conn = {
-				query: function(q, cb) {
-					expect(q.text).to.match(/user_id = \$1/)
-					expect(q.values).to.eql([10])
-					cb(null, {
-						rows: [{
-							id: 1,
-							price: '1.2',
-							amount: '1.34'
-						}]
-					})
+				read: {
+					query: function(q, cb) {
+						expect(q.text).to.match(/user_id = \$1/)
+						expect(q.values).to.eql([10])
+						cb(null, {
+							rows: [{
+								id: 1,
+								price: '1.2',
+								amount: '1.34'
+							}]
+						})
+					}
 				}
 			}
 			, req = {
@@ -107,10 +111,12 @@ describe('orders', function() {
 					}
 				},
 
-				query: function(q, cb) {
-					if (q.text.match(/activity/)) return
-					expect(q.text).to.match(/create_order/i)
-					cb(null, { rows: [{ order_id: 17 }] })
+				write: {
+					query: function(q, cb) {
+						if (q.text.match(/activity/)) return
+						expect(q.text).to.match(/create_order/i)
+						cb(null, { rows: [{ order_id: 17 }] })
+					}
 				}
 			}
 			, req = {
@@ -137,12 +143,14 @@ describe('orders', function() {
 	describe('cancel', function() {
 		it('cancels the order', function(done) {
 			var conn = {
-				query: function(q, cb) {
-					if (q.text.match(/activity/)) return
-					expect(q.text).to.match(/UPDATE "order"/)
-					expect(q.text).to.match(/cancelled = volume/)
-					expect(q.values)
-					cb(null, { rowCount: 1 })
+				write: {
+					query: function(q, cb) {
+						if (q.text.match(/activity/)) return
+						expect(q.text).to.match(/UPDATE "order"/)
+						expect(q.text).to.match(/cancelled = volume/)
+						expect(q.values)
+						cb(null, { rowCount: 1 })
+					}
 				}
 			}
 			, req = {

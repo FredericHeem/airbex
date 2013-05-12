@@ -9,7 +9,7 @@ var sjcl = require('../vendor/sjcl')
             message:'key parameter missing from query string'
         })
 
-        conn.query({
+        conn.read.query({
             text: 'SELECT user_id FROM api_key WHERE api_key_id = $1',
             values: [req.query.key]
         }, function(err, dres) {

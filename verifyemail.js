@@ -9,7 +9,7 @@ module.exports = function(email, cb) {
     async.series([
         function(next) {
             var domain = /^\S+@(\S+)$/.exec(email)[1]
-             url = format('http://check.block-disposable-email.com/easyapi/json/%s/%s', config.bde_api_key, domain)
+            , url = format('http://check.block-disposable-email.com/easyapi/json/%s/%s', config.bde_api_key, domain)
             request({
                 url: url,
                 json: true

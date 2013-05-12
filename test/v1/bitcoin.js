@@ -18,11 +18,13 @@ describe('bitcoin', function() {
 	describe('address', function() {
 		it('returns address', function(done) {
 			var conn = {
-				query: function(q, c) {
-					expect(q.text).to.match(/user_currency_account/i)
-					expect(q.text).to.match(/from btc_deposit_address/i)
-					expect(q.values).to.eql([25, 'BTC'])
-					c(null, { rows: [{ address: '1someaddress' }] })
+				read: {
+					query: function(q, c) {
+						expect(q.text).to.match(/user_currency_account/i)
+						expect(q.text).to.match(/from btc_deposit_address/i)
+						expect(q.values).to.eql([25, 'BTC'])
+						c(null, { rows: [{ address: '1someaddress' }] })
+					}
 				}
 			}
 			, req = {
@@ -43,11 +45,13 @@ describe('bitcoin', function() {
 	describe('withdraw', function() {
 		it('enqueues', function(done) {
 			var conn = {
-				query: function(q, c) {
-					if (q.text.match(/activity/)) return
-					expect(q.text).to.match(/btc_withdraw/i)
-					expect(q.values).to.eql([38, '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt', '0.15', 'BTC'])
-					c(null, { rows: [{ request_id: 59 }] })
+				write: {
+					query: function(q, c) {
+						if (q.text.match(/activity/)) return
+						expect(q.text).to.match(/btc_withdraw/i)
+						expect(q.values).to.eql([38, '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt', '0.15', 'BTC'])
+						c(null, { rows: [{ request_id: 59 }] })
+					}
 				}
 			}
 			, req = {

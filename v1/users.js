@@ -12,7 +12,7 @@ users.configure = function(app, conn, auth) {
 }
 
 users.whoami = function(conn, req, res, next) {
-	conn.query({
+	conn.read.query({
 		text: 'SELECT user_id id, email FROM "user" WHERE user_id = $1',
 		values: [req.user]
 	}, function(err, dres) {
@@ -26,7 +26,6 @@ users.create = function(conn, req, res, next) {
     if (!validate(req.body, 'user_create', res)) return
 
     verifyemail(req.body.email, function(err, ok) {
-        console.log(arguments)
         if (!err && !ok) {
             return res.send(403, { name: 'EmailFailedCheck', message: 'E-mail did not pass validation' })
         }
@@ -35,7 +34,7 @@ users.create = function(conn, req, res, next) {
             console.error('E-mail validation failed for %s:\n', req.body.email, err)
         }
 
-        conn.query({
+        conn.write.query({
             text: 'SELECT create_user($1, $2) user_id',
             values: [req.body.email, req.body.key]
         }, function(err, cres) {
@@ -59,7 +58,7 @@ users.create = function(conn, req, res, next) {
 }
 
 users.replaceLegacyApiKey = function(conn, req, res, next) {
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.write, 'query', {
         text: 'SELECT replace_legacy_api_key($1, $2, $3)',
         values: [req.body.oldKey, req.body.oldSecret, req.body.newKey]
     }).then(function(dres) {
@@ -75,7 +74,7 @@ users.replaceLegacyApiKey = function(conn, req, res, next) {
 
 users.replaceApiKey = function(conn, req, res, next) {
     if (!validate(req.body, 'user_replace_api_key', res)) return
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.write, 'query', {
         text: 'SELECT replace_api_key($1, $2)',
         values: [req.key, req.body.key]
     }).then(function(dres) {

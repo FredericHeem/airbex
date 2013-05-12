@@ -16,7 +16,7 @@ bitcoin.withdraw = function(conn, currencyId, req, res, next) {
     console.log('processing withdraw request of %d %s from user #%s to %s',
         req.body.amount, currencyId, req.user, req.body.address)
 
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.write, 'query', {
         text: 'SELECT ' + currencyId + '_withdraw ($1, $2, from_decimal($3, $4)) request_id',
         values: [req.user, req.body.address, req.body.amount, currencyId]
     })
@@ -44,7 +44,7 @@ bitcoin.withdraw = function(conn, currencyId, req, res, next) {
 }
 
 bitcoin.address = function(conn, currencyId, req, res, next) {
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.read, 'query', {
         text: util.format(
             'SELECT address FROM %s_deposit_address WHERE account_id = user_currency_account($1, $2)',
             currencyId),

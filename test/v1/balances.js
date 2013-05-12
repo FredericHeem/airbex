@@ -17,11 +17,13 @@ describe('balances', function() {
 	describe('forUser', function() {
 		it('returns balances', function(done) {
 			var conn = {
-				query: function(q, c) {
-					expect(q.text).to.match(/from account_view/i)
-					expect(q.text).to.match(/currency_id/i)
-					expect(q.values).to.eql([25])
-					c(null, { rows: [{ currency: 'XRP', available: '1.2' }] })
+				read: {
+					query: function(q, c) {
+						expect(q.text).to.match(/from account_view/i)
+						expect(q.text).to.match(/currency_id/i)
+						expect(q.values).to.eql([25])
+						c(null, { rows: [{ currency: 'XRP', available: '1.2' }] })
+					}
 				}
 			}
 			, req = {

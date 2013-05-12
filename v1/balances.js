@@ -7,7 +7,8 @@ Balances.configure = function(app, conn, auth) {
 }
 
 Balances.forUser = function(conn, req, res, next) {
-    Q.ninvoke(conn, 'query', {
+    console.log(conn)
+    Q.ninvoke(conn.read, 'query', {
         text: [
             'SELECT currency_id currency, SUM(available) available',
             'FROM account_view',

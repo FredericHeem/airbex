@@ -19,8 +19,10 @@ describe('ripple', function() {
 	describe('address', function() {
 		it('throws if there is no ripple account', function(done) {
 			var conn = {
-				query: function(q, c) {
-					c(null, { rows: [] })
+				read: {
+					query: function(q, c) {
+						c(null, { rows: [] })
+					}
 				}
 			}
 			, req = {
@@ -39,11 +41,13 @@ describe('ripple', function() {
 	describe('withdraw', function() {
 		it('enqueues', function(done) {
 			var conn = {
-				query: function(q, c) {
-					if (q.text.match(/activity/)) return
-					expect(q.text).to.match(/ripple_withdraw/i)
-					expect(q.values).to.eql([98, 'QQQ', 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT', '50.3'])
-					c(null, { rows: [{ request_id: 59 }] })
+				write: {
+					query: function(q, c) {
+						if (q.text.match(/activity/)) return
+						expect(q.text).to.match(/ripple_withdraw/i)
+						expect(q.values).to.eql([98, 'QQQ', 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT', '50.3'])
+						c(null, { rows: [{ request_id: 59 }] })
+					}
 				}
 			}
 			, req = {

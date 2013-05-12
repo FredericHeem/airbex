@@ -16,22 +16,24 @@ describe('activities', function() {
 	describe('activities', function() {
 		it('gets activities for the user', function(done) {
 			var conn = {
-				query: function(q, cb) {
-					expect(q.text).to.match(/created/i)
-					expect(q.text).to.match(/where user_id/i)
-					expect(q.text).to.match(/details/i)
-					expect(q.text).to.match(/FROM activity/i)
-					expect(q.text).to.match(/\$1/i)
-					expect(q.values).to.eql([10])
-					cb(null, {
-						rows: [{
-							created: 123,
-							details: JSON.stringify({ a: 1 })
-						}, {
-							created: 234,
-							details: JSON.stringify({ b: 2 })
-						}]
-					})
+				read: {
+					query: function(q, cb) {
+						expect(q.text).to.match(/created/i)
+						expect(q.text).to.match(/where user_id/i)
+						expect(q.text).to.match(/details/i)
+						expect(q.text).to.match(/FROM activity/i)
+						expect(q.text).to.match(/\$1/i)
+						expect(q.values).to.eql([10])
+						cb(null, {
+							rows: [{
+								created: 123,
+								details: JSON.stringify({ a: 1 })
+							}, {
+								created: 234,
+								details: JSON.stringify({ b: 2 })
+							}]
+						})
+					}
 				}
 			}
 			, req = {

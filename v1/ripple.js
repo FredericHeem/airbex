@@ -43,7 +43,7 @@ ripple.federation = function(config, conn, req, res, next) {
         values: [tag]
     }
 
-    Q.ninvoke(conn, 'query', query)
+    Q.ninvoke(conn.read, 'query', query)
     .then(function(dres) {
         if (!dres.rows.length) return sendError(user ? 'noSuchUser' : 'noSuchTag')
         var result = {
@@ -69,7 +69,7 @@ ripple.federation = function(config, conn, req, res, next) {
 }
 
 ripple.address = function(conn, req, res, next) {
-    conn.query({
+    conn.read.query({
         text: 'SELECT address FROM ripple_account'
     }, function(err, dres) {
         if (err) return next(err)
@@ -84,7 +84,7 @@ ripple.address = function(conn, req, res, next) {
 ripple.withdraw = function(conn, req, res, next) {
     if (!validate(req.body, 'ripple_out', res)) return
 
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.write, 'query', {
         text: 'SELECT ripple_withdraw(user_currency_account($1, $2), $3, from_decimal($4, $2))',
         values: [req.user, req.body.currency, req.body.address, req.body.amount]
     })

@@ -3,7 +3,10 @@ var config = require('konfu')
 , app = express()
 , http = require('http')
 , server = http.createServer(app)
-, conn = require('./db')(config.pg_url, config.pg_native)
+, conn = {
+    read: require('./db')(config.pg_read_url, config.pg_native),
+    write: require('./db')(config.pg_write_url, config.pg_native)
+}
 , Cache = require('./cache')
 
 app.config = config

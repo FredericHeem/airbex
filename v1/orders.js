@@ -28,7 +28,7 @@ orders.create = function(conn, req, res, next) {
         ]
     }
 
-    conn.query(query, function(err, dr) {
+    conn.write.query(query, function(err, dr) {
         if (err) {
             if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
                 return res.send(400, {
@@ -66,7 +66,7 @@ orders.create = function(conn, req, res, next) {
 }
 
 orders.forUser = function(conn, req, res, next) {
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.read, 'query', {
         text: [
             'SELECT order_id id, base_currency_id || quote_currency_id market, side, price, volume,',
             'original - volume remaining',
@@ -90,7 +90,7 @@ orders.forUser = function(conn, req, res, next) {
 
 orders.cancel = function(conn, req, res, next) {
     var q = 'UPDATE "order" SET cancelled = volume, volume = 0 WHERE order_id = $1 AND user_id = $2 AND volume > 0'
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.write, 'query', {
         text: q,
         values: [+req.params.id, req.user]
     })

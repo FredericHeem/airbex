@@ -9,7 +9,7 @@ bitcoincharts.configure = function(app, conn) {
 
 bitcoincharts.trades = function(conn, req, res, next) {
     var since = req.query.since || 0
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.read, 'query', {
         text:
             'SELECT ' +
             'price_decimal::varchar price, ' +
@@ -31,7 +31,7 @@ bitcoincharts.trades = function(conn, req, res, next) {
 }
 
 bitcoincharts.orderbook = function(conn, req, res, next) {
-   Q.ninvoke(conn, 'query', {
+   Q.ninvoke(conn.read, 'query', {
         text: [
             'SELECT *',
             'FROM order_depth_view od',

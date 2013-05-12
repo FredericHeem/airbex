@@ -10,7 +10,7 @@ transfer.configure = function(app, conn, auth) {
 transfer.transfer = function(conn, req, res, next) {
     if (!validate(req.body, 'transfer', res)) return
 
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.write, 'query', {
         text: [
             'SELECT user_transfer_to_email($1, $2, $3, from_decimal($4, $3)) transaction_id, su.email sender_email, ru.email receiver_email,',
             'ru.user_id receiver_user_id',

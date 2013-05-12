@@ -13,7 +13,7 @@ Markets.markets = function(conn, req, res, next) {
         return req.app.cache.formatOrderPrice(m, p)
     }
 
-    Q.ninvoke(conn, 'query', 'SELECT * FROM market_summary_view')
+    Q.ninvoke(conn.read, 'query', 'SELECT * FROM market_summary_view')
     .then(function(cres) {
         res.send(cres.rows.map(function(row) {
             var m = row.base_currency_id + row.quote_currency_id
@@ -40,7 +40,7 @@ Markets.depth = function(conn, req, res, next) {
         'ORDER BY price'
     ].join('\n')
 
-    Q.ninvoke(conn, 'query', {
+    Q.ninvoke(conn.read, 'query', {
         text: query,
         values: [req.params.id]
     })

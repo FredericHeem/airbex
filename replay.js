@@ -3,6 +3,7 @@ var fs = require('fs')
 , path  = require('path')
 , Client = require('pg').Client
 , argv = require('optimist')
+.usage('Run migration scripts.\nUsage: $0')
 .describe('d', 'database uri').demand('d').alias('d', 'db')
 .describe('f', 'from migration index').alias('f', 'from').default('f', 0)
 .describe('t', 'to migration index').alias('t', 'to').default('t', 1000)

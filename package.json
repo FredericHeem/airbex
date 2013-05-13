@@ -13,7 +13,8 @@
     "jsonschema": "~0.3.2",
     "email-existence": "git://github.com/abrkn/email-existence.git",
     "async": "~0.2.8",
-    "request": "~2.21.0"
+    "request": "~2.21.0",
+    "debug": "~0.7.2"
   },
   "scripts": {
     "test": "mocha"

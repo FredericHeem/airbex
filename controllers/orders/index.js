@@ -14,14 +14,14 @@ module.exports = function(app, api) {
     }
 
     function refresh() {
-        api.call('orders').done(itemsChanged)
+        api.call('v1/orders').done(itemsChanged)
     }
 
     $items.on('click', 'button.cancel', function(e) {
         e.preventDefault()
         var $item = $(e.target).closest('.item')
 
-        api.call('orders/' + $item.attr('data-id'), null, { type: 'DELETE' })
+        api.call('v1/orders/' + $item.attr('data-id'), null, { type: 'DELETE' })
         .fail(app.alertXhrError)
         .done(function() {
             api.balances()

@@ -12,7 +12,7 @@ module.exports = function(app, api) {
     }
 
     function refresh() {
-        api.call('markets')
+        api.call('v1/markets')
         .fail(app.alertXhrError)
         .done(marketsChanged)
     }

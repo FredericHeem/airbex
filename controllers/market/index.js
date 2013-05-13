@@ -71,7 +71,7 @@ module.exports = function(app, api, id) {
     }
 
     function refreshDepth() {
-        api.call('markets/' + id + '/depth')
+        api.call('v1/markets/' + id + '/depth')
         .fail(app.alertXhrError)
         .done(depthChanged)
     }
@@ -102,7 +102,7 @@ module.exports = function(app, api, id) {
 
     $buy.on('submit', function(e) {
         e.preventDefault()
-        api.call('orders', {
+        api.call('v1/orders', {
             market: id,
             type: 'bid',
             price: $buyPrice.val(),
@@ -118,7 +118,7 @@ module.exports = function(app, api, id) {
 
     $sell.on('submit', function(e) {
         e.preventDefault()
-        api.call('orders', {
+        api.call('v1/orders', {
             market: id,
             type: 'ask',
             price: $sellPrice.val(),

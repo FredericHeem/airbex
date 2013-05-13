@@ -12,7 +12,7 @@ module.exports = function() {
 
     api.call = function(method, data, options) {
         var settings = {
-            url: '/api/v1/' + method,
+            url: '/api/' + method,
             dataType: 'json'
         }
 
@@ -32,7 +32,7 @@ module.exports = function() {
 
     api.login = function(email, password) {
         var key = keyFromCredentials(email, password)
-        return api.call('whoami', null, { key: key })
+        return api.call('v1/whoami', null, { key: key })
         .then(function(user) {
             api.key = key
             app.user(user)
@@ -40,7 +40,7 @@ module.exports = function() {
     }
 
     api.register = function(email, password) {
-        return api.call('users', {
+        return api.call('v1/users', {
             email: email,
             key: keyFromCredentials(email, password)
         })
@@ -50,7 +50,7 @@ module.exports = function() {
     }
 
     api.balances = function() {
-        api.call('balances')
+        api.call('v1/balances')
         .done(app.balances.bind(app))
     }
 

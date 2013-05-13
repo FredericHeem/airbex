@@ -9,7 +9,7 @@ module.exports = function(app, api) {
 
     $form.on('submit', function(e) {
         e.preventDefault()
-        api.call('ripple/out', {
+        api.call('v1/ripple/out', {
             amount: $amount.val(),
             address: $address.val(),
             currency: $currency.val()

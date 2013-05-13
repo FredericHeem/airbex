@@ -45,7 +45,7 @@ module.exports = function(app, api) {
     }
 
     function refresh() {
-        api.call('activities').done(itemsChanged)
+        api.call('v1/activities').done(itemsChanged)
     }
 
     refresh()

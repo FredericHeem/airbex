@@ -8,7 +8,7 @@ module.exports = function(app, api) {
 
     $form.on('submit', function(e) {
         e.preventDefault()
-        api.call('ltc/out', {
+        api.call('v1/ltc/out', {
             amount: $amount.val(),
             address: $address.val()
         })

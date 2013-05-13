@@ -12,6 +12,7 @@ var markets = require('./controllers/markets')
 , dashboard = require('./controllers/dashboard')
 , depositbtc = require('./controllers/depositbtc')
 , depositltc = require('./controllers/depositltc')
+, adminBalances = require('./controllers/admin/balances')
 , $app = $('body')
 
 function section(name) {
@@ -84,6 +85,11 @@ module.exports = function(app, api, router) {
         if (!app.authorize()) return
         $section.html(depositltc(app, api).$el)
         section('depositltc')
+    })
+    .add(/^admin\/balances$/, function() {
+        if (!app.authorize()) return
+        $section.html(adminBalances(app, api).$el)
+        section('admin-balances')
     })
     .add(/^(.+)$/, function(hash) {
         $section.html(notfound(hash).$el)

@@ -18,7 +18,7 @@ app.bitcoinAddress = (function() {
     return function() {
         var d = $.Deferred()
         if (address) d.resolve(address)
-        return api.call('BTC/address')
+        return api.call('v1/BTC/address')
         .then(function(result) {
             return result.address
         })
@@ -30,7 +30,7 @@ app.litecoinAddress = (function() {
     return function() {
         var d = $.Deferred()
         if (address) d.resolve(address)
-        return api.call('LTC/address')
+        return api.call('v1/LTC/address')
         .then(function(result) {
             return result.address
         })
@@ -42,7 +42,7 @@ app.rippleAddress = (function() {
     return function() {
         var d = $.Deferred()
         if (address) d.resolve(address)
-        return api.call('ripple/address')
+        return api.call('v1/ripple/address')
         .then(function(result) {
             return result.address
         })

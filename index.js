@@ -13,7 +13,7 @@ app.config = config
 
 app.use(express.bodyParser())
 
-var routes = ['bitcoincharts', 'v1']
+var routes = ['bitcoincharts', 'v1', 'admin']
 routes.forEach(function(name) {
     require('./' + name).configure(app, conn)
 })

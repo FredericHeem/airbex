@@ -1,51 +1,42 @@
 var fs = require('fs')
+, colors = require('colors')
 , path  = require('path')
 , Client = require('pg').Client
-, url = process.argv[2]
-, Q = require('q')
 , argv = require('optimist')
-.demand('db')
-.default('start', 0)
-.default('stop', 1000)
-.default('db', process.env.NODE_ENV == 'travis' ? 'tcp://postgres@localhost/snow' : null)
+.describe('d', 'database uri').demand('d').alias('d', 'db')
+.describe('f', 'from migration index').alias('f', 'from').default('f', 0)
+.describe('t', 'to migration index').alias('t', 'to').default('t', 1000)
 .argv
-
-if (!argv.db) {
-    console.error('no db specified and NODE_ENV is not travis')
-    process.exit(1)
-}
 
 var client = new Client(argv.db)
 client.connect()
 
 var dir = path.join(__dirname, './migrations')
-, files = fs.readdirSync(dir)
-files.sort()
+, files = fs.readdirSync(dir).sort()
 
-function nextFile() {
+function nextFile(cb) {
     var fn = files.shift()
-    if (!fn) return null
+    if (!fn) return cb()
 
     var n = +fn.substr(0, 3)
-    if (n < argv.start) return nextFile()
-    if (n > argv.stop) return null
+    if (n < argv.from) return nextFile(cb)
+    if (n > argv.to) return cb()
 
     var q = fs.readFileSync(path.join(dir, fn), 'utf8')
-
-    console.log('running script %s', fn)
-
-    return Q.ninvoke(client, 'query', q)
-    .then(function() {
-        return nextFile()
-    }, function(err) {
-        console.error('failed to execute query:')
-        console.error(q)
-        throw err
+    process.stdout.write(fn.substr(0, 3) + '... ')
+    client.query(q, function(err) {
+        if (err) {
+            console.error('ERROR: %s\n'.red, err.message)
+            throw err
+        }
+        console.log('OK'.green)
+        nextFile(cb)
     })
 }
 
-nextFile()
-.then(function() {
-    client.end()
+if (argv.f === 0 && argv.t == 1000) console.log('running all migrations')
+else console.log('running migrations %s to %s', argv.f, argv.t)
+
+nextFile(function() {
+    process.exit()
 })
-.done()

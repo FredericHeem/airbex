@@ -1,5 +1,6 @@
 var num = require('num')
 , Activities = require('../activities')
+, Withdraws = require('./withdraws')
 
 module.exports = function(app, api) {
     var template = require('./template.html')
@@ -11,10 +12,13 @@ module.exports = function(app, api) {
     , $ltc = $balances.find('.ltc')
     , $xrp = $balances.find('.xrp')
     , activities = Activities(app, api)
+    , withdraws = Withdraws(app, api)
     , $activities = controller.$el.find('.activities')
+    , $withdraws = controller.$el.find('.withdraws')
     , $depositXrp = controller.$el.find('.deposit-xrp')
 
     $activities.replaceWith(activities.$el)
+    $withdraws.replaceWith(withdraws.$el)
 
     function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");

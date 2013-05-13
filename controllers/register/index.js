@@ -172,21 +172,27 @@ module.exports = function(app, api) {
 
         if (invalid) return
 
-        $submit.prop('disabled', true).addClass('is-loading')
+        $submit.prop('disabled', true)
+        .addClass('is-loading')
+        .html('Creating account...')
 
         api.register($email.find('input').val(), $password.find('input').val())
         .always(function() {
-            $submit.prop('disabled', false).removeClass('is-loading')
+            $submit.prop('disabled', false)
+            .removeClass('is-loading')
+            .html('Creating my account')
         }).done(function() {
             window.location.hash = '#dashboard'
         }).fail(function(xhr) {
             var err = app.errorFromXhr(xhr)
 
             if (err.name == 'EmailFailedCheck') {
+                $email.find('input').focus()
+
                 $email.addClass('error')
                 .find('.help-inline').html('No fake/disposable emails please!')
+
                 $submit.shake()
-                $email.find('input').focus()
                 return
             }
 

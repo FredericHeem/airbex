@@ -13,7 +13,7 @@ users.configure = function(app, conn, auth) {
 
 users.whoami = function(conn, req, res, next) {
 	conn.read.query({
-		text: 'SELECT user_id id, email FROM "user" WHERE user_id = $1',
+		text: 'SELECT user_id id, email, "admin" FROM "user" WHERE user_id = $1',
 		values: [req.user]
 	}, function(err, dres) {
 		if (err) return next(err)
@@ -26,12 +26,13 @@ users.create = function(conn, req, res, next) {
     if (!validate(req.body, 'user_create', res)) return
 
     verifyemail(req.body.email, function(err, ok) {
-        if (!err && !ok) {
-            return res.send(403, { name: 'EmailFailedCheck', message: 'E-mail did not pass validation' })
+        if (err) {
+            console.log('E-mail validation failed for %s:\n', req.body.email, err)
         }
 
-        if (err) {
-            console.error('E-mail validation failed for %s:\n', req.body.email, err)
+        if (!ok) {
+            if (err) console.log('email check failed', err)
+            return res.send(403, { name: 'EmailFailedCheck', message: 'E-mail did not pass validation' })
         }
 
         conn.write.query({

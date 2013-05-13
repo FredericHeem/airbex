@@ -189,8 +189,11 @@ module.exports = function(app, api) {
             if (err.name == 'EmailFailedCheck') {
                 $email.find('input').focus()
 
-                $email.addClass('error')
-                .find('.help-inline').html('No fake/disposable emails please!')
+                $email
+                .removeClass('success')
+                .addClass('error')
+                .find('.help-inline')
+                .html('No fake/disposable emails please!')
 
                 $submit.shake()
                 return

@@ -11,13 +11,13 @@
     "home.exchange.heading": "Veksle BTC/LTC/XRP",
     "home.exchange.body": "Etter at du registrerer deg, kan du kjøpe og selge BTC/LTC/XRP. Du kan også ta ut BTC/LTC til Ripple gjennom Justcoin.",
 
-    "dashboard": "Dashboard",
+    "dashboard": "Oversikt",
     "orders": "Ordre",
     "markets": "Markeder",
     "sign out": "Logg ut",
 
-    "header.existing user": "Allerede registrert",
-    "header.new user": "Ny bruker",
+    "header.existing user": "Logg inn",
+    "header.new user": "Registrere",
 
     "register.heading": "Start med Justcoin.",
     "register.email.label": "E-post",

@@ -41,7 +41,7 @@
     "loading": "Laster",
     "amount": "Antall",
     "price": "Pris",
-    "activities.CreateOrder.": "Du lagde en ordre for å %s %s %s for %s %s.",
+    "activities.CreateOrder": "Du lagde en ordre for å %s %s %s for %s %s.",
     "activities.CancelOrder": "Du slettet ordre #%s.",
     "activities.RippleWithdraw": "Du ba om å ta ut %s %s til Ripple (%s)",
     "activities.LTCWithdraw": "Du ba om å ta ut %s LTC til %s",

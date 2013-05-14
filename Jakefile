@@ -47,7 +47,7 @@ var vendor = [
 
 file('build/jquery.min.js', ['components/jquery/jquery.min.js'], cpTask)
 file('build/sjcl.js', ['vendor/sjcl.js'], cpTask)
-file('build/alertify.min.js', ['vendor/alertify/alertify.min.js'], cpTask)
+file('build/alertify.min.js', ['components/alertify/alertify.min.js'], cpTask)
 file('build/bootstrap.min.js', ['components/bootstrap/js/bootstrap.min.js'], cpTask)
 file('build/ripple.txt', ['assets/ripple.txt'], cpTask)
 file('build/raven.min.js', ['vendor/raven.min.js'], cpTask)
@@ -87,8 +87,8 @@ file('build/styles.css', ['build'], function() {
     exec('stylus assets/app.styl -o build');
     (cat('components/bootstrap/css/bootstrap.min.css') + '\n' +
     cat('components/bootstrap/css/bootstrap-responsive.min.css') + '\n' +
-    cat('vendor/alertify/alertify.bootstrap.css') + '\n' +
-    cat('vendor/alertify/alertify.bootstrap.css') + '\n' +
+    cat('components/alertify/themes/alertify.core.css') + '\n' +
+    cat('components/alertify/themes/alertify.bootstrap.css') + '\n' +
     cat('build/app.css') + '\n')
     .to(this.name)
 })

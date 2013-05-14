@@ -12,7 +12,9 @@ if (window.analytics) {
 }
 
 app.on('user', function(user) {
+    console.log(user)
     $app.toggleClass('is-logged-in', !!user)
+    $app.toggleClass('is-admin', user && user.admin)
 })
 
 app.bitcoinAddress = (function() {
@@ -69,4 +71,16 @@ $.fn.field = function(name, value) {
     }
 
     return $fields
+}
+
+$.fn.enabled = function(value) {
+    if (typeof value != 'undefined') {
+        return $(this).prop('disabled', !value)
+        .toggleClass('disabled', !value)
+    }
+    return !this.prop('disabled')
+}
+
+$.fn.fadeAway = function(delay) {
+    return $(this).fadeOut(delay || 500, function() { $(this).remove() })
 }

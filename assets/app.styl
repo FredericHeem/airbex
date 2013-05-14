@@ -28,16 +28,20 @@ footer {
     }
 }
 
-body:not(.is-logged-in) {
-    #top {
-        .balances, .orders, .activities { display: none }
-        .account-summary .logged-in { display: none; }
-    }
+body:not(.is-logged-in)
+    #top
+        .balances, .orders, .activities, .dashboard
+            display: none
 
-    .container.market .place-order-container {
-        display: none;
-    }
-}
+        .account-summary .logged-in
+            display: none
+
+    .container.market .place-order-container
+        display: none
+
+body:not(.is-admin)
+    #top .admin
+        display: none
 
 body.is-logged-in #top {
     .account-summary .not-logged-in { display: none; }

@@ -1,5 +1,5 @@
 <div class="container markets">
-    <h3>Markets</h3>
+    <h3><%= i18n('markets') %></h3>
 
     <div class="row">
         <div class="span7">
@@ -7,12 +7,12 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Last</th>
-                        <th>Bid</th>
-                        <th>Ask</th>
-                        <th>High</th>
-                        <th>Low</th>
-                        <th>Volume</th>
+                        <th><%= i18n('markets.column headers.last') %></th>
+                        <th><%= i18n('markets.column headers.bid') %></th>
+                        <th><%= i18n('markets.column headers.ask') %></th>
+                        <th><%= i18n('markets.column headers.high') %></th>
+                        <th><%= i18n('markets.column headers.low') %></th>
+                        <th><%= i18n('markets.column headers.volume') %></th>
                     </tr>
                 </thead>
                 <tbody class="list"></tbody>

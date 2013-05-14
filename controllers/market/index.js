@@ -78,26 +78,20 @@ module.exports = function(app, api, id) {
 
     function updateBuySummary() {
         var total = num($buyPrice.val()).mul($buyAmount.val())
-        $buySummary.html([
-            'You are buying',
+        $buySummary.i18n('market.buy summary',
             $buyAmount.val(),
             base,
-            'for',
             total.toString(),
-            quote
-        ].join(' '))
+            quote)
     }
 
     function updateSellSummary() {
         var total = num($sellPrice.val()).mul($sellAmount.val())
-        $sellSummary.html([
-            'You are selling',
+        $sellSummary.i18n('market.sell summary',
             $sellAmount.val(),
             base,
-            'for',
             total.toString(),
-            quote
-        ].join(' '))
+            quote)
     }
 
     $buy.on('submit', function(e) {
@@ -111,7 +105,7 @@ module.exports = function(app, api, id) {
         .fail(app.alertXhrError)
         .done(function(order) {
             api.balances()
-            alert('Order ' + order.id + ' placed')
+            alert(i18n('market.order placed', order.id))
             //window.location.hash = '#orders'
         })
     })
@@ -125,7 +119,7 @@ module.exports = function(app, api, id) {
             amount: $sellAmount.val()
         }).done(function(order) {
             api.balances()
-            alert('Order ' + order.id + ' placed')
+            alert(i18n('market.order placed', order.id))
             //window.location.hash = '#orders'
         })
     })

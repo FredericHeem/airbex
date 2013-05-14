@@ -1,8 +1,8 @@
 <tr class="item">
     <td><%= id %></td>
     <td><%= market %></td>
-    <td><%= type == 'bid' ? 'Buy' : 'Sell' %></td>
+    <td><%= type == 'bid' ? i18n('orders.buy') : i18n('orders.sell') %></td>
     <td><%= price %></td>
     <td><%= amount %></td>
-    <td><button class="cancel btn">Cancel</button></td>
+    <td><button class="cancel btn"><%= i18n('orders.cancel.label') %></button></td>
 </tr>

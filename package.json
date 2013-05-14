@@ -14,7 +14,7 @@
     "ejs": "0.8.3",
     "request": "~2.16.6",
     "always": "2.0.0",
-    "browserify": "x",
+    "browserify": "~2.13.3",
     "express": "3.0.2",
     "mocha": "1.8.1",
     "expect.js": "0.2.0",
@@ -26,7 +26,9 @@
     "moment": "~2.0.0",
     "numeral": "1.4.8",
     "http-proxy": "~0.10.2",
-    "lodash": "~1.2.1"
+    "lodash": "~1.2.1",
+    "jed": "~0.5.4",
+    "optimist": "~0.4.0"
   },
   "scripts": {
     "test": "jake test"

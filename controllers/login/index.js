@@ -13,7 +13,7 @@ module.exports = function(app, api, after) {
             var error = app.errorFromXhr(err)
 
             if (error.name == 'UnknownApiKey') {
-                alert('Wrong e-mail/password combination')
+                alert(app.i18n('login.wrong username or password'))
                 return
             }
 

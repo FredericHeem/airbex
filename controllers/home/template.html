@@ -1,26 +1,26 @@
 <div class="section container">
 <div class="jumbotron">
-        <h1>Welcome to Justcoin!</h1>
-        <p class="lead">Justcoin is a virtual currency exchange and Ripple gateway. We currently support Bitcoin and ripples (XRP)</p>
-        <a class="btn btn-large btn-success" href="#register">Sign up now</a>
+        <h1><%= i18n('home.heading') %></h1>
+        <p class="lead"><%= i18n('home.sub-heading') %></p>
+        <a class="btn btn-large btn-success" href="#register"><%= i18n('home.call to action') %></a>
       </div>
 
       <hr>
 
       <div class="row-fluid">
         <div class="span4">
-          <h2>Bitcoin</h2>
-          <p>You can deposit and withdraw BTC (three confirmations)</p>
-          <p><a class="btn" href="https://www.weusecoins.com/en" target="_blank">What is Bitcoin?</a></p>
+          <h2><%= i18n('home.bitcoin.heading') %></h2>
+          <p><%= i18n('home.bitcoin.body') %></p>
+          <p><a class="btn" href="https://www.weusecoins.com/en" target="_blank"><%= i18n('home.bitcoin.what is button') %></a></p>
         </div>
         <div class="span4">
-          <h2>Ripple</h2>
-          <p>Justcoin operates a Ripple gateway, meaning you can deposit and withdraw BTC to Ripple through Justcoin.</p>
-          <p><a class="btn" href="https://ripple.com" target="_blank">What is Ripple? &raquo;</a></p>
+          <h2><%= i18n('home.ripple.heading') %></h2>
+          <p>J<%= i18n('home.ripple.body') %></p>
+          <p><a class="btn" href="https://ripple.com" target="_blank"><%= i18n('home.ripple.what is button') %> &raquo;</a></p>
        </div>
         <div class="span4">
-          <h2>Exchange BTC/XRP</h2>
-          <p>Once you sign up, you can buy and sell BTC for XRP on our exchange. Alternatively, you can withdraw BTC to Ripple and exchange there.</p>
+          <h2><%= i18n('home.exchange.heading') %></h2>
+          <p><%= i18n('home.exchange.body') %></p>
         </div>
       </div>
 </div>

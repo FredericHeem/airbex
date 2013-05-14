@@ -1,0 +1,19 @@
+var argv = require('optimist')
+.demand('i')
+.demand('o')
+.argv
+
+var fs = require('fs')
+, path = require('path')
+
+var input = require(path.resolve(argv.i))
+, output = require(path.resolve(argv.o))
+, result = {}
+
+Object.keys(input).forEach(function(key) {
+    if (typeof output[key] != 'undefined') return
+    result[key] = 'TODO: ' + input[key]
+})
+
+var s = JSON.stringify(result, 0, 4)
+console.log(s.substr(2, s.length - 4))

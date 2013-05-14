@@ -1,26 +1,26 @@
 <div class="container withdraw-ltc">
-    <h3>Withdraw Litecoin</h3>
+    <h3><%= i18n('withdrawltc.heading') %></h3>
 
-    <p>Litecoin withdraws are normally handled in a few seconds.</p>
+    <p><%= i18n('withdrawltc.intro') %></p>
 
     <form class="form-horizontal well span6">
         <div class="control-group">
-            <label class="control-label" for="amount">Amount</label>
+            <label class="control-label" for="amount"><%= i18n('amount') %></label>
             <div class="controls">
                 <input class="amount" type="text" id="amount" >
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="address">Address</label>
+            <label class="control-label" for="address"><%= i18n('withdrawltc.address.label') %></label>
             <div class="controls">
-                <input class="address" id="address" type="address" placeholder="Lsomeaddress" />
+                <input class="address" id="address" type="address" placeholder="<%= i18n('withdrawltc.address.placeholder') %>" />
             </div>
         </div>
 
         <div class="control-group">
             <div class="controls">
-                <input type="submit" class="btn btn-primary" type="submit" value="Withdraw" />
+                <input type="submit" class="btn btn-primary" type="submit" value="<%= i18n('withdrawltc.submit') %>" />
             </div>
         </div>
     </form>

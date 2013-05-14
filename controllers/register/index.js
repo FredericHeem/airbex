@@ -4,37 +4,16 @@ module.exports = function(app, api) {
     var controller = {
         $el: $(require('./template.html')())
     }
+    , i18n = app.i18n
     , $form = controller.$el.find('.register')
     , $email = $form.find('.control-group.email')
     , $password = $form.find('.control-group.password')
     , $repeat = $form.find('.control-group.repeat')
     , $submit = $form.find('button')
     , $validation = $form.find('.validation')
-    , hints = {
-        email: 'We won\'t send you spam.',
-        password: '6 characters or more.',
-        repeat: 'Just to be sure.'
-    }
-    , successes = {
-        email: 'Really, we won\'t spam you.',
-        password: 'Looks good.',
-        repeat: 'That\'s a match.',
-    }
-    , errors = {
-        email: {
-            badFormat: 'Doesn\'t look valid'
-        },
-        password: {
-            tooShort: 'Too short! Minimum 6 characters.'
-        },
-        repeat: {
-            notSame: 'Doesn\'t match.'
-        }
-    }
-
-    $email.find('.help-inline').html(hints.email)
-    $password.find('.help-inline').html(hints.password)
-    $repeat.find('.help-inline').html(hints.repeat)
+    $email.find('.help-inline').html(i18n('register.hints.email'))
+    $password.find('.help-inline').html(i18n('register.hints.password'))
+    $repeat.find('.help-inline').html(i18n('register.hints.repeat'))
 
     $email.add($repeat).add($password)
     .on('focus keyup', 'input', function() {
@@ -51,7 +30,7 @@ module.exports = function(app, api) {
         var group = $(this).closest('.control-group')
         group.removeClass('error warning success is-valid')
         .find('.help-inline')
-        .html(hints[group.find('input').attr('name')])
+        .html(i18n('register.hints.' + group.find('input').attr('name')))
     })
 
     function validateEmail() {
@@ -63,10 +42,10 @@ module.exports = function(app, api) {
 
         if (valid) {
             $email.removeClass('error').addClass('success')
-            $hint.html(successes.email)
+            $hint.html(i18n('register.successes.email'))
         } else {
             $email.removeClass('success').addClass('error')
-            $hint.html(errors.email.badFormat)
+            $hint.html(i18n('register.errors.email.badFormat'))
         }
 
         $email.toggleClass('is-valid', valid)
@@ -82,10 +61,10 @@ module.exports = function(app, api) {
 
         if (valid) {
             $password.removeClass('error').addClass('success')
-            $hint.html(successes.password)
+            $hint.html(i18n('register.successes.password'))
         } else {
             $password.removeClass('success').addClass('error')
-            $hint.html(errors.password.tooShort)
+            $hint.html(i18n('register.errors.password.tooShort'))
         }
 
         $password.toggleClass('is-valid', valid)
@@ -108,10 +87,10 @@ module.exports = function(app, api) {
 
         if (valid) {
             $repeat.removeClass('error').addClass('success')
-            $hint.html(successes.repeat)
+            $hint.html(i18n('register.successes.repeat'))
         } else {
             $repeat.removeClass('success').addClass('error')
-            $hint.html(errors.repeat.notSame)
+            $hint.html(i18n('register.errors.repeat.notSame'))
         }
 
         $repeat.toggleClass('is-valid', valid)
@@ -174,13 +153,13 @@ module.exports = function(app, api) {
 
         $submit.prop('disabled', true)
         .addClass('is-loading')
-        .html('Creating account...')
+        .html(i18n('register.create button.creating'))
 
         api.register($email.find('input').val(), $password.find('input').val())
         .always(function() {
             $submit.prop('disabled', false)
             .removeClass('is-loading')
-            .html('Creating my account')
+            .html(i18n('register.create button'))
         }).done(function() {
             window.location.hash = '#dashboard'
         }).fail(function(xhr) {
@@ -193,7 +172,7 @@ module.exports = function(app, api) {
                 .removeClass('success')
                 .addClass('error')
                 .find('.help-inline')
-                .html('No fake/disposable emails please!')
+                .html(i18n('register.errors.email.checkFailed'))
 
                 $submit.shake()
                 return

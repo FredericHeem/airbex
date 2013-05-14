@@ -2,6 +2,8 @@ var api = require('./api')()
 , router = require('./router')()
 , $app = $('body')
 , app = require('./app')
+, debug = require('debug')
+debug.enable('*')
 
 require('./routes')(app, api, router)
 
@@ -48,6 +50,11 @@ app.rippleAddress = (function() {
         })
     }
 })()
+
+app.i18n = window.i18n = require('./i18n')()
+$.fn.i18n = function() {
+    $(this).html(app.i18n.apply(app.i18n, arguments))
+}
 
 var header = require('./controllers/header')(app, api)
 $app.find('.header').replaceWith(header.$el)

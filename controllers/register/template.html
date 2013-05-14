@@ -1,22 +1,22 @@
 <div class="register container">
-    <h3>Start using Justcoin.</h3>
+    <h3><%= i18n('register.heading') %></h3>
     <form class="register">
         <div class="control-group email">
-            <label class="control-label">Email address</label>
+            <label class="control-label"><%= i18n('register.email.label') %></label>
             <div class="controls">
                 <input type="text" name="email">
                 <span class="help-inline"></span>
             </div>
         </div>
         <div class="control-group password">
-            <label class="control-label">Password</label>
+            <label class="control-label"><%= i18n('register.password.label') %></label>
             <div class="controls">
                 <input type="password" name="password">
                 <span class="help-inline"></span>
             </div>
         </div>
         <div class="control-group repeat">
-            <label class="control-label">Repeat password</label>
+            <label class="control-label"><%= i18n('register.repeat.label') %></label>
             <div class="controls">
                 <input type="password" name="repeat">
                 <span class="help-inline"></span>
@@ -24,7 +24,7 @@
         </div>
         <div class="control-group">
             <div class="controls">
-                <button type="submit" class="btn btn-success btn-large">Create my account</button>
+                <button type="submit" class="btn btn-success btn-large"><%= i18n('register.create button') %></button>
             </div>
         </div>
     </form>

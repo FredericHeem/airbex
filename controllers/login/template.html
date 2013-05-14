@@ -1,8 +1,8 @@
 <div class="container login">
     <form class="span4">
-        <h2 class="heading">Please sign in</h2>
-        <input type="text" class="email input-block-level" placeholder="Email address" />
-        <input type="password" class="password input-block-level" placeholder="Password" />
-        <input type="submit" class="btn btn-large btn-primary" value="Sign in" />
+        <h2 class="heading"><%= i18n('login.heading') %></h2>
+        <input type="text" class="email input-block-level" placeholder="<%= i18n('login.email.placeholder') %>" />
+        <input type="password" class="password input-block-level" placeholder="<%= i18n('login.password.placeholder') %>" />
+        <input type="submit" class="btn btn-large btn-primary" value="<%= i18n('login.button') %>" />
     </form>
 </div>

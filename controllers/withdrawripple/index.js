@@ -16,7 +16,7 @@ module.exports = function(app, api) {
         })
         .fail(app.alertXhrError)
         .done(function() {
-            alert('Withdraw requested')
+            alert(app.i18n('withdrawripple.confirmation'))
             window.location.hash = '#activities'
         })
     })

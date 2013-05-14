@@ -1,4 +1,4 @@
-<h3>Account Funds</h3>
+<h3><%= i18n('dashboard.heading') %></h3>
 
 <div class="row">
     <table class="balances table table-bordered span6">
@@ -7,8 +7,8 @@
             <td class="available">
             </td>
             <td class="actions">
-                <a class="deposit-btc btn" href="#depositbtc">Deposit</a>
-                <a class="withdraw-btc btn" href="#withdrawbtc">Withdraw</a>
+                <a class="deposit-btc btn" href="#depositbtc"><%= i18n('deposit') %></a>
+                <a class="withdraw-btc btn" href="#withdrawbtc"><%= i18n('withdraw') %></a>
             </td>
         </tr>
         <tr class="balance ltc">
@@ -16,17 +16,17 @@
             <td class="available">
             </td>
             <td class="actions">
-                <a class="deposit-ltc btn" href="#depositltc">Deposit</a>
-                <a class="withdraw-ltc btn" href="#withdrawltc">Withdraw</a>
+                <a class="deposit-ltc btn" href="#depositltc"><%= i18n('deposit') %></a>
+                <a class="withdraw-ltc btn" href="#withdrawltc"><%= i18n('withdraw') %></a>
             </td>
         </tr>
         <tr class="balance xrp">
-            <td class="name">Ripples</td>
+            <td class="name">Ripple</td>
             <td class="available">
             </td>
             <td class="actions">
-                <a class="deposit-xrp btn" target="_blank">Deposit</a>
-                <a class="withdraw-xrp btn" href="#withdrawripple">Withdraw</a>
+                <a class="deposit-xrp btn" target="_blank"><%= i18n('deposit') %></a>
+                <a class="withdraw-xrp btn" href="#withdrawripple"><%= i18n('withdraw') %></a>
             </td>
         </tr>
     </table>

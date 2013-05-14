@@ -51,6 +51,7 @@
     "activities.heading": "Activity",
 
     "dashboard.heading": "Account Funds",
+    "dashboard.nok coming soon": "Coming soon!",
 
     "depositbtc.heading": "Add BTC to your account",
     "depositbtc.address.label": "Send to this address",

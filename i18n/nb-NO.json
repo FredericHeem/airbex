@@ -50,6 +50,7 @@
     "activities.Created": "Du lagde denne kontoen.",
     "activities.heading": "Kontoaktivitet",
     "dashboard.heading": "Oversikt",
+    "dashboard.nok coming soon": "Kommer snart!",
     "depositbtc.heading": "Sett inn Bitcoin",
     "depositbtc.address.label": "Send til denne adressen",
     "depositbtc.disclaimer": "vi krever 3 bekreftelser før du blir kreditert. Dette pleier å ta mindre enn en time.",

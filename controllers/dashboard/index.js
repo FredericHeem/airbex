@@ -11,6 +11,7 @@ module.exports = function(app, api) {
     , $btc = $balances.find('.btc')
     , $ltc = $balances.find('.ltc')
     , $xrp = $balances.find('.xrp')
+    , $nok = $balances.find('.nok')
     , activities = Activities(app, api)
     , withdraws = Withdraws(app, api)
     , $activities = controller.$el.find('.activities')
@@ -38,6 +39,7 @@ module.exports = function(app, api) {
         $btc.find('.available').html(formatNumber(indexed['BTC']) + ' BTC')
         $ltc.find('.available').html(formatNumber(indexed['LTC']) + ' LTC')
         $xrp.find('.available').html(formatNumber(indexed['XRP']) + ' XRP')
+        $nok.find('.available').html(formatNumber(indexed['NOK']) + ' NOK')
     }
 
     app.balances() && balancesUpdated(app.balances())

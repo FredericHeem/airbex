@@ -4,10 +4,12 @@ var util = require('util')
 , dicts = {
     'en-US': require('./en-US.json'),
     'en': require('./en-US.json'),
+    'en': require('./en-US.json'),
     'en-GB': require('./en-US.json'),
     'nb-NO': require('./nb-NO.json'),
     'no-NO': require('./nb-NO.json'),
     'no': require('./nb-NO.json'),
+    'nb': require('./nb-NO.json'),
 }
 , fallback = 'en'
 

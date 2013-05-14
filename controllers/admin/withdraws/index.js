@@ -8,6 +8,8 @@ module.exports = function(app, api) {
     }
     , $withdraws = controller.$el.find('.withdraws')
 
+    $el.filter('.nav-container').html(require('../nav.html')())
+
     function itemsChanged(items) {
         $withdraws.html($.map(items, function(item) {
             item.destination = JSON.stringify(item.destination)
@@ -40,9 +42,9 @@ module.exports = function(app, api) {
             .siblings().enabled(false)
 
 
-            api.call('admin/withdraws/' + id, { error: error || null }, { type: 'DELETE' })
+            api.call('admin/withdraws/' + id, { state: 'cancelled', error: error || null }, { type: 'PATCH' })
             .done(function() {
-                alertify.log(util.format('Order #%s deleted.', id), 'success', 10e3)
+                alertify.log(util.format('Order #%s cancelled.', id), 'success', 30e3)
                 $el.closest('.withdraw').fadeAway()
             })
             .fail(function(xhr) {
@@ -53,7 +55,51 @@ module.exports = function(app, api) {
         })
     })
 
+    $el.on('click', '.process', function() {
+        var id = $(this).closest('.withdraw').attr('data-id')
+        , $el = $(this)
+
+        $el.addClass('is-loading')
+        .enabled(false)
+        .siblings().enabled(false)
+
+
+        api.call('admin/withdraws/' + id, { state: 'processing' }, { type: 'PATCH' })
+        .done(function() {
+            alertify.log(util.format('Order #%s is now processing.', id), 'success', 30e3)
+            refresh()
+        })
+        .fail(function(xhr) {
+            var err = app.errorFromXhr(xhr)
+            alert(JSON.stringify(err, null, 4))
+            refresh()
+        })
+    })
+
+    $el.on('click', '.complete', function() {
+        var id = $(this).closest('.withdraw').attr('data-id')
+        , $el = $(this)
+
+        $el.addClass('is-loading')
+        .enabled(false)
+        .siblings().enabled(false)
+
+        api.call('admin/withdraws/' + id, { state: 'completed' }, { type: 'PATCH' })
+        .done(function() {
+            alertify.log(util.format('Order #%s marked as completed.', id), 'success', 30e3)
+            $el.closest('.withdraw').fadeAway()
+        })
+        .fail(function(xhr) {
+            var err = app.errorFromXhr(xhr)
+            alert(JSON.stringify(err, null, 4))
+            refresh()
+        })
+    })
+
     refresh()
+
+    app.section('admin')
+    $el.find('.nav a[href="#admin/withdraws"]').parent().addClass('active')
 
     return controller
 }

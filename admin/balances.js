@@ -7,7 +7,6 @@ Balances.configure = function(app, conn, auth) {
 }
 
 Balances.summary = function(conn, req, res, next) {
-    var query = 'SELECT SUM('
     conn.read.query([
         'SELECT a.currency_id AS currency, a.type, SUM(a.balance / 10^c.scale) balance',
         'FROM account a',

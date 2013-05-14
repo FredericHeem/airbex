@@ -18,7 +18,10 @@ task('app', [
     'build/styles.css',
     'build/index.html',
     'build/img',
-    'build/img/registerbg.jpg'
+    'build/img/registerbg.jpg',
+    'build/img/flags',
+    'build/img/flags/NO.png',
+    'build/img/flags/US.png'
 ])
 
 task('dist', [
@@ -28,11 +31,15 @@ task('dist', [
     'build/index.min.html',
     'build/ripple.txt',
     'build/img',
-    'build/img/registerbg.jpg'
+    'build/img/registerbg.jpg',
+    'build/img/flags',
+    'build/img/flags/NO.png',
+    'build/img/flags/US.png'
 ])
 
 directory('build')
 directory('build/img')
+directory('build/img/flags')
 
 var head = [
     'build/raven.min.js'
@@ -40,6 +47,7 @@ var head = [
 
 var vendor = [
     'build/jquery.min.js',
+    'build/jquery.cookie.js',
     'build/sjcl.js',
     'build/alertify.min.js',
     'build/bootstrap.min.js'
@@ -47,11 +55,14 @@ var vendor = [
 
 file('build/jquery.min.js', ['components/jquery/jquery.min.js'], cpTask)
 file('build/sjcl.js', ['vendor/sjcl.js'], cpTask)
+file('build/jquery.cookie.js', ['vendor/jquery.cookie.js'], cpTask)
 file('build/alertify.min.js', ['components/alertify/alertify.min.js'], cpTask)
 file('build/bootstrap.min.js', ['components/bootstrap/js/bootstrap.min.js'], cpTask)
 file('build/ripple.txt', ['assets/ripple.txt'], cpTask)
 file('build/raven.min.js', ['vendor/raven.min.js'], cpTask)
 file('build/img/registerbg.jpg', ['assets/img/registerbg.jpg'], cpTask)
+file('build/img/flags/NO.png', ['assets/img/flags/NO.png'], cpTask)
+file('build/img/flags/US.png', ['assets/img/flags/US.png'], cpTask)
 
 function cpTask() {
     cp(this.prereqs[0], this.name)
@@ -157,7 +168,9 @@ task('publish-prod', [
         'styles.min.css': null,
         'index.min.html': 'index.html',
         'ripple.txt': 'ripple.txt',
-        'img/registerbg.jpg': null
+        'img/registerbg.jpg': null,
+        'img/flags/NO.png': null,
+        'img/flags/US.png': null
     }
 
     async.forEach(Object.keys(files), function(fn, next) {

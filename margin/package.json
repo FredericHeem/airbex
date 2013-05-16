@@ -1,0 +1,20 @@
+{
+  "name": "snow-margin",
+  "description": "margin trader",
+  "version": "0.0.2",
+  "private": true,
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "underscore": "~1.4.4",
+    "async": "~0.1.22",
+    "request": "~2.12.0",
+    "num": "~0.2.1",
+    "debug": "~0.7.2",
+    "nonce": "~1.0.3",
+    "hail": "0.0.5",
+    "konfu": "~1.1.4",
+    "cli-table": "~0.2.0"
+  }
+}

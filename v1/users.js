@@ -5,6 +5,7 @@ var Q = require('q')
 , async = require('async')
 , validate = require('./validate')
 , Tropo = require('tropo')
+, debug = require('debug')('snow:tropo')
 
 require('tropo-webapi')
 
@@ -160,10 +161,15 @@ users.startPhoneVerify = function(conn, req, res, next) {
 users.tropo = function(conn, req, res, next) {
     var params = req.body.session.parameters
 
+    debug('processing tropo request with params %j', params)
+
     if (params.token != req.app.config.tropo_voice_token) {
-        console.error('invalid token in tropo token')
+        debug('specified tropo token %s does not match config token %s',
+            params.token, req.app.config.tropo_voice_token)
         return res.send(404)
     }
+
+    debug('configuring response')
 
     var tropo = new TropoWebAPI()
 
@@ -173,5 +179,9 @@ users.tropo = function(conn, req, res, next) {
     tropo.wait(2000)
     tropo.say(params.msg)
 
-    res.send(TropoJSON(tropo))
+    var tropoJSON = TropoJSON(tropo)
+
+    debug('sending tropo response %j', tropoJSON)
+
+    res.send(tropoJSON)
 }

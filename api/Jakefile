@@ -23,6 +23,27 @@ task('publish-staging', function() {
     })
 })
 
+task('pp', ['publish-production'])
+task('publish-production', function() {
+    jake.exec([
+        'npm version patch',
+        'npm pack'
+    ], { printStderr: true })
+
+    var version = require('./package.json').version
+    , name = require('./package.json').name
+    , fn = format('%s-%s.tgz', name, version)
+
+    jake.exec([
+        format('scp %s 10.0.0.184:/home/ubuntu/snow-api/app/%s', fn, fn),
+        'ssh 10.0.0.184 cd snow-api/app ; ./deploy.sh ' + version,
+        'rm ' + fn
+    ], {
+        printStderr: true,
+        printStdout: true
+    })
+})
+
 task('bitcoind', function() {
     var path = require('path')
     , util = require('util')

@@ -17,7 +17,10 @@ task('publish-staging', function() {
         'cd snow-api/app',
         format('mkdir %s', version),
         format('cd %s', version),
-        format('tar --strip-components=1 -zxvf ../../%s', fn)
+        format('tar --strip-components=1 -zxvf ../../%s', fn),
+        format('tar --strip-components=1 -zxvf ../../%s', fn),
+        format('cp ../../config.staging.json', '.'),
+        formaT('')
     ]
 
     jake.exec([

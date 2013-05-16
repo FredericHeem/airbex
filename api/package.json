@@ -1,0 +1,33 @@
+{
+  "name": "snow-api",
+  "version": "0.0.21",
+  "description": "rest interface to snow",
+  "dependencies": {
+    "pg": "~1.1.0",
+    "underscore": "1.4.2",
+    "express": "~3.2.1",
+    "num": "0.2.0",
+    "q": "0.9.0",
+    "raven": "~0.5.1",
+    "konfu": "~1.1.3",
+    "jsonschema": "~0.3.2",
+    "email-existence": "git://github.com/abrkn/email-existence.git",
+    "async": "~0.2.8",
+    "request": "~2.21.0",
+    "debug": "~0.7.2",
+    "tropo-webapi": "~1.0.16",
+    "tropo": "~0.0.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "mocha": "1.7.0",
+    "expect.js": "0.2.0",
+    "shelljs": "x"
+  },
+  "engines": {
+    "node": ">=0.8",
+    "npm": ">=1.1"
+  }
+}

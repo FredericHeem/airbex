@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "properties": {
+        "email": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\S+@\\S+$",
+            "maxLength": 254
+        },
+        "currency": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[A-Z]{3}$"
+        },
+        "amount": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\d+\\.?\\d*$"
+        }
+    }
+}

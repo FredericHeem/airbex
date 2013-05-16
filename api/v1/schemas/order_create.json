@@ -1,0 +1,25 @@
+{
+    "type": "object",
+    "properties": {
+        "market": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[A-Z]{6}$"
+        },
+        "price": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\d+\\.?\\d*$"
+        },
+        "amount": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\d+\\.?\\d*$"
+        },
+        "type": {
+            "type": "string",
+            "required": true,
+            "enum": ["bid", "ask"]
+        }
+    }
+}

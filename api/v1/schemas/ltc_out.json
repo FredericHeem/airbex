@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "properties": {
+        "address": {
+            "type": "string",
+            "required": true,
+            "pattern": "^L\\w{26,33}$"
+        },
+        "amount": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\d+\\.?\\d{0,8}$"
+        }
+    }
+}

@@ -30,7 +30,7 @@ Margin.prototype.sync = function(depth, cb) {
     if (depth.bids.length) {
         desired.push({
             market: this.market,
-            side: 'bid',
+            type: 'bid',
             volume: this.options.volume,
             price: num(depth.bids[0].price).mul(1 - this.options.margin).toString()
         })
@@ -41,7 +41,7 @@ Margin.prototype.sync = function(depth, cb) {
     if (depth.asks.length) {
         desired.push({
             market: this.market,
-            side: 'ask',
+            type: 'ask',
             price: num(depth.asks[0].price).mul(1 + this.options.margin).toString(),
             volume: this.options.volume,
             market: this.market
@@ -67,6 +67,6 @@ Margin.prototype.tick = function() {
     ], function(err) {
         if (err) return that.emit('error', err)
         debug('next tick in %d seconds', Math.round(that.options.interval / 1e3))
-        setTimeout(that.tick.bind(that), that.options.interval)
+        that.timer = setTimeout(that.tick.bind(that), that.options.interval)
     })
 }

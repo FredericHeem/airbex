@@ -3,6 +3,7 @@ var _ = require('underscore')
 , num = require('num')
 , debug = require('debug')('position')
 , util = require('util')
+, Table = require('cli-table')
 
 var Position = module.exports = function(market, client) {
     this.market = market
@@ -14,14 +15,14 @@ Position.prototype.groupOrders = function(orders) {
 
     orders.forEach(function(order) {
         var group = groups.filter(function(group) {
-            return group.side == order.side && num(group.price).eq(order.price)
+            return group.type == order.type && num(group.price).eq(order.price)
         })[0]
 
         if (!group) {
             group = {
                 price: order.price,
                 orders: [],
-                side: order.side,
+                type: order.type,
                 volume: '0'
             }
 
@@ -48,19 +49,6 @@ Position.prototype.get = function(cb) {
         })
 
         cb(null, orders)
-
-        /*
-        debug('actual:')
-        grouped.forEach(function(a) {
-            debug('side=%s; price=%s; volume=%s; orders=%s',
-                a.side, a.price, a.volume, a.orders.length)
-        })
-
-        debug('desired:')
-        _.each(desired, function(a) {
-            debug('side=%s; price=%s; volume=%s', a.side, a.price, a.volume)
-        })
-        */
     })
 }
 
@@ -72,7 +60,7 @@ Position.prototype.merge = function(desired, actual) {
         dps.push(dp)
 
         dp.actual = actual.filter(function(ap) {
-            return num(ap.price).eq(dp.price) && ap.side == dp.side
+            return num(ap.price).eq(dp.price) && ap.type == dp.type
         })[0]
 
         if (!dp.actual) {
@@ -86,7 +74,7 @@ Position.prototype.merge = function(desired, actual) {
     actual.forEach(function(ap) {
         var exists = dps.some(function(dp) {
             return num(ap.price).eq(dp.price) &&
-                ap.side == dp.side
+                ap.type == dp.type
         })
 
         if (exists) return
@@ -95,7 +83,7 @@ Position.prototype.merge = function(desired, actual) {
             price: ap.price,
             actual: ap,
             volume: '0',
-            side: ap.side
+            type: ap.type
         })
     })
 
@@ -104,9 +92,18 @@ Position.prototype.merge = function(desired, actual) {
 
 Position.prototype.cancelOrders = function(orders, cb) {
     var that = this
-    async.forEachSeries(orders, function(order, next) {
+    async.forEach(orders, function(order, cb) {
         debug('cancelling %s', order.id)
-        that.client.cancel(order.id, next)
+        that.client.cancel(order.id, function(err) {
+            if (err) {
+                if (err.message.match(/not found/)) {
+                    console.log('Warning: Order %s not found when cancelling', order.id)
+                    return cb()
+                }
+                return cb(err)
+            }
+            cb()
+        })
     }, cb)
 }
 
@@ -117,7 +114,7 @@ Position.prototype.setPosition = function(position, cb) {
     , i = position.actual.orders.length - 1
 
     debug('%s @ %s: %s --> %s%s',
-        position.side.toUpperCase(),
+        position.type.toUpperCase(),
         position.price,
         position.actual.volume,
         position.volume,
@@ -141,15 +138,68 @@ Position.prototype.setPosition = function(position, cb) {
         },
         function(next) {
             if (diff.eq(0)) return next()
-            debug('making up diff with a order of %s', + diff)
+            debug('making up diff with a order of %s', diff)
             that.client.order({
                 market: that.market,
-                side: position.side,
+                type: position.type,
                 price: position.price,
-                volume: diff.toString()
+                amount: diff.toString()
             }, next)
         }
     ], cb)
+}
+
+function createTable(market, actual, desired) {
+    var table = new Table({
+        head: ['Market', 'Side', 'Price', 'Desired', 'Actual', 'Delta'],
+        colWidths: [8, 6, 18, 18, 18, 18],
+        colAligns: ['left', 'center', 'right', 'right', 'right', 'right']
+    })
+
+    var groups = []
+
+    actual.forEach(function(a) {
+        groups.push({
+            type: a.type.toUpperCase(),
+            price: a.price,
+            actual: a,
+            desired: null
+        })
+    })
+
+    desired.forEach(function(d) {
+        var group = groups.filter(function(g) {
+            return g.price == d.price && g.type == d.type
+        })[0]
+
+        if (!group) {
+            group = {
+                type: d.type.toUpperCase(),
+                price: d.price,
+                actual: null,
+                desired: d
+            }
+            groups.push(group)
+        }
+    })
+
+    groups.sort(function(a, b) {
+        if (a.price != b.price) return a.price - b.price
+        return a.type - b.type
+    })
+
+    groups.forEach(function(g) {
+        table.push([
+            market,
+            g.type,
+            g.price,
+            g.desired ? g.desired.volume : 0,
+            g.actual ? g.actual.volume : 0,
+            (g.desired ? g.desired.volume : 0) - (g.actual ? g.actual.volume : 0)
+        ])
+    })
+
+    return table.toString()
 }
 
 Position.prototype.setPositions = function(desired, actual, cb) {
@@ -163,7 +213,9 @@ Position.prototype.sync = function(desired, cb) {
     async.waterfall([
         this.get.bind(this),
         function(orders, next) {
-            next(null, that.groupOrders(orders))
+            var actual = that.groupOrders(orders)
+            console.log(createTable(that.market, actual, desired))
+            next(null, actual)
         },
         this.setPositions.bind(this, desired)
     ], cb)

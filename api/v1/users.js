@@ -140,7 +140,8 @@ users.startPhoneVerify = function(conn, req, res, next) {
         debug('correct code is %s', code)
 
         var tropo = new Tropo({
-            voiceToken: req.app.config.tropo_voice_token
+            voiceToken: req.app.config.tropo_voice_token,
+            messagingToken: req.app.config.tropo_messaging_token
         })
 
         debug('using tropo token %s', req.app.config.tropo_voice_token)
@@ -168,7 +169,23 @@ users.startPhoneVerify = function(conn, req, res, next) {
 
         debug('requesting call to %s', req.body.number)
 
-        tropo.call(req.body.number, msg, function(err) {
+        async.parallel([
+            function(next) {
+                // call
+                tropo.call(req.body.number, msg, function(err) {
+                    if (err) return next(err)
+                    next()
+                })
+            },
+
+            function(next) {
+                // text
+                tropo.message(req.body.number, codeMsg, function(err) {
+                    if (err) return next(err)
+                    next()
+                })
+            }
+        ], function(err) {
             if (err) return next(err)
             res.send(204)
         })

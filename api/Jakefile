@@ -13,24 +13,9 @@ task('publish-staging', function() {
     , name = require('./package.json').name
     , fn = format('%s-%s.tgz', name, version)
 
-    var remoteCommands = [
-        'cd snow-api/app',
-        format('mkdir %s', version),
-        format('cd %s', version),
-        format('tar --strip-components=1 -zxvf ../../%s', fn),
-        format('rm ../../%s', fn),
-        format('cp ../../config.staging.json', '.'),
-        format('npm install'),
-        'cd ..',
-        'rm current',
-        format('ln -s %s current', version),
-        'sudo stop snow-api',
-        'sudo start snow-api'
-    ]
-
     jake.exec([
-        format('scp %s 54.217.208.30:/home/ubuntu/snow-api/%s', fn, fn),
-        'ssh 54.217.208.30 ' + remoteCommands.join(' ; ')
+        format('scp %s 54.217.208.30:/home/ubuntu/snow-api/app/%s', fn, fn),
+        'ssh 54.217.208.30 snow-api/app/deploy.sh'
     ], {
         printStderr: true,
         printStdout: true

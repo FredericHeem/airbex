@@ -2,18 +2,25 @@ var Q = require('q')
 , activities = require('./activities')
 , verifyemail = require('../verifyemail')
 , users = module.exports = {}
+, async = require('async')
 , validate = require('./validate')
+, Tropo = require('tropo')
+
+require('tropo-webapi')
 
 users.configure = function(app, conn, auth) {
     app.get('/v1/whoami', auth, users.whoami.bind(users, conn))
     app.post('/v1/users', users.create.bind(users, conn))
     app.post('/v1/replaceLegacyApiKey', users.replaceLegacyApiKey.bind(users, conn))
     app.post('/v1/replaceApiKey', auth, users.replaceApiKey.bind(users, conn))
+    app.post('/v1/users/verify/call', auth, users.startPhoneVerify.bind(users, conn))
+    app.post('/v1/users/verify', auth, users.verifyPhone.bind(users, conn))
+    app.post('/tropo', users.tropo.bind(users, conn))
 }
 
 users.whoami = function(conn, req, res, next) {
 	conn.read.query({
-		text: 'SELECT user_id id, email, "admin" FROM "user" WHERE user_id = $1',
+		text: 'SELECT user_id id, email, "admin", phone_number phone FROM "user" WHERE user_id = $1',
 		values: [req.user]
 	}, function(err, dres) {
 		if (err) return next(err)
@@ -32,6 +39,7 @@ users.create = function(conn, req, res, next) {
 
         if (!ok) {
             if (err) console.log('email check failed', err)
+            console.log('email check failed for %s', req.body.email)
             return res.send(403, { name: 'EmailFailedCheck', message: 'E-mail did not pass validation' })
         }
 
@@ -85,4 +93,85 @@ users.replaceApiKey = function(conn, req, res, next) {
         next(err)
     })
     .done()
+}
+
+users.verifyPhone = function(conn, req, res, next) {
+    conn.write.query({
+        text: 'SELECT verify_phone($1, $2) success',
+        values: [req.user, req.body.code]
+    }, function(err, dr) {
+        if (err) return next(err)
+        if (!dr.rows[0].success) return res.send(403, {
+            name: 'VerifictionFailed',
+            message: 'Verification failed. The code is wrong or you may not verify at this time.'
+        })
+        res.send(204)
+    })
+}
+
+users.startPhoneVerify = function(conn, req, res, next) {
+    conn.write.query({
+        text: 'SELECT create_phone_number_verify_code($2, $1) code',
+        values: [req.user, req.body.number]
+    }, function(err, dr) {
+        if (err) {
+            if ((/^User is locked out/i).exec(err.message)) {
+                return res.send(403, {
+                    name: 'LockedOut',
+                    message: err.message
+                })
+            }
+
+            return next(err)
+        }
+
+        var code = dr.rows[0].code
+
+        var tropo = new Tropo({
+            voiceToken: req.app.config.tropo_voice_token
+        })
+
+        var codeMsg = [
+            '<prosody rate=\'-5%\'>',
+            'Your code is:' ,
+            '</prosody>',
+            '<prosody rate=\'-40%\'>',
+            code.split('').join(', '),
+            '</prosody>'
+        ].join('')
+
+        var msg = [
+            '<speak>',
+            '<prosody rate=\'-5%\'>',
+            'Welcome to Just-coin.',
+            '</prosody>',
+            codeMsg,
+            codeMsg,
+            '</speak>'
+        ].join('')
+
+        tropo.call(req.body.number, msg, function(err) {
+            if (err) return next(err)
+            res.send(204)
+        })
+    })
+}
+
+users.tropo = function(conn, req, res, next) {
+    var params = req.body.session.parameters
+
+    if (params.token != req.app.config.tropo_voice_token) {
+        console.error('invalid token in tropo token')
+        return res.send(404)
+    }
+
+    var tropo = new TropoWebAPI()
+
+    //tropo.call(params.numberToDial)
+    tropo.call('sip:abrkn@getonsip.com')
+    //tropo.call('+4797771042')
+    tropo.wait(2000)
+    tropo.say(params.msg)
+
+    res.send(TropoJSON(tropo))
 }

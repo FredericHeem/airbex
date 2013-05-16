@@ -14,7 +14,8 @@
     "email-existence": "git://github.com/abrkn/email-existence.git",
     "async": "~0.2.8",
     "request": "~2.21.0",
-    "debug": "~0.7.2"
+    "debug": "~0.7.2",
+    "tropo-webapi": "~1.0.16"
   },
   "scripts": {
     "test": "mocha"
@@ -22,7 +23,8 @@
   "devDependencies": {
     "mocha": "1.7.0",
     "expect.js": "0.2.0",
-    "shelljs": "x"
+    "shelljs": "x",
+    "tropo-webapi": "git://github.com/tropo/tropo-webapi-node.git"
   },
   "engines": {
     "node": ">=0.8",

@@ -5,7 +5,7 @@ var Q = require('q')
 , async = require('async')
 , validate = require('./validate')
 , Tropo = require('tropo')
-, debug = require('debug')('snow:tropo')
+, debug = require('debug')('snow:users')
 
 require('tropo-webapi')
 
@@ -35,12 +35,12 @@ users.create = function(conn, req, res, next) {
 
     verifyemail(req.body.email, function(err, ok) {
         if (err) {
-            console.log('E-mail validation failed for %s:\n', req.body.email, err)
+            debug('E-mail validation failed for %s:\n', req.body.email, err)
         }
 
         if (!ok) {
-            if (err) console.log('email check failed', err)
-            console.log('email check failed for %s', req.body.email)
+            if (err) debug('email check failed', err)
+            debug('email check failed for %s', req.body.email)
             return res.send(403, { name: 'EmailFailedCheck', message: 'E-mail did not pass validation' })
         }
 
@@ -111,6 +111,8 @@ users.verifyPhone = function(conn, req, res, next) {
 }
 
 users.startPhoneVerify = function(conn, req, res, next) {
+    debug('processing request to start phone verification')
+
     conn.write.query({
         text: 'SELECT create_phone_number_verify_code($2, $1) code',
         values: [req.user, req.body.number]
@@ -128,9 +130,13 @@ users.startPhoneVerify = function(conn, req, res, next) {
 
         var code = dr.rows[0].code
 
+        debug('correct code is %s', code)
+
         var tropo = new Tropo({
             voiceToken: req.app.config.tropo_voice_token
         })
+
+        debug('using tropo token %s', req.app.config.tropo_voice_token)
 
         var codeMsg = [
             '<prosody rate=\'-5%\'>',
@@ -150,6 +156,10 @@ users.startPhoneVerify = function(conn, req, res, next) {
             codeMsg,
             '</speak>'
         ].join('')
+
+        debug('message %s', msg)
+
+        debug('requesting call to %s', req.body.number)
 
         tropo.call(req.body.number, msg, function(err) {
             if (err) return next(err)

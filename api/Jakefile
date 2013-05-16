@@ -13,14 +13,9 @@ task('publish-staging', function() {
     , name = require('./package.json').name
     , fn = format('%s-%s.tgz', name, version)
 
-    jake.exec([
-        format('scp %s 54.217.208.30:/home/ubuntu/snow-api/app/%s', fn, fn),
-        'ssh 54.217.208.30 cd snow-api/app ; ./deploy.sh ' + version,
-        'rm ' + fn
-    ], {
-        printStderr: true,
-        printStdout: true
-    })
+    exec(format('scp %s 54.217.208.30:/home/ubuntu/snow-api/app/%s', fn, fn))
+    exec('ssh 54.217.208.30 cd snow-api/app ; ./deploy.sh ' + version)
+    exec('rm ' + fn)
 })
 
 task('pp', ['publish-production'])
@@ -34,14 +29,9 @@ task('publish-production', function() {
     , name = require('./package.json').name
     , fn = format('%s-%s.tgz', name, version)
 
-    jake.exec([
-        format('scp %s 10.0.0.184:/home/ubuntu/snow-api/app/%s', fn, fn),
-        'ssh 10.0.0.184 cd snow-api/app ; ./deploy.sh ' + version,
-        'rm ' + fn
-    ], {
-        printStderr: true,
-        printStdout: true
-    })
+    exec(format('scp %s 10.0.0.184:/home/ubuntu/snow-api/app/%s', fn, fn))
+    exec('ssh 10.0.0.184 cd snow-api/app ; ./deploy.sh ' + version)
+    exec('rm ' + fn)
 })
 
 task('bitcoind', function() {

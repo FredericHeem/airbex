@@ -1,4 +1,9 @@
-# Index
+#!/bin/sh
+
+# slacve.sh
+# This script will install PostgreSQL and set it up as a streaming
+# replication slave. This instance can be used for read only
+
 slaven=1
 masterip=10.0.1.20
 
@@ -24,7 +29,8 @@ echo | sudo add-apt-repository ppa:pitti/postgresql
 sudo apt-get update
 
 # Install pg
-sudo apt-get -y install postgresql-9.2 postgresql-client-9.2 postgresql-contrib-9.2 postgresql-server-dev-9.2 libpq-dev
+sudo apt-get -y install postgresql-9.2 postgresql-client-9.2 \
+postgresql-contrib-9.2 postgresql-server-dev-9.2 libpq-dev
 
 sudo service postgresql stop
 
@@ -41,10 +47,11 @@ EOL
 sudo tee /etc/postgresql/9.2/main/pg_hba.conf << EOL
 local all postgres              peer
 host  all all 127.0.0.1/32      md5
-host  all all 10.0.0.239/32     md5
+host  all all 10.0.0.239/32     md5 # VPN
 host  all all 10.0.1.0/16       md5
-host  all all 10.0.0.184/32     md5
+host  all all 10.0.0.184/32     md5 # API
 host  all all ::1/128           md5
+host  all all 10.0.1.158/32     trust # pool
 EOL
 
 # ---------------------------------------------------------------------------------
@@ -53,6 +60,8 @@ EOL
 
 # PostgreSQL recovery
 sudo -u postgres -g postgres mkdir -m 0700 /data/main
+
+export PGPASSWORD=postgres
 
 # Copy data directory
 sudo -u postgres -g postgres pg_basebackup -h ${masterip} -D /data/main -U postgres

@@ -34,6 +34,7 @@ unix_socket_directory '/var/run/postgresql'
 wal_level = hot_standby
 max_wal_senders = 1
 wal_keep_segments = 32
+synchronous_standby_names = 'walreceiver'
 EOL
 
 # PostgreSQL ACL
@@ -43,6 +44,7 @@ host all postgres 10.0.0.239/32 md5 #VPN
 host all postgres 10.0.0.184/32 md5 #API
 host replication postgres 10.0.1.0/24  trust # Replication
 host all postgres 10.0.1.0/24 md5
+host all all 10.0.1.158/32 trust # pool
 EOL
 
 # Optionally, move data directory

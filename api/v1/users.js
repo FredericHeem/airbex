@@ -125,6 +125,13 @@ users.startPhoneVerify = function(conn, req, res, next) {
                 })
             }
 
+            if (err.message == 'Another user has already verified that phone number.') {
+                return res.send(403, {
+                    name: 'PhoneNumberInUse',
+                    message: err.message
+                })
+            }
+
             return next(err)
         }
 

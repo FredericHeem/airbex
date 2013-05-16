@@ -1,0 +1,17 @@
+{
+  "name": "snow-client",
+  "description": "access to snow",
+  "version": "0.1.7",
+  "dependencies": {
+    "request": "~2.12.0",
+    "async": "~0.1.22",
+    "underscore": "~1.4.2",
+    "num": "~0.2.0",
+    "debug": "~0.7.0",
+    "optimist": "~0.4.0",
+    "cli-table": "~0.2.0"
+  },
+  "bin": {
+    "snow": "./bin/snow"
+  }
+}

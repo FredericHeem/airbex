@@ -1,0 +1,32 @@
+{
+  "name": "snow-workers",
+  "version": "0.0.11",
+  "description": "workers for snow",
+  "dependencies": {
+    "underscore": "~1.4.4",
+    "debug": "~0.7.2",
+    "request": "~2.12.0",
+    "num": "0.2.0",
+    "q": "~0.9.3",
+    "drop": "~0.1.2",
+    "bitcoin": "~1.6.2",
+    "raven": "~0.5.1",
+    "konfu": "~1.1.4",
+    "semaphore": "~1.0.1",
+    "async": "~0.2.8",
+    "pg": "~1.1.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "mocha": "1.7.0",
+    "expect.js": "0.2.0",
+    "jake": "x",
+    "shelljs": "x"
+  },
+  "engines": {
+    "node": "~0.8",
+    "npm": "~1.1"
+  }
+}

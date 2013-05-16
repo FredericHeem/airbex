@@ -1,4 +1,5 @@
 var config = require('konfu')
+, debug = require('debug')
 , express = require('express')
 , app = express()
 , http = require('http')
@@ -9,7 +10,11 @@ var config = require('konfu')
 }
 , Cache = require('./cache')
 
+console.log('debug filter: DEBUG=%s', process.env.debug)
+debug('starting api web server')
+
 app.config = config
+debug('config %j', config)
 
 app.use(express.bodyParser())
 
@@ -32,4 +37,5 @@ var cache = new Cache(conn, function(err) {
     app.cache = cache
 
     server.listen(config.port)
+    debug('listening on %d', config.port)
 })

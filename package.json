@@ -15,7 +15,8 @@
     "async": "~0.2.8",
     "request": "~2.21.0",
     "debug": "~0.7.2",
-    "tropo-webapi": "~1.0.16"
+    "tropo-webapi": "~1.0.16",
+    "topo": "~0.0.1"
   },
   "scripts": {
     "test": "mocha"
@@ -23,8 +24,7 @@
   "devDependencies": {
     "mocha": "1.7.0",
     "expect.js": "0.2.0",
-    "shelljs": "x",
-    "tropo-webapi": "git://github.com/tropo/tropo-webapi-node.git"
+    "shelljs": "x"
   },
   "engines": {
     "node": ">=0.8",

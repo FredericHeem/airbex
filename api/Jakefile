@@ -1,14 +1,32 @@
 require('shelljs/global')
 
-task('pp', ['publish-production'])
-task('publish-production', function() {
+var format = require('util').format
+
+task('ps', ['publish-staging'])
+task('publish-staging', function() {
     jake.exec([
-        'git checkout production',
-        'git merge master',
-        'git checkout master',
-        'git push production production:master',
-        'npm version patch',
+        //'npm version patch',
+        'npm pack'
     ], { printStderr: true })
+
+    var version = require('./package.json').version
+    , name = require('./package.json').name
+    , fn = format('%s-%s.tgz', name, version)
+
+    var remoteCommands = [
+        'cd snow-api/app',
+        format('mkdir %s', version),
+        format('cd %s', version),
+        format('tar --strip-components=1 -zxvf ../../%s', fn)
+    ]
+
+    jake.exec([
+        format('scp %s 54.217.208.30:/home/ubuntu/snow-api/%s', fn, fn),
+        'ssh 54.217.208.30 ' + remoteCommands.join(' ; ')
+    ], {
+        printStderr: true,
+        printStdout: true
+    })
 })
 
 task('bitcoind', function() {

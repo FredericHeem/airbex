@@ -29,7 +29,7 @@ mkdir \$1
 cd \$1
 tar --strip-components=1 -zxvf ../snow-api-\$1.tgz
 rm ../snow-api-\$1.tgz
-cp ../../config.staging.json .
+cp ../../config.${environment}.json .
 npm install
 cd ..
 rm current
@@ -52,17 +52,17 @@ start on startup
 stop on shutdown
 
 script
-    cd ~/$name
-    echo $$ > $name.pid
+    cd ~/\$name
+    echo \$\$ > \$name.pid
     export DEBUG="*"
-    export NODE_ENV=staging
-    cp config.$NODE_ENV.json app/current
+    export NODE_ENV=${environment}
+    cp config.\$NODE_ENV.json app/current
     cd app/current
-    node . >> ../../log/$name.log 2>&1
+    node . >> ../../log/\$name.log 2>&1
 end script
 
 pre-stop script
-    rm ~/$name/$name.pid
+    rm ~/\$name/\$name.pid
 end script
 EOL
 
@@ -73,7 +73,7 @@ sudo tee /etc/monit/monitrc << EOL
 set daemon 120
 set logfile syslog
 #set alert a@abrkn.com
-set mail-format { from: webmaster@staging.justcoin.com }
+set mail-format { from: webmaster@${environment}.justcoin.com }
 set mailserver localhost
 
 set httpd port 2812

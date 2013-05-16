@@ -1,0 +1,14 @@
+{
+  "name": "snow-db",
+  "description": "migration scripts for snow",
+  "version": "0.0.3",
+  "scripts": {
+    "test": "mocha -b"
+  },
+  "devDependencies": {
+    "pg": "~1.1.0",
+    "optimist": "~0.4.0",
+    "mocha": "~1.9.0",
+    "colors": "~0.6.0-1"
+  }
+}

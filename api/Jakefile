@@ -15,7 +15,8 @@ task('publish-staging', function() {
 
     jake.exec([
         format('scp %s 54.217.208.30:/home/ubuntu/snow-api/app/%s', fn, fn),
-        'ssh 54.217.208.30 cd snow-api/app ; ./deploy.sh ' + version
+        'ssh 54.217.208.30 cd snow-api/app ; ./deploy.sh ' + version,
+        'rm ' + fn
     ], {
         printStderr: true,
         printStdout: true

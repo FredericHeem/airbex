@@ -21,27 +21,27 @@ sudo apt-get install -y libpq-dev
 cd ~
 mkdir snow-api
 cd snow-api
-mkdir app log repo
+mkdir app log
 
-# Git
-sudo apt-get install -y git
-
-# Repo
-cd repo
-git init --bare
-
-# Receive hook
-tee hooks/post-receive << EOL
-#!/bin/sh
-cd ~/snow-api
-git --work-tree=./app --git-dir=./repo checkout -f
-cd app
+tee app/deploy.sh << EOL
+#!/bin/bash
+mkdir \$1
+cd \$1
+tar --strip-components=1 -zxvf ../snow-api-\$1.tgz
+rm ../snow-api-\$1.tgz
+cp ../../config.staging.json .
 npm install
+cd ..
+rm current
+ln -s \$1 current
 sudo stop snow-api
 sudo start snow-api
 EOL
 
-chmod +x hooks/post-receive
+chmod +x app/deploy.sh
+
+# Git
+sudo apt-get install -y git
 
 # Upstart
 sudo tee /etc/init/snow-api.conf << EOL
@@ -52,17 +52,17 @@ start on startup
 stop on shutdown
 
 script
-    cd ~/\$name
-    echo \$$ > \$name.pid
-    export NODE_ENV=${environment}
-    cp config.\$NODE_ENV.json app/
-    export DEBUG=snow*
-    cd app
-    node . >> ../log/\$name.log
+    cd ~/$name
+    echo $$ > $name.pid
+    export DEBUG="*"
+    export NODE_ENV=staging
+    cp config.$NODE_ENV.json app/current
+    cd app/current
+    node . >> ../../log/$name.log 2>&1
 end script
 
 pre-stop script
-    rm ~/\$name/\$name.pid
+    rm ~/$name/$name.pid
 end script
 EOL
 

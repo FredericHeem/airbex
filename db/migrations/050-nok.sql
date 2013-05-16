@@ -22,7 +22,7 @@ BEGIN
         INSERT INTO api_key (api_key_id, user_id)
         VALUES (key, user_id);
 
-        -- Pre-create accounts sop that user_currency_account is read-only safe
+        -- Pre-create accounts so that user_currency_account is read-only safe
         PERFORM user_currency_account(user_id, 'BTC');
         PERFORM user_currency_account(user_id, 'XRP');
         PERFORM user_currency_account(user_id, 'LTC');

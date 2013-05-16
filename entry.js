@@ -15,6 +15,15 @@ app.on('user', function(user) {
     console.log(user)
     $app.toggleClass('is-logged-in', !!user)
     $app.toggleClass('is-admin', user && user.admin)
+
+    if (!user.phone) {
+        var verifyphone = require('./controllers/verifyphone')(app, api)
+        $app.append(verifyphone.$el)
+        verifyphone.$el.modal({
+            keyboard: false,
+            backdrop: 'static'
+        })
+    }
 })
 
 app.bitcoinAddress = (function() {

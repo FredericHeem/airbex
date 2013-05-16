@@ -108,5 +108,14 @@
     "withdrawripple.amount.label": "Antall",
     "withdrawripple.address.label": "Ripple-adress",
     "withdrawripple.address.placeholder": "radresse",
-    "withdrawripple.button": "Ta ut til Ripple"
+    "withdrawripple.button": "Ta ut til Ripple",
+
+    "verifyphone.heading": "Godkjenn telefonnummer",
+    "verifyphone.intro": "For å gjøre kontoen din sikrere, ringer vi deg og leser opp en kode med fire tall. Vi betaler for samtalen. Skriv nummeret ditt med +47 foran.",
+    "verifyphone.number.placeholder": "+4797385296",
+    "verifyphone.call me": "Ring meg",
+    "verifyphone.verify code": "Bekreft kode",
+    "verifyphone.calling you": "Ringer deg...",
+    "verifyphone.verifying code": "Godkjenner koden...",
+    "verifyphone.verified": "Telefonnummeret %s ble godkjent"
 }

@@ -1,0 +1,18 @@
+<div class="modal fade hide">
+    <div class="modal-header">
+        <h3><%= i18n('verifyphone.heading') %></h3>
+    </div>
+    <div class="modal-body">
+        <p><%= i18n('verifyphone.intro') %></p>
+
+        <form class="call form-inline">
+            <input type="text" name="phone" placeholder="<%= i18n('verifyphone.number.placeholder') %>">
+            <button type="submit" class="btn btn-primary"><%= i18n('verifyphone.call me') %></button>
+        </form>
+
+        <form class="code form-inline" style="display:none;">
+            <input type="text" name="code">
+            <button type="submit" class="btn btn-primary"><%= i18n('verifyphone.verify code') %></button>
+        </form>
+    </div>
+</div>

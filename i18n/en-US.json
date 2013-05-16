@@ -21,8 +21,8 @@
     "amount": "Amount",
     "price": "Price",
 
-    "header.existing user": "Existing user",
-    "header.new user": "New user",
+    "header.existing user": "Log in",
+    "header.new user": "Register",
 
     "register.heading": "Start using Justcoin.",
     "register.email.label": "Email address",
@@ -119,5 +119,15 @@
     "withdrawripple.amount.label": "Amount",
     "withdrawripple.address.label": "Ripple address",
     "withdrawripple.address.placeholder": "rsomeaddress",
-    "withdrawripple.button": "Withdraw to Ripple"
+    "withdrawripple.button": "Withdraw to Ripple",
+
+    "verifyphone.heading": "Verify phone",
+    "verifyphone.intro": "To make your account more secure, we'll now call you and read a four digit code. Dont' worry, we're paying for the call.",
+    "verifyphone.number.placeholder": "+170285976",
+    "verifyphone.call me": "Call me",
+    "verifyphone.verify code": "Verify code",
+
+    "verifyphone.calling you": "Calling you...",
+    "verifyphone.verifying code": "Verifying code...",
+    "verifyphone.verified": "Phone number %s verified"
 }

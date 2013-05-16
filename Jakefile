@@ -156,11 +156,7 @@ task('host', ['app'], function() {
     return server
 })
 
-// publishing
-task('pp', ['publish-prod'])
-task('publish-prod', [
-    'clean', 'dist'
-], function() {
+function publish(hostname, cb) {
     var async = require('async')
     , files = {
         'head.min.js': null,
@@ -173,15 +169,39 @@ task('publish-prod', [
         'img/flags/US.png': null
     }
 
-    async.forEach(Object.keys(files), function(fn, next) {
+    var cmds = []
+    var baseDir = '/home/ubuntu/snow-web/public/'
+    var dirs = ['img', 'img/flags']
+
+    cmds = cmds.concat(dirs.map(function(dir) {
+        return 'ssh ubuntu@' + hostname + ' mkdir -p ' + baseDir + dir
+    }))
+
+    cmds = cmds.concat(Object.keys(files).map(function(fn) {
         var outName = files[fn] || fn
-        , cmd = 'scp -C build/' + fn + ' ubuntu@10.0.0.184:/home/ubuntu/snow-web/public/' + outName
-        jake.exec(cmd, { printStdout: true, printStderr: true }, next)
-    }, function(err) {
+        return 'scp -C build/' + fn + ' ubuntu@' + hostname + ':' + baseDir + outName
+    }))
+
+    jake.exec(cmds, { printStdout: true, printStderr: true }, cb)
+}
+
+// publishing
+task('pp', ['publish-prod'])
+task('publish-prod', [
+    'clean', 'dist'
+], function() {
+    publish('10.0.0.184', function(err) {
         if (err) return complete(err)
         exec('npm version patch', { silent: false })
         complete()
     })
+}, { async: true })
+
+task('ps', ['publish-staging'])
+task('publish-staging', [
+    'clean', 'dist'
+], function() {
+    publish('54.217.208.30', complete)
 }, { async: true })
 
 // testing

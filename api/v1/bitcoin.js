@@ -29,13 +29,9 @@ bitcoin.withdraw = function(conn, currencyId, req, res, next) {
     }, function(err) {
         if (err.code === '23514' && err.message.match(/non_negative_available/)) {
             return res.send(500, {
-                code: 'ENOFUNDS',
+                name: 'NoFunds',
                 message: 'insufficient funds'
             })
-        }
-
-        if (err.code === 'EINVALIDADDRESS') {
-            return res.send(500, _.pick(err, 'code', 'message'))
         }
 
         next(err)

@@ -19,6 +19,10 @@ debug('config %j', config)
 if (config.raven) {
     var raven = require('raven')
     app.use(raven.middleware.express(config.raven))
+
+    raven.patchGlobal(function() {
+        console.error('leaving process (after global patch)')
+    })
 }
 
 app.use(express.bodyParser())
@@ -38,10 +42,4 @@ var cache = new Cache(conn, function(err) {
 
     server.listen(config.port)
     debug('listening on %d', config.port)
-})
-
-process.on('uncaughtException', function(err) {
-    console.error('uncaught error')
-    console.error(err)
-    console.error(err.stack)
 })

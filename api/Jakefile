@@ -23,9 +23,7 @@ task('publish-staging', function() {
 
 task('pp', ['publish-production'])
 task('publish-production', function() {
-    jake.exec([
-        'npm pack'
-    ], { printStderr: true })
+    exec('npm pack')
 
     var version = require('./package.json').version
     , name = require('./package.json').name

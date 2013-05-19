@@ -1,6 +1,6 @@
 {
   "name": "snow-api",
-  "version": "0.0.43",
+  "version": "0.0.45",
   "description": "rest interface to snow",
   "dependencies": {
     "pg": "~1.1.0",
@@ -16,7 +16,7 @@
     "request": "~2.21.0",
     "debug": "~0.7.2",
     "tropo-webapi": "git://github.com/tropo/tropo-webapi-node.git",
-    "tropo": "~0.0.2"
+    "tropo": "~0.0.3"
   },
   "scripts": {
     "test": "mocha"

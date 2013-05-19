@@ -186,14 +186,6 @@ users.startPhoneVerify = function(conn, req, res, next) {
                     if (err) return next(err)
                     next()
                 })
-            },
-
-            function(next) {
-                // text
-                tropo.message(req.body.number, codeMsg, function(err) {
-                    if (err) return next(err)
-                    next()
-                })
             }
         ], function(err) {
             if (err) return next(err)

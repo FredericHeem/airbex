@@ -4,18 +4,20 @@ var format = require('util').format
 
 task('ps', ['publish-staging'])
 task('publish-staging', function() {
-    jake.exec([
-        'npm version patch',
-        'git commit -m \'bump version\'',
-        'npm pack'
-    ], { printStderr: true })
+    // patch + tag
+    exec('npm version patch')
+    var v = require('./package.json').version
+    exec('git add package.json')
+    exec('git commit -m "v' + v + '"')
+    exec('git tag ' + v)
 
-    var version = require('./package.json').version
-    , name = require('./package.json').name
-    , fn = format('%s-%s.tgz', name, version)
+    exec('npm pack')
+
+    var name = require('./package.json').name
+    , fn = format('%s-%s.tgz', name, v)
 
     exec(format('scp %s 54.217.208.30:/home/ubuntu/snow-api/app/%s', fn, fn))
-    exec('ssh 54.217.208.30 cd snow-api/app ; ./deploy.sh ' + version)
+    exec('ssh 54.217.208.30 cd snow-api/app ; ./deploy.sh ' + v)
     exec('rm ' + fn)
 })
 

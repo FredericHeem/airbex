@@ -101,7 +101,17 @@ users.verifyPhone = function(conn, req, res, next) {
         text: 'SELECT verify_phone($1, $2) success',
         values: [req.user, req.body.code]
     }, function(err, dr) {
-        if (err) return next(err)
+        if (err) {
+            if (err.message == 'User already has a verified phone number.') {
+                return res.send(400, {
+                    name: 'AlreadyVerified',
+                    message: 'A phone number has already been verified for this user'
+                })
+            }
+
+            return next(err)
+        }
+
         if (!dr.rows[0].success) return res.send(403, {
             name: 'VerifictionFailed',
             message: 'Verification failed. The code is wrong or you may not verify at this time.'

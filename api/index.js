@@ -39,3 +39,9 @@ var cache = new Cache(conn, function(err) {
     server.listen(config.port)
     debug('listening on %d', config.port)
 })
+
+process.on('uncaughtException', function(err) {
+    console.error('uncaught error')
+    console.error(err)
+    console.error(err.stack)
+})

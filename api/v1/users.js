@@ -113,7 +113,7 @@ users.verifyPhone = function(conn, req, res, next) {
         }
 
         if (!dr.rows[0].success) return res.send(403, {
-            name: 'VerifictionFailed',
+            name: 'VerificationFailed',
             message: 'Verification failed. The code is wrong or you may not verify at this time.'
         })
         res.send(204)

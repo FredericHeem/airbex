@@ -44,6 +44,20 @@ orders.create = function(conn, req, res, next) {
                 })
             }
 
+            if (/^price.*has too high accuracy$/.test(err.message)) {
+                return res.send(400, {
+                    name: 'TooHighPriceAccuracy',
+                    message: 'There are too many decimal places in the price ' + req.body.price
+                })
+            }
+
+            if (/^volume.*has too high accuracy$/.test(err.message)) {
+                return res.send(400, {
+                    name: 'TooHighVolumeAccuracy',
+                    message: 'There are too many decimal places in the amount ' + req.body.amount
+                })
+            }
+
             return next(err)
         }
 

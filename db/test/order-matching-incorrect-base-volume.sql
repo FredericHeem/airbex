@@ -25,6 +25,8 @@ BEGIN
     alice := create_user('alice@hotmail.com', key2);
     bid := (SELECT market_id FROM market WHERE base_currency_id = 'BTC' AND quote_currency_id = 'QRP');
 
+    UPDATE "user" SET fee_ratio = 0 WHERE user_id IN (bob, alice);
+
     -- Fund Bob with 10 BTC
     INSERT INTO "transaction" (debit_account_id, credit_account_id, amount)
     VALUES (special_account('edge', 'BTC'), user_currency_account(bob, 'BTC'), 10e8);

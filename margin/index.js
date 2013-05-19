@@ -26,13 +26,17 @@ Margin.prototype.sync = function(depth, cb) {
     debug('syncing')
 
     var desired = []
+    , desiredBid = num(depth.bids[0].price).mul(1 - this.options.margin)
+    , desiredAsk = num(depth.asks[0].price).mul(1 + this.options.margin)
+    desiredBid.set_precision(3)
+    desiredAsk.set_precision(3)
 
     if (depth.bids.length) {
         desired.push({
             market: this.market,
             type: 'bid',
             volume: this.options.volume,
-            price: num(depth.bids[0].price).mul(1 - this.options.margin).toString()
+            price: desiredBid.toString()
         })
 
         debug('best bid %j', depth.bids[0])
@@ -42,7 +46,7 @@ Margin.prototype.sync = function(depth, cb) {
         desired.push({
             market: this.market,
             type: 'ask',
-            price: num(depth.asks[0].price).mul(1 + this.options.margin).toString(),
+            price: desiredAsk.toString(),
             volume: this.options.volume,
             market: this.market
         })

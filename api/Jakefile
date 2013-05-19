@@ -6,7 +6,7 @@ task('ps', ['publish-staging'])
 task('publish-staging', function() {
     jake.exec([
         'npm version patch',
-        'git commit -am "bump version"',
+        'git commit -m "bump version"',
         'npm pack'
     ], { printStderr: true })
 

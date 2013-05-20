@@ -12,3 +12,7 @@ before_script:
 script:
   - "pushd db && npm test && popd"
   - "pushd api && npm test && popd"
+  - "pushd web && npm test && popd"
+  - "pushd workers && npm test && popd"
+  - "pushd margin && npm test && popd"
+  - "pushd client && npm test && popd"

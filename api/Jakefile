@@ -9,7 +9,7 @@ task('publish-staging', function() {
     var v = require('./package.json').version
     exec('git add package.json')
     exec('git commit -m "v' + v + '"')
-    exec('git tag ' + v)
+    exec('git tag api-' + v)
 
     exec('npm pack')
 

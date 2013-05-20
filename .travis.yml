@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+  - "0.10"
+env:
+  - NODE_ENV=travis
+before_install:
+  - npm config set loglevel warn
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - "sleep 1"
+script:
+  - "pushd db && npm test && popd"
+  - "pushd api && npm test && popd"

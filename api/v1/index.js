@@ -3,7 +3,8 @@ module.exports = {
         var auth = require('./auth')(conn)
 
         ;['balances', 'markets', 'orders', 'ripple', 'intercom',
-        'currencies', 'activities', 'users', 'transfer', 'withdraws']
+        'currencies', 'activities', 'users', 'transfer', 'withdraws',
+        'keys']
         .forEach(function(name) {
             require('./' + name).configure(app, conn, auth)
         })

@@ -25,10 +25,10 @@ task('dev', function() {
     return
 
     // bitcoind
-    var bitcoind = exec('bitcoind -datadir=btc -txindex=1', exited.bind(this, 'bitcoind'))
+//    var bitcoind = exec('bitcoind -datadir=btc -txindex=1', exited.bind(this, 'bitcoind'))
 
     // litecoind
-    var litecoind = exec('litecoind -datadir=ltc', exited.bind(this, 'litecoind'))
+//    var litecoind = exec('litecoind -datadir=ltc', exited.bind(this, 'litecoind'))
 
     // workers
     /*

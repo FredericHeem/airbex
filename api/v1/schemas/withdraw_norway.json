@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "properties": {
+        "account": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\d+"
+        },
+        "amount": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\d+\\.?\\d{0,2}$"
+        }
+    }
+}

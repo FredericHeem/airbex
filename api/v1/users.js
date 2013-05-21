@@ -12,22 +12,65 @@ require('tropo-webapi')
 users.configure = function(app, conn, auth) {
     app.get('/v1/whoami', auth, users.whoami.bind(users, conn))
     app.post('/v1/users', users.create.bind(users, conn))
+    app.post('/v1/users/identity', auth, users.identity.bind(users, conn))
     app.post('/v1/replaceLegacyApiKey', users.replaceLegacyApiKey.bind(users, conn))
     app.post('/v1/replaceApiKey', auth, users.replaceApiKey.bind(users, conn))
     app.post('/v1/users/verify/call', auth, users.startPhoneVerify.bind(users, conn))
     app.post('/v1/users/verify', auth, users.verifyPhone.bind(users, conn))
+    app.get('/v1/users/bankAccounts', auth, users.bankAccounts.bind(users, conn))
     app.post('/tropo', users.tropo.bind(users, conn))
 }
 
 users.whoami = function(conn, req, res, next) {
+    // TODO: extract to view
 	conn.read.query({
-		text: 'SELECT user_id id, email, "admin", phone_number phone FROM "user" WHERE user_id = $1',
+		text: [
+            'SELECT',
+            '   user_id id,',
+            '   email,',
+            '   admin,',
+            '   phone_number phone,',
+            '   first_name firstname,',
+            '   last_name lastname,',
+            '   address,',
+            '   country,',
+            '   postal_area postalarea,',
+            '   city',
+            'FROM "user"',
+            'WHERE user_id = $1'
+        ].join('\n'),
 		values: [req.user]
 	}, function(err, dres) {
 		if (err) return next(err)
 		if (!dres.rows.length) return res.send(404)
-		res.send(dres.rows[0])
+        // PostgreSQL is not case sensitive. Case sensitive naming must be done here
+        // and not using "AS".
+        var row = dres.rows[0]
+		res.send({
+            id: row.id,
+            email: row.email,
+            admin: row.admin,
+            phone: row.phone,
+            firstName: row.firstname,
+            lastName: row.lastname,
+            address: row.address,
+            country: row.country,
+            postalArea: row.postalarea,
+            city: row.city
+        })
 	})
+}
+
+users.bankAccounts = function(conn, req, res, next) {
+    conn.read.query({
+        text: [
+            'SELECT * FROM bank_account WHERE user_id = $1'
+        ].join('\n'),
+        values: [req.user]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(200, dr.rows)
+    })
 }
 
 users.create = function(conn, req, res, next) {
@@ -64,6 +107,43 @@ users.create = function(conn, req, res, next) {
 
             cb(err)
         })
+    })
+}
+
+users.identity = function(conn, req, res, next) {
+    if (!validate(req.body, 'user_identity', res)) return
+    var query = {
+        text: [
+            'UPDATE "user"',
+            'SET',
+            '   first_name = $2,',
+            '   last_name = $3,',
+            '   address = $4,',
+            '   country = $5,',
+            '   city = $6,',
+            '   postal_area = $7',
+            'WHERE',
+            '   user_id = $1 AND',
+            '   first_name IS NULL'
+        ].join('\n'),
+        values: [req.user, req.body.firstName, req.body.lastName, req.body.address,
+            req.body.country, req.body.city, req.body.postalArea]
+    }
+
+    conn.write.query(query, function(err, dr) {
+        if (err) {
+            return next(err)
+        }
+
+        if (!dr.rowCount) {
+            return res.send(404, {
+                name: 'IdentityAlreadySet',
+                message: 'The identity for the user has already been set.'
+            })
+        }
+
+        activities.log(conn, req.user, 'Identity set', {})
+        return res.send(204)
     })
 }
 

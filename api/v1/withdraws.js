@@ -1,10 +1,34 @@
 var _ = require('underscore')
 , activities = require('./activities')
+, validate = require('./validate')
 , withdraws = module.exports = {}
 
 withdraws.configure = function(app, conn, auth) {
     app.del('/v1/withdraws/:id', auth, withdraws.cancel.bind(withdraws, conn))
     app.get('/v1/withdraws', auth, withdraws.forUser.bind(withdraws, conn))
+    app.post('/v1/withdraws/norway', auth, withdraws.withdrawNorway.bind(withdraws, conn))
+}
+
+withdraws.withdrawNorway = function(conn, req, res, next) {
+    if (!validate(req.body, 'withdraw_norway', res)) return
+
+    conn.write.query({
+        text: [
+            'SELECT withdraw_manual($1, $2::numeric * 10^c.scale, $3) id',
+            'FROM currency c',
+            'WHERE c.currency_id = $1'
+        ].join('\n'),
+        values: [req.user, req.currency, req.amount]
+    }, function(err, dr) {
+        if (err) return next(err)
+
+        if (!dr.rowCount) return res.send(400, {
+            name: 'CurrencyNotFound',
+            message: 'The currency could not be found'
+        })
+
+        res.send(204)
+    })
 }
 
 withdraws.forUser = function(conn, req, res, next) {

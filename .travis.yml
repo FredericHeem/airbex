@@ -24,9 +24,36 @@ before_script:
   - "sh -e /etc/init.d/xvfb start"
   - "sleep 1"
 script:
+  # db
   - "psql -c 'create database travis;' -U postgres"
   - "pushd db"
   - "npm install"
   - "node ./node_modules/pg-migrate/bin/pg-migrate -d migrations -u postgres://postgres@localhost/travis"
   - "node ./node_modules/pg-test/bin/pg-test test"
+  - "popd"
+  # api
+  - "pushd api"
+  - "npm install"
+  - "which mocha"
+  - "npm test"
+  - "popd"
+  # workers
+  - "pushd workers"
+  - "npm install"
+  - "npm test"
+  - "popd"
+  # web
+  - "pushd web"
+  - "npm install"
+  - "npm test"
+  - "popd"
+  # margin
+  - "pushd margin"
+  - "npm install"
+  - "npm test"
+  - "popd"
+  # client
+  - "pushd client"
+  - "npm install"
+  - "npm test"
   - "popd"

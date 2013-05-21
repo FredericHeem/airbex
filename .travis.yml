@@ -11,5 +11,7 @@ script:
   - "psql -c 'create database travis;' -U postgres"
   - "pushd db"
   - "npm install"
-  - "pg-migrate"
+  - "which node"
+  - "which pg-migrate"
   - "node ./node_modules/pg-migrate/bin/pg-migrate"
+  - "pg-migrate"

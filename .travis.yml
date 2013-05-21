@@ -11,11 +11,7 @@ script:
   - "psql -c 'create database travis;' -U postgres"
   - "cd db"
   - "npm install"
-  - "which node"
-  - "which nodejs"
-  - "which pg-migrate"
-  - pg-migrate
-  - "pg-migrate -d migrations"
+  - "pg-migrate -d migrations -u postgres://postgres@localhost/travis"
   - "npm test"
   - "cd .."
   - "cd api"

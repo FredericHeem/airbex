@@ -3,7 +3,7 @@
   "description": "migration scripts for snow",
   "version": "0.0.3",
   "scripts": {
-    "test": "mocha -b"
+    "test": "pg-test test"
   },
   "devDependencies": {
     "pg": "~1.1.0",

@@ -10,9 +10,11 @@ before_script:
   - "sh -e /etc/init.d/xvfb start"
   - "sleep 1"
 script:
+  - "npm install -g pg-test pg-migrate"
   - "psql -c 'create database travis;' -U postgres"
   - "pushd db"
   - "npm install"
+  - "ls -r"
   - "pg-migrate -d migrations"
   - "npm test"
   - "popd"

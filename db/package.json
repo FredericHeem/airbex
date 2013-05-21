@@ -3,7 +3,7 @@
   "description": "migration scripts for snow",
   "version": "0.0.3",
   "scripts": {
-    "test": "./node_modules/pg-test/pg-test test"
+    "test": "pg-test test"
   },
   "devDependencies": {
     "pg-test": "~1.0.0",

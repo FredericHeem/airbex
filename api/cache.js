@@ -37,6 +37,13 @@ var async = require('async')
     })
 }
 
+Cache.prototype.parseCurrency = function(value, currency) {
+    var item = this.currencies[currency]
+    , result = num(value).mul(Math.pow(10, item.scale))
+    result.set_precision(0)
+    return result.toString()
+}
+
 Cache.prototype.formatCurrency = function(value, currency) {
     var item = this.currencies[currency]
     assert(item)

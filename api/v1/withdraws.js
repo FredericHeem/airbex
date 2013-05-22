@@ -1,6 +1,6 @@
 var _ = require('underscore')
-, activities = require('./activities')
 , validate = require('./validate')
+, activities = require('./activities')
 , withdraws = module.exports = {}
 
 withdraws.configure = function(app, conn, auth) {
@@ -12,22 +12,44 @@ withdraws.configure = function(app, conn, auth) {
 withdraws.withdrawNorway = function(conn, req, res, next) {
     if (!validate(req.body, 'withdraw_norway', res)) return
 
-    conn.write.query({
+    conn.read.query({
         text: [
-            'SELECT withdraw_manual($1, $2::numeric * 10^c.scale, $3) id',
-            'FROM currency c',
-            'WHERE c.currency_id = $1'
+            'SELECT ba.details',
+            'FROM bank_account ba',
+            'INNER JOIN "user" u ON u.user_id = ba.user_id',
+            'WHERE ba.bank_account_id = $2 AND u.user_id = $1'
         ].join('\n'),
-        values: [req.user, req.currency, req.amount]
+        values: [req.user, req.body.bankAccount]
     }, function(err, dr) {
         if (err) return next(err)
 
-        if (!dr.rowCount) return res.send(400, {
-            name: 'CurrencyNotFound',
-            message: 'The currency could not be found'
+        if (!dr.rowCount) return res.send(404, {
+            name: 'BankAccountNotFound',
+            message: 'Bank account does not exist or belongs to another user.'
         })
 
-        res.send(204)
+        var account = dr.rows[0].details.account
+        , amount = req.app.cache.parseCurrency(req.body.amount, 'NOK')
+        , destination = {
+            type: 'NorwayBank',
+            account: account
+        }
+
+        conn.write.query({
+            text: 'SELECT withdraw_manual($1, $2, $3, $4)',
+            values: [req.user, 'NOK', amount, destination]
+        }, function(err, dr) {
+            if (!err) return res.send(204)
+
+            if (err.message.match(/non_negative_available/)) {
+                return res.send(500, {
+                    name: 'NoFunds',
+                    message: 'Insufficient funds.'
+                })
+            }
+
+            next(err)
+        })
     })
 }
 
@@ -38,11 +60,27 @@ withdraws.forUser = function(conn, req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows.map(function(row) {
+            var destination
+
+            if (row.method == 'BTC') {
+                destination = row.bitcoin_address
+            } else if (row.method == 'LTC') {
+                destination = row.litecoin_address
+            } else if (row.method == 'manual'){
+                if (row.manual_destination.type == 'NorwayBank') {
+                    destination = row.manual_destination.account
+                }
+            }
+
+            if (!destination) {
+                return next(new Error('Unknown destination for ' + JSON.stringify(row)))
+            }
+
             return _.extend({
                 currency: row.currency_id,
                 amount: req.app.cache.formatCurrency(row.amount, row.currency_id),
                 id: row.request_id,
-                destination: row.ripple_address || row.litecoin_address || row.bitcoin_address || null
+                destination:  destination
             }, _.pick(row, 'created', 'completed', 'method', 'state', 'error'))
         }))
     })

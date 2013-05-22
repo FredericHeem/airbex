@@ -1,10 +1,9 @@
 {
     "type": "object",
     "properties": {
-        "account": {
-            "type": "string",
-            "required": true,
-            "pattern": "^\\d+"
+        "bankAccount": {
+            "type": "integer",
+            "required": true
         },
         "amount": {
             "type": "string",

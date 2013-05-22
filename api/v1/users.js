@@ -69,7 +69,13 @@ users.bankAccounts = function(conn, req, res, next) {
         values: [req.user]
     }, function(err, dr) {
         if (err) return next(err)
-        res.send(200, dr.rows)
+        res.send(200, dr.rows.map(function(row) {
+            return {
+                id: row.bank_account_id,
+                details: row.details,
+                displayName: row.display_name
+            }
+        }))
     })
 }
 

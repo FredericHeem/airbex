@@ -8,7 +8,7 @@ credit.configure = function(app, conn, auth) {
 credit.bankCredit = function(conn, req, res, next) {
     // conversion from string to properly scaled bigint is performed
     // in the actual query
-    conn.write.query({
+    var query = {
         text: [
             'SELECT bank_credit($1, $2, ($3::numeric * 10^scale)::bigint, $4, $5) transaction_id',
             'FROM currency',
@@ -21,7 +21,9 @@ credit.bankCredit = function(conn, req, res, next) {
             req.body.bank_account_id,
             req.body.reference
         ]
-    }, function(err, dr) {
+    }
+
+    conn.write.query(query, function(err, dr) {
         if (err) return next(err)
         if (!dr.rowCount) return next(new Error('currency not found ' + req.body.currency_id))
         activities.log(conn, req.user, 'AdminBankAccountCredit', req.body)

@@ -40,7 +40,7 @@ CREATE TABLE bank_credited (
     "reference" varchar(50) NOT NULL
 );
 
-CREATE FUNCTION bank_credit (
+CREATE OR REPLACE FUNCTION bank_credit (
     uid int,
     cid currency_id,
     amnt bigint,

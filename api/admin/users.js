@@ -6,6 +6,27 @@ var users = module.exports = {}
 users.configure = function(app, conn, auth) {
     app.get('/admin/users', auth, users.users.bind(users, conn))
     app.get('/admin/users/:id', auth, users.user.bind(users, conn))
+    app.get('/admin/users/:user/bankAccounts', auth, users.bankAccounts.bind(users, conn))
+    app.post('/admin/users/:user/bankAccounts', auth, users.addBankAccount.bind(users, conn))
+}
+
+users.addBankAccount = function(conn, req, res, next) {
+    conn.write.query({
+        text: [
+            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic, routing_number)',
+            'VALUES ($1, $2, $3, $4, $5)'
+        ].join('\n'),
+        values: [
+            +req.params.user,
+            req.body.account_number,
+            req.body.iban,
+            req.body.swiftbic,
+            req.body.routing_number
+        ]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(204)
+    })
 }
 
 users.user = function(conn, req, res, next) {
@@ -16,11 +37,32 @@ users.user = function(conn, req, res, next) {
         values: [+req.params.id]
     }, function(err, dr) {
         if (err) return next(err)
+
         if (!dr.rowCount) return res.send(404, {
             name: 'UserNotFound',
             message: 'There is no user with the specified id.'
         })
         res.send(dr.rows[0])
+    })
+}
+
+users.bankAccounts = function(conn, req, res, next) {
+    conn.read.query({
+        text: [
+            'SELECT * FROM bank_account WHERE user_id = $1'
+        ].join('\n'),
+        values: [req.params.user]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(200, dr.rows.map(function(row) {
+            console.log(row)
+            return _.extend(_.pick(row, 'iban', 'swiftbic'), {
+                id: row.bank_account_id,
+                displayName: row.display_name,
+                accountNumber: row.account_number,
+                routingNumber: row.routing_number
+            })
+        }))
     })
 }
 

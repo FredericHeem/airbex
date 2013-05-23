@@ -1,4 +1,5 @@
 var Q = require('q')
+, _ = require('lodash')
 , activities = require('./activities')
 , verifyemail = require('../verifyemail')
 , users = module.exports = {}
@@ -70,11 +71,12 @@ users.bankAccounts = function(conn, req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         res.send(200, dr.rows.map(function(row) {
-            return {
+            return _.extend(_.pick(row, 'iban', 'swiftbic'), {
                 id: row.bank_account_id,
-                details: row.details,
-                displayName: row.display_name
-            }
+                displayName: row.display_name,
+                accountNumber: row.account_number,
+                routingNumber: row.routing_number
+            })
         }))
     })
 }

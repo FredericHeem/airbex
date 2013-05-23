@@ -16,7 +16,8 @@
     "request": "~2.21.0",
     "debug": "~0.7.2",
     "tropo-webapi": "git://github.com/tropo/tropo-webapi-node.git",
-    "tropo": "~0.0.5"
+    "tropo": "~0.0.5",
+    "lodash": "~1.2.1"
   },
   "scripts": {
     "test": "mocha"

@@ -5,7 +5,11 @@ if (config.raven) {
 	var Raven = require('raven').Client
 	, raven = new Raven(config.raven)
 
-	raven.patchGlobal(function() {
+	raven.patchGlobal(function(logged, err) {
+        console.error('logged', logged)
+        console.error(err)
+        console.error(err.stack)
+
 		console.error('exiting process (after global patch)')
 		process.exit(1)
 	})

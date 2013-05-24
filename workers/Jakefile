@@ -1,5 +1,7 @@
 require('shelljs/global')
 
+var format = require('util').format
+
 task('ps', ['publish-staging'])
 task('publish-staging', function() {
     // patch + tag

@@ -29,7 +29,7 @@ task('publish-production', function() {
     , name = require('./package.json').name
     , fn = format('%s-%s.tgz', name, version)
 
-    exec(format('scp %s 10.0.0.213:/home/ubuntu/snow-workers/app/%s', fn, fn))
-    exec('ssh 10.0.0.213 cd snow-workers/app ; ./deploy.sh ' + version)
+    exec(format('scp %s 10.0.1.213:/home/ubuntu/snow-workers/app/%s', fn, fn))
+    exec('ssh 10.0.1.213 cd snow-workers/app ; ./deploy.sh ' + version)
     exec('rm ' + fn)
 })

@@ -60,7 +60,7 @@ script
     export NODE_ENV=${environment}
     cp config.\$NODE_ENV.json app/current
     cd app/current
-    node . >> ../../log/\$name.log 2>&1
+    node ./bin/all >> ../../log/\$name.log 2>&1
 end script
 
 pre-stop script

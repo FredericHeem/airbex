@@ -6,7 +6,6 @@ if (config.raven) {
 	, raven = new Raven(config.raven)
 
 	raven.patchGlobal(function(logged, err) {
-        console.error('logged', logged)
         console.error(err)
         console.error(err.stack)
 

@@ -43,8 +43,8 @@ var errorHandler = function(err) {
 var btce = new hail.Btce(config.btce)
 , flip = new Flip(btce)
 , margin = new Margin('BTCLTC', flip, snow, {
-    volume: 1,
-    margin: 0.075
+    volume: 2.5,
+    margin: 0.01
 })
 margin.on('error',  errorHandler)
 
@@ -52,8 +52,8 @@ margin.on('error',  errorHandler)
 var gox = new hail.MtGox(config.mtgox)
 , ripple = new hail.Ripple(config.ripple)
 , margin = new Margin('BTCXRP', ripple, snow, {
-    volume: 1,
-    margin: 0.15
+    volume: 2.5,
+    margin: 0.01
 })
 margin.on('error',  errorHandler)
 

@@ -4,6 +4,7 @@
 # Ports: 8000 (HTTP)
 
 export environment=production
+export prefix=production.
 
 sudo apt-get update
 sudo apt-get upgrade -y
@@ -132,16 +133,42 @@ tee ~/snow-api/config.${environment}.json << EOL
 }
 EOL
 
+# nginx
+sudo apt-get install -y nginx
+
+# --- /home/ubuntu/snow-api/nginx.conf
+tee /home/ubuntu/snow-api/nginx.conf << EOL
+server {
+    real_ip_header X-Forwarded-For;
+    set_real_ip_from 0.0.0.0/0;
+
+    listen 8010;
+    server_name ${prefix}api.justcoin.com;
+    access_log /home/ubuntu/snow-api/log/access.log;
+    error_log /home/ubuntu/snow-api/log/error.log;
+
+    gzip on;
+    gzip_http_version 1.1;
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_proxied any;
+    gzip_types text/plain text/html text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript text/x-js;
+    gzip_buffers 16 8k;
+    gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+
+    location / {
+        proxy_pass http://localhost:8000/;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+}
+EOL
+
+sudo nginx -s reload
+
+# --- make site available and enabled
+sudo ln nginx.conf /etc/nginx/sites-available/${prefix}api.justcoin.com
+sudo ln /etc/nginx/sites-available/${prefix}api.justcoin.com /etc/nginx/sites-enabled/${prefix}api.justcoin.com
+
 vim ~/snow-api/config.${environment}.json
 
 sudo reboot
-
-########################################################################
-#
-# MUST DO FIRST PUSH AT THIS POINT:
-# git push ${environment} +${environment}:refs/heads/master
-#
-# Subsequent pushes can be done with git push ${environment} ${environment}:master
-#
-########################################################################
-

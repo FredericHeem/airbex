@@ -1,13 +1,33 @@
 require('shelljs/global')
 
-task('pp', ['publish-production'])
+task('ps', ['publish-staging'])
+task('publish-staging', function() {
+    // patch + tag
+    exec('npm version patch')
+    var v = require('./package.json').version
+    exec('git add package.json')
+    exec('git commit -m "v' + v + '"')
+    exec('git tag workers-' + v)
 
+    exec('npm pack')
+
+    var name = require('./package.json').name
+    , fn = format('%s-%s.tgz', name, v)
+
+    exec(format('scp %s 54.217.208.30:/home/ubuntu/snow-workers/app/%s', fn, fn))
+    exec('ssh 54.217.208.30 cd snow-workers/app ; ./deploy.sh ' + v)
+    exec('rm ' + fn)
+})
+
+task('pp', ['publish-production'])
 task('publish-production', function() {
-    jake.exec([
-        'npm version patch',
-        'git checkout production',
-        'git merge master',
-        'git checkout master',
-        'git push production production:master'
-    ], { printStderr: true })
+    exec('npm pack')
+
+    var version = require('./package.json').version
+    , name = require('./package.json').name
+    , fn = format('%s-%s.tgz', name, version)
+
+    exec(format('scp %s 10.0.0.213:/home/ubuntu/snow-workers/app/%s', fn, fn))
+    exec('ssh 10.0.0.213 cd snow-workers/app ; ./deploy.sh ' + version)
+    exec('rm ' + fn)
 })

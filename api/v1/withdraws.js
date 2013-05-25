@@ -6,15 +6,15 @@ var _ = require('underscore')
 withdraws.configure = function(app, conn, auth) {
     app.del('/v1/withdraws/:id', auth, withdraws.cancel.bind(withdraws, conn))
     app.get('/v1/withdraws', auth, withdraws.forUser.bind(withdraws, conn))
-    app.post('/v1/withdraws/norway', auth, withdraws.withdrawNorway.bind(withdraws, conn))
+    app.post('/v1/withdraws/norway', auth, withdraws.withdrawBank.bind(withdraws, conn))
 }
 
-withdraws.withdrawNorway = function(conn, req, res, next) {
+withdraws.withdrawBank = function(conn, req, res, next) {
     if (!validate(req.body, 'withdraw_norway', res)) return
 
     conn.read.query({
         text: [
-            'SELECT ba.account_number',
+            'SELECT ba.bank_account_id',
             'FROM bank_account ba',
             'INNER JOIN "user" u ON u.user_id = ba.user_id',
             'WHERE ba.bank_account_id = $2 AND u.user_id = $1'
@@ -28,11 +28,11 @@ withdraws.withdrawNorway = function(conn, req, res, next) {
             message: 'Bank account does not exist or belongs to another user.'
         })
 
-        var account = dr.rows[0].bank_account
+        var account = dr.rows[0].bank_account_id
         , amount = req.app.cache.parseCurrency(req.body.amount, 'NOK')
         , destination = {
-            type: 'NorwayBank',
-            account: account
+            type: 'Bank',
+            bankAccountId: account
         }
 
         conn.write.query({
@@ -67,8 +67,10 @@ withdraws.forUser = function(conn, req, res, next) {
             } else if (row.method == 'LTC') {
                 destination = row.litecoin_address
             } else if (row.method == 'manual'){
-                if (row.manual_destination.type == 'NorwayBank') {
-                    destination = row.manual_destination.account
+                if (row.manual_destination.type == 'Bank') {
+                    destination = row.manual_destination.bankAccountId
+                } else {
+                    return next(new Error('Unknown manual destination type ' + row.manual_destination.type))
                 }
             }
 

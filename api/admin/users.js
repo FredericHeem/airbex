@@ -98,8 +98,10 @@ users.withdrawRequests = function(conn, req, res, next) {
             } else if (row.method == 'LTC') {
                 destination = row.litecoin_address
             } else if (row.method == 'manual') {
-                if (row.manual_destination.type == 'NorwayBank') {
-                    destination = row.manual_destination.account
+                if (row.manual_destination.type == 'Bank') {
+                    destination = row.manual_destination.bankAccountId
+                } else {
+                    return next(new Error('Unknown manual destination type ' + row.manual_destination.type))
                 }
             }
 
@@ -107,12 +109,10 @@ users.withdrawRequests = function(conn, req, res, next) {
                 return next(new Error('Unknown destination for ' + JSON.stringify(row)))
             }
 
-            return _.extend({
-                currency: row.currency_id,
-                amount: req.app.cache.formatCurrency(row.amount, row.currency_id),
-                id: row.request_id,
-                destination:  destination
-            }, _.pick(row, 'created', 'completed', 'method', 'state', 'error'))
+            row.destination = destination
+            row.amount = req.app.cache.formatCurrency(row.amount, row.currency_id)
+
+            return row
         }))
     })
 }

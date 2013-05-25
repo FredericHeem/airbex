@@ -66,6 +66,8 @@ withdraws.forUser = function(conn, req, res, next) {
                 destination = row.bitcoin_address
             } else if (row.method == 'LTC') {
                 destination = row.litecoin_address
+            } else if (row.method == 'ripple') {
+                destination = row.ripple_address
             } else if (row.method == 'manual'){
                 if (row.manual_destination.type == 'Bank') {
                     destination = row.manual_destination.bankAccountId

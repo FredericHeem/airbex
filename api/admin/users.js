@@ -7,6 +7,8 @@ users.configure = function(app, conn, auth) {
     app.get('/admin/users', auth, users.users.bind(users, conn))
     app.get('/admin/users/:id', auth, users.user.bind(users, conn))
     app.get('/admin/users/:user/bankAccounts', auth, users.bankAccounts.bind(users, conn))
+    app.get('/admin/users/:user/withdrawRequests', auth, users.withdrawRequests.bind(users, conn))
+    app.get('/admin/users/:user/activities', auth, users.activities.bind(users, conn))
     app.post('/admin/users/:user/bankAccounts', auth, users.addBankAccount.bind(users, conn))
 }
 
@@ -62,6 +64,55 @@ users.bankAccounts = function(conn, req, res, next) {
                 accountNumber: row.account_number,
                 routingNumber: row.routing_number
             })
+        }))
+    })
+}
+
+users.activities = function(conn, req, res, next) {
+    conn.read.query({
+        text: [
+            'SELECT * FROM activity WHERE user_id = $1'
+        ].join('\n'),
+        values: [req.params.user]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(200, dr.rows.map(function(row) {
+            row.details = JSON.parse(row.details)
+            return row
+        }))
+    })
+}
+
+
+users.withdrawRequests = function(conn, req, res, next) {
+    conn.read.query({
+        text: 'SELECT * FROM withdraw_request_view WHERE user_id = $1',
+        values: [req.params.user]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(dr.rows.map(function(row) {
+            var destination
+
+            if (row.method == 'BTC') {
+                destination = row.bitcoin_address
+            } else if (row.method == 'LTC') {
+                destination = row.litecoin_address
+            } else if (row.method == 'manual') {
+                if (row.manual_destination.type == 'NorwayBank') {
+                    destination = row.manual_destination.account
+                }
+            }
+
+            if (!destination) {
+                return next(new Error('Unknown destination for ' + JSON.stringify(row)))
+            }
+
+            return _.extend({
+                currency: row.currency_id,
+                amount: req.app.cache.formatCurrency(row.amount, row.currency_id),
+                id: row.request_id,
+                destination:  destination
+            }, _.pick(row, 'created', 'completed', 'method', 'state', 'error'))
         }))
     })
 }

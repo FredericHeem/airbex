@@ -14,7 +14,7 @@ withdraws.withdrawNorway = function(conn, req, res, next) {
 
     conn.read.query({
         text: [
-            'SELECT ba.details',
+            'SELECT ba.account_number',
             'FROM bank_account ba',
             'INNER JOIN "user" u ON u.user_id = ba.user_id',
             'WHERE ba.bank_account_id = $2 AND u.user_id = $1'
@@ -28,7 +28,7 @@ withdraws.withdrawNorway = function(conn, req, res, next) {
             message: 'Bank account does not exist or belongs to another user.'
         })
 
-        var account = dr.rows[0].details.account
+        var account = dr.rows[0].bank_account
         , amount = req.app.cache.parseCurrency(req.body.amount, 'NOK')
         , destination = {
             type: 'NorwayBank',

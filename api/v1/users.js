@@ -29,6 +29,7 @@ users.whoami = function(conn, req, res, next) {
             'SELECT',
             '   user_id id,',
             '   email,',
+            '   email_verified_at,',
             '   admin,',
             '   phone_number phone,',
             '   first_name firstname,',
@@ -55,6 +56,7 @@ users.whoami = function(conn, req, res, next) {
             firstName: row.firstname,
             lastName: row.lastname,
             address: row.address,
+            emailVerified: row.email_verified_at !== null,
             country: row.country,
             postalArea: row.postalarea,
             city: row.city

@@ -1,7 +1,6 @@
 var sjcl = require('../vendor/sjcl')
 , connect = require('express/node_modules/connect')
 , util = require('util')
-, tarpit = require('../tarpit')()
 , auth = module.exports = function(conn) {
     return function(req, res, next) {
         if (req.user) return next()
@@ -22,7 +21,7 @@ var sjcl = require('../vendor/sjcl')
             if (err) return next(err)
 
             if (!dres.rowCount) {
-                return tarpit(function() {
+                return req.app.tarpit(function() {
                     res.send(401, { name: 'UnknownApiKey', message: 'Unknown admin API key' })
                 })
             }

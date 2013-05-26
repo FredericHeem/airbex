@@ -9,7 +9,16 @@ users.configure = function(app, conn, auth) {
     app.get('/admin/users/:user/bankAccounts', auth, users.bankAccounts.bind(users, conn))
     app.get('/admin/users/:user/withdrawRequests', auth, users.withdrawRequests.bind(users, conn))
     app.get('/admin/users/:user/activities', auth, users.activities.bind(users, conn))
+    app.post('/admin/users/:user/sendVerificationEmail', auth, users.sendVerificationEmail.bind(users, conn))
     app.post('/admin/users/:user/bankAccounts', auth, users.addBankAccount.bind(users, conn))
+}
+
+users.sendVerificationEmail = function(conn, req, res, next) {
+    var email = require('../v1/email')
+    email.sendVerificationEmail(conn, req.app.smtp, req.params.user, function(err) {
+        if (err) return next(err)
+        res.send(204)
+    })
 }
 
 users.addBankAccount = function(conn, req, res, next) {

@@ -1,10 +1,14 @@
+var tarpit = require('../tarpit')()
+
 module.exports = {
     configure: function(app, conn) {
+        app.tarpit = tarpit
+
         var auth = require('./auth')(conn)
 
         ;['balances', 'markets', 'orders', 'ripple', 'intercom',
         'currencies', 'activities', 'users', 'transfer', 'withdraws',
-        'keys']
+        'keys', 'email']
         .forEach(function(name) {
             require('./' + name).configure(app, conn, auth)
         })

@@ -126,11 +126,15 @@ reset.resetPasswordContinue = function(conn, req, res, next) {
 
         debug('requesting call to %s', phoneNumber)
 
-        tropo.call(phoneNumber, msg, function(err) {
-            if (err) return next(err)
+        res.send(200, 'Email confirmed. Next we will call you. Close this window and go back to the password reset window.')
 
-            res.send(200, 'Email confirmed. Next we will call you. Close this window and go back to the password reset window.')
-        })
+        setTimeout(function() {
+            tropo.call(phoneNumber, msg, function(err) {
+                if (!err) return debug('call placed')
+                console.error('Failed to call user at %s', phoneNumber)
+                console.error(err)
+            })
+        }, 10e3)
     })
 }
 

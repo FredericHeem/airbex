@@ -52,4 +52,22 @@ describe('users', function() {
 			users.create(conn, req, res, done)
 		})
 	})
+
+	describe('createPhoneCode', function() {
+		it('always has four digits', function() {
+			for (var i = 0; i < 1000; i++) {
+				var s = users.createPhoneCode()
+				expect(s.length).to.be(4)
+			}
+		})
+	})
+
+	describe('createEmailCode', function() {
+		it('always has 20 digits', function() {
+			for (var i = 0; i < 1000; i++) {
+				var s = users.createEmailCode()
+				expect(s.length).to.be(20)
+			}
+		})
+	})
 })

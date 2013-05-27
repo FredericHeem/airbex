@@ -8,7 +8,7 @@ module.exports = {
 
         ;['balances', 'markets', 'orders', 'ripple', 'intercom',
         'currencies', 'activities', 'users', 'transfer', 'withdraws',
-        'keys', 'email']
+        'keys', 'email', 'resetPassword']
         .forEach(function(name) {
             require('./' + name).configure(app, conn, auth)
         })

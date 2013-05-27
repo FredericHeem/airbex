@@ -7,6 +7,7 @@ var Q = require('q')
 , validate = require('./validate')
 , Tropo = require('tropo')
 , debug = require('debug')('snow:users')
+, crypto = require('crypto')
 
 require('tropo-webapi')
 

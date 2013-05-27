@@ -43,10 +43,10 @@ script:
   - "npm test"
   - "popd"
   # web
-  - "pushd web"
-  - "npm install"
-  - "npm test"
-  - "popd"
+  #- "pushd web"
+  #- "npm install"
+  #- "npm test"
+  #- "popd"
   # margin
   - "pushd margin"
   - "npm install"

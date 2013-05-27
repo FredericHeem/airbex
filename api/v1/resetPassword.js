@@ -4,8 +4,6 @@ var reset = module.exports = {}
 , debug = require('debug')('snow:resetPassword')
 , Tropo = require('tropo')
 
-require('tropo-webapi')
-
 reset.configure = function(app, conn, auth) {
     app.post('/v1/resetPassword', reset.resetPasswordBegin.bind(reset, conn))
     app.get('/v1/resetPassword/continue/:code', reset.resetPasswordContinue.bind(reset, conn))

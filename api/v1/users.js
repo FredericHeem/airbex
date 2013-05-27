@@ -301,8 +301,6 @@ users.tropo = function(conn, req, res, next) {
     var tropo = new TropoWebAPI()
 
     tropo.call(params.numberToDial)
-    //tropo.call('sip:abrkn@getonsip.com')
-    //tropo.call('+4797771042')
     tropo.wait(2000);
     tropo.say(params.msg)
 

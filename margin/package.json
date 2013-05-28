@@ -1,10 +1,13 @@
 {
-  "name": "snow-margin",
+  "name": "margin",
   "description": "margin trader",
-  "version": "0.0.2",
-  "private": true,
+  "version": "0.0.3",
   "scripts": {
     "test": "mocha"
+  },
+  "preferGlobal": true,
+  "bin": {
+    "margin": "./bin/margin"
   },
   "dependencies": {
     "underscore": "~1.4.4",
@@ -15,7 +18,9 @@
     "nonce": "~1.0.3",
     "hail": "0.0.5",
     "konfu": "~1.1.4",
-    "cli-table": "~0.2.0"
+    "cli-table": "~0.2.0",
+    "optimist": "~0.5.0",
+    "snow-client": "~0.1.8"
   },
   "devDependencies": {
     "expect.js": "~0.2.0",

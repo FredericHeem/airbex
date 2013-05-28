@@ -3,4 +3,3 @@ config.production.json
 node_modules/
 *.log
 /go.ps1
-bin/

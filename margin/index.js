@@ -16,7 +16,9 @@ var util = require('util')
         interval: 1000 * 60 * 5
     })
 
-    this.position = new Position(this.market, to)
+    this.position = new Position(this.market, to, {
+        whatif: this.options.whatif
+    })
     this.tick()
 }
 

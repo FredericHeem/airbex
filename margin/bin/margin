@@ -1,0 +1,99 @@
+#!/usr/bin/env node
+var config = require('konfu')
+, async = require('async')
+, Margin = require('../index')
+, hail = require('hail')
+, Fx = require('../fx')
+, argv = require('optimist')
+.alias('w', 'what-if').describe('w', 'Run without placing/orders').default(false)
+
+function endpointFromConfig(conf) {
+    var result
+
+    if (conf.type == 'bitcoincharts') {
+        var Bitcoincharts = require('../bitcoincharts')
+        , result = new Bitcoincharts()
+        return result
+    }
+
+    if (conf.type == 'snow') {
+        return new hail.Snow(config.snow.key)
+    }
+
+    if (conf.type == 'btce') {
+        return new hail.Btce(config.btce)
+    }
+
+    if (conf.type == 'fx') {
+        return new Fx(endpointFromConfig(conf.inner), conf.ref)
+    }
+
+    if (conf.type == 'flip') {
+        var Flip = require('../flip')
+        , inner = endpointFromConfig(conf.inner)
+        return new Flip(inner)
+    }
+
+    throw new Error('Unknown endpoint type ' + conf.type)
+}
+
+function errorHandler(err) {
+    if (err.name == 'InsufficientFunds') {
+        return console.error('Failed to place an order, insufficient funds')
+    }
+
+    console.error('uncaught error')
+    console.error(err)
+    console.error(err.stack)
+
+    async.forEach(margins, function(margin, next) {
+        cancelAll(margin, next)
+    }, function() {
+        process.exit(1)
+    })
+}
+
+function cancelAll(ep, cb) {
+    if (!ep.orders) {
+        console.error('order enumeration not implemented for endpoint')
+        return cb()
+    }
+
+    if (!ep.cancel) {
+        console.error('order cancellation not implemented for endpoint')
+        return cb()
+    }
+
+    ep.orders(function(err, orders) {
+        if (err) {
+            console.error('failed to retrieve orders to cancel everything')
+            console.error(err)
+            return process.exit(1)
+        }
+
+        async.forEach(orders, function(order, next) {
+            ep.cancel(order.id, function(err) {
+                if (err) {
+                    console.error('failed to cancel order %s', order.id)
+                    console.error(err)
+                } else {
+                    console.log('cancelled order %s', order.id)
+                }
+                next()
+            })
+        }, cb)
+    })
+}
+
+var margins = config.positions.map(function(pos) {
+    var from = endpointFromConfig(pos.from)
+    , to = endpointFromConfig(pos.to)
+    , margin = new Margin(pos.pair, from, to, pos)
+    margin.on('error',  errorHandler)
+    return margin
+})
+
+process.on('uncaughtException', function(err) {
+    console.error('unhandled exception in process!')
+    errorHandler(err)
+})

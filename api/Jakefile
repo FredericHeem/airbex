@@ -2,36 +2,37 @@ require('shelljs/global')
 
 var format = require('util').format
 
+function execOrDie(cmd) {
+    var result = exec(cmd, { silent: false })
+    if (result.code === 0) return
+    console.error(cmd + ' status ' + result.code)
+    console.error(result.output)
+    process.exit(result.code)
+}
+
+function publishTo(host) {
+    execOrDie('npm pack')
+
+    var stamp = +new Date()
+    , name = require('./package.json').name
+    , version = require('./package.json').version
+    , fn = format('%s-%s.tgz', name, version)
+
+    execOrDie(format('scp %s %s:/home/ubuntu/snow-api/app/%s-%s.tgz', fn, host, name, stamp))
+    execOrDie(format('ssh %s cd snow-api/app ; ./deploy.sh %s', host, stamp))
+    execOrDie('rm ' + fn)
+}
+
 task('ps', ['publish-staging'])
 task('publish-staging', function() {
-    // patch + tag
-    exec('npm version patch')
-    var v = require('./package.json').version
-    exec('git add package.json')
-    exec('git commit -m "v' + v + '"')
-    exec('git tag api-' + v)
-
-    exec('npm pack')
-
-    var name = require('./package.json').name
-    , fn = format('%s-%s.tgz', name, v)
-
-    exec(format('scp %s 54.217.208.30:/home/ubuntu/snow-api/app/%s', fn, fn))
-    exec('ssh 54.217.208.30 cd snow-api/app ; ./deploy.sh ' + v)
-    exec('rm ' + fn)
+    publishTo('54.217.208.30')
 })
 
 task('pp', ['publish-production'])
 task('publish-production', function() {
-    exec('npm pack')
-
-    var version = require('./package.json').version
-    , name = require('./package.json').name
-    , fn = format('%s-%s.tgz', name, version)
-
-    exec(format('scp %s 10.0.0.184:/home/ubuntu/snow-api/app/%s', fn, fn))
-    exec('ssh 10.0.0.184 cd snow-api/app ; ./deploy.sh ' + version)
-    exec('rm ' + fn)
+    var tag = new Date().toISOString().match(/^[^\.]+/)[0].replace(/:/g, '-')
+    publishTo('10.0.0.184')
+    execOrDie('git tag ' + tag)
 })
 
 task('bitcoind', function() {

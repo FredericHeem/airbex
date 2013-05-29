@@ -2,34 +2,30 @@ require('shelljs/global')
 
 var format = require('util').format
 
-task('ps', ['publish-staging'])
-task('publish-staging', function() {
-    // patch + tag
-    exec('npm version patch')
-    var v = require('./package.json').version
-    exec('git add package.json')
-    exec('git commit -m "v' + v + '"')
-    exec('git tag workers-' + v)
+function execOrDie(cmd) {
+    var result = exec(cmd, { silent: false })
+    if (result.code === 0) return
+    console.error(cmd + ' status ' + result.code)
+    console.error(result.output)
+    process.exit(result.code)
+}
 
-    exec('npm pack')
+function publishTo(host) {
+    execOrDie('npm pack')
 
-    var name = require('./package.json').name
-    , fn = format('%s-%s.tgz', name, v)
+    var stamp = +new Date()
+    , name = require('./package.json').name
+    , version = require('./package.json').version
+    , fn = format('%s-%s.tgz', name, version)
 
-    exec(format('scp %s 54.217.208.30:/home/ubuntu/snow-workers/app/%s', fn, fn))
-    exec('ssh 54.217.208.30 cd snow-workers/app ; ./deploy.sh ' + v)
-    exec('rm ' + fn)
-})
+    execOrDie(format('scp %s %s:/home/ubuntu/snow-workers/app/%s-%s.tgz', fn, host, name, stamp))
+    execOrDie(format('ssh %s cd snow-workers/app ; ./deploy.sh %s', host, stamp))
+    execOrDie('rm ' + fn)
+}
 
 task('pp', ['publish-production'])
 task('publish-production', function() {
-    exec('npm pack')
-
-    var version = require('./package.json').version
-    , name = require('./package.json').name
-    , fn = format('%s-%s.tgz', name, version)
-
-    exec(format('scp %s 10.0.1.213:/home/ubuntu/snow-workers/app/%s', fn, fn))
-    exec('ssh 10.0.1.213 cd snow-workers/app ; ./deploy.sh ' + version)
-    exec('rm ' + fn)
+    var tag = new Date().toISOString().match(/^[^\.]+/)[0].replace(/:/g, '-')
+    publishTo('10.0.1.213')
+    execOrDie('git tag ' + tag)
 })

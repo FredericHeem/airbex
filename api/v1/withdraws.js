@@ -10,46 +10,39 @@ withdraws.configure = function(app, conn, auth) {
 }
 
 withdraws.withdrawBank = function(conn, req, res, next) {
-    if (!validate(req.body, 'withdraw_norway', res)) return
+    if (!validate(req.body, 'withdraw_bank', res)) return
 
-    conn.read.query({
+    conn.write.query({
         text: [
-            'SELECT ba.bank_account_id',
-            'FROM bank_account ba',
-            'INNER JOIN "user" u ON u.user_id = ba.user_id',
-            'WHERE ba.bank_account_id = $2 AND u.user_id = $1'
+            'SELECT withdraw_bank($2, $3, $4)',
+            'FROM bank_account',
+            'WHERE bank_account_id = $2 AND user_id = $1'
         ].join('\n'),
-        values: [req.user, req.body.bankAccount]
+        values: [
+            req.user,
+            +req.body.bankAccount,
+            req.body.currency,
+            req.app.cache.parseCurrency(req.body.amount, req.body.currency)
+        ]
     }, function(err, dr) {
-        if (err) return next(err)
-
-        if (!dr.rowCount) return res.send(404, {
-            name: 'BankAccountNotFound',
-            message: 'Bank account does not exist or belongs to another user.'
-        })
-
-        var account = dr.rows[0].bank_account_id
-        , amount = req.app.cache.parseCurrency(req.body.amount, 'NOK')
-        , destination = {
-            type: 'Bank',
-            bankAccountId: account
-        }
-
-        conn.write.query({
-            text: 'SELECT withdraw_manual($1, $2, $3, $4)',
-            values: [req.user, 'NOK', amount, destination]
-        }, function(err, dr) {
-            if (!err) return res.send(204)
-
+        if (err) {
             if (err.message.match(/non_negative_available/)) {
                 return res.send(500, {
                     name: 'NoFunds',
                     message: 'Insufficient funds.'
                 })
             }
+            return next(err)
+        }
 
-            next(err)
-        })
+        if (!dr.rowCount) {
+            return res.send(400, {
+                name: 'BankAccountNotFound',
+                message: 'Bank account not found for this user'
+            })
+        }
+
+        return res.send(204)
     })
 }
 
@@ -68,12 +61,8 @@ withdraws.forUser = function(conn, req, res, next) {
                 destination = row.litecoin_address
             } else if (row.method == 'ripple') {
                 destination = row.ripple_address
-            } else if (row.method == 'manual'){
-                if (row.manual_destination.type == 'Bank') {
-                    destination = row.manual_destination.bankAccountId
-                } else {
-                    return next(new Error('Unknown manual destination type ' + row.manual_destination.type))
-                }
+            } else if (row.method == 'bank'){
+                destination = row.bank_account_id
             }
 
             if (!destination) {

@@ -9,7 +9,7 @@ withdraws.configure = function(app, conn, auth) {
 withdraws.index = function(conn, req, res, next) {
     var query = [
     'SELECT *',
-    'FROM manual_withdraw_request_view',
+    'FROM bank_withdraw_request_view',
     'WHERE state NOT IN (\'cancelled\', \'completed\')'
     ].join('\n')
 

@@ -108,12 +108,8 @@ users.withdrawRequests = function(conn, req, res, next) {
                 destination = row.litecoin_address
             } else if (row.method == 'ripple') {
                 destination = row.ripple_address
-            } else if (row.method == 'manual') {
-                if (row.manual_destination.type == 'Bank') {
-                    destination = row.manual_destination.bankAccountId
-                } else {
-                    return next(new Error('Unknown manual destination type ' + row.manual_destination.type))
-                }
+            } else if (row.method == 'bank') {
+                destination = row.bank_account_id
             }
 
             if (!destination) {

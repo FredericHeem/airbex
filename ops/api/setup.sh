@@ -4,7 +4,7 @@
 # Ports: 8000 (HTTP)
 
 export environment=production
-export prefix=production.
+export prefix=""
 
 sudo apt-get update
 sudo apt-get upgrade -y
@@ -163,11 +163,11 @@ server {
 }
 EOL
 
-sudo nginx -s reload
-
 # --- make site available and enabled
 sudo ln nginx.conf /etc/nginx/sites-available/${prefix}api.justcoin.com
 sudo ln /etc/nginx/sites-available/${prefix}api.justcoin.com /etc/nginx/sites-enabled/${prefix}api.justcoin.com
+
+sudo nginx -s reload
 
 vim ~/snow-api/config.${environment}.json
 

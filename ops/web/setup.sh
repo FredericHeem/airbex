@@ -19,7 +19,7 @@ mkdir log
 mkdir log public
 
 # --- /home/ubuntu/snow-web/nginx.conf
-tee nginx.conf << EOL
+tee /home/ubuntu/snow-web/nginx.conf << EOL
 server {
     listen 8001;
     server_name ${prefix}justcoin.com;
@@ -37,7 +37,7 @@ server {
     gzip_disable "MSIE [1-6]\.(?!.*SV1)";
 
     location /api {
-        proxy_pass https://api.${prefix}justcoin.com;
+        proxy_pass http://10.0.0.184:8010;
         rewrite ^/api(/.+)\$ \$1 break;
         proxy_set_header X-Real-IP \$remote_addr;
     }
@@ -57,7 +57,7 @@ server {
 EOL
 
 # --- make site available and enabled
-sudo ln nginx.conf /etc/nginx/sites-available/${prefix}justcoin.com
-sudo ln /etc/nginx/sites-available/${prefix}justcoin.com /etc/nginx/sites-enabled/${prefix}justcoin.com
+sudo ln nginx.conf /etc/nginx/sites-available/justcoin.com
+sudo ln /etc/nginx/sites-available/justcoin.com /etc/nginx/sites-enabled/justcoin.com
 
 sudo reboot

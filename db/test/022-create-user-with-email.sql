@@ -13,7 +13,7 @@ BEGIN
 		RAISE 'User not found by email_lower';
 	END IF;
 
-	IF (SELECT COUNT(*) FROM api_key WHERE api_key_id = fn.key AND secret IS NULL AND user_id = uid) <> 1 THEN
+	IF (SELECT COUNT(*) FROM api_key WHERE api_key_id = fn.key AND user_id = uid) <> 1 THEN
 		RAISE 'User first api key not found';
 	END IF;
 END; $$; ROLLBACK;

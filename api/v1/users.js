@@ -15,7 +15,6 @@ users.configure = function(app, conn, auth) {
     app.get('/v1/whoami', auth, users.whoami.bind(users, conn))
     app.post('/v1/users', users.create.bind(users, conn))
     app.post('/v1/users/identity', auth, users.identity.bind(users, conn))
-    app.post('/v1/replaceLegacyApiKey', users.replaceLegacyApiKey.bind(users, conn))
     app.post('/v1/replaceApiKey', auth, users.replaceApiKey.bind(users, conn))
     app.post('/v1/users/verify/call', auth, users.startPhoneVerify.bind(users, conn))
     app.post('/v1/users/verify', auth, users.verifyPhone.bind(users, conn))
@@ -156,21 +155,6 @@ users.identity = function(conn, req, res, next) {
         activities.log(conn, req.user, 'Identity set', {})
         return res.send(204)
     })
-}
-
-users.replaceLegacyApiKey = function(conn, req, res, next) {
-    Q.ninvoke(conn.write, 'query', {
-        text: 'SELECT replace_legacy_api_key($1, $2, $3)',
-        values: [req.body.oldKey, req.body.oldSecret, req.body.newKey]
-    }).then(function(dres) {
-        res.send(200, {})
-    }, function(err) {
-        if (err.message === 'The specified old_key/old_secret combination was not found') {
-            return res.send(401)
-        }
-        next(err)
-    })
-    .done()
 }
 
 users.replaceApiKey = function(conn, req, res, next) {

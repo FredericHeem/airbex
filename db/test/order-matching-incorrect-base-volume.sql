@@ -1,5 +1,5 @@
--- Bob will sell 1 BTC @ 150,000 QRP
--- Alice will buy 0.05 BTC @ 175,000 QRP
+-- Bob will sell 1 BTC @ 150,000 XRP
+-- Alice will buy 0.05 BTC @ 175,000 XRP
 -- Bob's order should remain with 0.95 volume (BTC)
 BEGIN; DO $$
 DECLARE
@@ -9,21 +9,10 @@ DECLARE
     alice int;
     bid int;
     mid int;
-    key1 varchar := 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBB';
-    key2 varchar := 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACCCC';
 BEGIN
-    INSERT INTO "currency" (currency_id, scale)
-    VALUES ('QRP', 6);
-
-    INSERT INTO "market" (base_currency_id, quote_currency_id, scale)
-    VALUES ('BTC', 'QRP', 3);
-
-    INSERT INTO "account" (currency_id, "type")
-    VALUES ('QRP', 'edge');
-
-    bob := create_user('bob@gmail.com', key1);
-    alice := create_user('alice@hotmail.com', key2);
-    bid := (SELECT market_id FROM market WHERE base_currency_id = 'BTC' AND quote_currency_id = 'QRP');
+    bob := create_user('bob@gmail.com', repeat('a', 64));
+    alice := create_user('alice@hotmail.com', repeat('b', 64));
+    bid := (SELECT market_id FROM market WHERE base_currency_id = 'BTC' AND quote_currency_id = 'XRP');
 
     UPDATE "user" SET fee_ratio = 0 WHERE user_id IN (bob, alice);
 
@@ -31,9 +20,9 @@ BEGIN
     INSERT INTO "transaction" (debit_account_id, credit_account_id, amount)
     VALUES (special_account('edge', 'BTC'), user_currency_account(bob, 'BTC'), 10e8);
 
-    -- Fund Alice with 10,000 QRP
+    -- Fund Alice with 10,000 XRP
     INSERT INTO "transaction" (debit_account_id, credit_account_id, amount)
-    VALUES (special_account('edge', 'QRP'), user_currency_account(alice, 'QRP'), 10000e6);
+    VALUES (special_account('edge', 'XRP'), user_currency_account(alice, 'XRP'), 10000e6);
 
     -- Create Bob's order
     INSERT INTO "order" (market_id, user_id, side, price, volume)
@@ -50,7 +39,7 @@ BEGIN
 
     mid := currval('match_match_id_seq');
 
-    -- Match should be 0.05 BTC @ 150,000 QRP (7,500 QRP)
+    -- Match should be 0.05 BTC @ 150,000 XRP (7,500 XRP)
     IF (SELECT volume FROM "match" WHERE match_id = mid) <> 0.05*10^(8-3) THEN
         RAISE 'Match volume incorrect';
     END IF;
@@ -59,9 +48,9 @@ BEGIN
         RAISE 'Match price incorrect. Expeted 150000e3 actual %', (SELECT price FROM "match" WHERE match_id = mid);
     END IF;
 
-    -- Bob should have 0.05 BTC * 150,000 QRP/BTC = 7,500 QRP
-    IF (SELECT balance FROM "account" WHERE account_id = user_currency_account(bob, 'QRP')) <> 7500e6 THEN
-        RAISE 'Bob did not receive the correct amount of QRP';
+    -- Bob should have 0.05 BTC * 150,000 XRP/BTC = 7,500 XRP
+    IF (SELECT balance FROM "account" WHERE account_id = user_currency_account(bob, 'XRP')) <> 7500e6 THEN
+        RAISE 'Bob did not receive the correct amount of XRP';
     END IF;
 
     -- Alice should have 0.05 BTC

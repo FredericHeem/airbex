@@ -23,7 +23,7 @@ BEGIN
     rid := withdraw_bank(baid, 'NOK'::currency_id, 100e5::bigint);
 
     -- Verify
-    SELECT * INTO wr FROM withdraw_request;
+    SELECT * INTO wr FROM withdraw_request WHERE request_id = rid;
 
     IF wr IS NULL THEN
         RAISE 'request not found';

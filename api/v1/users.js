@@ -152,7 +152,7 @@ users.identity = function(conn, req, res, next) {
             })
         }
 
-        activities.log(conn, req.user, 'Identity set', {})
+        activities.log(conn, req.user, 'IdentitySet', {})
         return res.send(204)
     })
 }

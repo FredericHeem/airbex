@@ -1,4 +1,4 @@
-var _ = require('underscore')
+var _ = require('lodash')
 , async = require('async')
 , num = require('num')
 , debug = require('debug')('position')

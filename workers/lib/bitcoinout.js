@@ -1,5 +1,5 @@
 var debug = require('debug')('snow:bitcoinout')
-, _ = require('underscore')
+, _ = require('lodash')
 , num = require('num')
 , util = require('util')
 , raven = require('./raven')

@@ -1,4 +1,4 @@
-var _ = require('underscore')
+var _ = require('lodash')
 , util = require('util')
 , assert = require('assert')
 

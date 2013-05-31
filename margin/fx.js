@@ -3,7 +3,7 @@ var async = require('async')
 , request = require('request')
 , debug = require('debug')('snow:fx')
 , util = require('util')
-_ = require('underscore')
+_ = require('lodash')
 , fx = module.exports = function(inner, ref) {
     this.inner = inner;
     this.ref = ref;

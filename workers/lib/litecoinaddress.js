@@ -1,6 +1,6 @@
 var debug = require('debug')('snow:litecoinaddress')
 , Q = require('q')
-, _ = require('underscore')
+, _ = require('lodash')
 
 var LitecoinAddress = module.exports = function(ep, dbClient) {
     var Client = require('bitcoin').Client

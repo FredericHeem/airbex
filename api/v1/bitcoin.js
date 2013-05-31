@@ -1,6 +1,6 @@
 var Q = require('q')
 , activities = require('./activities')
-, _ = require('underscore')
+, _ = require('lodash')
 , util = require('util')
 , validate = require('./validate')
 , bitcoin = module.exports = {}

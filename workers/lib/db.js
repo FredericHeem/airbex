@@ -1,4 +1,4 @@
-var _ = require('underscore')
+var _ = require('lodash')
 
 module.exports = function(url, native) {
 	var pg = native ? require('pg').native : require('pg')

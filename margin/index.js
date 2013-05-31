@@ -3,7 +3,7 @@ var util = require('util')
 , debug = require('debug')('margin')
 , num = require('num')
 , async = require('async')
-, _ = require('underscore')
+, _ = require('lodash')
 , Position = require('./position')
 , debug = require('debug')('margin')
 , Margin = module.exports = function(market, from, to, options) {

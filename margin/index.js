@@ -3,7 +3,7 @@ var util = require('util')
 , debug = require('debug')('margin')
 , num = require('num')
 , async = require('async')
-, _ = require('underscore')
+, _ = require('lodash')
 , Position = require('./position')
 , debug = require('debug')('margin')
 , Margin = module.exports = function(market, from, to, options) {
@@ -16,7 +16,9 @@ var util = require('util')
         interval: 1000 * 60 * 5
     })
 
-    this.position = new Position(this.market, to)
+    this.position = new Position(this.market, to, {
+        whatif: this.options.whatif
+    })
     this.tick()
 }
 

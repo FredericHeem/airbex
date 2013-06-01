@@ -1,6 +1,6 @@
 var debug = require('debug')('snow:bitcoinaddress')
 , Q = require('q')
-, _ = require('underscore')
+, _ = require('lodash')
 
 var BitcoinAddress = module.exports = function(bitcoinEndpoint, dbClient) {
     var Bitcoin = require('bitcoin').Client

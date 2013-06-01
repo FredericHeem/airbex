@@ -1,8 +1,0 @@
-language: node_js
-env:
-  - DB=postgres://postgres@localhost/test
-node_js:
-  - 0.8
-before_script:
-  - psql -c 'create database test;' -U postgres
-  - node ./replay.js -d postgres://postgres@localhost/test

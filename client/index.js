@@ -8,7 +8,9 @@ var debug = require('debug')('snow')
 }
 
 function bodyToError(body) {
-    return new Error(JSON.stringify(body, null, 4))
+    var error = new Error(body.message || body)
+    if (body.name) error.name = body.name
+    return error
 }
 
 Snow.prototype.orders = function(cb) {

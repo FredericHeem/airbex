@@ -1,13 +1,31 @@
 require('shelljs/global')
 
-task('pp', ['publish-production'])
+var format = require('util').format
 
+function execOrDie(cmd) {
+    var result = exec(cmd, { silent: false })
+    if (result.code === 0) return
+    console.error(cmd + ' status ' + result.code)
+    console.error(result.output)
+    process.exit(result.code)
+}
+
+function publishTo(host) {
+    execOrDie('npm pack')
+
+    var stamp = +new Date()
+    , name = require('./package.json').name
+    , version = require('./package.json').version
+    , fn = format('%s-%s.tgz', name, version)
+
+    execOrDie(format('scp %s %s:/home/ubuntu/snow-workers/app/%s-%s.tgz', fn, host, name, stamp))
+    execOrDie(format('ssh %s cd snow-workers/app ; ./deploy.sh %s', host, stamp))
+    execOrDie('rm ' + fn)
+}
+
+task('pp', ['publish-production'])
 task('publish-production', function() {
-    jake.exec([
-        'npm version patch',
-        'git checkout production',
-        'git merge master',
-        'git checkout master',
-        'git push production production:master'
-    ], { printStderr: true })
+    var tag = new Date().toISOString().match(/^[^\.]+/)[0].replace(/:/g, '-')
+    publishTo('10.0.1.213')
+    execOrDie('git tag ' + tag)
 })

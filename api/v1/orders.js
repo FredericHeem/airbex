@@ -1,5 +1,5 @@
 var Q = require('q')
-, _ = require('underscore')
+, _ = require('lodash')
 , orders = module.exports = {}
 , validate = require('./validate')
 , activities = require('./activities')

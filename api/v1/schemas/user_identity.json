@@ -1,0 +1,35 @@
+{
+    "type": "object",
+    "properties": {
+        "firstName": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[\\w\\s]+$"
+        },
+        "lastName": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[\\w\\s]+$"
+        },
+        "address": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[\\w\\s\\n]+$"
+        },
+        "city": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[\\w\\s]+$"
+        },
+        "postalArea": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[\\w\\s]+$"
+        },
+        "country": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[A-Z]{2}$"
+        }
+    }
+}

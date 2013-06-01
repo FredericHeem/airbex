@@ -21,7 +21,9 @@ var sjcl = require('../vendor/sjcl')
             if (err) return next(err)
 
             if (!dres.rowCount) {
-                return res.send(401, { name: 'UnknownApiKey', message: 'Unknown admin API key' })
+                return req.app.tarpit(function() {
+                    res.send(401, { name: 'UnknownApiKey', message: 'Unknown admin API key' })
+                })
             }
 
             req.user = dres.rows[0].user_id

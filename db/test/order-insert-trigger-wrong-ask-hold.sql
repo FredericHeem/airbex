@@ -5,10 +5,7 @@ DECLARE
   bid int;
   oid int;
 BEGIN
-
-  INSERT INTO "user" (email, email_lower)
-  VALUES ('test@test.com', 'test@test.com');
-  uid := currval('user_user_id_seq');
+  uid := create_user('t@t', repeat('x', 64));
 
   bid := (SELECT market_id FROM "market" WHERE base_currency_id = 'BTC' AND quote_currency_id = 'XRP');
 

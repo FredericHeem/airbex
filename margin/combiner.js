@@ -3,7 +3,7 @@ var async = require('async')
 , request = require('request')
 , debug = require('debug')('snow:combiner')
 , util = require('util')
-_ = require('underscore')
+_ = require('lodash')
 , combiner = module.exports = function(sources) {
     this.sources = sources;
 }

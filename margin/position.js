@@ -1,13 +1,14 @@
-var _ = require('underscore')
+var _ = require('lodash')
 , async = require('async')
 , num = require('num')
 , debug = require('debug')('position')
 , util = require('util')
 , Table = require('cli-table')
 
-var Position = module.exports = function(market, client) {
+var Position = module.exports = function(market, client, options) {
     this.market = market
     this.client = client
+    this.options = options || {}
 }
 
 Position.prototype.groupOrders = function(orders) {
@@ -93,7 +94,13 @@ Position.prototype.merge = function(desired, actual) {
 Position.prototype.cancelOrders = function(orders, cb) {
     var that = this
     async.forEach(orders, function(order, cb) {
+        if (that.options.whatif) {
+            debug('would cancel order %s', order.id)
+            return cb()
+        }
+
         debug('cancelling %s', order.id)
+
         that.client.cancel(order.id, function(err) {
             if (err) {
                 if (err.message.match(/not found/)) {
@@ -138,13 +145,27 @@ Position.prototype.setPosition = function(position, cb) {
         },
         function(next) {
             if (diff.eq(0)) return next()
+
+            if (that.options.whatif) {
+                debug('would make up up diff with a order of %s', diff)
+                return next()
+            }
+
             debug('making up diff with a order of %s', diff)
+
             that.client.order({
                 market: that.market,
                 type: position.type,
                 price: position.price,
                 amount: diff.toString()
-            }, next)
+            }, function(err) {
+                if (!err) return next()
+                if (err.name == 'InsufficientFunds') {
+                    console.error('Insufficient funds to place %s order in %s', position.type, that.market)
+                    return next()
+                }
+                return next(err)
+            })
         }
     ], cb)
 }

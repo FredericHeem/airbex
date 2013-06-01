@@ -1,0 +1,59 @@
+language: node_js
+node_js:
+  - 0.10
+env:
+  - NODE_ENV=travis
+before_install:
+  - npm config set loglevel warn
+before_script:
+  # postgresql 9.2
+  - sudo /etc/init.d/postgresql stop
+  - sudo cp /etc/postgresql/9.1/main/pg_hba.conf ./
+  - sudo apt-get remove postgresql postgresql-9.1 -qq --purge
+  - source /etc/lsb-release
+  - echo "deb http://apt.postgresql.org/pub/repos/apt/ $DISTRIB_CODENAME-pgdg main" > pgdg.list
+  - sudo mv pgdg.list /etc/apt/sources.list.d/
+  - wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
+  - sudo apt-get update
+  - sudo apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" install postgresql-9.2 postgresql-contrib-9.2 -qq
+  - sudo /etc/init.d/postgresql stop
+  - sudo cp ./pg_hba.conf /etc/postgresql/9.2/main
+  - sudo /etc/init.d/postgresql start
+  # xwindows
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - "sleep 1"
+script:
+  # db
+  - "psql -c 'create database travis;' -U postgres"
+  - "pushd db"
+  - "npm install"
+  - "node ./node_modules/pg-migrate/bin/pg-migrate -d migrations -u postgres://postgres@localhost/travis"
+  - "node ./node_modules/pg-test/bin/pg-test test"
+  - "popd"
+  # api
+  - "pushd api"
+  - "npm install"
+  - "which mocha"
+  - "npm test"
+  - "popd"
+  # workers
+  - "pushd workers"
+  - "npm install"
+  - "npm test"
+  - "popd"
+  # web
+  #- "pushd web"
+  #- "npm install"
+  #- "npm test"
+  #- "popd"
+  # margin
+  - "pushd margin"
+  - "npm install"
+  - "npm test"
+  - "popd"
+  # client
+  - "pushd client"
+  - "npm install"
+  - "npm test"
+  - "popd"

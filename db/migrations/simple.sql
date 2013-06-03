@@ -127,16 +127,8 @@ BEGIN
     bid_fee_ratio := user_fee_ratio(bido.user_id);
     bid_fee := ceil(bid_fee_ratio * bid_credit);
 
-    UPDATE "hold"
-    SET amount = amount - bid_credit
-    WHERE hold_id = asko.hold_id;
-
     INSERT INTO transaction (debit_account_id, credit_account_id, amount)
     VALUES (user_currency_account(asko.user_id, m.base_currency_id), user_currency_account(bido.user_id, m.base_currency_id), bid_credit);
-
-    UPDATE "hold"
-    SET amount = amount - ask_credit
-    WHERE hold_id = bido.hold_id;
 
     INSERT INTO transaction (debit_account_id, credit_account_id, amount)
     VALUES (user_currency_account(bido.user_id, m.quote_currency_id), user_currency_account(asko.user_id, m.quote_currency_id), ask_credit);
@@ -294,7 +286,7 @@ BEGIN
     FOR ao IN
     SELECT *
     FROM "order"
-    WHERE side = 1
+    WHERE side = 1 AND volume > 0
     ORDER BY price ASC, order_id ASC
     LOOP
         RAISE NOTICE '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!';

@@ -117,7 +117,7 @@ users.create = function(conn, req, res, next) {
                 return res.send(403, { name: 'EmailAlreadyInUse', message:'e-mail is already in use' })
             }
 
-            cb(err)
+            next(err)
         })
     })
 }

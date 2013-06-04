@@ -100,7 +100,7 @@ users.create = function(conn, req, res, next) {
         }
 
         conn.write.query({
-            text: 'SELECT create_user($1, $2) user_id',
+            text: 'SELECT create_user($1, $2, TRUE) user_id',
             values: [req.body.email, req.body.key]
         }, function(err, cres) {
             if (!err) {

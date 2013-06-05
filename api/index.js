@@ -16,12 +16,17 @@ app.config = config
 debug('config %j', config)
 
 if (config.raven) {
+    debug('Configuring Raven...')
+
     var raven = require('raven')
     app.use(raven.middleware.express(config.raven))
+    debug('Raven middleware added')
 
     raven.patchGlobal(function() {
         console.error('leaving process (after global patch)')
     })
+
+    debug('Raven patched global')
 }
 
 app.use(express.bodyParser())

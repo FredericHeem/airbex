@@ -1,5 +1,5 @@
 var config = require('konfu')
-, debug = require('debug')
+, debug = require('debug')('api')
 , express = require('express')
 , app = express()
 , http = require('http')
@@ -10,20 +10,10 @@ var config = require('konfu')
 }
 , Cache = require('./cache')
 
-console.log('debug filter: DEBUG=%s', process.env.debug)
 debug('starting api web server')
 
 app.config = config
 debug('config %j', config)
-
-if (config.raven) {
-    var raven = require('raven')
-    app.use(raven.middleware.express(config.raven))
-
-    raven.patchGlobal(function() {
-        console.error('leaving process (after global patch)')
-    })
-}
 
 app.use(express.bodyParser())
 
@@ -35,6 +25,24 @@ routes.forEach(function(name) {
 app.use(function(req, res) {
     res.send(404)
 })
+
+if (config.raven) {
+    debug('Configuring Raven...')
+
+    var raven = require('raven')
+    app.use(raven.middleware.express(config.raven))
+    debug('Raven middleware added')
+
+    raven.patchGlobal(function(logged, err) {
+        console.error(err)
+        console.error(err.stack)
+
+        console.error('exiting process (after global patch)')
+        process.exit(1)
+    })
+
+    debug('Raven patched global')
+}
 
 var cache = new Cache(conn, function(err) {
     if (err) throw err

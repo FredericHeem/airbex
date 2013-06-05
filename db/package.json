@@ -8,5 +8,7 @@
   "devDependencies": {
     "pg-test": "~1.0.1",
     "pg-migrate": "~1.1.3"
+  },
+  "dependencies": {
   }
 }

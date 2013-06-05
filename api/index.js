@@ -1,5 +1,5 @@
 var config = require('konfu')
-, debug = require('debug')
+, debug = require('debug')('api')
 , express = require('express')
 , app = express()
 , http = require('http')

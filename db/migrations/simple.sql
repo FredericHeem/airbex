@@ -5,7 +5,10 @@ ALTER TABLE "user"
 ALTER TABLE "user"
     ALTER COLUMN simple DROP DEFAULT;
 
----------------
+ALTER TABLE "order"
+    ALTER COLUMN price DROP NOT NULL;
+
+--- Replace create_user, adding simple flag
 
 DROP FUNCTION create_user(character varying, character varying);
 
@@ -33,183 +36,7 @@ END; $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
------------------------
-
-
-CREATE OR REPLACE FUNCTION order_insert()
-  RETURNS trigger AS
-$BODY$
-DECLARE
-    hid int;
-    aid int;
-    m market%ROWTYPE;
-    bc_scale int;
-    qc_scale int;
-    h bigint;
-BEGIN
-    IF NEW.hold_id IS NOT NULL THEN
-        RAISE EXCEPTION 'did not expect order to have hold set at insert';
-    END IF;
-
-    IF NEW.volume = 0 THEN
-        RAISE EXCEPTION 'did not expect order to be inserted with zero volume';
-    END IF;
-
-    SELECT * INTO m FROM market WHERE market_id = NEW.market_id;
-
-    IF NEW.side = 0 THEN
-        aid = user_currency_account(NEW.user_id, m.quote_currency_id);
-    ELSE
-        aid = user_currency_account(NEW.user_id, m.base_currency_id);
-    END IF;
-
-    SELECT scale INTO bc_scale FROM currency WHERE currency_id = m.base_currency_id;
-    SELECT scale INTO qc_scale FROM currency WHERE currency_id = m.quote_currency_id;
-
-    -- create hold
-    h := ceil(CASE WHEN NEW.side = 0 THEN NEW.price * NEW.volume / 10^(bc_scale - qc_scale) ELSE NEW.volume * 10^(m.scale) END);
-
-    INSERT INTO hold (account_id, amount) VALUES (aid, h);
-    hid := currval('hold_hold_id_seq');
-
-    NEW.hold_id := hid;
-    NEW.original = NEW.volume;
-
-    RETURN NEW;
-END; $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
-CREATE OR REPLACE FUNCTION match_insert()
-  RETURNS trigger AS
-$BODY$
-DECLARE
-    bido order%ROWTYPE;
-    asko order%ROWTYPE;
-    ask_credit bigint;
-    bid_credit bigint;
-    bid_fee_ratio decimal(6, 4);
-    ask_fee_ratio decimal(6, 4);
-    bid_fee bigint;
-    ask_fee bigint;
-    bc_scale int;
-    qc_scale int;
-    m market%ROWTYPE;
-BEGIN
-    SELECT * INTO bido FROM "order" WHERE order_id = NEW.bid_order_id;
-    SELECT * INTO asko FROM "order" WHERE order_id = NEW.ask_order_id;
-    SELECT * INTO m FROM market WHERE market_id = asko.market_id;
-
-    bc_scale := (SELECT scale FROM currency WHERE currency_id = m.base_currency_id);
-    qc_scale := (SELECT scale FROM currency WHERE currency_id = m.quote_currency_id);
-
-    UPDATE "order"
-    SET volume = volume - NEW.volume, matched = matched + NEW.volume
-    WHERE order_id = bido.order_id OR order_id = asko.order_id;
-
-    -- The book uses a volumes expressed in the scale of the currency minus the scale of the book
-    bid_credit := NEW.volume * 10^m.scale;
-
-    IF bido.user_id = asko.user_id THEN
-        RAISE NOTICE 'Order has been matched with another order from the same user.';
-        RETURN NEW;
-    END IF;
-
-    IF random() < 0.5 THEN
-        ask_credit := ceil(NEW.price * NEW.volume / 10^(bc_scale - qc_scale));
-    ELSE
-        ask_credit := floor(NEW.price * NEW.volume / 10^(bc_scale - qc_scale));
-    END IF;
-
-    ask_fee_ratio := user_fee_ratio(asko.user_id);
-    ask_fee := ceil(ask_fee_ratio * ask_credit);
-
-    bid_fee_ratio := user_fee_ratio(bido.user_id);
-    bid_fee := ceil(bid_fee_ratio * bid_credit);
-
-    INSERT INTO transaction (debit_account_id, credit_account_id, amount)
-    VALUES (user_currency_account(asko.user_id, m.base_currency_id), user_currency_account(bido.user_id, m.base_currency_id), bid_credit);
-
-    INSERT INTO transaction (debit_account_id, credit_account_id, amount)
-    VALUES (user_currency_account(bido.user_id, m.quote_currency_id), user_currency_account(asko.user_id, m.quote_currency_id), ask_credit);
-
-    -- Fees
-    IF ask_fee > 0 THEN
-        RAISE NOTICE 'Fee for asker is % %', ask_fee / 10^qc_scale, m.quote_currency_id;
-
-        INSERT INTO "transaction" (debit_account_id ,credit_account_id, amount)
-        VALUES (user_currency_account(asko.user_id, m.quote_currency_id), special_account('fee', m.quote_currency_id), ask_fee);
-    END IF;
-
-    IF bid_fee > 0 THEN
-        RAISE NOTICE 'Fee for bidder is % %', bid_fee / 10^bc_scale, m.base_currency_id;
-
-        INSERT INTO "transaction" (debit_account_id ,credit_account_id, amount)
-        VALUES (user_currency_account(bido.user_id, m.base_currency_id), special_account('fee', m.base_currency_id), bid_fee);
-    END IF;
-
-    RETURN NEW;
-END; $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
-CREATE OR REPLACE FUNCTION execute_order(oid integer)
-  RETURNS integer AS
-$BODY$
-DECLARE
-    o "order"%ROWTYPE;
-    othero "order"%ROWTYPE;
-    p bigint;
-    v bigint;
-BEGIN
-    RAISE NOTICE 'Executing order #%', oid;
-
-    SELECT * INTO o FROM "order" WHERE order_id = oid;
-
-    SELECT * INTO othero
-    FROM "order" oo
-    WHERE
-        oo.volume > 0 AND
-        o.market_id = oo.market_id AND
-        o.side <> oo.side AND
-        (
-
-            (o.side = 0 AND oo.price <= o.price) OR
-            (o.side = 1 AND oo.price >= o.price)
-        )
-    ORDER BY
-        CASE WHEN o.side = 0 THEN oo.price ELSE -oo.price END ASC;
-
-    IF NOT FOUND THEN
-        RAISE NOTICE 'Could not match order #%', oid;
-        RETURN NULL;
-    END IF;
-
-    p := othero.price;
-
-    v := (CASE WHEN o.volume > othero.volume THEN othero.volume ELSE o.volume END);
-
-    RAISE NOTICE 'Matching order #% (%@%) with #% (%@%). Actual: %@%',
-        o.order_id, o.volume, o.price, othero.order_id, othero.volume, othero.price, v, p;
-
-    INSERT INTO match (bid_order_id, ask_order_id, price, volume)
-    VALUES (
-        CASE WHEN o.side = 0 THEN o.order_id ELSE othero.order_id END,
-        CASE WHEN o.side = 1 THEN o.order_id ELSE othero.order_id END,
-        p,
-        v);
-
-    IF o.volume > v THEN
-        PERFORM execute_order(oid);
-    END IF;
-
-    RETURN othero.order_id;
-END; $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
--------------------------------
-
+--- Add bank credit
 CREATE OR REPLACE FUNCTION bank_credit(uid integer, cid currency_id, amnt bigint, bid integer, ref character varying)
   RETURNS integer AS
 $BODY$
@@ -230,18 +57,7 @@ END; $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-CREATE OR REPLACE FUNCTION order_after_update() RETURNS trigger AS $$
-BEGIN
-    RAISE NOTICE 'Order #% updated from % to %',
-        OLD.order_id, OLD.volume, NEW.volume;
-
-    IF NEW.hold_id IS NULL AND OLD.hold_id IS NOT NULL THEN
-        RAISE NOTICE 'Deleting hold % for order %', OLD.hold_id, OLD.order_id;
-        DELETE FROM hold WHERE hold_id = OLD.hold_id;
-    END IF;
-
-    RETURN NULL;
-END; $$ LANGUAGE plpgsql;
+------------------------------
 
 CREATE OR REPLACE FUNCTION spend_credit (
     tid int
@@ -289,8 +105,6 @@ BEGIN
     WHERE side = 1 AND volume > 0
     ORDER BY price ASC, order_id ASC
     LOOP
-        RAISE NOTICE '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!';
-
         -- (r 10^(b-q))/a
         amnt := floor((remain * 10^(bcs - qcs)) / ao.price);
 
@@ -326,3 +140,317 @@ BEGIN
 
     RAISE 'Could not match entire amount (no more ask orders)';
 END; $$ LANGUAGE plpgsql;
+
+--------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION execute_order(oid integer)
+  RETURNS integer AS
+$BODY$
+DECLARE
+    o "order"%ROWTYPE;
+    othero "order"%ROWTYPE;
+    p bigint;
+    v bigint;
+BEGIN
+    RAISE NOTICE 'Executing order %', oid;
+
+    SELECT * INTO o FROM "order" WHERE order_id = oid;
+
+    SELECT * INTO othero
+    FROM "order" oo
+    WHERE
+        oo.volume > 0 AND
+        o.market_id = oo.market_id AND
+        o.side <> oo.side AND
+        (
+            o.price IS NULL OR
+            (o.side = 0 AND oo.price <= o.price) OR
+            (o.side = 1 AND oo.price >= o.price)
+        )
+    ORDER BY
+        CASE WHEN o.side = 0 THEN oo.price ELSE -oo.price END ASC;
+
+    IF NOT FOUND THEN
+        RAISE NOTICE 'Could not match order #%', oid;
+        RETURN NULL;
+    END IF;
+
+    p := othero.price;
+
+    v := (CASE WHEN o.volume > othero.volume THEN othero.volume ELSE o.volume END);
+
+    RAISE NOTICE 'Matching order #% (%@%) with #% (%@%). Actual: %@%',
+        o.order_id, o.volume, o.price, othero.order_id, othero.volume, othero.price, v, p;
+
+    INSERT INTO match (bid_order_id, ask_order_id, price, volume)
+    VALUES (
+        CASE WHEN o.side = 0 THEN o.order_id ELSE othero.order_id END,
+        CASE WHEN o.side = 1 THEN o.order_id ELSE othero.order_id END,
+        p,
+        v);
+
+    IF o.volume > v THEN
+        RAISE NOTICE 'Executing order again to match remaining %', o.volume - v;
+        PERFORM execute_order(oid);
+    END IF;
+
+    RETURN othero.order_id;
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+--------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION order_after_update() RETURNS trigger AS $$
+BEGIN
+    RAISE NOTICE 'Order #% updated from % to %',
+        OLD.order_id, OLD.volume, NEW.volume;
+
+    IF NEW.hold_id IS NULL AND OLD.hold_id IS NOT NULL THEN
+        RAISE NOTICE 'Deleting hold % for order %', OLD.hold_id, OLD.order_id;
+        DELETE FROM hold WHERE hold_id = OLD.hold_id;
+    END IF;
+
+    RETURN NULL;
+END; $$ LANGUAGE plpgsql;
+
+--------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION order_insert()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+    hid int;
+    aid int;
+    m market%ROWTYPE;
+    bc_scale int;
+    qc_scale int;
+    h bigint;
+BEGIN
+    IF NEW.hold_id IS NOT NULL THEN
+        RAISE EXCEPTION 'did not expect order to have hold set at insert';
+    END IF;
+
+    IF NEW.volume = 0 THEN
+        RAISE EXCEPTION 'did not expect order to be inserted with zero volume';
+    END IF;
+
+    NEW.original = NEW.volume;
+
+
+    IF NEW.price IS NOT NULL THEN
+        RAISE NOTICE 'Creating hold for limit order %', NEW.order_id;
+
+        SELECT * INTO m FROM market WHERE market_id = NEW.market_id;
+
+        IF NEW.side = 0 THEN
+            aid = user_currency_account(NEW.user_id, m.quote_currency_id);
+        ELSE
+            aid = user_currency_account(NEW.user_id, m.base_currency_id);
+        END IF;
+
+        SELECT scale INTO bc_scale FROM currency WHERE currency_id = m.base_currency_id;
+        SELECT scale INTO qc_scale FROM currency WHERE currency_id = m.quote_currency_id;
+
+        -- create hold
+        h := ceil(CASE
+            WHEN NEW.side = 0 THEN NEW.price * NEW.volume / 10^(bc_scale - qc_scale)
+            ELSE NEW.volume * 10^(m.scale)
+        END);
+
+        INSERT INTO hold (account_id, amount) VALUES (aid, h);
+        hid := currval('hold_hold_id_seq');
+
+        NEW.hold_id := hid;
+    ELSE
+        RAISE NOTICE 'Not creating hold for market order %', NEW.order_id;
+    END IF;
+
+    RETURN NEW;
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+CREATE OR REPLACE FUNCTION order_insert_match()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+    v bigint;
+BEGIN
+    PERFORM execute_order(NEW.order_id);
+
+    IF NEW.price IS NULL THEN
+        SELECT volume INTO v FROM "order" WHERE order_id = NEW.order_id;
+
+        IF v > 0 THEN
+            RAISE 'Could not fill entire market order. % remains.', v;
+        END IF;
+    END IF;
+
+    RETURN NULL;
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+--------------------------------------
+
+ALTER TABLE "match"
+    ADD COLUMN ask_fee bigint,
+    ADD COLUMN bid_fee bigint;
+
+CREATE OR REPLACE FUNCTION convert_and_withdraw (
+    uid int,
+    bid int,
+    amnt bigint,
+    bc currency_id,
+    qc currency_id
+) RETURNS void AS $$
+DECLARE
+    m market%ROWTYPE;
+    bamnt bigint;
+    oid int;
+    bcs int;
+BEGIN
+    IF (SELECT user_id FROM bank_account WHERE bank_account_id = bid) <> uid THEN
+        RAISE 'User does not own bank account.';
+    END IF;
+
+    SELECT *
+    INTO m
+    FROM market
+    WHERE
+        quote_currency_id = qc AND
+        base_currency_id = bc;
+
+    SELECT scale INTO bcs FROM currency WHERE currency_id = bc;
+
+    IF NOT FOUND THEN
+        RAISE 'Market not found.';
+    END IF;
+
+    INSERT INTO "order" (user_id, market_id, price, side, volume)
+    VALUES (uid, m.market_id, NULL, 0, amnt);
+
+    oid := currval('order_order_id_seq');
+
+    SELECT matched
+    INTO bamnt
+    FROM "order"
+    WHERE order_id = oid;
+
+    -- Convert from market volume scale to base currency scale.
+    bamnt := bamnt * 10^(bcs - m.scale);
+
+    IF matched <= 0 THEN
+        RAISE 'Not matched. This should never happen.';
+    END IF;
+
+    PERFORM withdraw_bank(bid, bc, bamnt);
+END; $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION match_insert()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+    bido order%ROWTYPE;
+    asko order%ROWTYPE;
+    ask_credit bigint;
+    bid_credit bigint;
+    bid_fee_ratio decimal(6, 4);
+    ask_fee_ratio decimal(6, 4);
+    bid_fee bigint;
+    ask_fee bigint;
+    bc_scale int;
+    qc_scale int;
+    m market%ROWTYPE;
+    ucount int;
+BEGIN
+    SELECT * INTO bido FROM "order" WHERE order_id = NEW.bid_order_id;
+    SELECT * INTO asko FROM "order" WHERE order_id = NEW.ask_order_id;
+    SELECT * INTO m FROM market WHERE market_id = asko.market_id;
+
+    bc_scale := (SELECT scale FROM currency WHERE currency_id = m.base_currency_id);
+    qc_scale := (SELECT scale FROM currency WHERE currency_id = m.quote_currency_id);
+
+    RAISE NOTICE 'Reducing order volumes and increasing matched volumes';
+
+    UPDATE "order"
+    SET volume = volume - NEW.volume, matched = matched + NEW.volume
+    WHERE order_id = bido.order_id OR order_id = asko.order_id;
+
+    GET DIAGNOSTICS ucount = ROW_COUNT;
+
+    IF ucount <> 2 THEN
+        RAISE 'Expected 2 order updates, did %', ucount;
+    END IF;
+
+    -- The book uses a volumes expressed in the scale of the currency minus the scale of the book
+    bid_credit := NEW.volume * 10^m.scale;
+
+    IF bido.user_id = asko.user_id THEN
+        RAISE NOTICE 'Order has been matched with another order from the same user.';
+        RETURN NEW;
+    END IF;
+
+    IF random() < 0.5 THEN
+        ask_credit := ceil(NEW.price * NEW.volume / 10^(bc_scale - qc_scale));
+    ELSE
+        ask_credit := floor(NEW.price * NEW.volume / 10^(bc_scale - qc_scale));
+    END IF;
+
+    RAISE NOTICE 'Reducing holds.';
+
+    UPDATE "hold"
+    SET amount = amount - bid_credit
+    WHERE hold_id = asko.hold_id;
+
+    UPDATE "hold"
+    SET amount = amount - ask_credit
+    WHERE hold_id = bido.hold_id;
+
+    RAISE NOTICE 'Performing base transfer, % %', bid_credit / 10^bc_scale, m.base_currency_id;
+
+    RAISE NOTICE 'Ask user has balance=%, held=% of base', (
+        SELECT balance FROM account WHERE user_id = asko.user_id AND currency_id = m.base_currency_id
+    ), (
+        SELECT hold FROM account WHERE user_id = asko.user_id AND currency_id = m.base_currency_id
+    );
+
+    INSERT INTO transaction (debit_account_id, credit_account_id, amount)
+    VALUES (user_currency_account(asko.user_id, m.base_currency_id), user_currency_account(bido.user_id, m.base_currency_id), bid_credit);
+
+    RAISE NOTICE 'Performing quote transfer, % %', ask_credit / 10^qc_scale, m.quote_currency_id;
+
+    INSERT INTO transaction (debit_account_id, credit_account_id, amount)
+    VALUES (user_currency_account(bido.user_id, m.quote_currency_id), user_currency_account(asko.user_id, m.quote_currency_id), ask_credit);
+
+    RAISE NOTICE 'Estimating fees.';
+
+    ask_fee_ratio := user_fee_ratio(asko.user_id);
+    ask_fee := ceil(ask_fee_ratio * ask_credit);
+
+    bid_fee_ratio := user_fee_ratio(bido.user_id);
+    bid_fee := ceil(bid_fee_ratio * bid_credit);
+
+    NEW.ask_fee = ask_fee;
+    NEW.bid_fee = bid_fee;
+
+    -- Fees
+    IF ask_fee > 0 THEN
+        RAISE NOTICE 'Fee for asker is % %', ask_fee / 10^qc_scale, m.quote_currency_id;
+
+        INSERT INTO "transaction" (debit_account_id ,credit_account_id, amount)
+        VALUES (user_currency_account(asko.user_id, m.quote_currency_id), special_account('fee', m.quote_currency_id), ask_fee);
+    END IF;
+
+    IF bid_fee > 0 THEN
+        RAISE NOTICE 'Fee for bidder is % %', bid_fee / 10^bc_scale, m.base_currency_id;
+
+        INSERT INTO "transaction" (debit_account_id ,credit_account_id, amount)
+        VALUES (user_currency_account(bido.user_id, m.base_currency_id), special_account('fee', m.base_currency_id), bid_fee);
+    END IF;
+
+    RETURN NEW;
+END; $BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

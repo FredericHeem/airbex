@@ -22,8 +22,12 @@ if (config.raven) {
     app.use(raven.middleware.express(config.raven))
     debug('Raven middleware added')
 
-    raven.patchGlobal(function() {
-        console.error('leaving process (after global patch)')
+    raven.patchGlobal(function(logged, err) {
+        console.error(err)
+        console.error(err.stack)
+
+        console.error('exiting process (after global patch)')
+        process.exit(1)
     })
 
     debug('Raven patched global')

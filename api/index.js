@@ -10,7 +10,6 @@ var config = require('konfu')
 }
 , Cache = require('./cache')
 
-console.log('debug filter: DEBUG=%s', process.env.debug)
 debug('starting api web server')
 
 app.config = config

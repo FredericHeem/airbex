@@ -15,6 +15,17 @@ debug('starting api web server')
 app.config = config
 debug('config %j', config)
 
+app.use(express.bodyParser())
+
+var routes = ['bitcoincharts', 'v1', 'admin']
+routes.forEach(function(name) {
+    require('./' + name).configure(app, conn)
+})
+
+app.use(function(req, res) {
+    res.send(404)
+})
+
 if (config.raven) {
     debug('Configuring Raven...')
 
@@ -32,17 +43,6 @@ if (config.raven) {
 
     debug('Raven patched global')
 }
-
-app.use(express.bodyParser())
-
-var routes = ['bitcoincharts', 'v1', 'admin']
-routes.forEach(function(name) {
-    require('./' + name).configure(app, conn)
-})
-
-app.use(function(req, res) {
-    res.send(404)
-})
 
 var cache = new Cache(conn, function(err) {
     if (err) throw err

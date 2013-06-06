@@ -4,7 +4,7 @@ DECLARE
     uid int;
     a boolean;
 BEGIN
-    uid := (SELECT create_user('test@fest.com', repeat('X', 64)));
+    uid := (SELECT create_user('test@fest.com', repeat('X', 64), FALSE));
 
     RAISE NOTICE 'user % created', uid;
 
@@ -25,7 +25,7 @@ DECLARE
     uid int;
     a boolean;
 BEGIN
-    uid := (SELECT create_user('test@fest.com', repeat('X', 64)));
+    uid := (SELECT create_user('test@fest.com', repeat('X', 64), FALSE));
 
     BEGIN
         UPDATE "user" SET admin = NULL WHERE user_id = uid;

@@ -3,7 +3,7 @@ DECLARE
   uid int;
   key varchar(64) := 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBB';
 BEGIN
-	uid := create_user('test@TEST.com', fn.key);
+	uid := create_user('test@TEST.com', fn.key, FALSE);
 
 	IF (SELECT COUNT(*) FROM "user" WHERE email = 'test@TEST.com') <> 1 THEN
 		RAISE 'User not found by email';

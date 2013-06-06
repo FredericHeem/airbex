@@ -2,7 +2,7 @@ BEGIN; DO $$ <<fn>>
 DECLARE
     uid int;
 BEGIN
-    uid := create_user('a@a', repeat('x', 64));
+    uid := create_user('a@a', repeat('x', 64), FALSE);
 
     BEGIN
         PERFORM reset_password_continue(repeat('a', 20));

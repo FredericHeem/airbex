@@ -11,8 +11,8 @@ DECLARE
     u2_btc_expected bigint := (0.70877830 * 1e8)::bigint;
 BEGIN
     -- create users
-    uid1 := create_user('u1@g', REPEAT('x', 64));
-    uid2 := create_user('u2@g', REPEAT('y', 64));
+    uid1 := create_user('u1@g', REPEAT('x', 64), FALSE);
+    uid2 := create_user('u2@g', REPEAT('y', 64), FALSE);
 
     -- credit user1 with 1 btc
     INSERT INTO "transaction" (debit_account_id, credit_account_id, amount)

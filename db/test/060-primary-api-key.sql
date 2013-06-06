@@ -3,7 +3,7 @@ DECLARE
     uid int;
     p boolean;
 BEGIN
-    uid := create_user('t@t', repeat('x', 64));
+    uid := create_user('t@t', repeat('x', 64), FALSE);
     PERFORM replace_api_key(repeat('x', 64), repeat('y', 64));
 
     p := (SELECT "primary" FROM api_key WHERE api_key_id = repeat('y', 64));

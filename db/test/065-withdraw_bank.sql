@@ -8,7 +8,7 @@ DECLARE
   bwr bank_withdraw_request%ROWTYPE;
   h hold%ROWTYPE;
 BEGIN
-    uid := create_user('a@a', fn.key);
+    uid := create_user('a@a', fn.key, FALSE);
 
     -- Credit the user 100 NOK
     PERFORM edge_credit(uid, 'NOK', 100e5::bigint);

@@ -5,7 +5,7 @@ DECLARE
   bid int;
   oid int;
 BEGIN
-  uid := create_user('t@t', repeat('x', 64));
+  uid := create_user('t@t', repeat('x', 64), FALSE);
 
   bid := (SELECT market_id FROM "market" WHERE base_currency_id = 'BTC' AND quote_currency_id = 'XRP');
 

@@ -13,8 +13,7 @@
         },
         "address": {
             "type": "string",
-            "required": true,
-            "pattern": "^[\\w\\s\\n]+$"
+            "required": true
         },
         "city": {
             "type": "string",

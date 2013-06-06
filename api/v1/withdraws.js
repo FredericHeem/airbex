@@ -6,7 +6,7 @@ var _ = require('lodash')
 withdraws.configure = function(app, conn, auth) {
     app.del('/v1/withdraws/:id', auth, withdraws.cancel.bind(withdraws, conn))
     app.get('/v1/withdraws', auth, withdraws.forUser.bind(withdraws, conn))
-    app.post('/v1/withdraws/norway', auth, withdraws.withdrawBank.bind(withdraws, conn))
+    app.post('/v1/withdraws/bank', auth, withdraws.withdrawBank.bind(withdraws, conn))
 }
 
 withdraws.withdrawBank = function(conn, req, res, next) {

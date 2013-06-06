@@ -1,0 +1,19 @@
+{
+    "type": "object",
+    "properties": {
+        "bankAccount": {
+            "type": "integer",
+            "required": true
+        },
+        "amount": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\d+\\.?\\d{0,2}$"
+        },
+        "currency": {
+            "type": "string",
+            "required": true,
+            "pattern": "^NOK$"
+        }
+    }
+}

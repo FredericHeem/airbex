@@ -3,13 +3,11 @@
     "properties": {
         "firstName": {
             "type": "string",
-            "required": true,
-            "pattern": "^[\\w\\s]+$"
+            "required": true
         },
         "lastName": {
             "type": "string",
-            "required": true,
-            "pattern": "^[\\w\\s]+$"
+            "required": true
         },
         "address": {
             "type": "string",
@@ -17,8 +15,7 @@
         },
         "city": {
             "type": "string",
-            "required": true,
-            "pattern": "^[\\w\\s]+$"
+            "required": true
         },
         "postalArea": {
             "type": "string",

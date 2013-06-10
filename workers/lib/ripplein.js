@@ -4,6 +4,7 @@ var Q = require('q')
 , assert = require('assert')
 , EventEmitter = require('events').EventEmitter
 , util = require('util')
+, raven = require('./raven')
 
 var RippleIn = module.exports = function(db, uri) {
     this.client = db
@@ -91,6 +92,12 @@ RippleIn.prototype.rippleCredit = function(hash, currencyId, userId, amount) {
         }
 
         if (error.message == 'insert or update on table "account" violates foreign key constraint "account_user_id_fkey"') {
+            return
+        }
+
+        if (error.message == 'credit failed, account <NULL> not found') {
+            raven.captureMessage(util.format('Ripple transaction %s of %s %s with destination tag %s skipped. No such user.',
+                hash, amount, currencyId, userId))
             return
         }
 

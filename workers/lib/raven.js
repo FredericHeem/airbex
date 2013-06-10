@@ -21,5 +21,9 @@ module.exports = {
 	captureError: function(err) {
 		console.error(err)
 		console.error(err.stack)
+	},
+
+	captureMessage: function(message) {
+		console.log(message)
 	}
 }

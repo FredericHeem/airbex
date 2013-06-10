@@ -25,7 +25,7 @@ describe('users', function() {
 					query: function(q, c) {
 						if (q.text.match(/activity/)) return
 						expect(q.text).to.match(/select create_user/i)
-						expect(q.values).to.eql(['bob@bob.com', key])
+						expect(q.values).to.eql(['bob@bob.com', key, true])
 						c(null, { rows: [{ user_id: 89 }] })
 					}
 				}
@@ -33,7 +33,8 @@ describe('users', function() {
 			, req = {
 				body: {
 					email: 'bob@bob.com',
-					key: key
+					key: key,
+					simple: true
 				}
 			}
 			, res = {

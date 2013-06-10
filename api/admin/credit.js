@@ -11,16 +11,15 @@ credit.bankCredit = function(conn, req, res, next) {
     // in the actual query
     var query = {
         text: [
-            'SELECT bank_credit($1, $2, ($3::numeric * 10^scale)::bigint, $4, $5) transaction_id',
+            'SELECT bank_credit($1, $2, ($3::numeric * 10^scale)::bigint, $4) transaction_id',
             'FROM currency',
             'WHERE currency_id = $2'
         ].join('\n'),
         values: [
-            req.body.user_id,
-            req.body.currency_id,
-            req.body.amount,
-            req.body.bank_account_id,
-            req.body.reference
+            req.body.user_id, // 1
+            req.body.currency_id, // 2
+            req.body.amount, // 3
+            req.body.reference // 4
         ]
     }
 
@@ -35,7 +34,6 @@ credit.bankCredit = function(conn, req, res, next) {
         activities.log(conn, req.body.user_id, 'BankCredit', {
             currency: req.body.currency_id,
             amount: req.body.amount,
-            bankAccount: req.body.bank_account_id,
             reference: req.body.reference
         })
         res.send(201, { transaction_id: dr.rows[0].transaction_id })

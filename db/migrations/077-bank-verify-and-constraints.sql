@@ -1,8 +1,14 @@
 ALTER TABLE bank_account
-    ADD COLUMN verified_at timestamptz DEFAULT(current_timestamp),
+    ADD COLUMN verified_at timestamptz,
     ADD COLUMN verify_code varchar(4),
     ADD COLUMN verify_attempts int DEFAULT(0),
     ADD COLUMN verify_started_at timestamptz;
+
+UPDATE bank_account
+SET
+    verify_attempts = NULL,
+    verify_started_at = current_timestamp,
+    verified_at = current_timestamp;
 
 ALTER TABLE bank_account
     ALTER COLUMN verified_at DROP DEFAULT;

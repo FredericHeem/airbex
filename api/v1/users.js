@@ -100,8 +100,8 @@ users.create = function(conn, req, res, next) {
         }
 
         conn.write.query({
-            text: 'SELECT create_user($1, $2, TRUE) user_id',
-            values: [req.body.email, req.body.key]
+            text: 'SELECT create_user($1, $2, $3) user_id',
+            values: [req.body.email, req.body.key, req.body.simple]
         }, function(err, cres) {
             if (!err) {
                 activities.log(conn, cres.rows[0].user_id, 'Created', {})

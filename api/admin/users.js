@@ -7,6 +7,7 @@ users.configure = function(app, conn, auth) {
     app.get('/admin/users', auth, users.users.bind(users, conn))
     app.get('/admin/users/:id', auth, users.user.bind(users, conn))
     app.get('/admin/users/:user/bankAccounts', auth, users.bankAccounts.bind(users, conn))
+    app.post('/admin/users/:user/bankAccounts/:id/startVerify', auth, users.startBankAccountVerify.bind(users, conn))
     app.get('/admin/users/:user/withdrawRequests', auth, users.withdrawRequests.bind(users, conn))
     app.get('/admin/users/:user/activities', auth, users.activities.bind(users, conn))
     app.post('/admin/users/:user/sendVerificationEmail', auth, users.sendVerificationEmail.bind(users, conn))
@@ -24,8 +25,8 @@ users.sendVerificationEmail = function(conn, req, res, next) {
 users.addBankAccount = function(conn, req, res, next) {
     conn.write.query({
         text: [
-            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic, routing_number)',
-            'VALUES ($1, $2, $3, $4, $5)'
+            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic, routing_number, verified_at)',
+            'VALUES ($1, $2, $3, $4, $5, current_timestamp)'
         ].join('\n'),
         values: [
             +req.params.user,
@@ -36,6 +37,32 @@ users.addBankAccount = function(conn, req, res, next) {
         ]
     }, function(err, dr) {
         if (err) return next(err)
+        res.send(204)
+    })
+}
+
+users.startBankAccountVerify = function(conn, req, res, next) {
+    conn.write.query({
+        text: [
+            'UPDATE bank_account',
+            'SET verify_started_at = current_timestamp',
+            'WHERE',
+            '   bank_account_id = $1 AND',
+            '   verify_started_at IS NULL'
+        ].join('\n'),
+        values: [
+            req.params.id
+        ]
+    }, function(err, dr) {
+        if (err) return next(err)
+
+        if (!dr.rowCount) {
+            return res.send(404, {
+                name: 'BankAccountNotFound',
+                message: 'Bank account not found or already started verifying'
+            })
+        }
+
         res.send(204)
     })
 }
@@ -66,13 +93,7 @@ users.bankAccounts = function(conn, req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         res.send(200, dr.rows.map(function(row) {
-            console.log(row)
-            return _.extend(_.pick(row, 'iban', 'swiftbic'), {
-                id: row.bank_account_id,
-                displayName: row.display_name,
-                accountNumber: row.account_number,
-                routingNumber: row.routing_number
-            })
+            return row
         }))
     })
 }
@@ -91,7 +112,6 @@ users.activities = function(conn, req, res, next) {
         }))
     })
 }
-
 
 users.withdrawRequests = function(conn, req, res, next) {
     conn.read.query({

@@ -14,8 +14,8 @@ BEGIN
     PERFORM edge_credit(uid, 'NOK', 100e5::bigint);
 
     -- Create a bank account for the user
-    INSERT INTO bank_account (user_id, iban)
-    VALUES (uid, '12345');
+    INSERT INTO bank_account (user_id, iban, verified_at, verify_started_at, verify_attempts)
+    VALUES (uid, '12345', current_timestamp, current_timestamp - '1 hour'::interval, NULL);
 
     baid := currval('bank_account_bank_account_id_seq');
 

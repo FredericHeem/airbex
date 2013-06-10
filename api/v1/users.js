@@ -19,7 +19,13 @@ users.configure = function(app, conn, auth) {
     app.post('/v1/users/verify/call', auth, users.startPhoneVerify.bind(users, conn))
     app.post('/v1/users/verify', auth, users.verifyPhone.bind(users, conn))
     app.get('/v1/users/bankAccounts', auth, users.bankAccounts.bind(users, conn))
+    app.post('/v1/users/bankAccounts', auth, users.addBankAccount.bind(users, conn))
+    app.post('/v1/users/bankAccounts/:id/verify', auth, users.verifyBankAccount.bind(users, conn))
     app.post('/tropo', users.tropo.bind(users, conn))
+}
+
+users.createBankVerifyCode = function() {
+    return crypto.randomBytes(2).toString('hex')
 }
 
 users.whoami = function(conn, req, res, next) {
@@ -66,6 +72,50 @@ users.whoami = function(conn, req, res, next) {
 	})
 }
 
+users.addBankAccount = function(conn, req, res, next) {
+    conn.write.query({
+        text: [
+            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic, routing_number, verify_code)',
+            'VALUES ($1, $2, $3, $4, $5, $6)'
+        ].join('\n'),
+        values: [
+            req.user,
+            req.body.account_number,
+            req.body.iban,
+            req.body.swiftbic,
+            req.body.routing_number,
+            users.createBankVerifyCode()
+        ]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(204)
+    })
+}
+
+users.verifyBankAccount = function(conn, req, res, next) {
+    conn.write.query({
+        text: [
+            'SELECT verify_bank_account($1, $2, $3) success'
+        ].join('\n'),
+        values: [
+            req.user,
+            req.body.bankAccount,
+            req.body.code
+        ]
+    }, function(err, dr) {
+        if (err) return next(err)
+
+        if (!dr.rows[0].success) {
+            return res.send(400, {
+                name: 'WrongBankVerifyCode',
+                message: 'Bank account verification failed. Wrong code.'
+            })
+        }
+
+        res.send(204)
+    })
+}
+
 users.bankAccounts = function(conn, req, res, next) {
     conn.read.query({
         text: [
@@ -79,7 +129,8 @@ users.bankAccounts = function(conn, req, res, next) {
                 id: row.bank_account_id,
                 displayName: row.display_name,
                 accountNumber: row.account_number,
-                routingNumber: row.routing_number
+                routingNumber: row.routing_number,
+                verified: !!row.verified_at
             })
         }))
     })

@@ -101,7 +101,7 @@ users.bankAccounts = function(conn, req, res, next) {
 users.activity = function(conn, req, res, next) {
     conn.read.query({
         text: [
-            'SELECT * FROM activity WHERE user_id = $1'
+            'SELECT * FROM activity WHERE user_id = $1 ORDER BY created DESC LIMIT 100'
         ].join('\n'),
         values: [req.params.user]
     }, function(err, dr) {

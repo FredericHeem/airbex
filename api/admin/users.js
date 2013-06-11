@@ -173,6 +173,8 @@ users.buildQuery = function(params) {
     , values = []
 
     if (params.user_id || params.all) conditions.push(['user_id', params.user_id || params.all ])
+    if (+(params.user_id || params.all)) conditions.push(['user_id', (params.user_id || params.all) / 1234 ])
+
     if (params.phone_number || params.all) conditions.push(['phone_number', params.phone_number || params.all])
     if (params.first_name || params.all) conditions.push(['first_name', params.first_name || params.all])
     if (params.last_name || params.all) conditions.push(['last_name', params.last_name || params.all])

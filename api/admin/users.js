@@ -199,7 +199,6 @@ users.buildQuery = function(params) {
 
 users.users = function(conn, req, res, next) {
     var query = users.buildQuery(req.query)
-    console.log(JSON.stringify(query, null, 4))
     conn.read.query(query, function(err, dr) {
         if (err) return next(err)
         return res.send(dr.rows)

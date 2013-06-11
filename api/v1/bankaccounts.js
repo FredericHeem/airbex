@@ -29,7 +29,8 @@ bankAccounts.index = function(conn, req, res, next) {
                 displayName: row.display_name,
                 accountNumber: row.account_number,
                 routingNumber: row.routing_number,
-                verified: !!row.verified_at
+                verified: !!row.verified_at,
+                verifying: !!row.verify_started_at
             })
         }))
     })

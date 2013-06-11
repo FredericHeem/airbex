@@ -9,7 +9,7 @@ users.configure = function(app, conn, auth) {
     app.get('/admin/users/:user/bankAccounts', auth, users.bankAccounts.bind(users, conn))
     app.post('/admin/users/:user/bankAccounts/:id/startVerify', auth, users.startBankAccountVerify.bind(users, conn))
     app.get('/admin/users/:user/withdrawRequests', auth, users.withdrawRequests.bind(users, conn))
-    app.get('/admin/users/:user/activities', auth, users.activities.bind(users, conn))
+    app.get('/admin/users/:user/activity', auth, users.activity.bind(users, conn))
     app.post('/admin/users/:user/sendVerificationEmail', auth, users.sendVerificationEmail.bind(users, conn))
     app.post('/admin/users/:user/bankAccounts', auth, users.addBankAccount.bind(users, conn))
 }
@@ -98,7 +98,7 @@ users.bankAccounts = function(conn, req, res, next) {
     })
 }
 
-users.activities = function(conn, req, res, next) {
+users.activity = function(conn, req, res, next) {
     conn.read.query({
         text: [
             'SELECT * FROM activity WHERE user_id = $1'

@@ -12,6 +12,7 @@ users.configure = function(app, conn, auth) {
     app.get('/admin/users/:user/activity', auth, users.activity.bind(users, conn))
     app.post('/admin/users/:user/sendVerificationEmail', auth, users.sendVerificationEmail.bind(users, conn))
     app.post('/admin/users/:user/bankAccounts', auth, users.addBankAccount.bind(users, conn))
+    app.get('/admin/users/:user/accounts', auth, users.accounts.bind(users, conn))
 }
 
 users.sendVerificationEmail = function(conn, req, res, next) {
@@ -95,6 +96,28 @@ users.bankAccounts = function(conn, req, res, next) {
         res.send(200, dr.rows.map(function(row) {
             return row
         }))
+    })
+}
+
+users.accounts = function(conn, req, res, next) {
+    conn.read.query({
+        text: [
+            'SELECT',
+            '   a.account_id,',
+            '   a.currency_id AS currency,',
+            '   a.type,',
+            '   a.balance / 10^c.scale balance,',
+            '   a.hold / 10^c.scale "hold",',
+            '   (a.balance - a.hold) / 10^c.scale available',
+            'FROM account a',
+            'INNER JOIN "currency" c ON a.currency_id = c.currency_id',
+            'WHERE a.user_id = $1',
+            'ORDER BY currency, type'
+        ].join('\n'),
+        values: [req.params.user]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(dr.rows)
     })
 }
 

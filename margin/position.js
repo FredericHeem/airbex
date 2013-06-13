@@ -129,7 +129,7 @@ Position.prototype.setPosition = function(position, cb) {
     )
 
     while (diff.lt(0)) {
-        diff = diff.add(position.actual.orders[i].volume)
+        diff = diff.add(position.actual.orders[i].remaining)
         cancels.push(position.actual.orders[i--])
     }
 

@@ -13,6 +13,7 @@ users.configure = function(app, conn, auth) {
     app.post('/admin/users/:user/sendVerificationEmail', auth, users.sendVerificationEmail.bind(users, conn))
     app.post('/admin/users/:user/bankAccounts', auth, users.addBankAccount.bind(users, conn))
     app.get('/admin/users/:user/accounts', auth, users.accounts.bind(users, conn))
+    app.post('/admin/users/:user/bankAccounts/:id/setVerified', auth, users.setBankAccountVerified.bind(users, conn))
 }
 
 users.sendVerificationEmail = function(conn, req, res, next) {
@@ -61,6 +62,36 @@ users.startBankAccountVerify = function(conn, req, res, next) {
             return res.send(404, {
                 name: 'BankAccountNotFound',
                 message: 'Bank account not found or already started verifying'
+            })
+        }
+
+        res.send(204)
+    })
+}
+
+users.setBankAccountVerified = function(conn, req, res, next) {
+    conn.write.query({
+        text: [
+            'UPDATE bank_account',
+            'SET',
+            '   verify_started_at = current_timestamp,',
+            '   verified_at = current_timestamp,',
+            '   verify_code = null,',
+            '   verify_attempts = null',
+            'WHERE',
+            '   bank_account_id = $1 AND',
+            '   verified_at IS NULL'
+        ].join('\n'),
+        values: [
+            req.params.id
+        ]
+    }, function(err, dr) {
+        if (err) return next(err)
+
+        if (!dr.rowCount) {
+            return res.send(404, {
+                name: 'BankAccountNotFound',
+                message: 'Bank account not found or already verifying'
             })
         }
 

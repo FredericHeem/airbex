@@ -31,7 +31,7 @@ Position.prototype.groupOrders = function(orders) {
         }
 
         group.orders.push(order)
-        group.volume = num(group.volume).add(order.volume).toString()
+        group.volume = num(group.volume).add(order.remaining).toString()
     })
 
     return groups
@@ -45,7 +45,7 @@ Position.prototype.get = function(cb) {
         if (err) return cb(err)
 
         // Ignore orders for other markets
-        var orders = orders.filter(function(o) {
+        orders = orders.filter(function(o) {
             return that.market == o.market
         })
 

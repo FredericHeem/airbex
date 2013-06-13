@@ -94,7 +94,7 @@ orders.forUser = function(conn, req, res, next) {
         res.send(r.rows.map(function(row) {
             return {
                 id: row.id,
-                type: row.type ? 'ask' : 'bid',
+                type: row.side ? 'ask' : 'bid',
                 price: req.app.cache.formatOrderPrice(row.price, row.market),
                 remaining: req.app.cache.formatOrderVolume(row.volume, row.market),
                 amount: req.app.cache.formatOrderVolume(row.original, row.market),

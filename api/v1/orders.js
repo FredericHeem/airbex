@@ -83,7 +83,7 @@ orders.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn.read, 'query', {
         text: [
             'SELECT order_id id, base_currency_id || quote_currency_id market, side, price, volume,',
-            'original - volume remaining',
+            'original, original - volume matched',
             'FROM order_view o',
             'INNER JOIN market m ON m.market_id = o.market_id',
             'WHERE user_id = $1 AND volume > 0'
@@ -92,11 +92,15 @@ orders.forUser = function(conn, req, res, next) {
     })
     .then(function(r) {
         res.send(r.rows.map(function(row) {
-            row.type = row.type ? 'ask' : 'bid'
-            row.price = req.app.cache.formatOrderPrice(row.price, row.market)
-            row.amount = req.app.cache.formatOrderVolume(row.volume, row.market)
-            row.remaining = req.app.cache.formatOrderVolume(row.remaining, row.market)
-            return row
+            return {
+                id: row.id,
+                type: row.side ? 'ask' : 'bid',
+                price: req.app.cache.formatOrderPrice(row.price, row.market),
+                remaining: req.app.cache.formatOrderVolume(row.volume, row.market),
+                amount: req.app.cache.formatOrderVolume(row.original, row.market),
+                matched: req.app.cache.formatOrderVolume(row.matched, row.market),
+                market: row.market
+            }
         }))
     }, next)
     .done()

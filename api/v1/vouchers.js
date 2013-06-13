@@ -9,6 +9,7 @@ var _ = require('lodash')
 vouchers.configure = function(app, conn, auth) {
     app.post('/v1/vouchers', auth, vouchers.create.bind(vouchers, conn))
     app.post('/v1/vouchers/:id/redeem', auth, vouchers.redeem.bind(vouchers, conn))
+    app.get('/v1/vouchers', auth, vouchers.index.bind(vouchers, conn))
 }
 
 vouchers.createId = function() {
@@ -47,6 +48,28 @@ vouchers.create = function(conn, req, res, next) {
     }, function(err) {
         if (err) return next(err)
         res.send(201, { voucher: voucherId })
+    })
+}
+
+vouchers.index = function(conn, req, res, next) {
+    conn.read.query({
+        text: [
+            'SELECT v.voucher_id, h.amount, a.currency_id',
+            'FROM voucher v',
+            'INNER JOIN "hold" h ON h.hold_id = v.hold_id',
+            'INNER JOIN account a ON a.account_id = h.account_id',
+            'WHERE a.user_id = $1'
+        ].join('\n'),
+        values: [req.user]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(201, dr.rows.map(function(row) {
+            return {
+                code: row.voucher_id,
+                currency: row.currency_id,
+                amount: req.app.cache.formatCurrency(row.amount, row.currency_id)
+            }
+        }))
     })
 }
 

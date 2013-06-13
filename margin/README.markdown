@@ -1,7 +1,7 @@
 margin
 ===
 
-Experimental virtual currency margin trader, not suited for production use.
+Experimental digital currency margin trader, not suited for production use.
 
 Install
 ---

@@ -83,10 +83,14 @@ orders.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn.read, 'query', {
         text: [
             'SELECT order_id id, base_currency_id || quote_currency_id market, side, price, volume,',
-            'original, original - volume matched',
+            'original, matched, cancelled',
             'FROM order_view o',
             'INNER JOIN market m ON m.market_id = o.market_id',
-            'WHERE user_id = $1 AND volume > 0'
+            'WHERE user_id = $1 AND (volume > 0 OR matched > 0)',
+            'ORDER BY',
+            'CASE WHEN volume > 0 THEN 0 ELSE 1 END ASC,',
+            'order_id DESC',
+            'LIMIT 25'
         ].join('\n'),
         values: [req.user]
     })
@@ -99,6 +103,7 @@ orders.forUser = function(conn, req, res, next) {
                 remaining: req.app.cache.formatOrderVolume(row.volume, row.market),
                 amount: req.app.cache.formatOrderVolume(row.original, row.market),
                 matched: req.app.cache.formatOrderVolume(row.matched, row.market),
+                cancelled: req.app.cache.formatOrderVolume(row.cancelled, row.market),
                 market: row.market
             }
         }))

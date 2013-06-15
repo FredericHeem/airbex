@@ -14,7 +14,8 @@
         "currency": {
             "type": "string",
             "required": true,
-            "pattern": "^[A-Z]{3}$"
+            "pattern": "^[A-Z]{3}$",
+            "enum": ["BTC", "LTC", "XRP"]
         }
     }
 }

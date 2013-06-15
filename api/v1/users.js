@@ -290,7 +290,7 @@ users.startPhoneVerify = function(conn, req, res, next) {
             '</prosody>',
             '<prosody rate=\'-40%\'>',
             code.split('').join(', '),
-            '</prosody>'
+            '.</prosody>'
         ].join('')
 
         var msg = [

@@ -34,6 +34,7 @@ cd ~
 
 # Install forever-daemon
 sudo npm install -g forever
+sudo rm -rf .npm
 
 # Install margin
 npm install margin

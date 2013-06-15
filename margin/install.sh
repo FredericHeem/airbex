@@ -30,11 +30,13 @@ echo | sudo add-apt-repository ppa:chris-lea/node.js
 sudo apt-get update
 sudo apt-get install -y python-software-properties python g++ make nodejs
 
+echo "176.9.79.196 api.bitcoincharts.com" | sudo tee -a /etc/hosts
+
 cd ~
 
 # Install forever-daemon
 sudo npm install -g forever
-sudo rm -rf .npm
+sudo rm -rf .npm tmp
 
 # Install margin
 npm install margin

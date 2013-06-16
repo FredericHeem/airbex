@@ -5,6 +5,7 @@
 
 export environment=production
 export prefix=production.
+export api=10.0.0.184:8010
 
 sudo apt-get update
 sudo apt-get upgrade -y
@@ -37,24 +38,21 @@ server {
     gzip_disable "MSIE [1-6]\.(?!.*SV1)";
 
     location /api {
-        proxy_pass http://10.0.0.184:8010;
+        proxy_pass http://${api};
         rewrite ^/api(/.+)\$ \$1 break;
         proxy_set_header X-Real-IP \$remote_addr;
     }
 }
 
 server {
-    listen 8001;
-    server_name ${prefix}snowco.in;
-    rewrite ^ https://${prefix}justcoin.com\$request_uri? permanent;
-}
-
-server {
     listen 8002;
-    server_name ${prefix}snowco.in ${prefix}justcoin.com;
+    server_name ${prefix}justcoin.com;
     rewrite ^ https://${prefix}justcoin.com\$request_uri? permanent;
 }
 EOL
+
+sudo nginx -s reload
+vim /home/ubuntu/snow-web/nginx.conf
 
 # --- make site available and enabled
 sudo ln nginx.conf /etc/nginx/sites-available/justcoin.com

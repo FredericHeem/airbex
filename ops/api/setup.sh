@@ -164,8 +164,8 @@ server {
 EOL
 
 # --- make site available and enabled
-sudo ln nginx.conf /etc/nginx/sites-available/${prefix}api.justcoin.com
-sudo ln /etc/nginx/sites-available/${prefix}api.justcoin.com /etc/nginx/sites-enabled/${prefix}api.justcoin.com
+sudo ln nginx.conf /etc/nginx/sites-available/api.justcoin.com
+sudo ln /etc/nginx/sites-available/api.justcoin.com /etc/nginx/sites-enabled/api.justcoin.com
 
 sudo nginx -s reload
 

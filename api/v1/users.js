@@ -22,6 +22,41 @@ users.configure = function(app, conn, auth) {
     app.post('/v1/users/bankAccounts', auth, users.addBankAccount.bind(users, conn))
     app.post('/v1/users/bankAccounts/:id/verify', auth, users.verifyBankAccount.bind(users, conn))
     app.post('/tropo', users.tropo.bind(users, conn))
+    app.patch('/v1/users/current', auth, users.patch.bind(users, conn))
+}
+
+users.patch = function(conn, req, res, next) {
+    var updates = {}
+    , values = [req.user]
+
+    if (req.body.language !== undefined) {
+        updates['language'] = req.body.language
+    }
+
+    var updateText = _.map(updates, function(value, key) {
+        values.push(value)
+        return key + ' = $' + values.length
+    })
+
+    if (values.length === 1) {
+        return res.send(400, {
+            name: 'NoUpdates',
+            message: 'No updates were provided'
+        })
+    }
+
+    conn.write.query({
+        text: [
+            'UPDATE "user"',
+            'SET ' + updateText,
+            'WHERE user_id = $1'
+        ].join('\n'),
+        values: values
+    }, function(err, dr) {
+        if (err) return next(err)
+        if (!dr.rowCount) return next(new Error('User ' + req.user + ' not found'))
+        res.send(204)
+    })
 }
 
 users.createBankVerifyCode = function() {
@@ -44,6 +79,7 @@ users.whoami = function(conn, req, res, next) {
             '   address,',
             '   country,',
             '   postal_area postalarea,',
+            '   language,',
             '   city',
             'FROM "user"',
             'WHERE user_id = $1'
@@ -67,7 +103,8 @@ users.whoami = function(conn, req, res, next) {
             emailVerified: row.email_verified_at !== null,
             country: row.country,
             postalArea: row.postalarea,
-            city: row.city
+            city: row.city,
+            language: row.language
         })
 	})
 }

@@ -40,7 +40,17 @@ email.sendVerificationEmail = function(conn, smtp, userId, cb) {
 
 email.verifySend = function(conn, req, res, next) {
     email.sendVerificationEmail(conn, req.app.smtp, req.user, function(err) {
-        if (err) return next(err)
+        if (err) {
+            if (err.message == 'E-mail already verified') {
+                return res.send(400, {
+                    name: 'EmailAlreadyVerified',
+                    message: 'The email for this user account has already been verified'
+                })
+            }
+
+            return next(err)
+        }
+
         res.send(204)
     })
 }

@@ -45,7 +45,7 @@ describe('ripple', function() {
 					query: function(q, c) {
 						if (q.text.match(/activity/)) return
 						expect(q.text).to.match(/ripple_withdraw/i)
-						expect(q.values).to.eql([98, 'QQQ', 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT', '50.3'])
+						expect(q.values).to.eql([98, 'BTC', 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT', '50.3'])
 						c(null, { rows: [{ request_id: 59 }] })
 					}
 				}
@@ -55,7 +55,7 @@ describe('ripple', function() {
 				body: {
 					address: 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT',
 					amount: '50.3',
-					currency: 'QQQ'
+					currency: 'BTC'
 				}
 			}
 			, res = {

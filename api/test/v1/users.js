@@ -7,10 +7,12 @@ describe('users', function() {
 			var routes = []
 			, app = {
 				post: function(url) { routes.push('post ' + url) },
+				patch: function(url) { routes.push('patch ' + url) },
 				get: function(url) { routes.push('get ' + url) }
 			}
 			users.configure(app)
 			expect(routes).to.contain('post /v1/users')
+			expect(routes).to.contain('patch /v1/users/current')
 			expect(routes).to.contain('get /v1/whoami')
 		})
 	})

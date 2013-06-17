@@ -9,7 +9,7 @@ module.exports = {
         ;['balances', 'markets', 'orders', 'ripple', 'intercom',
         'currencies', 'activities', 'users', 'transfer', 'withdraws',
         'keys', 'email', 'resetPassword', 'simple', 'bankaccounts',
-        'language', 'vouchers']
+        'language', 'vouchers', 'send']
         .forEach(function(name) {
             require('./' + name).configure(app, conn, auth)
         })

@@ -22,7 +22,10 @@ reset.createPhoneCode = function() {
 
 reset.resetPasswordBegin = function(conn, req, res, next) {
     var emailCode = reset.createEmailCode()
-    , url = 'https://justcoin.com/api/v1/resetPassword/continue/' + emailCode
+    , baseUrl = process.env.NODE_ENV == 'production' ?
+        'https://justcoin.com' : process.env.NODE_ENV == 'staging' ?
+        'https://staging.justcoin.com' : 'http://localhost:5073'
+    , url = baseUrl + '/api/v1/resetPassword/continue/' + emailCode
     , emailTemplate = _.template([
         '<p>A request has just been made to reset your password at Justcoin.',
         'If this was not you, ignore and delete this email.</p>',

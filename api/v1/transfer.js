@@ -9,6 +9,7 @@ transfer.configure = function(app, conn, auth) {
 
 transfer.transfer = function(conn, req, res, next) {
     if (!validate(req.body, 'transfer', res)) return
+    if (req.body.currency == 'NOK') return next(new Error('Cannot transfer NOK'))
 
     Q.ninvoke(conn.write, 'query', {
         text: [

@@ -24,7 +24,11 @@ email.sendVerificationEmail = function(conn, smtp, userId, cb) {
     }, function(err, dr) {
         if (err) return cb(err)
 
-        var url = 'https://justcoin.com/api/v1/email/verify/' + code
+        var baseUrl = process.env.NODE_ENV == 'production' ?
+            'https://justcoin.com' : process.env.NODE_ENV == 'staging' ?
+            'https://staging.justcoin.com' : 'http://localhost:5073'
+
+        var url = baseUrl + '/api/v1/email/verify/' + code
 
         var mail = {
             from: 'Justcoin <hello@justcoin.com>',

@@ -86,11 +86,8 @@ orders.forUser = function(conn, req, res, next) {
             'original, matched, cancelled',
             'FROM order_view o',
             'INNER JOIN market m ON m.market_id = o.market_id',
-            'WHERE user_id = $1 AND (volume > 0 OR matched > 0)',
-            'ORDER BY',
-            'CASE WHEN volume > 0 THEN 0 ELSE 1 END ASC,',
-            'order_id DESC',
-            'LIMIT 25'
+            'WHERE user_id = $1 AND volume > 0',
+            'ORDER BY order_id DESC'
         ].join('\n'),
         values: [req.user]
     })

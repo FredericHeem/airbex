@@ -8,6 +8,7 @@ orders.configure = function(app, conn, auth) {
     app.del('/v1/orders/:id', auth, orders.cancel.bind(orders, conn))
     app.post('/v1/orders', auth, orders.create.bind(orders, conn))
     app.get('/v1/orders', auth, orders.forUser.bind(orders, conn))
+    app.get('/v1/orders/history', auth, orders.history.bind(orders, conn))
 }
 
 orders.create = function(conn, req, res, next) {
@@ -79,10 +80,23 @@ orders.create = function(conn, req, res, next) {
     })
 }
 
+function formatOrderRow(cache, row) {
+    return {
+        id: row.order_id,
+        type: row.side ? 'ask' : 'bid',
+        price: cache.formatOrderPrice(row.price, row.market),
+        remaining: cache.formatOrderVolume(row.volume, row.market),
+        amount: cache.formatOrderVolume(row.original, row.market),
+        matched: cache.formatOrderVolume(row.matched, row.market),
+        cancelled: cache.formatOrderVolume(row.cancelled, row.market),
+        market: row.market
+    }
+}
+
 orders.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn.read, 'query', {
         text: [
-            'SELECT order_id id, base_currency_id || quote_currency_id market, side, price, volume,',
+            'SELECT order_id, base_currency_id || quote_currency_id market, side, price, volume,',
             'original, matched, cancelled',
             'FROM order_view o',
             'INNER JOIN market m ON m.market_id = o.market_id',
@@ -92,17 +106,28 @@ orders.forUser = function(conn, req, res, next) {
         values: [req.user]
     })
     .then(function(r) {
+        res.send(r.rows.map(formatOrderRow.bind(this, req.app.cache)))
+    }, next)
+    .done()
+}
+
+orders.history = function(conn, req, res, next) {
+    Q.ninvoke(conn.read, 'query', {
+        text: [
+            'SELECT order_id, market, side, volume, matched, cancelled, original, price, average_price',
+            'FROM order_history o',
+            'INNER JOIN market m ON m.market_id = o.market_id',
+            'WHERE user_id = $1 AND matched > 0',
+            'ORDER BY order_id DESC',
+            'LIMIT 100'
+        ].join('\n'),
+        values: [req.user]
+    })
+    .then(function(r) {
         res.send(r.rows.map(function(row) {
-            return {
-                id: row.id,
-                type: row.side ? 'ask' : 'bid',
-                price: req.app.cache.formatOrderPrice(row.price, row.market),
-                remaining: req.app.cache.formatOrderVolume(row.volume, row.market),
-                amount: req.app.cache.formatOrderVolume(row.original, row.market),
-                matched: req.app.cache.formatOrderVolume(row.matched, row.market),
-                cancelled: req.app.cache.formatOrderVolume(row.cancelled, row.market),
-                market: row.market
-            }
+            var result = formatOrderRow(req.app.cache, row)
+            result.averagePrice = req.app.cache.formatOrderPrice(row.average_price, row.market)
+            return result
         }))
     }, next)
     .done()

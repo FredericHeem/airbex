@@ -7,7 +7,7 @@ module.exports = {
         var auth = require('./auth')(conn)
 
         ;['balances', 'markets', 'orders', 'ripple', 'intercom',
-        'currencies', 'activities', 'users', 'transfer', 'withdraws',
+        'currencies', 'activities', 'users', 'withdraws',
         'keys', 'email', 'resetPassword', 'simple', 'bankaccounts',
         'language', 'vouchers', 'send']
         .forEach(function(name) {

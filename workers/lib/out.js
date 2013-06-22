@@ -1,6 +1,6 @@
 var Out = module.exports = {}
 , debug = require('debug')('snow:out')
-, prefix = 'snow:out'
+, _= require('lodash')
 
 Out.cancelRequest = function(client, request, error, cb) {
     debug('cancelling request %s', request.request_id)
@@ -21,10 +21,7 @@ Out.popBatch = function(client, currency, cb) {
     var query = 'SELECT * FROM pop_' + currency + '_withdraw_requests()'
 
     client.query(query, function(err, dr) {
-        if (err) {
-            console.error('%s failed to retrieve batch', prefix, err)
-            return cb()
-        }
+        if (err) return cb(err)
 
         if (!dr.rowCount) {
             debug('no withdraws are pending')

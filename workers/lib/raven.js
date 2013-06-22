@@ -18,7 +18,7 @@ if (config.raven) {
 }
 
 module.exports = {
-	captureError: function(err) {
+	captureException: function(err) {
 		console.error(err)
 		console.error(err.stack)
 	},

@@ -1,4 +1,13 @@
 var config = require('konfu')
-, RippleIn = require('../lib/ripplein')
+, RippleIn = require('../ripplein')
 , dbClient = require('../lib/db')(config.pg_url, config.pg_native)
-new RippleIn(dbClient, config.ripple_uri)
+, rippleIn = new RippleIn(dbClient, config.ripple_uri, config.ripple_account, config.ripple_secret)
+, raven = require('../lib/raven')
+
+rippleIn.on('error', function(err) {
+    raven.captureException(err)
+})
+
+rippleIn.on('log', function(msg) {
+    raven.captureMessage(msg)
+})

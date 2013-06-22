@@ -1,4 +1,9 @@
 var config = require('konfu')
-, RippleOut = require('../lib/rippleout')
+, RippleOut = require('../rippleout')
 , dbClient = require('../lib/db')(config.pg_url, config.pg_native)
-new RippleOut(dbClient, config.ripple_account, config.ripple_secret, config.ripple_uri)
+, rippleOut = new RippleOut(dbClient, config.ripple_account, config.ripple_secret, config.ripple_uri)
+, raven = require('../lib/raven')
+
+rippleOut.on('error', function(err) {
+    raven.captureException(err)
+})

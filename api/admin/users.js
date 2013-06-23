@@ -31,11 +31,11 @@ users.sendVerificationEmail = function(conn, req, res, next) {
 }
 
 users.addBankAccount = function(conn, req, res, next) {
-    conn.write.query({
+    var query = {
         text: [
             'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
-            'routing_number, verified_at)',
-            'VALUES ($1, $2, $3, $4, $5, current_timestamp)'
+            'routing_number, verified_at, verify_attempts, verify_started_at)',
+            'VALUES ($1, $2, $3, $4, $5, current_timestamp, NULL, current_timestamp)'
         ].join('\n'),
         values: [
             +req.params.user,
@@ -44,7 +44,11 @@ users.addBankAccount = function(conn, req, res, next) {
             req.body.swiftbic,
             req.body.routing_number
         ]
-    }, function(err) {
+    }
+
+    console.log(query)
+
+    conn.write.query(query, function(err) {
         if (err) return next(err)
         res.send(204)
     })

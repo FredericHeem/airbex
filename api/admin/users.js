@@ -6,6 +6,7 @@ var users = module.exports = {}
 users.configure = function(app, conn, auth) {
     app.get('/admin/users', auth, users.users.bind(users, conn))
     app.get('/admin/users/:id', auth, users.user.bind(users, conn))
+    app.patch('/admin/users/:id', auth, users.patch.bind(users, conn))
     app.get('/admin/users/:user/bankAccounts', auth, users.bankAccounts.bind(users, conn))
     app.post('/admin/users/:user/bankAccounts/:id/startVerify', auth, users.startBankAccountVerify.bind(users, conn))
     app.get('/admin/users/:user/withdrawRequests', auth, users.withdrawRequests.bind(users, conn))
@@ -113,6 +114,43 @@ users.user = function(conn, req, res, next) {
             message: 'There is no user with the specified id.'
         })
         res.send(dr.rows[0])
+    })
+}
+
+users.patch = function(conn, req, res, next) {
+    var updates = {}
+    , values = [req.params.id]
+    , allowed = ['email', 'first_name', 'last_name', 'phone_number', 'country',
+        'city', 'postal_area', 'address', 'simple']
+
+    _.each(allowed, function(k) {
+        if (req.body[k] === undefined) return
+        updates[k] = req.body[k]
+    })
+
+    var updateText = _.map(updates, function(value, key) {
+        values.push(value)
+        return key + ' = $' + values.length
+    })
+
+    if (values.length === 1) {
+        return res.send(400, {
+            name: 'NoUpdates',
+            message: 'No updates were provided'
+        })
+    }
+
+    conn.write.query({
+        text: [
+            'UPDATE "user"',
+            'SET ' + updateText,
+            'WHERE user_id = $1'
+        ].join('\n'),
+        values: values
+    }, function(err, dr) {
+        if (err) return next(err)
+        if (!dr.rowCount) return next(new Error('User ' + req.user + ' not found'))
+        res.send(204)
     })
 }
 

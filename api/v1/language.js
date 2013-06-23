@@ -1,14 +1,14 @@
 var debug = require('debug')('snow:language')
 , util = require('util')
-, _ = require('lodash')
 , language = module.exports = {}
+, languageRe = /^([a-z]{1,8}(?:-[a-z]{1,8})?)(?:;q=([0-9](?:\.[0-9])?))?$/i
 
 language.configure = function(app, conn) {
     app.get('/v1/language', language.language.bind(language, conn))
 }
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-language.language = function(conn, req, res, next) {
+language.language = function(conn, req, res) {
     var header = req.get('Accept-Language')
     , language = null
 
@@ -16,7 +16,7 @@ language.language = function(conn, req, res, next) {
         debug('Accept-Language header is missing')
     } else {
         var languages = header.split(/,/g).map(function(token) {
-            var match = token.match(/^([a-z]{1,8}(?:-[a-z]{1,8})?)(?:;q=([0-9](?:\.[0-9])?))?$/i)
+            var match = token.match(languageRe)
 
             if (!match) {
                 debug('skipping invalid language token %s', token)

@@ -32,14 +32,12 @@ var flipOrder = function(order, side) {
     }
 
     if (side || order.side) flippedOrder.side = flipSide(order.side || side)
-    if (order.market) flippedOrder.market = flipPair(orde.market)
+    if (order.market) flippedOrder.market = flipPair(order.market)
 
     return flippedOrder
 }
 
 Flip.prototype.depth = function(market, cb) {
-    var that = this
-
     this.inner.depth(flipPair(market), function(err, depth) {
         if (err) return cb(err)
 

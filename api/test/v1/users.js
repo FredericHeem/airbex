@@ -1,3 +1,4 @@
+/* global describe, it */
 var expect = require('expect.js')
 , users = require('../../v1/users')
 

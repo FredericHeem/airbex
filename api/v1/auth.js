@@ -1,13 +1,13 @@
-var sjcl = require('../vendor/sjcl')
-, connect = require('express/node_modules/connect')
-, util = require('util')
-, auth = module.exports = function(conn) {
+module.exports = function(conn) {
     return function(req, res, next) {
         if (req.user) return next()
-        if (!req.query.key) return res.send(401, {
-            name: 'KeyMissing',
-            message:'key parameter missing from query string'
-        })
+
+        if (!req.query.key) {
+            return res.send(401, {
+                name: 'KeyMissing',
+                message:'key parameter missing from query string'
+            })
+        }
 
         conn.read.query({
             text: 'SELECT user_id FROM api_key WHERE api_key_id = $1',

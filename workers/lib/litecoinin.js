@@ -1,5 +1,4 @@
 var Q = require('q')
-, util = require('util')
 , num = require('num')
 , async = require('async')
 
@@ -44,7 +43,9 @@ LitecoinIn.prototype.processTx = function(txid) {
             values: [address]
         }).get('rows').get(0).get('count').then(function(internal) {
             if (!internal) {
-                return console.error('address for wallet transaction %s is not in database', txid)
+                return console.error(
+                    'address for wallet transaction %s is not in database',
+                    txid)
             }
 
             var satoshi = +num(detail.amount).mul(1e8)
@@ -95,7 +96,8 @@ LitecoinIn.prototype.processNewBlocks = function() {
     var that = this
 
     return Q.all([
-        Q.ninvoke(this.client, 'query', 'SELECT height FROM ltc_block').get('rows').get(0).get('height'),
+        Q.ninvoke(this.client, 'query', 'SELECT height FROM ltc_block')
+        .get('rows').get(0).get('height'),
         Q.ninvoke(this.litecoin, 'getBlockCount').then(function(result) {
             return result
         }, function(err) {

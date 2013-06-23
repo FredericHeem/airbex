@@ -1,6 +1,5 @@
 var debug = require('debug')('snow:litecoinaddress')
 , Q = require('q')
-, _ = require('lodash')
 
 var LitecoinAddress = module.exports = function(ep, dbClient) {
     var Client = require('bitcoin').Client
@@ -24,8 +23,10 @@ LitecoinAddress.prototype.loop = function() {
 }
 
 LitecoinAddress.prototype.saveAddress = function(accountId, address) {
-    var query = 'INSERT INTO ltc_deposit_address (account_id, address) \
-                 VALUES ($1, $2)'
+    var query = [
+        'INSERT INTO ltc_deposit_address (account_id, address)',
+        'VALUES ($1, $2)'
+    ].join('\n')
 
     return Q.ninvoke(this.client, 'query', {
         text: query,
@@ -42,10 +43,12 @@ LitecoinAddress.prototype.processAccount = function(row) {
 LitecoinAddress.prototype.findAccountsNeedingAddresses = function() {
     var that = this
 
-    var query = 'SELECT a.account_id \
-                 FROM account a \
-                 LEFT JOIN ltc_deposit_address bda ON bda.account_id = a.account_id \
-                 WHERE a.currency_id = \'LTC\' AND bda.address IS NULL'
+    var query = [
+        'SELECT a.account_id',
+        'FROM account a',
+        'LEFT JOIN ltc_deposit_address bda ON bda.account_id = a.account_id',
+        'WHERE a.currency_id = \'LTC\' AND bda.address IS NULL'
+    ].join('\n')
 
     return Q.ninvoke(this.client, 'query', query)
     .get('rows')

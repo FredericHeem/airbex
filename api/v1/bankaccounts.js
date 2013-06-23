@@ -1,14 +1,12 @@
 var _ = require('lodash')
-, activities = require('./activities')
-, validate = require('./validate')
 , bankAccounts = module.exports = {}
-, debug = require('debug')('snow:bankAccounts')
 , crypto = require('crypto')
 
 bankAccounts.configure = function(app, conn, auth) {
     app.get('/v1/bankAccounts', auth, bankAccounts.index.bind(bankAccounts, conn))
     app.post('/v1/bankAccounts', auth, bankAccounts.add.bind(bankAccounts, conn))
-    app.post('/v1/bankAccounts/:id/verify', auth, bankAccounts.verify.bind(bankAccounts, conn))
+    app.post('/v1/bankAccounts/:id/verify', auth,
+        bankAccounts.verify.bind(bankAccounts, conn))
 }
 
 bankAccounts.createVerifyCode = function() {
@@ -39,7 +37,8 @@ bankAccounts.index = function(conn, req, res, next) {
 bankAccounts.add = function(conn, req, res, next) {
     conn.write.query({
         text: [
-            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic, routing_number, verify_code)',
+            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
+            'routing_number, verify_code)',
             'VALUES ($1, $2, $3, $4, $5, $6)'
         ].join('\n'),
         values: [
@@ -50,7 +49,7 @@ bankAccounts.add = function(conn, req, res, next) {
             req.body.routingNumber,
             bankAccounts.createVerifyCode()
         ]
-    }, function(err, dr) {
+    }, function(err) {
         if (err) return next(err)
         res.send(204)
     })

@@ -1,3 +1,4 @@
+/* global describe, it */
 var expect = require('expect.js')
 , db = require('../db')
 
@@ -23,7 +24,8 @@ describe('db', function() {
 				}, 'user_id')
 
 				expect(query).to.eql({
-					text: 'INSERT INTO person (name, age) VALUES ($1, $2) RETURNING user_id',
+					text: 'INSERT INTO person (name, age) VALUES ($1, $2) ' +
+						'RETURNING user_id',
 					values: ['Bob', 11]
 				})
 			})

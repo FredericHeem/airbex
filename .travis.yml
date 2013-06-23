@@ -57,4 +57,5 @@ script:
   - "npm install"
   - "npm test"
   - "popd"
-  - "jshint `find | grep -P '.js$' | grep -vP '(/node_modules/|/web/vendor|/web/components/)' | sed ':a;N;$!ba;s/\n/ /g'`"
+  - "npm install jshint"
+  - "jshint `find | grep -P '\\.js$' | grep -vP '(/node_modules/|/vendor/|/web/components/)' | sed ':a;N;$!ba;s/\\n/ /g'`"

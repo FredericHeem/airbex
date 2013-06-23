@@ -1,7 +1,5 @@
 var debug = require('debug')('snow')
-, url = require('url')
 , request = require('request')
-, util = require('util')
 , Snow = module.exports = function(key, ep) {
     this.url = ep || 'https://justcoin.com/api/v1/'
     this.key = key

@@ -1,3 +1,4 @@
+/* global describe, it */
 var expect = require('expect.js')
 , markets = require('../../v1/markets')
 
@@ -20,7 +21,10 @@ describe('markets', function() {
 				read: {
 					query: function(q, c) {
 						expect(q).to.match(/market/i)
-						c(null, { rows: [{ base_currency_id: 'DRP', quote_currency_id: 'HRP'  }] })
+						c(null, { rows: [{
+							base_currency_id: 'DRP',
+							quote_currency_id: 'HRP'
+						}] })
 					}
 				}
 			}
@@ -32,7 +36,7 @@ describe('markets', function() {
 						},
 						formatOrderVolume: function() {
 							return 'formatted'
-						},
+						}
 					}
 				}
 			}
@@ -57,7 +61,7 @@ describe('markets', function() {
 						c(null, { rows: [
 							{ price: 9, volume: 123, type: 0 },
 							{ price: 9.5, volume: 55, type: 0 },
-							{ price: 8.5, volume: 87, type: 1 },
+							{ price: 8.5, volume: 87, type: 1 }
 						]})
 					}
 				}
@@ -74,7 +78,7 @@ describe('markets', function() {
 						},
 						formatOrderVolume: function(v) {
 							return v.toString()
-						},
+						}
 					}
 				}
 			}

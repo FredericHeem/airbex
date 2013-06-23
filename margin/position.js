@@ -1,8 +1,6 @@
-var _ = require('lodash')
-, async = require('async')
+var async = require('async')
 , num = require('num')
 , debug = require('debug')('position')
-, util = require('util')
 , Table = require('cli-table')
 
 var Position = module.exports = function(market, client, options) {
@@ -161,7 +159,9 @@ Position.prototype.setPosition = function(position, cb) {
             }, function(err) {
                 if (!err) return next()
                 if (err.name == 'InsufficientFunds') {
-                    console.error('Insufficient funds to place %s order in %s', position.type, that.market)
+                    console.error('Insufficient funds to place %s order in %s',
+                        position.type, that.market)
+
                     return next()
                 }
                 return next(err)

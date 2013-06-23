@@ -1,3 +1,4 @@
+/* global describe, it */
 var expect = require('expect.js')
 , resetPassword = require('../../v1/resetPassword')
 

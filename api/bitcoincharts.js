@@ -1,10 +1,11 @@
-var _ = require('lodash')
-, Q = require('q')
+var Q = require('q')
 , bitcoincharts = module.exports = {}
 
 bitcoincharts.configure = function(app, conn) {
-    app.get('/bitcoincharts/:currencyId/trades.json', bitcoincharts.trades.bind(bitcoincharts, conn))
-    app.get('/bitcoincharts/:currencyId/orderbook.json', bitcoincharts.orderbook.bind(bitcoincharts, conn))
+    app.get('/bitcoincharts/:currencyId/trades.json',
+        bitcoincharts.trades.bind(bitcoincharts, conn))
+    app.get('/bitcoincharts/:currencyId/orderbook.json',
+        bitcoincharts.orderbook.bind(bitcoincharts, conn))
 }
 
 bitcoincharts.trades = function(conn, req, res, next) {
@@ -31,7 +32,7 @@ bitcoincharts.trades = function(conn, req, res, next) {
 }
 
 bitcoincharts.orderbook = function(conn, req, res, next) {
-   Q.ninvoke(conn.read, 'query', {
+    Q.ninvoke(conn.read, 'query', {
         text: [
             'SELECT *',
             'FROM order_depth_view od',

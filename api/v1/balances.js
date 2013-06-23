@@ -1,5 +1,4 @@
 var Q = require('q')
-, num = require('num')
 , Balances = module.exports = {}
 
 Balances.configure = function(app, conn, auth) {
@@ -19,7 +18,8 @@ Balances.forUser = function(conn, req, res, next) {
     .get('rows')
     .then(function(balances) {
         res.send(balances.map(function(balance) {
-            balance.available = req.app.cache.formatCurrency(balance.available, balance.currency)
+            balance.available = req.app.cache.formatCurrency(balance.available,
+                balance.currency)
             return balance
         }))
     }, next)

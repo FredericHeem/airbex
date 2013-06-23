@@ -92,10 +92,15 @@ withdraws.cancel = function(conn, req, res, next) {
         values: [+req.params.id, req.user]
     }, function(err, dr) {
         if (err) return next(err)
-        if (!dr.rowCount) return res.send(404, {
-            name: 'WithdrawRequestNotFound',
-            message: 'The withdraw request was not found, does not belong to the user, or is already processing/processed'
-        })
+
+        if (!dr.rowCount) {
+            return res.send(404, {
+                name: 'WithdrawRequestNotFound',
+                message: 'The withdraw request was not found, ' +
+                    'does not belong to the user, or is already processing/processed'
+            })
+        }
+
         activities.log(conn, req.user, 'CancelWithdrawRequest', { id: +req.params.id })
         res.send(204)
     })

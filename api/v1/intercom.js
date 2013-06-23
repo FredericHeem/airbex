@@ -9,7 +9,8 @@ intercom.configure = function(app, conn, auth) {
 intercom.intercom = function(conn, config, req, res, next) {
     conn.read.query({
         text: [
-            'SELECT user_id, email_lower, FLOOR(EXTRACT(epoch FROM created))::int created',
+            'SELECT user_id, email_lower,',
+            'FLOOR(EXTRACT(epoch FROM created))::int created',
             'FROM "user"',
             'WHERE user_id = $1'
         ].join('\n'),
@@ -23,7 +24,8 @@ intercom.intercom = function(conn, config, req, res, next) {
 
         var userHash = hmac.digest('hex')
 
-        debug('hashed user id %s with secret %s to get %s', user.user_id, config.intercom_secret, userHash)
+        debug('hashed user id %s with secret %s to get %s',
+            user.user_id, config.intercom_secret, userHash)
 
         res.send({
             app_id: config.intercom_app_id,

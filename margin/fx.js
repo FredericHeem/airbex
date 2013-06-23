@@ -2,20 +2,20 @@ var async = require('async')
 , num = require('num')
 , request = require('request')
 , debug = require('debug')('snow:fx')
-, util = require('util')
-_ = require('lodash')
 , fx = module.exports = function(inner, ref) {
     this.inner = inner;
     this.ref = ref;
 };
 
 fx.prototype.depth = function(market, cb) {
-    var that = this, rate, depth;
+    var that = this, rate, depth
+    , url = 'http://www.google.com/ig/calculator?hl=en&q=1' +
+        this.ref + '=?' + market.substr(3)
 
     async.parallel({
         'rate': function(next) {
             request({
-                url: 'http://www.google.com/ig/calculator?hl=en&q=1' + that.ref + '=?' + market.substr(3),
+                url: url,
                 json: true
             }, function(err, res, data) {
                 if (err) return next(err);

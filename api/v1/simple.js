@@ -1,11 +1,10 @@
-var _ = require('lodash')
-, validate = require('./validate')
-, activities = require('./activities')
+var validate = require('./validate')
 , async = require('async')
 , simple = module.exports = {}
 
 simple.configure = function(app, conn, auth) {
-    app.post('/v1/simple/convertAndWithdraw', auth, simple.convertAndWithdraw.bind(simple, conn))
+    app.post('/v1/simple/convertAndWithdraw', auth,
+        simple.convertAndWithdraw.bind(simple, conn))
 }
 
 simple.convertAndWithdraw = function(conn, req, res, next) {
@@ -24,7 +23,8 @@ simple.convertAndWithdraw = function(conn, req, res, next) {
                 values: [
                     req.user,
                     +req.body.bankAccount,
-                    req.app.cache.parseOrderVolume(req.body.amount, 'BTC' + req.body.currency),
+                    req.app.cache.parseOrderVolume(req.body.amount,
+                        'BTC' + req.body.currency),
                     req.body.currency
                 ]
             }, function(err, dr) {
@@ -62,7 +62,8 @@ simple.convertAndWithdraw = function(conn, req, res, next) {
                     return next('Withdraw request ' + wrid + ' not found')
                 }
 
-                var amount = req.app.cache.formatCurrency(dr.rows[0].amount, req.body.currency)
+                var amount = req.app.cache.formatCurrency(
+                    dr.rows[0].amount, req.body.currency)
 
                 return res.send(200, {
                     amount:  amount

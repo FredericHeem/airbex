@@ -8,9 +8,9 @@ withdraws.configure = function(app, conn, auth) {
 
 withdraws.index = function(conn, req, res, next) {
     var query = [
-    'SELECT *',
-    'FROM bank_withdraw_request_view',
-    'WHERE state NOT IN (\'cancelled\', \'completed\')'
+        'SELECT *',
+        'FROM bank_withdraw_request_view',
+        'WHERE state NOT IN (\'cancelled\', \'completed\')'
     ].join('\n')
 
     conn.read.query(query, function(err, dr) {
@@ -29,13 +29,18 @@ withdraws.cancel = function(conn, req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         if (dr.rowCount) {
-            activities.log(conn, req.user, 'AdminWithdrawCancel', { id: req.params.id, error: req.body.error || null })
+            activities.log(conn, req.user, 'AdminWithdrawCancel', {
+                id: req.params.id,
+                error: req.body.error || null
+            })
+
             return res.send(204)
         }
 
         res.send(404, {
             name: 'WithdrawRequestNotFound',
-            message: 'The withdraw request was not found or is already processing/processed'
+            message: 'The withdraw request was not found or ' +
+                'is already processing/processed'
         })
     })
 }
@@ -81,7 +86,8 @@ withdraws.complete = function(conn, req, res, next) {
 
         res.send(404, {
             name: 'WithdrawRequestNotFound',
-            message: 'The withdraw request was not found or is not in the processing state'
+            message: 'The withdraw request was not found or ' +
+                'is not in the processing state'
         })
     })
 }

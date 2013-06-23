@@ -1,6 +1,4 @@
-var Q = require('q')
-, num = require('num')
-, Balances = module.exports = {}
+var Balances = module.exports = {}
 
 Balances.configure = function(app, conn, auth) {
     app.get('/admin/balances', auth, Balances.summary.bind(Balances, conn))

@@ -9,7 +9,7 @@ ripple.configure = function(app, conn, auth) {
     app.get('/ripple/federation', ripple.federation.bind(ripple, app.config, conn))
 }
 
-ripple.federation = function(config, conn, req, res, next) {
+ripple.federation = function(config, conn, req, res) {
     var domain = req.query.domain
     , tag = req.query.tag
     , user = req.query.user
@@ -39,7 +39,10 @@ ripple.federation = function(config, conn, req, res, next) {
         text: 'SELECT user_id FROM "user" WHERE REPLACE(email_lower, \'@\', \'_\') = $1',
         values: [user]
     } : {
-        text: 'SELECT REPLACE(email_lower, \'@\', \'_\') username FROM "user" WHERE user_id = $1',
+        text: [
+            'SELECT REPLACE(email_lower, \'@\', \'_\') username',
+            'FROM "user" WHERE user_id = $1'
+        ].join('\n'),
         values: [tag]
     }
 
@@ -51,7 +54,7 @@ ripple.federation = function(config, conn, req, res, next) {
             federation_json: {
                 type: 'federation_record',
                 currencies: config.ripple_federation_currencies,
-                expires: Math.round(+new Date / 1e3) + 3600 * 24 * 7,
+                expires: Math.round(+new Date() / 1e3) + 3600 * 24 * 7,
                 domain: config.ripple_federation.domain,
                 signer: null
             },
@@ -84,8 +87,13 @@ ripple.address = function(conn, req, res, next) {
 ripple.withdraw = function(conn, req, res, next) {
     if (!validate(req.body, 'ripple_out', res)) return
 
+    var queryText = [
+        'SELECT ripple_withdraw(user_currency_account($1, $2), $3,',
+        'from_decimal($4, $2))'
+    ].join('\n')
+
     Q.ninvoke(conn.write, 'query', {
-        text: 'SELECT ripple_withdraw(user_currency_account($1, $2), $3, from_decimal($4, $2))',
+        text: queryText,
         values: [req.user, req.body.currency, req.body.address, req.body.amount]
     })
     .then(function(cres) {
@@ -96,14 +104,14 @@ ripple.withdraw = function(conn, req, res, next) {
         })
         res.send(201, { id: cres.rows[0].request_id })
     }, function(err) {
-        if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
+        if (err.message.match(/transaction_amount_check/)) {
             return res.send(400, {
                 name: 'InvalidAmount',
                 message: 'The requested transfer amount is invalid/out of range'
             })
         }
 
-        if (err.message == 'new row for relation "account" violates check constraint "non_negative_available"') {
+        if (err.message.match(/non_negative_available/)) {
             return res.send(400, {
                 name: 'InsufficientFunds',
                 message: 'Insufficient funds'

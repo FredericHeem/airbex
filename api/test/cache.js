@@ -1,3 +1,4 @@
+/* global describe, it */
 var expect = require('expect.js')
 , Cache = require('../cache')
 

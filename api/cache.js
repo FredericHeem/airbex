@@ -13,9 +13,11 @@ var async = require('async')
             })
         },
         markets: function(cb) {
-            conn.read.query({
-                text: 'SELECT market_id, scale, base_currency_id || quote_currency_id pair FROM market'
-            }, function(err, res) {
+            conn.read.query([
+                'SELECT market_id, scale,',
+                '   base_currency_id || quote_currency_id pair',
+                'FROM market'
+            ].join('\n'), function(err, res) {
                 if (err) return cb(err)
                 cb(null, res.rows)
             })

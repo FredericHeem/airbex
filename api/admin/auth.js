@@ -1,13 +1,13 @@
-var sjcl = require('../vendor/sjcl')
-, connect = require('express/node_modules/connect')
-, util = require('util')
-, auth = module.exports = function(conn) {
+module.exports = function(conn) {
     return function(req, res, next) {
         if (req.user) return next()
-        if (!req.query.key) return res.send(401, {
-            name: 'KeyMissing',
-            message:'key parameter missing from query string'
-        })
+
+        if (!req.query.key) {
+            return res.send(401, {
+                name: 'KeyMissing',
+                message:'key parameter missing from query string'
+            })
+        }
 
         conn.read.query({
             text: [
@@ -22,7 +22,10 @@ var sjcl = require('../vendor/sjcl')
 
             if (!dres.rowCount) {
                 return req.app.tarpit(function() {
-                    res.send(401, { name: 'UnknownApiKey', message: 'Unknown admin API key' })
+                    res.send(401, {
+                        name: 'UnknownApiKey',
+                        message: 'Unknown admin API key'
+                    })
                 })
             }
 

@@ -1,3 +1,4 @@
+/* global describe, it */
 var expect = require('expect.js')
 , activities = require('../../v1/activities')
 

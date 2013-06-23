@@ -100,7 +100,8 @@ RippleOut.prototype.verifyLine = function(request, cb) {
 
         if (!line || diff.lt(0)) {
             if (!line) debug('user has no line to %s', that.account)
-            debug('user is missing %s in his %s line to %s', diff, request.currency_id, that.account)
+            debug('user is missing %s in his %s line to %s', diff, request.currency_id,
+                that.account)
             return cb(false)
         }
 
@@ -143,7 +144,8 @@ RippleOut.prototype.send = function(request, cb) {
 
     debug('executing transaction to %s', request.address)
 
-    that.drop.payment(that.account, request.address, amount, function(err, hash) {
+    that.drop.payment(that.account, request.address, amount,
+        function(err) {
         if (err) {
             var abort, reason, report
 
@@ -189,7 +191,8 @@ RippleOut.prototype.send = function(request, cb) {
 
         out.markRequestCompleted(that.client, request, function(err) {
             if (err) {
-                err = new Error(format('Failed to mark withdraw request %s as completed: %s',
+                err = new Error(format(
+                    'Failed to mark withdraw request %s as completed: %s',
                     request.request_id, err.message))
                 that.emit('error', err)
             }

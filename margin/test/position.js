@@ -1,5 +1,5 @@
+/* global describe, it */
 var expect = require('expect.js')
-, num = require('num')
 , Position = require('../position')
 
 var mockClient = {

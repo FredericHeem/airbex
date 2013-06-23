@@ -8,13 +8,18 @@ users.configure = function(app, conn, auth) {
     app.get('/admin/users/:id', auth, users.user.bind(users, conn))
     app.patch('/admin/users/:id', auth, users.patch.bind(users, conn))
     app.get('/admin/users/:user/bankAccounts', auth, users.bankAccounts.bind(users, conn))
-    app.post('/admin/users/:user/bankAccounts/:id/startVerify', auth, users.startBankAccountVerify.bind(users, conn))
-    app.get('/admin/users/:user/withdrawRequests', auth, users.withdrawRequests.bind(users, conn))
+    app.post('/admin/users/:user/bankAccounts/:id/startVerify',
+        auth, users.startBankAccountVerify.bind(users, conn))
+    app.get('/admin/users/:user/withdrawRequests', auth,
+        users.withdrawRequests.bind(users, conn))
     app.get('/admin/users/:user/activity', auth, users.activity.bind(users, conn))
-    app.post('/admin/users/:user/sendVerificationEmail', auth, users.sendVerificationEmail.bind(users, conn))
-    app.post('/admin/users/:user/bankAccounts', auth, users.addBankAccount.bind(users, conn))
+    app.post('/admin/users/:user/sendVerificationEmail', auth,
+        users.sendVerificationEmail.bind(users, conn))
+    app.post('/admin/users/:user/bankAccounts', auth,
+        users.addBankAccount.bind(users, conn))
     app.get('/admin/users/:user/accounts', auth, users.accounts.bind(users, conn))
-    app.post('/admin/users/:user/bankAccounts/:id/setVerified', auth, users.setBankAccountVerified.bind(users, conn))
+    app.post('/admin/users/:user/bankAccounts/:id/setVerified', auth,
+        users.setBankAccountVerified.bind(users, conn))
 }
 
 users.sendVerificationEmail = function(conn, req, res, next) {
@@ -28,7 +33,8 @@ users.sendVerificationEmail = function(conn, req, res, next) {
 users.addBankAccount = function(conn, req, res, next) {
     conn.write.query({
         text: [
-            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic, routing_number, verified_at)',
+            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
+            'routing_number, verified_at)',
             'VALUES ($1, $2, $3, $4, $5, current_timestamp)'
         ].join('\n'),
         values: [
@@ -38,7 +44,7 @@ users.addBankAccount = function(conn, req, res, next) {
             req.body.swiftbic,
             req.body.routing_number
         ]
-    }, function(err, dr) {
+    }, function(err) {
         if (err) return next(err)
         res.send(204)
     })
@@ -109,10 +115,13 @@ users.user = function(conn, req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
 
-        if (!dr.rowCount) return res.send(404, {
-            name: 'UserNotFound',
-            message: 'There is no user with the specified id.'
-        })
+        if (!dr.rowCount) {
+            return res.send(404, {
+                name: 'UserNotFound',
+                message: 'There is no user with the specified id.'
+            })
+        }
+
         res.send(dr.rows[0])
     })
 }
@@ -151,7 +160,10 @@ users.patch = function(conn, req, res, next) {
         if (err) return next(err)
         if (!dr.rowCount) return next(new Error('User ' + req.user + ' not found'))
 
-        activities.log(conn, req.user, 'AdminEditUser', { user_id: req.params.id, edits: req.body })
+        activities.log(conn, req.user, 'AdminEditUser', {
+            user_id: req.params.id,
+            edits: req.body
+        })
 
         res.send(204)
     })
@@ -244,14 +256,32 @@ users.buildQuery = function(params) {
     , conditions = []
     , values = []
 
-    if (params.user_id || params.all) conditions.push(['user_id', params.user_id || params.all ])
-    if (+(params.user_id || params.all)) conditions.push(['user_id', (params.user_id || params.all) / 1234 ])
+    if (params.user_id || params.all) {
+        conditions.push(['user_id', params.user_id || params.all ])
+    }
+    if (+(params.user_id || params.all)) {
+        conditions.push(['user_id', (params.user_id || params.all) / 1234 ])
+    }
 
-    if (params.phone_number || params.all) conditions.push(['phone_number', params.phone_number || params.all])
-    if (params.first_name || params.all) conditions.push(['first_name', params.first_name || params.all])
-    if (params.last_name || params.all) conditions.push(['last_name', params.last_name || params.all])
-    if (params.country || params.all) conditions.push(['country', params.country || params.all])
-    if (params.email || params.all) conditions.push(['email', params.email || params.all])
+    if (params.phone_number || params.all) {
+        conditions.push(['phone_number', params.phone_number || params.all])
+    }
+
+    if (params.first_name || params.all) {
+        conditions.push(['first_name', params.first_name || params.all])
+    }
+
+    if (params.last_name || params.all) {
+        conditions.push(['last_name', params.last_name || params.all])
+    }
+
+    if (params.country || params.all) {
+        conditions.push(['country', params.country || params.all])
+    }
+
+    if (params.email || params.all) {
+        conditions.push(['email', params.email || params.all])
+    }
 
     if (conditions.length) {
         query.push('WHERE')

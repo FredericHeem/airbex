@@ -1,5 +1,4 @@
 require('./activities')
-require('./auth')
 require('./balances')
 require('./bitcoin')
 require('./currencies')

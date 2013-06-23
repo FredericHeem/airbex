@@ -1,3 +1,4 @@
+/* global describe, it */
 var expect = require('expect.js')
 , ripple = require('../../v1/ripple')
 
@@ -28,7 +29,7 @@ describe('ripple', function() {
 			, req = {
 			}
 			, res = {
-				send: function(code, r) {
+				send: function(code) {
 					expect(code).to.be(500)
 					done()
 				}
@@ -40,12 +41,13 @@ describe('ripple', function() {
 
 	describe('withdraw', function() {
 		it('enqueues', function(done) {
-			var conn = {
+			var addr = 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT'
+			, conn = {
 				write: {
 					query: function(q, c) {
 						if (q.text.match(/activity/)) return
 						expect(q.text).to.match(/ripple_withdraw/i)
-						expect(q.values).to.eql([98, 'BTC', 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT', '50.3'])
+						expect(q.values).to.eql([98, 'BTC', addr, '50.3'])
 						c(null, { rows: [{ request_id: 59 }] })
 					}
 				}
@@ -53,7 +55,7 @@ describe('ripple', function() {
 			, req = {
 				user: 98,
 				body: {
-					address: 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT',
+					address: addr,
 					amount: '50.3',
 					currency: 'BTC'
 				}

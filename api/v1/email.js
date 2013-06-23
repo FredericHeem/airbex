@@ -1,11 +1,10 @@
-var Q = require('q')
-, validate = require('./validate')
-, email = module.exports = {}
+var email = module.exports = {}
 , nodemailer = require('nodemailer')
 , crypto = require('crypto')
 
 email.configure = function(app, conn, auth) {
-    app.smtp = nodemailer.createTransport(app.config.smtp.service, app.config.smtp.options)
+    app.smtp = nodemailer.createTransport(app.config.smtp.service,
+        app.config.smtp.options)
 
     app.post('/v1/email/verify/send', auth, email.verifySend.bind(email, conn))
     app.get('/v1/email/verify/:code', email.verify.bind(email, conn))
@@ -34,8 +33,10 @@ email.sendVerificationEmail = function(conn, smtp, userId, cb) {
             from: 'Justcoin <hello@justcoin.com>',
             to: dr.rows[0].email,
             subject: 'E-mail verification',
-            html: '<p>To verify your e-mail address with Justcoin, follow this link:<br><br>' +
-                '<a href="' + url + '">' + url + '</a></p><p>If you didn\'t request this, you can safely ignore this email.</p>'
+            html: '<p>To verify your e-mail address with Justcoin, ' +
+                'follow this link:<br><br>' +
+                '<a href="' + url + '">' + url + '</a></p>' +
+                '<p>If you didn\'t request this, you can safely ignore this email.</p>'
         }
 
         smtp.sendMail(mail, cb)

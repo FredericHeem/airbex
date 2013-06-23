@@ -4,9 +4,10 @@ var reset = module.exports = {}
 , debug = require('debug')('snow:resetPassword')
 , Tropo = require('tropo')
 
-reset.configure = function(app, conn, auth) {
+reset.configure = function(app, conn) {
     app.post('/v1/resetPassword', reset.resetPasswordBegin.bind(reset, conn))
-    app.get('/v1/resetPassword/continue/:code', reset.resetPasswordContinue.bind(reset, conn))
+    app.get('/v1/resetPassword/continue/:code',
+        reset.resetPasswordContinue.bind(reset, conn))
     app.post('/v1/resetPassword/end', reset.resetPasswordEnd.bind(reset, conn))
 }
 
@@ -36,7 +37,7 @@ reset.resetPasswordBegin = function(conn, req, res, next) {
     conn.write.query({
         text: 'SELECT reset_password_begin($1, $2, $3)',
         values: [req.body.email, emailCode, reset.createPhoneCode()]
-    }, function(err, dr) {
+    }, function(err) {
         if (err) {
             if (err.message == 'User has a recent reset attempt.') {
                 return res.send(403, {
@@ -127,7 +128,8 @@ reset.resetPasswordContinue = function(conn, req, res, next) {
 
         debug('requesting call to %s', phoneNumber)
 
-        res.send(200, 'Email confirmed. Next we will call you. Close this window and go back to the password reset window.')
+        res.send(200, 'Email confirmed. Next we will call you. ',
+            'Close this window and go back to the password reset window.')
 
         setTimeout(function() {
             tropo.call(phoneNumber, msg, function(err) {
@@ -143,7 +145,7 @@ reset.resetPasswordEnd = function(conn, req, res, next) {
     conn.write.query({
         text: 'SELECT reset_password_end($1, $2, $3)',
         values: [req.body.email, req.body.code, req.body.key]
-    }, function(err, dr) {
+    }, function(err) {
         if (err) {
             return next(err)
         }

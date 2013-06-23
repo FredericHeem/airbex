@@ -11,7 +11,10 @@ module.exports = function(email, cb) {
     async.series([
         function(next) {
             var domain = /^\S+@(\S+)$/.exec(email)[1]
-            , url = format('http://check.block-disposable-email.com/easyapi/json/%s/%s', config.bde_api_key, domain)
+            , url = format(
+                'http://check.block-disposable-email.com/easyapi/json/%s/%s',
+                config.bde_api_key, domain)
+
             console.log('checking vs %s', url)
 
             request({
@@ -21,7 +24,11 @@ module.exports = function(email, cb) {
                 console.log(data)
                 if (err) return next(err)
                 console.log('status code %s', res.statusCode)
-                if (res.statusCode != 200) return next(new Error(format('Status code %d', res.statusCode)))
+
+                if (res.statusCode != 200) {
+                    return next(new Error(format('Status code %d', res.statusCode)))
+                }
+
                 debug('Email check for domain of %s:\n%j', email, data)
                 if (data.domain_status != 'ok') return cb(null, false)
                 //next()

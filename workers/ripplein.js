@@ -137,8 +137,8 @@ RippleIn.prototype.cacheCurrencies = function(cb) {
 
 // FUNCTION ripple_credit(h varchar(64), s currency_id, a int, amnt bigint)
 RippleIn.prototype.rippleCredit = function(hash, currencyId, userId, amount, cb) {
-    var that = this
-    console.log('ripple crediting account %s %s %s (tx %s)', userId, amount, currencyId, hash)
+    console.log('ripple crediting account %s %s %s (tx %s)', userId,
+        amount, currencyId, hash)
 
     this.client.query({
         text: 'SELECT ripple_credit($1, $2, $3, $4) tid',
@@ -187,7 +187,9 @@ RippleIn.prototype.subscribeAccounts = function(cb) {
 RippleIn.prototype.subscribeAccount = function(account, cb) {
     debug('subscribing to %s', account)
 
-    this.drop.subscribe(account, this.onAccountMessage.bind(this, this.account), function(err) {
+    this.drop.subscribe(account, this.onAccountMessage.bind(this, this.account),
+        function(err)
+    {
         if (err) return cb(err)
         debug('subscribed to %s', account)
         cb()
@@ -224,11 +226,14 @@ RippleIn.prototype.processTransaction = function(tran, cb) {
 
                     return that.returnToSender(tran, function(err) {
                         if (err) {
-                            err = new Error('Failed to return ' + tran.hash + ' to sender')
+                            err = new Error(util.format(
+                                'Failed to return %s to sender: %s',
+                                tran.hash, err.message))
                             that.emit('error', err)
                         }
 
-                        that.emit('log', 'Transaction ' + tran.hash + ' returned to sender')
+                        that.emit('log', util.format('Transaction %s returned to sender',
+                            tran.hash))
 
                         cb()
                     })

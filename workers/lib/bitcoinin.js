@@ -1,5 +1,4 @@
 var Q = require('q')
-, util = require('util')
 , num = require('num')
 , async = require('async')
 
@@ -102,7 +101,8 @@ BitcoinIn.prototype.processNewBlocks = function() {
     var that = this
 
     return Q.all([
-        Q.ninvoke(this.client, 'query', 'SELECT height FROM btc_block').get('rows').get(0).get('height'),
+        Q.ninvoke(this.client, 'query', 'SELECT height FROM btc_block')
+        .get('rows').get(0).get('height'),
         Q.ninvoke(this.bitcoin, 'getBlockCount').then(function(result) {
             return result
         }, function(err) {

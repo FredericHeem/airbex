@@ -1,5 +1,4 @@
-var _ = require('lodash')
-, Q = require('q')
+var Q = require('q')
 , Markets = module.exports = {}
 
 Markets.configure = function(app, conn) {
@@ -47,7 +46,7 @@ Markets.depth = function(conn, req, res, next) {
     .then(function(dres) {
         return res.send({
             bids: dres.rows.filter(function(row) {
-                return row.type == 0
+                return row.type === 0
             }).map(function(row) {
                 return [
                     req.app.cache.formatOrderPrice(row.price, req.params.id),

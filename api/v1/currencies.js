@@ -5,9 +5,10 @@ currencies.configure = function(app, conn) {
 }
 
 currencies.currencies = function(conn, req, res, next) {
-    var query =
-        'SELECT currency_id id, scale \
-        FROM "currency" ORDER BY currency_id'
+    var query = [
+        'SELECT currency_id id, scale',
+        'FROM "currency" ORDER BY currency_id'
+    ].join('\n')
 
     conn.read.query(query, function(err, dr) {
         if (err) return next(err)

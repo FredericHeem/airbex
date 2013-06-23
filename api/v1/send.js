@@ -9,7 +9,9 @@ exports.configure = function(app, conn, auth) {
     app.post('/v1/send', auth, exports.send.bind(exports, conn))
 }
 
-exports.emailVoucher = function(smtp, conn, cache, fromUser, toEmail, amount, currency, cb) {
+exports.emailVoucher = function(smtp, conn, cache, fromUser, toEmail,
+    amount, currency, cb)
+{
     var voucherId = vouchers.createId()
     var sender
 
@@ -17,7 +19,11 @@ exports.emailVoucher = function(smtp, conn, cache, fromUser, toEmail, amount, cu
         // Find information about sender
         function(next) {
             conn.read.query({
-                text: 'SELECT first_name, last_name, email FROM "user" WHERE user_id = $1',
+                text: [
+                    'SELECT first_name, last_name, email',
+                    'FROM "user"',
+                    'WHERE user_id = $1'
+                ].join('\n'),
                 values: [fromUser]
             }, function(err, dr) {
                 if (err) return next(err)
@@ -58,7 +64,8 @@ exports.emailVoucher = function(smtp, conn, cache, fromUser, toEmail, amount, cu
             var mail = {
                 from: 'Justcoin <hello@justcoin.com>',
                 to: toEmail,
-                subject: format('%s has sent you %s %s on Justcoin', sender, amount, currencyFull),
+                subject: format('%s has sent you %s %s on Justcoin',
+                    sender, amount, currencyFull),
                 html: format([
                     '<p>Hi there,</p><p>%s has sent you %s %s on Justcoin,',
                     'the digital currency exchange.</p>',

@@ -1,8 +1,6 @@
 var debug = require('debug')('snow:bitcoinout')
-, _ = require('lodash')
 , num = require('num')
 , util = require('util')
-, raven = require('./raven')
 , async = require('async')
 , prefix = '[snow:bitcoinout]'
 , out = require('./out')
@@ -58,12 +56,15 @@ BitcoinOut.prototype.validateAddresses = function(requests, cb) {
                 console.error('%s failed to validate address %s', prefix, request.address)
                 console.error(prefix, err)
             } else {
-                console.error('%s address %s is invalid, trying to abort', prefix, request.address)
+                console.error('%s address %s is invalid, trying to abort',
+                    prefix, request.address)
             }
 
             out.cancelRequest(that.client, request, 'invalid address', function(err) {
                 if (err) {
-                    console.error('%s failed to abort request with invalid address %s', prefix, request.request_id)
+                    console.error('%s failed to abort request with invalid address %s',
+                        prefix, request.request_id)
+
                     return cb()
                 }
 
@@ -117,7 +118,9 @@ BitcoinOut.prototype.sendBatch = function(requests, cb) {
             debug('send requests successful')
             debug(util.inspect(res))
 
-            return async.each(requests, out.markRequestCompleted.bind(that, that.client), function(err) {
+            return async.each(requests,
+                out.markRequestCompleted.bind(that, that.client), function(err)
+            {
                 if (!err) {
                     debug('succeeded in marking requests as done')
                     return cb()
@@ -145,7 +148,9 @@ BitcoinOut.prototype.sendBatch = function(requests, cb) {
             })
         }
 
-        console.error('%s not sure why the request failed. requests will remain uncertain', prefix)
+        console.error('%s not sure why the request failed. ' +
+            'requests will remain uncertain', prefix)
+
         console.error(prefix, err)
         cb()
     })

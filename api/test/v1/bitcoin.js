@@ -1,5 +1,7 @@
+/* global describe, it */
 var expect = require('expect.js')
 , bitcoin = require('../../v1/bitcoin')
+, andy = '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt'
 
 describe('bitcoin', function() {
 	describe('configure', function() {
@@ -49,7 +51,7 @@ describe('bitcoin', function() {
 					query: function(q, c) {
 						if (q.text.match(/activity/)) return
 						expect(q.text).to.match(/btc_withdraw/i)
-						expect(q.values).to.eql([38, '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt', '0.15', 'BTC'])
+						expect(q.values).to.eql([38, andy, '0.15', 'BTC'])
 						c(null, { rows: [{ request_id: 59 }] })
 					}
 				}

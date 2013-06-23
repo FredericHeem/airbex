@@ -1,3 +1,4 @@
+/* global describe, it */
 var expect = require('expect.js')
 , crypto = require('crypto')
 , vouchers = require('../../v1/vouchers')

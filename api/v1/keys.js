@@ -1,5 +1,4 @@
-var debug = require('debug')('snow:keys')
-, validate = require('./validate')
+var validate = require('./validate')
 , crypto = require('crypto')
 , keys = module.exports = {}
 

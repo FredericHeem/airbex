@@ -22,10 +22,10 @@ var build = {
     }
 }
 
-var self = module.exports = function(url, native) {
+var self = module.exports = function(url, useNative) {
     assert(url)
     var pg = require('pg')
-    if (native) pg = pg.native
+    if (useNative) pg = pg.native
     var client = new pg.Client(url)
     client.build = build
     client.connect()

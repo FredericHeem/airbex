@@ -1,3 +1,4 @@
+/* global describe, it */
 var expect = require('expect.js')
 , currencies = require('../../v1/currencies')
 

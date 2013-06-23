@@ -5,12 +5,12 @@ module.exports = {
         app.tarpit = tarpit
 
         var auth = require('./auth')(conn)
-
-        ;['balances', 'markets', 'orders', 'ripple', 'intercom',
+        , routes = ['balances', 'markets', 'orders', 'ripple', 'intercom',
         'currencies', 'activities', 'users', 'withdraws',
         'keys', 'email', 'resetPassword', 'simple', 'bankaccounts',
         'language', 'vouchers', 'send']
-        .forEach(function(name) {
+
+        routes.forEach(function(name) {
             require('./' + name).configure(app, conn, auth)
         })
 

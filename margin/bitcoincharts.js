@@ -1,6 +1,5 @@
 var _ = require('lodash')
 , request = require('request')
-, debug = require('debug')('bitcoincharts')
 
 var bc = module.exports = function(options) {
     this.options = options || {}

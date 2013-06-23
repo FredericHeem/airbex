@@ -1,5 +1,4 @@
 var Q = require('q')
-, _ = require('lodash')
 , orders = module.exports = {}
 , validate = require('./validate')
 , activities = require('./activities')
@@ -18,7 +17,7 @@ orders.create = function(conn, req, res, next) {
         text: [
             'SELECT create_order($1, m.market_id, $3, $4, $5) order_id',
             'FROM market m',
-            'WHERE m.base_currency_id || m.quote_currency_id = $2',
+            'WHERE m.base_currency_id || m.quote_currency_id = $2'
         ].join('\n'),
         values: [
             req.user,
@@ -31,14 +30,14 @@ orders.create = function(conn, req, res, next) {
 
     conn.write.query(query, function(err, dr) {
         if (err) {
-            if (err.message == 'new row for relation "transaction" violates check constraint "transaction_amount_check"') {
+            if (err.message.match(/transaction_amount_check/)) {
                 return res.send(400, {
                     name: 'InvalidAmount',
                     message: 'The requested transfer amount is invalid/out of range'
                 })
             }
 
-            if (err.message == 'new row for relation "account" violates check constraint "non_negative_available"') {
+            if (err.message.match(/non_negative_available/)) {
                 return res.send(400, {
                     name: 'InsufficientFunds',
                     message: 'insufficient funds'
@@ -48,14 +47,14 @@ orders.create = function(conn, req, res, next) {
             if (/^price.*has too high accuracy$/.test(err.message)) {
                 return res.send(400, {
                     name: 'TooHighPriceAccuracy',
-                    message: 'There are too many decimal places in the price ' + req.body.price
+                    message: 'Too many decimal places in price ' + req.body.price
                 })
             }
 
             if (/^volume.*has too high accuracy$/.test(err.message)) {
                 return res.send(400, {
                     name: 'TooHighVolumeAccuracy',
-                    message: 'There are too many decimal places in the amount ' + req.body.amount
+                    message: 'Too many decimal places in amount ' + req.body.amount
                 })
             }
 
@@ -65,7 +64,10 @@ orders.create = function(conn, req, res, next) {
         var row = dr.rows[0]
 
         if (!row) {
-            return res.send(404, { name: 'MarketNotFound', message: 'Market not found' })
+            return res.send(404, {
+                name: 'MarketNotFound',
+                message: 'Market not found'
+            })
         }
 
         activities.log(conn, req.user, 'CreateOrder', {
@@ -96,8 +98,9 @@ function formatOrderRow(cache, row) {
 orders.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn.read, 'query', {
         text: [
-            'SELECT order_id, base_currency_id || quote_currency_id market, side, price, volume,',
-            'original, matched, cancelled',
+            'SELECT order_id, base_currency_id || quote_currency_id market,',
+            '   side, price, volume,',
+            '   original, matched, cancelled',
             'FROM order_view o',
             'INNER JOIN market m ON m.market_id = o.market_id',
             'WHERE user_id = $1 AND volume > 0',
@@ -114,7 +117,8 @@ orders.forUser = function(conn, req, res, next) {
 orders.history = function(conn, req, res, next) {
     Q.ninvoke(conn.read, 'query', {
         text: [
-            'SELECT order_id, market, side, volume, matched, cancelled, original, price, average_price',
+            'SELECT order_id, market, side, volume, matched, cancelled,',
+            '   original, price, average_price',
             'FROM order_history o',
             'INNER JOIN market m ON m.market_id = o.market_id',
             'WHERE user_id = $1 AND matched > 0',
@@ -126,7 +130,10 @@ orders.history = function(conn, req, res, next) {
     .then(function(r) {
         res.send(r.rows.map(function(row) {
             var result = formatOrderRow(req.app.cache, row)
-            result.averagePrice = req.app.cache.formatOrderPrice(row.average_price, row.market)
+
+            result.averagePrice = req.app.cache.formatOrderPrice(row.average_price,
+                row.market)
+
             return result
         }))
     }, next)
@@ -134,7 +141,16 @@ orders.history = function(conn, req, res, next) {
 }
 
 orders.cancel = function(conn, req, res, next) {
-    var q = 'UPDATE "order" SET cancelled = volume, volume = 0 WHERE order_id = $1 AND user_id = $2 AND volume > 0'
+    var q = [
+        'UPDATE "order"',
+        'SET',
+        '   cancelled = volume,',
+        '   volume = 0',
+        'WHERE',
+        '   order_id = $1 AND',
+        '   user_id = $2 AND volume > 0'
+    ].join('\n')
+
     Q.ninvoke(conn.write, 'query', {
         text: q,
         values: [+req.params.id, req.user]

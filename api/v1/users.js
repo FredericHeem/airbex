@@ -1,3 +1,4 @@
+/* global TropoWebAPI, TropoJSON */
 var Q = require('q')
 , _ = require('lodash')
 , activities = require('./activities')
@@ -20,7 +21,8 @@ users.configure = function(app, conn, auth) {
     app.post('/v1/users/verify', auth, users.verifyPhone.bind(users, conn))
     app.get('/v1/users/bankAccounts', auth, users.bankAccounts.bind(users, conn))
     app.post('/v1/users/bankAccounts', auth, users.addBankAccount.bind(users, conn))
-    app.post('/v1/users/bankAccounts/:id/verify', auth, users.verifyBankAccount.bind(users, conn))
+    app.post('/v1/users/bankAccounts/:id/verify', auth,
+        users.verifyBankAccount.bind(users, conn))
     app.post('/tropo', users.tropo.bind(users, conn))
     app.patch('/v1/users/current', auth, users.patch.bind(users, conn))
 }
@@ -112,7 +114,8 @@ users.whoami = function(conn, req, res, next) {
 users.addBankAccount = function(conn, req, res, next) {
     conn.write.query({
         text: [
-            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic, routing_number, verify_code)',
+            'INSERT INTO bank_account (user_id, account_number,',
+            '   iban, swiftbic, routing_number, verify_code)',
             'VALUES ($1, $2, $3, $4, $5, $6)'
         ].join('\n'),
         values: [
@@ -123,7 +126,7 @@ users.addBankAccount = function(conn, req, res, next) {
             req.body.routing_number,
             users.createBankVerifyCode()
         ]
-    }, function(err, dr) {
+    }, function(err) {
         if (err) return next(err)
         res.send(204)
     })
@@ -184,7 +187,11 @@ users.create = function(conn, req, res, next) {
         if (!ok) {
             if (err) debug('email check failed', err)
             debug('email check failed for %s', req.body.email)
-            return res.send(403, { name: 'EmailFailedCheck', message: 'E-mail did not pass validation' })
+
+            return res.send(403, {
+                name: 'EmailFailedCheck',
+                message: 'E-mail did not pass validation'
+            })
         }
 
         conn.write.query({
@@ -196,13 +203,20 @@ users.create = function(conn, req, res, next) {
                 return res.send(201, { id: cres.rows[0].user_id })
             }
 
-            if (err.message === 'new row for relation "user" violates check constraint "email_regex"') {
-                return res.send(403, { name: 'InvalidEmail', message: 'e-mail is invalid' })
+            if (err.message.match(/email_regex/)) {
+                return res.send(403, {
+                    name: 'InvalidEmail',
+                    message: 'e-mail is invalid'
+                })
             }
 
-            if (err.message === 'duplicate key value violates unique constraint "api_key_pkey"' ||
-                err.message === 'duplicate key value violates unique constraint "email_lower_unique"') {
-                return res.send(403, { name: 'EmailAlreadyInUse', message:'e-mail is already in use' })
+            if (err.message.match(/api_key_pkey/) ||
+                err.message.match(/email_lower_unique/))
+            {
+                return res.send(403, {
+                    name: 'EmailAlreadyInUse',
+                    message:'e-mail is already in use'
+                })
             }
 
             next(err)
@@ -252,7 +266,7 @@ users.replaceApiKey = function(conn, req, res, next) {
     Q.ninvoke(conn.write, 'query', {
         text: 'SELECT replace_api_key($1, $2)',
         values: [req.key, req.body.key]
-    }).then(function(dres) {
+    }).then(function() {
         res.send(200, {})
     }, function(err) {
         // TODO: error message when key does not exist.
@@ -277,10 +291,14 @@ users.verifyPhone = function(conn, req, res, next) {
             return next(err)
         }
 
-        if (!dr.rows[0].success) return res.send(403, {
-            name: 'VerificationFailed',
-            message: 'Verification failed. The code is wrong or you may not verify at this time.'
-        })
+        if (!dr.rows[0].success) {
+            return res.send(403, {
+                name: 'VerificationFailed',
+                message: 'Verification failed. The code is wrong or ' +
+                    'you may not verify at this time.'
+            })
+        }
+
         res.send(204)
     })
 }
@@ -359,7 +377,7 @@ users.startPhoneVerify = function(conn, req, res, next) {
     })
 }
 
-users.tropo = function(conn, req, res, next) {
+users.tropo = function(conn, req, res) {
     var params = req.body.session.parameters
 
     debug('processing tropo request with params %j', params)

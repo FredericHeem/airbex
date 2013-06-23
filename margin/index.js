@@ -49,8 +49,7 @@ Margin.prototype.sync = function(depth, cb) {
             market: this.market,
             type: 'ask',
             price: desiredAsk.toString(),
-            volume: this.options.volume,
-            market: this.market
+            volume: this.options.volume
         })
 
         debug('best ask %j', depth.asks[0])
@@ -63,7 +62,6 @@ Margin.prototype.sync = function(depth, cb) {
 
 Margin.prototype.tick = function() {
     var that = this
-    , depth
 
     debug('acquiring source depth for %s', this.market)
 

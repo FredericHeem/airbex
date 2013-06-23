@@ -1,7 +1,4 @@
-var _ = require('lodash')
-, activities = require('./activities')
-, validate = require('./validate')
-, debug = require('debug')('snow:vouchers')
+var validate = require('./validate')
 , crypto = require('crypto')
 , async = require('async')
 , vouchers = module.exports = {}

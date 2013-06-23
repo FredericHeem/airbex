@@ -150,6 +150,9 @@ users.patch = function(conn, req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         if (!dr.rowCount) return next(new Error('User ' + req.user + ' not found'))
+
+        activities.log(conn, req.user, 'AdminEditUser', { user_id: req.params.id, edits: req.body })
+
         res.send(204)
     })
 }

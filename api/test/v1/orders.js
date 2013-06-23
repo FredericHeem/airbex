@@ -27,9 +27,9 @@ describe('orders', function() {
 						expect(q.values).to.eql([10])
 						cb(null, {
 							rows: [{
-								id: 1
+								order_id: 1
 							}, {
-								id: 7
+								order_id: 7
 							}]
 						})
 					}
@@ -68,9 +68,9 @@ describe('orders', function() {
 						expect(q.values).to.eql([10])
 						cb(null, {
 							rows: [{
-								id: 1,
+								order_id: 1,
 								price: '1.2',
-								amount: '1.34'
+								volume: '1.34'
 							}]
 						})
 					}

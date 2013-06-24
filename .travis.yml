@@ -47,11 +47,6 @@ script:
   #- "npm install"
   #- "npm test"
   #- "popd"
-  # margin
-  - "pushd margin"
-  - "npm install"
-  - "npm test"
-  - "popd"
   # client
   - "pushd client"
   - "npm install"

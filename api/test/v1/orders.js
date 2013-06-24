@@ -122,6 +122,7 @@ describe('orders', function() {
 			}
 			, req = {
 				user: 8,
+				apiKey: { canTrade: true },
 				body: {
 					market: 'BTCUSD',
 					amount: '9',
@@ -133,6 +134,42 @@ describe('orders', function() {
 				send: function(code, r) {
 					expect(code).to.be(201)
 					expect(r.id).to.be(17)
+					done()
+				}
+			}
+
+			orders.create(conn, req, res, done)
+		})
+
+		it('requires canTrade api key permission', function(done) {
+			var conn = {
+				build: {
+					insert: function() {
+						return 'built'
+					}
+				},
+
+				write: {
+					query: function(q, cb) {
+						if (q.text.match(/activity/)) return
+						expect(q.text).to.match(/create_order/i)
+						cb(null, { rows: [{ order_id: 17 }] })
+					}
+				}
+			}
+			, req = {
+				user: 8,
+				apiKey: {},
+				body: {
+					market: 'BTCUSD',
+					amount: '9',
+					price: '12',
+					type: 'ask'
+				}
+			}
+			, res = {
+				send: function(code) {
+					expect(code).to.be(401)
 					done()
 				}
 			}
@@ -156,6 +193,7 @@ describe('orders', function() {
 			}
 			, req = {
 				user: 3,
+				apiKey: { canTrade: true },
 				params: {
 					id: 9
 				}
@@ -163,6 +201,35 @@ describe('orders', function() {
 			, res = {
 				send: function(code) {
 					expect(code).to.be(204)
+					done()
+				}
+			}
+
+			orders.cancel(conn, req, res, done)
+		})
+
+		it('requires canTrade api key permission', function(done) {
+			var conn = {
+				write: {
+					query: function(q, cb) {
+						if (q.text.match(/activity/)) return
+						expect(q.text).to.match(/UPDATE "order"/)
+						expect(q.text).to.match(/cancelled = volume/)
+						expect(q.values)
+						cb(null, { rowCount: 1 })
+					}
+				}
+			}
+			, req = {
+				user: 3,
+				apiKey: {},
+				params: {
+					id: 9
+				}
+			}
+			, res = {
+				send: function(code) {
+					expect(code).to.be(401)
 					done()
 				}
 			}

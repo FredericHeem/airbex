@@ -14,6 +14,13 @@ bitcoin.configure = function(app, conn, auth, currencyId) {
 bitcoin.withdraw = function(conn, currencyId, req, res, next) {
     if (!validate(req.body, currencyId.toLowerCase() + '_out', res)) return
 
+    if (!req.apiKey.canWithdraw) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must have withdraw permission'
+        })
+    }
+
     console.log('processing withdraw request of %d %s from user #%s to %s',
         req.body.amount, currencyId, req.user, req.body.address)
 
@@ -45,6 +52,13 @@ bitcoin.withdraw = function(conn, currencyId, req, res, next) {
 }
 
 bitcoin.address = function(conn, currencyId, req, res, next) {
+    if (!req.apiKey.canDeposit) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must have deposit permission'
+        })
+    }
+
     var queryText = util.format([
         'SELECT address',
         'FROM %s_deposit_address',

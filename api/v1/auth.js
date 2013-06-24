@@ -10,7 +10,11 @@ module.exports = function(conn) {
         }
 
         conn.read.query({
-            text: 'SELECT user_id FROM api_key WHERE api_key_id = $1',
+            text: [
+                'SELECT user_id, can_withdraw, can_deposit, can_trade, "primary"',
+                'FROM api_key',
+                'WHERE api_key_id = $1'
+            ].join('\n'),
             values: [req.query.key]
         }, function(err, dres) {
             if (err) return next(err)
@@ -21,8 +25,17 @@ module.exports = function(conn) {
                 })
             }
 
-            req.user = dres.rows[0].user_id
+            var row = dres.rows[0]
+
+            req.user = row.user_id
             req.key = req.query.key
+
+            req.apiKey = {
+                canTrade: row.can_trade,
+                canDeposit: row.can_deposit,
+                canWithdraw: row.can_withdraw,
+                primary: row.primary
+            }
 
             return next()
         })

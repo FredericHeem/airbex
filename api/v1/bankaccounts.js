@@ -14,6 +14,13 @@ bankAccounts.createVerifyCode = function() {
 }
 
 bankAccounts.index = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.read.query({
         text: [
             'SELECT * FROM bank_account WHERE user_id = $1'
@@ -35,6 +42,13 @@ bankAccounts.index = function(conn, req, res, next) {
 }
 
 bankAccounts.add = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.write.query({
         text: [
             'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
@@ -56,6 +70,13 @@ bankAccounts.add = function(conn, req, res, next) {
 }
 
 bankAccounts.verify = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.write.query({
         text: [
             'SELECT verify_bank_account($1, $2, $3) success'

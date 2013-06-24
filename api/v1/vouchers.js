@@ -30,6 +30,13 @@ CREATE FUNCTION create_voucher (
 vouchers.create = function(conn, req, res, next) {
     if (!validate(req.body, 'voucher_create', res)) return
 
+    if (!req.apiKey.canWithdraw) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must have withdraw permission'
+        })
+    }
+
     var voucherId = vouchers.createId()
 
     conn.write.query({
@@ -49,6 +56,13 @@ vouchers.create = function(conn, req, res, next) {
 }
 
 vouchers.index = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.read.query({
         text: [
             'SELECT v.voucher_id, h.amount, a.currency_id',
@@ -77,6 +91,13 @@ CREATE FUNCTION redeem_voucher (
 ) RETURNS int AS $$
 */
 vouchers.redeem = function(conn, req, res, next) {
+    if (!req.apiKey.canDeposit) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must have deposit permission'
+        })
+    }
+
     async.waterfall([
         function(next) {
             conn.write.query({

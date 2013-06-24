@@ -13,6 +13,13 @@ orders.configure = function(app, conn, auth) {
 orders.create = function(conn, req, res, next) {
     if (!validate(req.body, 'order_create', res)) return
 
+    if (!req.apiKey.canTrade) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must have trade permission'
+        })
+    }
+
     var query = {
         text: [
             'SELECT create_order($1, m.market_id, $3, $4, $5) order_id',
@@ -141,6 +148,13 @@ orders.history = function(conn, req, res, next) {
 }
 
 orders.cancel = function(conn, req, res, next) {
+    if (!req.apiKey.canTrade) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must have trade permission'
+        })
+    }
+
     var q = [
         'UPDATE "order"',
         'SET',

@@ -87,6 +87,13 @@ ripple.address = function(conn, req, res, next) {
 ripple.withdraw = function(conn, req, res, next) {
     if (!validate(req.body, 'ripple_out', res)) return
 
+    if (!req.apiKey.canWithdraw) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must have withdraw permission'
+        })
+    }
+
     var queryText = [
         'SELECT ripple_withdraw(user_currency_account($1, $2), $3,',
         'from_decimal($4, $2))'

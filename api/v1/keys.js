@@ -10,7 +10,15 @@ keys.configure = function(app, conn, auth) {
 }
 
 keys.replace = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary key'
+        })
+    }
+
     if (!validate(req.body, 'keys_replace', res)) return
+
     conn.write.query({
         text: 'SELECT replace_api_key($1, $2)',
         values: [req.key, req.body.key]
@@ -21,6 +29,13 @@ keys.replace = function(conn, req, res, next) {
 }
 
 keys.remove = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.write.query({
         text: [
             'DELETE',
@@ -43,16 +58,30 @@ keys.remove = function(conn, req, res, next) {
 }
 
 keys.index = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.write.query({
         text: [
-            'SELECT api_key_id id',
+            'SELECT api_key_id, can_trade, can_withdraw, can_deposit',
             'FROM api_key',
             'WHERE user_id = $1 AND "primary" = FALSE'
         ].join('\n'),
         values: [req.user]
     }, function(err, dr) {
         if (err) return next(err)
-        res.send(200, dr.rows)
+        res.send(200, dr.rows.map(function(row) {
+            return {
+                id: row.api_key_id,
+                canTrade: row.can_trade,
+                canDeposit: row.can_deposit,
+                canWithdraw: row.can_withdraw
+            }
+        }))
     })
 }
 
@@ -64,24 +93,30 @@ keys.generateApiKey = function() {
 }
 
 keys.create = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     var key = keys.generateApiKey()
 
     conn.write.query({
         text: [
-            'INSERT INTO api_key (api_key_id, user_id, "primary")',
-            'VALUES ($1, $2, FALSE)'
+            'INSERT INTO api_key (api_key_id, user_id, "primary",',
+            '   can_trade, can_deposit, can_withdraw)',
+            'VALUES ($1, $2, FALSE, $3, $4, $5)'
         ].join('\n'),
-        values: [key, req.user]
-    }, function(err, dr) {
+        values: [
+            key,
+            req.user,
+            req.body.canTrade,
+            req.body.canDeposit,
+            req.body.canWithdraw
+        ]
+    }, function(err) {
         if (err) return next(err)
-
-        if (!dr.rowCount) {
-            return res.send(404, {
-                name: 'ApiKeyNotFound',
-                message: 'API does not exist, belongs to another user, or is primary.'
-            })
-        }
-
         res.send(201, { id: key })
     })
 }

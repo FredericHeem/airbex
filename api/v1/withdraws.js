@@ -12,6 +12,13 @@ withdraws.configure = function(app, conn, auth) {
 withdraws.withdrawBank = function(conn, req, res, next) {
     if (!validate(req.body, 'withdraw_bank', res)) return
 
+    if (!req.apiKey.canWithdraw) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must have withdraw permission'
+        })
+    }
+
     conn.write.query({
         text: [
             'SELECT withdraw_bank($2, $3, $4)',
@@ -80,6 +87,13 @@ withdraws.forUser = function(conn, req, res, next) {
 }
 
 withdraws.cancel = function(conn, req, res, next) {
+    if (!req.apiKey.canWithdraw) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must have withdraw permission'
+        })
+    }
+
     conn.write.query({
         text: [
             'SELECT cancel_withdraw_request($1, null) request_id',

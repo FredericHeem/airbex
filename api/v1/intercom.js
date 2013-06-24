@@ -7,6 +7,13 @@ intercom.configure = function(app, conn, auth) {
 }
 
 intercom.intercom = function(conn, config, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.read.query({
         text: [
             'SELECT user_id, email_lower,',

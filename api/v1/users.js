@@ -28,6 +28,13 @@ users.configure = function(app, conn, auth) {
 }
 
 users.patch = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     var updates = {}
     , values = [req.user]
 
@@ -112,6 +119,13 @@ users.whoami = function(conn, req, res, next) {
 }
 
 users.addBankAccount = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.write.query({
         text: [
             'INSERT INTO bank_account (user_id, account_number,',
@@ -133,6 +147,13 @@ users.addBankAccount = function(conn, req, res, next) {
 }
 
 users.verifyBankAccount = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.write.query({
         text: [
             'SELECT verify_bank_account($1, $2, $3) success'
@@ -157,6 +178,13 @@ users.verifyBankAccount = function(conn, req, res, next) {
 }
 
 users.bankAccounts = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.read.query({
         text: [
             'SELECT * FROM bank_account WHERE user_id = $1'
@@ -226,6 +254,14 @@ users.create = function(conn, req, res, next) {
 
 users.identity = function(conn, req, res, next) {
     if (!validate(req.body, 'user_identity', res)) return
+
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     var query = {
         text: [
             'UPDATE "user"',
@@ -263,6 +299,14 @@ users.identity = function(conn, req, res, next) {
 
 users.replaceApiKey = function(conn, req, res, next) {
     if (!validate(req.body, 'user_replace_api_key', res)) return
+
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     Q.ninvoke(conn.write, 'query', {
         text: 'SELECT replace_api_key($1, $2)',
         values: [req.key, req.body.key]
@@ -276,6 +320,13 @@ users.replaceApiKey = function(conn, req, res, next) {
 }
 
 users.verifyPhone = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     conn.write.query({
         text: 'SELECT verify_phone($1, $2) success',
         values: [req.user, req.body.code]
@@ -304,6 +355,13 @@ users.verifyPhone = function(conn, req, res, next) {
 }
 
 users.startPhoneVerify = function(conn, req, res, next) {
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     debug('processing request to start phone verification')
 
     conn.write.query({

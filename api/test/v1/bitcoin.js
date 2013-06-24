@@ -30,12 +30,38 @@ describe('bitcoin', function() {
 				}
 			}
 			, req = {
-				user: 25
+				user: 25,
+				apiKey: { canDeposit: true }
 			}
 			, res = {
 				send: function(code, r) {
 					expect(code).to.be(200)
 					expect(r.address).to.be('1someaddress')
+					done()
+				}
+			}
+
+			bitcoin.address(conn, 'BTC', req, res, done)
+		})
+
+		it('requires canDeposit permission', function(done) {
+			var conn = {
+				read: {
+					query: function(q, c) {
+						expect(q.text).to.match(/user_currency_account/i)
+						expect(q.text).to.match(/from btc_deposit_address/i)
+						expect(q.values).to.eql([25, 'BTC'])
+						c(null, { rows: [{ address: '1someaddress' }] })
+					}
+				}
+			}
+			, req = {
+				user: 25,
+				apiKey: {}
+			}
+			, res = {
+				send: function(code) {
+					expect(code).to.be(401)
 					done()
 				}
 			}
@@ -58,6 +84,7 @@ describe('bitcoin', function() {
 			}
 			, req = {
 				user: 38,
+				apiKey: { canWithdraw: true },
 				body: {
 					address: '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt',
 					amount: '0.15'
@@ -67,6 +94,35 @@ describe('bitcoin', function() {
 				send: function(code, r) {
 					expect(code).to.be(201)
 					expect(r.id).to.be(59)
+					done()
+				}
+			}
+
+			bitcoin.withdraw(conn, 'BTC', req, res, done)
+		})
+
+		it('requires canWithdraw api key permission', function(done) {
+			var conn = {
+				write: {
+					query: function(q, c) {
+						if (q.text.match(/activity/)) return
+						expect(q.text).to.match(/btc_withdraw/i)
+						expect(q.values).to.eql([38, andy, '0.15', 'BTC'])
+						c(null, { rows: [{ request_id: 59 }] })
+					}
+				}
+			}
+			, req = {
+				user: 38,
+				apiKey: {},
+				body: {
+					address: '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt',
+					amount: '0.15'
+				}
+			}
+			, res = {
+				send: function(code) {
+					expect(code).to.be(401)
 					done()
 				}
 			}

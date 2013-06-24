@@ -167,6 +167,13 @@ exports.send = function(conn, req, res, next) {
     if (!validate(req.body, 'transfer', res)) return
     if (req.body.currency == 'NOK') throw new Error('Cannot transfer fiat')
 
+    if (!req.apiKey.canWithdraw) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must have withdraw permission'
+        })
+    }
+
     exports.transfer(conn, req.app.cache, req.user, req.body.email,
         req.body.amount, req.body.currency, function(err) {
             if (!err) return res.send(204)

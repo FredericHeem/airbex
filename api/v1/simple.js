@@ -10,6 +10,13 @@ simple.configure = function(app, conn, auth) {
 simple.convertAndWithdraw = function(conn, req, res, next) {
     if (!validate(req.body, 'convertAndWithdraw', res)) return
 
+    if (!req.apiKey.primary) {
+        return res.send(401, {
+            name: 'MissingApiKeyPermission',
+            message: 'Must be primary api key'
+        })
+    }
+
     async.waterfall([
         function(next) {
             conn.write.query({

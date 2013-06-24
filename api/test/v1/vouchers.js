@@ -50,6 +50,7 @@ describe('vouchers', function() {
             }
             , req = {
                 user: 101,
+                apiKey: { canWithdraw: true },
                 body: {
                     amount: '10',
                     currency: 'BTC'
@@ -69,6 +70,47 @@ describe('vouchers', function() {
                     expect(n).to.be(201)
                     expect(r.voucher).to.be('aaaaaaaaaaaa')
                     vouchers.createId = cid
+                    done()
+                }
+            }
+
+            vouchers.create(conn, req, res, done)
+        })
+
+        it('requires canWithdraw api key permission', function(done) {
+            vouchers.createId = function() {
+                return 'aaaaaaaaaaaa'
+            }
+
+            var conn = {
+                write: {
+                    query: function(q, c) {
+                        expect(q.text).to.contain('create_voucher($1, $2, $3, $4')
+                        expect(q.values).to.eql(['aaaaaaaaaaaa', 101, 'BTC', 10e8])
+                        c(null, { rows: [{ }] })
+                    }
+                }
+            }
+            , req = {
+                user: 101,
+                apiKey: {},
+                body: {
+                    amount: '10',
+                    currency: 'BTC'
+                },
+                app: {
+                    cache: {
+                        parseCurrency: function(n, c) {
+                            expect(n).to.be('10')
+                            expect(c).to.be('BTC')
+                            return 10e8
+                        }
+                    }
+                }
+            }
+            , res = {
+                send: function(n) {
+                    expect(n).to.be(401)
                     done()
                 }
             }
@@ -95,6 +137,7 @@ describe('vouchers', function() {
             }
             , req = {
                 user: 102,
+                apiKey: { canDeposit: true },
                 params: {
                     id: 'aaaaaaaaaaaa'
                 }
@@ -102,6 +145,38 @@ describe('vouchers', function() {
             , res = {
                 send: function(n) {
                     expect(n).to.be(204)
+                    done()
+                }
+            }
+
+            vouchers.redeem(conn, req, res, done)
+        })
+
+        it('requires canDeposit api key permission', function(done) {
+            var conn = {
+                write: {
+                    query: function(q, c) {
+                        expect(q.text).to.contain('redeem_voucher($1, $2')
+                        expect(q.values).to.eql(['aaaaaaaaaaaa', 102])
+                        c(null, { rows: [{ }] })
+                    }
+                },
+                read: {
+                    query: function(q, c) {
+                        c(null, { rows: [{ amount: 1e8, currency: 'BTC' }] })
+                    }
+                }
+            }
+            , req = {
+                user: 102,
+                apiKey: {},
+                params: {
+                    id: 'aaaaaaaaaaaa'
+                }
+            }
+            , res = {
+                send: function(n) {
+                    expect(n).to.be(401)
                     done()
                 }
             }

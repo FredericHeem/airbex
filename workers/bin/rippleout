@@ -4,6 +4,6 @@ var config = require('konfu')
 , rippleOut = new RippleOut(dbClient, config.ripple_account, config.ripple_secret, config.ripple_uri)
 , raven = require('../lib/raven')
 
-rippleOut.on('error', function(err) {
-    raven.captureException(err)
+rippleOut.on('log', function(msg) {
+    raven.captureMessage(msg)
 })

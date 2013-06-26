@@ -41,7 +41,7 @@ ripple.federation = function(config, conn, req, res) {
     } : {
         text: [
             'SELECT REPLACE(email_lower, \'@\', \'_\') username',
-            'FROM "user" WHERE user_id = $1'
+            'FROM "user" WHERE tag = $1'
         ].join('\n'),
         values: [tag]
     }

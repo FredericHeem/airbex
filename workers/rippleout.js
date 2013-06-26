@@ -75,7 +75,8 @@ RippleOut.prototype.verifyLine = function(request, cb) {
     var that = this
 
     if (request.currency_id == 'XRP') {
-        return cb(null, true)
+        debug('will not verify line for XRP')
+        return cb(true)
     }
 
     debug('checking lines for %j', request)

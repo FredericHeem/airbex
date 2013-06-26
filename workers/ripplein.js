@@ -150,6 +150,7 @@ RippleIn.prototype.rippleCredit = function(hash, currencyId, tag, amount, cb) {
         if (err) {
             // Already criedted
             if (err.message.match(/ripple_credited_hash_key/)) {
+                debug('ignoring duplicate ripple credit')
                 return cb()
             }
 

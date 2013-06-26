@@ -6,3 +6,17 @@ require('./rippleout')
 require('./litecoinaddress')
 require('./litecoinin')
 require('./litecoinout')
+
+var config = require('konfu')
+
+if (config.raven) {
+    var raven = require('raven')
+
+    raven.patchGlobal(function(logged, err) {
+        console.error(err)
+        console.error(err.stack)
+
+        console.error('exiting process (after global patch)')
+        process.exit(1)
+    })
+}

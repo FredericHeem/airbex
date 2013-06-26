@@ -137,16 +137,22 @@ RippleOut.prototype.send = function(request, cb) {
 
     var amount = {
         currency: request.currency_id,
-        issuer: this.account,
         amount: num(request.amount, request.scale).toString()
+    }
+
+    if (amount.currency != 'XRP') {
+        amount.issuer = this.account
     }
 
     debug('amount %j', amount)
 
-    debug('executing transaction to %s', request.address)
+    debug('executing transaction to %s...', request.address)
 
     that.drop.payment(that.account, request.address, amount,
-        function(err) {
+        function(err)
+    {
+        debug('execution completed')
+
         if (err) {
             var abort, reason, report
 
@@ -163,6 +169,8 @@ RippleOut.prototype.send = function(request, cb) {
             } else {
                 report = true
             }
+
+            debug('will not report error %s: %s', err.name || '<null>', err.message)
 
             if (report) {
                 err = new Error(format('Failed to send transaction #%s: %s, %s',

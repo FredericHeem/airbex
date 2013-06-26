@@ -163,6 +163,9 @@ RippleIn.prototype.rippleCredit = function(hash, currencyId, tag, amount, cb) {
             return cb(err)
         }
 
+        debug('ripple credit complete, internal transaction id %s',
+            dr.rows[0].tid)
+
         cb(null, dr.rows[0].tid)
     })
 }
@@ -234,9 +237,14 @@ RippleIn.prototype.processTransaction = function(tran, cb) {
     var that = this
 
     assert(tran)
+    assert(tran.type)
     assert(cb)
 
+    if (tran.from == this.account) return cb()
+    if (tran.type !== 'payment') return debug('Ignoring %s', tran.type)
+
     debug('processing transaction %s...', tran.hash)
+    debug(util.inspect(tran))
 
     if (tran.type != 'payment') {
         debug('unexpected transaction type %s. skipping', tran.type)
@@ -288,15 +296,6 @@ RippleIn.prototype.processTransaction = function(tran, cb) {
 
 RippleIn.prototype.onAccountMessage = function(account, tran) {
     var that = this
-    assert(tran)
-    assert(tran.type)
-
-    if (tran.type !== 'payment') return debug('Ignoring %s', tran.type)
-
-    if (tran.to !== account) {
-        assert.equal(tran.from, account)
-        return
-    }
 
     this.processTransaction(tran, function(err) {
         if (err) that.emit('error', err)

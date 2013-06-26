@@ -68,13 +68,6 @@ email.verifySend = function(conn, req, res, next) {
 }
 
 email.verify = function(conn, req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     conn.write.query({
         text: 'SELECT verify_email($1)',
         values: [req.params.code]

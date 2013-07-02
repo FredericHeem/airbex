@@ -1,6 +1,7 @@
 var Q = require('q')
 , num = require('num')
 , async = require('async')
+, debug = require('debug')('snow:litecoinin')
 
 var LitecoinIn = module.exports = function(ep, dbClient, minConf) {
     var Client = require('bitcoin').Client
@@ -17,7 +18,7 @@ LitecoinIn.prototype.loop = function() {
     return this.processNewBlocks()
     .then(function(result) {
         if (result) {
-            console.log('litecoinin checking for more work immediately')
+            debug('litecoinin checking for more work immediately')
             return that.loop()
         }
 
@@ -35,7 +36,7 @@ LitecoinIn.prototype.processTx = function(txid) {
         if (!tx.details) return
         if (tx.details.length !== 1) throw new Error('more than one detail')
         var detail = tx.details[0]
-        if (detail.category !== 'receive') return console.log('not received')
+        if (detail.category !== 'receive') return debug('not received')
         var address = detail.address
 
         return Q.ninvoke(that.client, 'query', {
@@ -57,7 +58,10 @@ LitecoinIn.prototype.processTx = function(txid) {
             .then(function(res) {
                 return res.rows[0].tid
             }, function(err) {
-                if (err.code === '23505') return console.log('duplicate tx %s', txid)
+                if (err.code === '23505') {
+                    return console.log('Ignoring duplicate tx %s', txid)
+                }
+
                 throw err
             })
         })
@@ -74,7 +78,7 @@ LitecoinIn.prototype.getBlock = function(hash) {
 LitecoinIn.prototype.analyzeBlock = function(block) {
     var that = this
 
-    console.log('processing %d transactions', block.tx.length)
+    debug('processing %d transactions', block.tx.length)
 
     var d = Q.defer()
 
@@ -106,7 +110,8 @@ LitecoinIn.prototype.processNewBlocks = function() {
         })
     ]).then(function(heights) {
         var lastHeight = heights[0]
-        console.log('litecoin heights: internal=%s; client=%s', lastHeight, heights[1])
+
+        debug('litecoin heights: internal=%s; client=%s', lastHeight, heights[1])
 
         if (heights[1] < lastHeight + that.minConf) return null
 
@@ -114,7 +119,7 @@ LitecoinIn.prototype.processNewBlocks = function() {
         .then(function(hash) {
             return that.getBlock(hash)
             .then(that.analyzeBlock.bind(that), function(err) {
-                console.error('???', err)
+                throw err
             })
             .then(function() {
                 return Q.ninvoke(that.client, 'query', {

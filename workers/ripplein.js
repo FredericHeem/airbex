@@ -32,6 +32,7 @@ util.inherits(RippleIn, EventEmitter)
 
 RippleIn.prototype.connect = function() {
     var that = this
+
     debug('connecting to %s', this.uri)
 
     this.drop = new Drop(this.uri)
@@ -45,7 +46,10 @@ RippleIn.prototype.connect = function() {
 
     this.subscribeAccounts(function(err) {
         if (err) return that.emit(err)
-        that.catchup()
+
+        that.catchup(function(err) {
+            if (err) that.emit(err)
+        })
     })
 }
 
@@ -79,10 +83,12 @@ RippleIn.prototype.catchup = function(cb) {
                 if (err) return next(err)
                 debug('found %d accounts', dr.rows.length)
 
-                async.each(dr.rows, function(row, next) {
-                    if (row.ledger_index + 1 == index) {
-                        debug('no need to catch up %s', row.address)
-                        return next(next)
+                async.eachSeries(dr.rows, function(row, next) {
+                    debug('row %s index %s', row.ledger_index, index)
+
+                    if (row.ledger_index == index) {
+                        console.log('No need to catch up %s', row.address)
+                        return next()
                     }
 
                     that.catchupAccount(row.address, row.ledger_index + 1, index, next)
@@ -93,6 +99,8 @@ RippleIn.prototype.catchup = function(cb) {
 }
 
 RippleIn.prototype.setAccountLedgerIndex = function(account, index, cb) {
+    console.log('Setting ledger index of account %s to %s', account, index)
+
     this.client.query({
         text: [
             'UPDATE ripple_account',
@@ -101,26 +109,42 @@ RippleIn.prototype.setAccountLedgerIndex = function(account, index, cb) {
             '(ledger_index IS NULL OR ledger_index < $1)'
         ].join('\n'),
         values: [index, account]
-    }, cb)
+    }, function(err, dr) {
+        if (err) {
+            console.error('Failed to ledger index for %s to %s: %s',
+                account, index, err.message)
+
+            return cb(err)
+        }
+
+        if (dr.rowCount) {
+            console.log('Ledger index of account %s set to %s', account, index)
+        } else {
+            console.log('Ledger index was not set for %s (redundant)', account)
+        }
+
+        cb()
+    })
 }
 
 RippleIn.prototype.catchupAccount = function(account, fromIndex, toIndex, cb) {
     var that = this
-    console.log('fetching transactions for %s from %d to %d', account, fromIndex, toIndex)
+
+    console.log('Catching up account %s (%d ... %d)', account, fromIndex, toIndex)
 
     this.drop.transactions(account, fromIndex, toIndex, function(err, trans) {
         if (err) return cb(err)
 
-        console.log('found %d transactions for %s between %d and %d',
+        console.log('Found %d transactions for %s',
             trans.length, account, fromIndex, toIndex)
 
-        async.each(trans, function(tran, next) {
+        async.eachSeries(trans, function(tran, next) {
             that.processTransaction(tran, next)
         }, function(err) {
             if (err) return cb(err)
             debug('finished catching up %s', account)
             that.setAccountLedgerIndex(account, toIndex, cb)
-        })
+        }, cb)
     })
 }
 
@@ -140,7 +164,7 @@ RippleIn.prototype.cacheCurrencies = function(cb) {
 
 // FUNCTION ripple_credit(h varchar(64), s currency_id, a int, amnt bigint)
 RippleIn.prototype.rippleCredit = function(hash, currencyId, tag, amount, cb) {
-    console.log('ripple crediting user with tag %s %s %s (tx %s)', tag,
+    console.log('Ripple crediting user with tag %s %s %s (tx %s)', tag,
         amount, currencyId, hash)
 
     this.client.query({
@@ -148,8 +172,8 @@ RippleIn.prototype.rippleCredit = function(hash, currencyId, tag, amount, cb) {
         values: [hash, currencyId, tag, amount]
     }, function(err, dr) {
         if (err) {
-            // Already criedted
-            if (err.message.match(/ripple_credited_hash_key/)) {
+            // Already credited
+            if (err.message.match(/ripple_processed_pkey/)) {
                 debug('ignoring duplicate ripple credit')
                 return cb()
             }
@@ -164,8 +188,7 @@ RippleIn.prototype.rippleCredit = function(hash, currencyId, tag, amount, cb) {
             return cb(err)
         }
 
-        debug('ripple credit complete, internal transaction id %s',
-            dr.rows[0].tid)
+        console.log('ripple credit complete, internal transaction id %s', dr.rows[0].tid)
 
         cb(null, dr.rows[0].tid)
     })
@@ -187,7 +210,7 @@ RippleIn.prototype.subscribeAccounts = function(cb) {
     this.client.query(query, function(err, dr) {
         if (err) return cb(err)
         var accounts = _.pluck(dr.rows, 'address')
-        async.each(accounts, that.subscribeAccount, cb)
+        async.eachSeries(accounts, that.subscribeAccount, cb)
     })
 }
 
@@ -241,8 +264,14 @@ RippleIn.prototype.processTransaction = function(tran, cb) {
     assert(tran.type)
     assert(cb)
 
-    if (tran.from == this.account) return cb()
-    if (tran.type !== 'payment') return debug('Ignoring %s', tran.type)
+    if (tran.from == this.account) {
+        return cb()
+    }
+
+    if (tran.type !== 'payment') {
+        debug('Ignoring %s', tran.type)
+        return cb()
+    }
 
     debug('processing transaction %s...', tran.hash)
     debug(util.inspect(tran))

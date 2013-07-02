@@ -9,7 +9,7 @@
         "amount": {
             "type": "string",
             "required": true,
-            "pattern": "^\\d+\\.?\\d{0,17}$"
+            "pattern": "^\\d+(\\.\\d{1,17})?$"
         },
         "currency": {
             "type": "string",

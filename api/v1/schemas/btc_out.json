@@ -9,7 +9,7 @@
         "amount": {
             "type": "string",
             "required": true,
-            "pattern": "^\\d+\\.?\\d{0,8}$"
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
         }
     }
 }

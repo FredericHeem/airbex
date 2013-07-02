@@ -9,12 +9,12 @@
         "price": {
             "type": "string",
             "required": true,
-            "pattern": "^\\d+\\.?\\d*$"
+            "pattern": "^\\d+(\\.\\d+)?$"
         },
         "amount": {
             "type": "string",
             "required": true,
-            "pattern": "^\\d+\\.?\\d*$"
+            "pattern": "^\\d+(\\.\\d+)?$"
         },
         "type": {
             "type": "string",

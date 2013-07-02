@@ -1,6 +1,7 @@
 var Q = require('q')
 , num = require('num')
 , async = require('async')
+, debug = require('debug')('snow:bitcoinin')
 
 var BitcoinIn = module.exports = function(bitcoinEndpoint, dbClient, minConf) {
     var Bitcoin = require('bitcoin').Client
@@ -17,7 +18,7 @@ BitcoinIn.prototype.loop = function() {
     return this.processNewBlocks()
     .then(function(result) {
         if (result) {
-            console.log('bitcoinin checking for more work immediately')
+            debug('bitcoinin checking for more work immediately')
             return that.loop()
         }
 
@@ -48,13 +49,22 @@ BitcoinIn.prototype.processOutput = function(o, txid) {
         values: [address]
     }).get('rows').get(0).get('count').then(function(internal) {
         if (!internal) return 'external address'
+
         var satoshi = +num(o.value).mul(1e8)
+
+        console.log('Crediting %s, %s (%s), to Bitcoin address %s...',
+            txid, o.value, satoshi, address)
 
         return Q.ninvoke(that.client, 'query', {
             text: 'SELECT btc_credit($1, $2, $3) tid',
             values: [txid, address, satoshi]
         }).fail(function(err) {
-            if (err.code === '23505') return 'duplicate tx'
+            if (err.code === '23505') {
+                console.log('Skipped duplicate Bitcoin transaction %s', txid)
+
+                return 'duplicate tx'
+            }
+
             throw err
         }).get('rows').get(0).get('tid')
     })
@@ -81,7 +91,7 @@ BitcoinIn.prototype.getBlock = function(hash) {
 BitcoinIn.prototype.analyzeBlock = function(block) {
     var that = this
 
-    console.log('processing %d transactions', block.tx.length)
+    debug('processing %d transactions', block.tx.length)
 
     var d = Q.defer()
 
@@ -111,15 +121,20 @@ BitcoinIn.prototype.processNewBlocks = function() {
         })
     ]).then(function(heights) {
         var lastHeight = heights[0]
-        console.log('bitcoin heights: internal=%s; client=%s', lastHeight, heights[1])
+
+        debug('bitcoin heights: internal=%s; client=%s', lastHeight, heights[1])
 
         if (heights[1] < lastHeight + that.minConf) return null
 
         return Q.ninvoke(that.bitcoin, 'getBlockHash', lastHeight + 1)
         .then(function(hash) {
+            debug('Processing block at height #%s...', lastHeight + 1)
+
             return that.getBlock(hash)
             .then(that.analyzeBlock.bind(that))
             .then(function() {
+                debug('Finished processing block #%s (%s)', lastHeight + 1, hash)
+
                 return Q.ninvoke(that.client, 'query', {
                     text: 'UPDATE btc_block SET height = $1',
                     values: [lastHeight + 1]

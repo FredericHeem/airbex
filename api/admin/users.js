@@ -113,7 +113,7 @@ users.setBankAccountVerified = function(conn, req, res, next) {
 users.user = function(conn, req, res, next) {
     conn.read.query({
         text: [
-            'SELECT * FROM "user" WHERE user_id = $1'
+            'SELECT * FROM admin_user_view WHERE user_id = $1'
         ].join('\n'),
         values: [+req.params.id]
     }, function(err, dr) {

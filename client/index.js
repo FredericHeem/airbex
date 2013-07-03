@@ -1,11 +1,15 @@
 var debug = require('debug')('snow')
+, assert = require('assert')
 , request = require('request')
 , Snow = module.exports = function(key, ep) {
     this.url = ep || 'https://justcoin.com/api/v1/'
+    debug('using endpoint %s', ep)
+
     this.key = key
 }
 
 function bodyToError(body) {
+    assert(body)
     var error = new Error(body.message || body)
     if (body.name) error.name = body.name
     return error

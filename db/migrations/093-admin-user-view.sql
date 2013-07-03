@@ -16,6 +16,4 @@ LEFT JOIN
         SELECT a.user_id, address
         FROM ltc_deposit_address lda
         INNER JOIN account a ON a.account_id = lda.account_id
-    ) lda ON lda.user_id = u.user_id
-WHERE
-    bda.user_id = u.user_id;
+    ) lda ON lda.user_id = u.user_id;

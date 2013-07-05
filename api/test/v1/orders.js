@@ -116,7 +116,7 @@ describe('orders', function() {
 					query: function(q, cb) {
 						if (q.text.match(/activity/)) return
 						expect(q.text).to.match(/create_order/i)
-						cb(null, { rows: [{ order_id: 17 }] })
+						cb(null, { rows: [{ oid: 17 }] })
 					}
 				}
 			}

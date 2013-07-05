@@ -36,6 +36,11 @@ describe('markets', function() {
 						},
 						formatOrderVolume: function() {
 							return 'formatted'
+						},
+						markets: {
+							DRPHRP: {
+								scale: 5
+							}
 						}
 					}
 				}

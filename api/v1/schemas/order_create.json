@@ -7,9 +7,8 @@
             "pattern": "^[A-Z]{6}$"
         },
         "price": {
-            "type": "string",
-            "required": true,
-            "pattern": "^\\d+(\\.\\d+)?$"
+            "type": ["string", "null"],
+            "required": true
         },
         "amount": {
             "type": "string",

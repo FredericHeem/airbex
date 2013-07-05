@@ -13,6 +13,13 @@ orders.configure = function(app, conn, auth) {
 orders.create = function(conn, req, res, next) {
     if (!validate(req.body, 'order_create', res)) return
 
+    if (req.body.price && !req.body.price.match(/^\d+(\.\d+)?$/)) {
+        res.send({
+            name: 'BadRequest',
+            message: 'Price is invalid'
+        })
+    }
+
     if (!req.apiKey.canTrade) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -32,7 +39,7 @@ orders.create = function(conn, req, res, next) {
             req.user,
             req.body.market,
             req.body.type == 'bid' ? 0 : 1,
-            req.body.price,
+            req.body.price || null,
             req.body.amount
         ]
     }

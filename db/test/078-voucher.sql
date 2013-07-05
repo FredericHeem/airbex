@@ -26,8 +26,8 @@ DECLARE
     tavail bigint;
 BEGIN
     vid := repeat('a', 12);
-    fuid := create_user('a@a', repeat('a', 64), FALSE);
-    tuid := create_user('b@b', repeat('b', 64), FALSE);
+    fuid := create_user('a@a', repeat('a', 64));
+    tuid := create_user('b@b', repeat('b', 64));
     PERFORM edge_credit(fuid, 'BTC', 10e8::bigint);
 
     PERFORM create_voucher(repeat('a', 12), fuid, 'BTC', 10e8::bigint);
@@ -62,7 +62,7 @@ DECLARE
     avail bigint;
 BEGIN
     vid := repeat('a', 12);
-    uid := create_user('a@a', repeat('a', 64), FALSE);
+    uid := create_user('a@a', repeat('a', 64));
     PERFORM edge_credit(uid, 'BTC', 10e8::bigint);
 
     PERFORM create_voucher(repeat('a', 12), uid, 'BTC', 10e8::bigint);
@@ -86,7 +86,7 @@ DECLARE
     avail bigint;
 BEGIN
     vid := repeat('a', 12);
-    uid := create_user('a@a', repeat('a', 64), FALSE);
+    uid := create_user('a@a', repeat('a', 64));
     PERFORM edge_credit(uid, 'BTC', 10e8::bigint);
 
     PERFORM create_voucher(repeat('a', 12), uid, 'BTC', 10e8::bigint);

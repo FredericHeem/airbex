@@ -7,8 +7,8 @@ SAVEPOINT before_tests;
 
 DO $$ <<fn>>
 DECLARE
-    ask_uid int := create_user('a@a', repeat('a', 64), FALSE);
-    bid_uid int := create_user('b@b', repeat('b', 64), FALSE);
+    ask_uid int := create_user('a@a', repeat('a', 64));
+    bid_uid int := create_user('b@b', repeat('b', 64));
     ask_oid int;
     bid_oid int;
     mrid int := (SELECT market_id FROM market

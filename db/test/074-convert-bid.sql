@@ -4,8 +4,8 @@ SAVEPOINT before_tests;
 
 DO $$
 DECLARE
-    bid_uid int := create_user('a@a', repeat('a', 64), FALSE);
-    ask_uid int := create_user('b@b', repeat('b', 64), FALSE);
+    bid_uid int := create_user('a@a', repeat('a', 64));
+    ask_uid int := create_user('b@b', repeat('b', 64));
     sold bigint;
     mid int;
 BEGIN

@@ -7,7 +7,7 @@ DECLARE
     mid int;
     vol bigint;
 BEGIN
-    uid := create_user('a@a', repeat('x', 64), FALSE);
+    uid := create_user('a@a', repeat('x', 64));
     mid := (SELECT market_id FROM market WHERE
         base_currency_id || quote_currency_id = 'BTCNOK');
     PERFORM edge_credit(uid, 'BTC', 1e8::bigint);

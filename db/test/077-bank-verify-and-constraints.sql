@@ -9,7 +9,7 @@ DECLARE
     bid int;
     vat timestamptz;
 BEGIN
-    uid := create_user('a@a', repeat('a', 64), false);
+    uid := create_user('a@a', repeat('a', 64));
 
     INSERT INTO bank_account (user_id, account_number, verify_code, verify_attempts)
     VALUES (uid, '12345678', 'ABCD', 0);
@@ -37,7 +37,7 @@ DECLARE
     bid int;
     vat timestamptz;
 BEGIN
-    uid := create_user('a@a', repeat('a', 64), false);
+    uid := create_user('a@a', repeat('a', 64));
 
     INSERT INTO bank_account (user_id, account_number, verify_code, verify_attempts)
     VALUES (uid, '12345678', 'ABCD', 0);
@@ -68,7 +68,7 @@ DECLARE
     bid int;
 BEGIN
     RAISE NOTICE 'Test: Unable to verify before started';
-    uid := create_user('a@a', repeat('a', 64), false);
+    uid := create_user('a@a', repeat('a', 64));
 
     INSERT INTO bank_account (user_id, account_number, verify_code, verify_attempts)
     VALUES (uid, '12345678', 'ABCD', 0);
@@ -94,7 +94,7 @@ DECLARE
 BEGIN
     RAISE NOTICE 'Test: Unable to try verification too many times';
 
-    uid := create_user('a@a', repeat('a', 64), false);
+    uid := create_user('a@a', repeat('a', 64));
 
     INSERT INTO bank_account (user_id, account_number, verify_code, verify_attempts)
     VALUES (uid, '12345678', 'ABCD', 0);

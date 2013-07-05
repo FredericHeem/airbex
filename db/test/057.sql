@@ -2,7 +2,7 @@ BEGIN; DO $$ <<fn>>
 DECLARE
     uid int;
 BEGIN
-    uid := (SELECT create_user('b@c', repeat('a', 64), FALSE));
+    uid := (SELECT create_user('b@c', repeat('a', 64)));
 
     UPDATE "user"
     SET

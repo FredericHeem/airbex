@@ -7,7 +7,7 @@ DECLARE
     uid int;
     lang varchar;
 BEGIN
-    uid := create_user('a@a', repeat('x', 64), false);
+    uid := create_user('a@a', repeat('x', 64));
     lang := (SELECT language FROM "user" WHERE user_id = uid);
 
     IF lang IS NOT NULL THEN

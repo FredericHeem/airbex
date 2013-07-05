@@ -10,8 +10,8 @@ DECLARE
     bid int;
     mid int;
 BEGIN
-    bob := create_user('bob@gmail.com', repeat('a', 64), FALSE);
-    alice := create_user('alice@hotmail.com', repeat('b', 64), FALSE);
+    bob := create_user('bob@gmail.com', repeat('a', 64));
+    alice := create_user('alice@hotmail.com', repeat('b', 64));
     bid := (SELECT market_id FROM market WHERE base_currency_id = 'BTC' AND quote_currency_id = 'XRP');
 
     UPDATE "user" SET fee_ratio = 0 WHERE user_id IN (bob, alice);

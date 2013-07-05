@@ -7,7 +7,7 @@ DO $$
 DECLARE
     uid int;
 BEGIN
-    uid := create_user('a@a', repeat('a', 64), FALSE);
+    uid := create_user('a@a', repeat('a', 64));
 
     IF (
         SELECT api_key_id

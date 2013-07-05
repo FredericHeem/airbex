@@ -6,8 +6,8 @@ DO $$ <<fn>>
 DECLARE
     n varchar := '+12345678';
     c phone_number_verify_code;
-    u1 int := create_user('bob@gmail.com', repeat('x', 64), FALSE);
-    u2 int := create_user('alice@gmail.com', repeat('y', 64), FALSE);
+    u1 int := create_user('bob@gmail.com', repeat('x', 64));
+    u2 int := create_user('alice@gmail.com', repeat('y', 64));
 BEGIN
     c := create_phone_number_verify_code(n, u1);
     RAISE NOTICE 'Verify code %', c;
@@ -37,7 +37,7 @@ DO $$ <<fn>>
 DECLARE
     n varchar := '+123456789';
     c phone_number_verify_code;
-    u int := create_user('bob2@gmail.com', repeat('a', 64), FALSE);
+    u int := create_user('bob2@gmail.com', repeat('a', 64));
 BEGIN
     c := create_phone_number_verify_code(n, u);
     RAISE NOTICE 'Verify code %', c;
@@ -51,7 +51,7 @@ DO $$ <<fn>>
 DECLARE
     n varchar := '+12345678910';
     c phone_number_verify_code;
-    u int := create_user('bob3@gmail.com', repeat('b', 64), FALSE);
+    u int := create_user('bob3@gmail.com', repeat('b', 64));
 BEGIN
     c := create_phone_number_verify_code(n, u);
     RAISE NOTICE 'Verify code %', c;

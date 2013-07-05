@@ -81,7 +81,6 @@ users.whoami = function(conn, req, res, next) {
             '   email,',
             '   email_verified_at,',
             '   admin,',
-            '   simple,',
             '   tag,',
             '   phone_number phone,',
             '   first_name firstname,',
@@ -105,7 +104,6 @@ users.whoami = function(conn, req, res, next) {
             id: row.id,
             email: row.email,
             admin: row.admin,
-            simple: row.simple,
             tag: row.tag,
             phone: row.phone,
             firstName: row.firstname,
@@ -225,8 +223,8 @@ users.create = function(conn, req, res, next) {
         }
 
         conn.write.query({
-            text: 'SELECT create_user($1, $2, $3) user_id',
-            values: [req.body.email, req.body.key, req.body.simple]
+            text: 'SELECT create_user($1, $2) user_id',
+            values: [req.body.email, req.body.key]
         }, function(err, cres) {
             if (!err) {
                 activities.log(conn, cres.rows[0].user_id, 'Created', {})

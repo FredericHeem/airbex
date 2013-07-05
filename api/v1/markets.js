@@ -23,7 +23,8 @@ Markets.markets = function(conn, req, res, next) {
                 low: formatPriceOrNull(row.low, m),
                 bid: formatPriceOrNull(row.bid, m),
                 ask: formatPriceOrNull(row.ask, m),
-                volume: req.app.cache.formatOrderVolume(row.volume, m)
+                volume: req.app.cache.formatOrderVolume(row.volume, m),
+                scale: req.app.cache.markets[m].scale
             }
         }))
     }, next)
@@ -36,7 +37,7 @@ Markets.depth = function(conn, req, res, next) {
         'FROM order_depth_view odv',
         'INNER JOIN market m ON m.market_id = odv.market_id',
         'WHERE m.base_currency_id || m.quote_currency_id = $1',
-        'ORDER BY price'
+        'ORDER BY CASE WHEN side = 1 THEN price ELSE -price END'
     ].join('\n')
 
     Q.ninvoke(conn.read, 'query', {

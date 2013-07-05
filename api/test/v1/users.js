@@ -36,8 +36,7 @@ describe('users', function() {
 			, req = {
 				body: {
 					email: 'bob@bob.com',
-					key: key,
-					simple: true
+					key: key
 				}
 			}
 			, res = {

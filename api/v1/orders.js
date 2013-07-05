@@ -20,9 +20,11 @@ orders.create = function(conn, req, res, next) {
         })
     }
 
+    var method = req.body.aon ? 'create_order_aon' : 'create_order'
+
     var query = {
         text: [
-            'SELECT create_order($1, m.market_id, $3, $4, $5) order_id',
+            'SELECT ' + method + '($1, m.market_id, $3, $4, $5) oid',
             'FROM market m',
             'WHERE m.base_currency_id || m.quote_currency_id = $2'
         ].join('\n'),
@@ -77,15 +79,23 @@ orders.create = function(conn, req, res, next) {
             })
         }
 
+        if (row.oid === null) {
+            return res.send(409, {
+                name: 'FailedToMatchEntireOrder',
+                message: 'Failed to match entire all-or-nothing order'
+            })
+        }
+
         activities.log(conn, req.user, 'CreateOrder', {
             market: req.body.market,
             type: req.body.type,
             price: req.body.price,
             amount: req.body.amount,
-            address: req.body.address
+            address: req.body.address,
+            aon: req.body.aon || false
         })
 
-        res.send(201, { id: row.order_id })
+        res.send(201, { id: row.oid })
     })
 }
 

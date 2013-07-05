@@ -1,19 +1,15 @@
 {
     "type": "object",
     "properties": {
-        "bankAccount": {
-            "type": "integer",
-            "required": true
-        },
         "amount": {
             "type": "string",
             "required": true,
-            "pattern": "^\\d+(\\.\\d{1,2})?$"
+            "pattern": "^\\d+(\\.\\d+)?$"
         },
-        "currency": {
+        "market": {
             "type": "string",
             "required": true,
-            "pattern": "^NOK$"
+            "pattern": "^[A-Z]{6}$"
         }
     }
 }

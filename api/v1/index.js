@@ -7,7 +7,7 @@ module.exports = {
         var auth = require('./auth')(conn)
         , routes = ['balances', 'markets', 'orders', 'ripple', 'intercom',
         'currencies', 'activities', 'users', 'withdraws',
-        'keys', 'email', 'resetPassword', 'simple', 'bankaccounts',
+        'keys', 'email', 'resetPassword', 'spend', 'bankaccounts',
         'language', 'vouchers', 'send']
 
         routes.forEach(function(name) {

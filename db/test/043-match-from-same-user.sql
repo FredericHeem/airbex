@@ -8,7 +8,7 @@ DECLARE
     match_id int;
     market_id int;
 BEGIN
-    fn.user_id := create_user('bob@gmail.com', fn.api_key, FALSE);
+    fn.user_id := create_user('bob@gmail.com', fn.api_key);
     fn.market_id := (SELECT m.market_id FROM market m WHERE base_currency_id || quote_currency_id = 'BTCXRP');
 
     -- Fund user with 10 BTC

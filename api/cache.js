@@ -57,6 +57,17 @@ Cache.prototype.parseOrderVolume = function(value, marketId) {
     return result.toString()
 }
 
+Cache.prototype.parseOrderPrice = function(value, marketId) {
+    var market = this.markets[marketId]
+    , currency = this.currencies[marketId.substr(0, 3)]
+    assert(market)
+    assert(currency)
+
+    var result = num(value).mul(Math.pow(10, market.scale))
+    result.set_precision(0)
+    return result.toString()
+}
+
 Cache.prototype.formatCurrency = function(value, currency) {
     var item = this.currencies[currency]
     assert(item)

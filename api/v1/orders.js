@@ -2,6 +2,7 @@ var Q = require('q')
 , orders = module.exports = {}
 , validate = require('./validate')
 , activities = require('./activities')
+, debug = require('debug')('snow:orders')
 
 orders.configure = function(app, conn, auth) {
     app.del('/v1/orders/:id', auth, orders.cancel.bind(orders, conn))
@@ -29,12 +30,14 @@ orders.create = function(conn, req, res, next) {
 
     var marketId = req.app.cache.markets[req.body.market].id
     , price = null
-    , amount = req.app.cache.formatOrderVolume(req.body.amount, req.body.market)
+    , amount = req.app.cache.parseOrderVolume(req.body.amount, req.body.market)
     , query
 
     if (req.body.price) {
-        price = req.app.cache.formatOrderPrice(req.body.price, req.body.market)
+        price = req.app.cache.parseOrderPrice(req.body.price, req.body.market)
     }
+
+    debug('price %s --> %s', req.body.price, price)
 
     if (req.body.aon) {
         query = {

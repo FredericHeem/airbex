@@ -77,7 +77,7 @@ describe('bitcoin', function() {
 					query: function(q, c) {
 						if (q.text.match(/activity/)) return
 						expect(q.text).to.match(/btc_withdraw/i)
-						expect(q.values).to.eql([38, andy, '0.15', 'BTC'])
+						expect(q.values).to.eql([38, andy, 0.15 * 1e8, 'BTC'])
 						c(null, { rows: [{ request_id: 59 }] })
 					}
 				}
@@ -88,6 +88,13 @@ describe('bitcoin', function() {
 				body: {
 					address: '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt',
 					amount: '0.15'
+				},
+				app: {
+					cache: {
+						parseCurrency: function(n) {
+							return n * 1e8
+						}
+					}
 				}
 			}
 			, res = {

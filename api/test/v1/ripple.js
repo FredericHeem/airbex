@@ -47,7 +47,7 @@ describe('ripple', function() {
 					query: function(q, c) {
 						if (q.text.match(/activity/)) return
 						expect(q.text).to.match(/ripple_withdraw/i)
-						expect(q.values).to.eql([98, 'BTC', addr, '50.3'])
+						expect(q.values).to.eql([98, 'BTC', addr, 'parsed'])
 						c(null, { rows: [{ request_id: 59 }] })
 					}
 				}
@@ -59,6 +59,13 @@ describe('ripple', function() {
 					address: addr,
 					amount: '50.3',
 					currency: 'BTC'
+				},
+				app: {
+					cache: {
+						parseCurrency: function() {
+							return 'parsed'
+						}
+					}
 				}
 			}
 			, res = {
@@ -91,6 +98,13 @@ describe('ripple', function() {
 					address: addr,
 					amount: '50.3',
 					currency: 'BTC'
+				},
+				app: {
+					cache: {
+						parseCurrency: function(n) {
+							return n * 1e8
+						}
+					}
 				}
 			}
 			, res = {

@@ -104,7 +104,7 @@ ripple.withdraw = function(conn, req, res, next) {
             req.user,
             req.body.currency,
             req.body.address,
-            app.cache.parseCurrency(req.body.amount, req.body.currency)
+            req.app.cache.parseCurrency(req.body.amount, req.body.currency)
         ]
     })
     .then(function(cres) {

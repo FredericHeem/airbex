@@ -42,6 +42,7 @@ describe('vouchers', function() {
             var conn = {
                 write: {
                     query: function(q, c) {
+                        if (q.text.match(/activity/)) return
                         expect(q.text).to.contain('create_voucher($1, $2, $3, $4')
                         expect(q.values).to.eql(['aaaaaaaaaaaa', 101, 'BTC', 10e8])
                         c(null, { rows: [{ }] })

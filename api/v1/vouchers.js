@@ -1,6 +1,7 @@
 var validate = require('./validate')
 , crypto = require('crypto')
 , async = require('async')
+, activities = require('./activities')
 , vouchers = module.exports = {}
 
 vouchers.configure = function(app, conn, auth) {
@@ -51,6 +52,12 @@ vouchers.create = function(conn, req, res, next) {
         ]
     }, function(err) {
         if (err) return next(err)
+
+        activities.log(conn, req.user, 'CreateVoucher', {
+            currency: req.body.currency,
+            amount: req.body.amount
+        })
+
         res.send(201, { voucher: voucherId })
     })
 }

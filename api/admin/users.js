@@ -134,7 +134,7 @@ users.patch = function(conn, req, res, next) {
     var updates = {}
     , values = [req.params.id]
     , allowed = ['email', 'first_name', 'last_name', 'phone_number', 'country',
-        'city', 'postal_area', 'address']
+        'city', 'postal_area', 'address', 'suspended']
 
     _.each(allowed, function(k) {
         if (req.body[k] === undefined) return

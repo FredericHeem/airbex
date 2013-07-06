@@ -95,13 +95,17 @@ ripple.withdraw = function(conn, req, res, next) {
     }
 
     var queryText = [
-        'SELECT ripple_withdraw(user_currency_account($1, $2), $3,',
-        'from_decimal($4, $2))'
+        'SELECT ripple_withdraw(user_currency_account($1, $2), $3, $4)'
     ].join('\n')
 
     Q.ninvoke(conn.write, 'query', {
         text: queryText,
-        values: [req.user, req.body.currency, req.body.address, req.body.amount]
+        values: [
+            req.user,
+            req.body.currency,
+            req.body.address,
+            app.cache.parseCurrency(req.body.amount, req.body.currency)
+        ]
     })
     .then(function(cres) {
         activities.log(conn, req.user, 'RippleWithdraw', {

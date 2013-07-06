@@ -25,12 +25,17 @@ bitcoin.withdraw = function(conn, currencyId, req, res, next) {
         req.body.amount, currencyId, req.user, req.body.address)
 
     var queryText = util.format(
-        'SELECT %s_withdraw ($1, $2, from_decimal($3, $4)) request_id',
+        'SELECT %s_withdraw($1, $2, $3) request_id',
         currencyId)
 
     Q.ninvoke(conn.write, 'query', {
         text: queryText,
-        values: [req.user, req.body.address, req.body.amount, currencyId]
+        values: [
+            req.user,
+            req.body.address,
+            req.app.cache.parseCurrency(req.body.amount, currencyId),
+            currencyId
+        ]
     })
     .then(function(cres) {
         activities.log(conn, req.user, currencyId + 'Withdraw', {

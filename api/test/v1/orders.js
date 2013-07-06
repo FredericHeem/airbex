@@ -115,7 +115,7 @@ describe('orders', function() {
 				write: {
 					query: function(q, cb) {
 						if (q.text.match(/activity/)) return
-						expect(q.text).to.match(/create_order/i)
+						expect(q.text).to.match(/INSERT INTO "order"/i)
 						cb(null, { rows: [{ oid: 17 }] })
 					}
 				}
@@ -152,7 +152,7 @@ describe('orders', function() {
 				write: {
 					query: function(q, cb) {
 						if (q.text.match(/activity/)) return
-						expect(q.text).to.match(/create_order/i)
+						expect(q.text).to.match(/INSERT INTO "order"/i)
 						cb(null, { rows: [{ order_id: 17 }] })
 					}
 				}

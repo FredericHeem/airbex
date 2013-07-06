@@ -27,21 +27,43 @@ orders.create = function(conn, req, res, next) {
         })
     }
 
-    var method = req.body.aon ? 'create_order_aon' : 'create_order'
+    var marketId = req.app.cache.markets[req.body.market].id
+    , price = null
+    , amount = req.app.cache.formatOrderVolume(req.body.amount, req.body.market)
+    , query
 
-    var query = {
-        text: [
-            'SELECT ' + method + '($1, m.market_id, $3, $4, $5) oid',
-            'FROM market m',
-            'WHERE m.base_currency_id || m.quote_currency_id = $2'
-        ].join('\n'),
-        values: [
-            req.user,
-            req.body.market,
-            req.body.type == 'bid' ? 0 : 1,
-            req.body.price || null,
-            req.body.amount
-        ]
+    if (req.body.price) {
+        price = req.app.cache.formatOrderPrice(req.body.price, req.body.market)
+    }
+
+    if (req.body.aon) {
+        query = {
+            text: [
+                'SELECT create_order_aon($1, $2, $3, $4, $5) oid'
+            ].join('\n'),
+            values: [
+                req.user,
+                marketId,
+                req.body.type == 'bid' ? 0 : 1,
+                price,
+                amount
+            ]
+        }
+    } else {
+        query = {
+            text: [
+                'INSERT INTO "order" (user_id, market_id, side, price, volume)',
+                'VALUES ($1, $2, $3, $4, $5)',
+                'RETURNING order_id oid'
+            ].join('\n'),
+            values: [
+                req.user,
+                marketId,
+                req.body.type == 'bid' ? 0 : 1,
+                price,
+                amount
+            ]
+        }
     }
 
     conn.write.query(query, function(err, dr) {

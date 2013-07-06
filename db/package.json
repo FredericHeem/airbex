@@ -6,9 +6,8 @@
     "test": "pg-test test"
   },
   "devDependencies": {
-    "pg-test": "~1.0.1",
+    "pg-test": "~1.0.3",
     "pg-migrate": "~1.1.3"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

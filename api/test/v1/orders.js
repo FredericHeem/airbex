@@ -128,6 +128,20 @@ describe('orders', function() {
 					amount: '9',
 					price: '12',
 					type: 'ask'
+				},
+				app: {
+					cache: {
+						markets: {
+							BTCUSD: {
+							}
+						},
+						parseOrderVolume: function(n) {
+							return n * 1e5
+						},
+						parseOrderPrice: function(n) {
+							return n * 1e3
+						}
+					}
 				}
 			}
 			, res = {

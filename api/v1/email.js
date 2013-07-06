@@ -60,6 +60,14 @@ email.verifySend = function(conn, req, res, next) {
                 })
             }
 
+            if (err.message.match(/^E-mail verification code issued less than/)) {
+                return res.send(409, {
+                    name: 'EmailVerificationLockedOut',
+                    message: 'Another attempt to verify email was made not long ago. ' +
+                        'Try again later.'
+                })
+            }
+
             return next(err)
         }
 

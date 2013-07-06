@@ -376,6 +376,13 @@ users.startPhoneVerify = function(conn, req, res, next) {
                 })
             }
 
+            if (err.message.match(/User already has a verified phone number/)) {
+                return res.send(400, {
+                    name: 'PhoneAlreadyVerified',
+                    message: 'User already has a verified phone number'
+                })
+            }
+
             if (err.message == 'Another user has already verified that phone number.') {
                 return res.send(403, {
                     name: 'PhoneNumberInUse',

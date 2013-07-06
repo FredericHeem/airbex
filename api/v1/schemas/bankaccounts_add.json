@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "properties": {
+        "accountNumber": {
+            "type": "string",
+            "pattern": "^[0-9]{1,25}$"
+        },
+        "iban": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9 ]{1,35}$"
+        },
+        "swiftbic": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]{1,15}$"
+        },
+        "routingNumber": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]{1,15}$"
+        }
+    }
+}

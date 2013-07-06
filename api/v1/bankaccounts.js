@@ -1,4 +1,5 @@
 var _ = require('lodash')
+, validate = require('./validate')
 , bankAccounts = module.exports = {}
 , crypto = require('crypto')
 
@@ -42,6 +43,8 @@ bankAccounts.index = function(conn, req, res, next) {
 }
 
 bankAccounts.add = function(conn, req, res, next) {
+    if (!validate(req.body, 'bankaccounts_add', res)) return
+
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',

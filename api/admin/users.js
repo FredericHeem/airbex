@@ -20,6 +20,26 @@ users.configure = function(app, conn, auth) {
     app.get('/admin/users/:user/accounts', auth, users.accounts.bind(users, conn))
     app.post('/admin/users/:user/bankAccounts/:id/setVerified', auth,
         users.setBankAccountVerified.bind(users, conn))
+    app.del('/admin/users/:user/bankAccounts/:id', auth,
+        users.removeBankAccount.bind(users, conn))
+}
+
+users.removeBankAccount = function(conn, req, res, next) {
+    conn.write.query({
+        text: 'DELETE FROM bank_account WHERE bank_account_id = $1',
+        values: [req.params.id]
+    }, function(err, dr) {
+        if (err) return next(err)
+
+        if (!dr.rowCount) {
+            return res.send(404, {
+                name: 'BankAccountNotFound',
+                message: 'Bank account #' + req.params.id + ' not found'
+            })
+        }
+
+        res.send(204)
+    })
 }
 
 users.sendVerificationEmail = function(conn, req, res, next) {

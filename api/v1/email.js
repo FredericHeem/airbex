@@ -68,6 +68,14 @@ email.verifySend = function(conn, req, res, next) {
 }
 
 email.verify = function(conn, req, res, next) {
+    if (!req.params.code) {
+        return res.send(400, 'Email verification code missing from url.')
+    }
+
+    if (!req.params.code.match(/^[a-z0-9]{20}$/)) {
+        return res.send(400, 'Invalid email verification code in url.')
+    }
+
     conn.write.query({
         text: 'SELECT verify_email($1)',
         values: [req.params.code]

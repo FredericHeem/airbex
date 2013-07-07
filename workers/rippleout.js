@@ -76,17 +76,19 @@ RippleOut.prototype.verifyLine = function(request, cb) {
 
     if (request.currency_id == 'XRP') {
         debug('will not verify line for XRP')
-        return cb(true)
+        return cb(null, true)
     }
 
     debug('checking lines for %j', request)
 
     that.drop.lines(request.address, function(err, lines) {
         if (err) {
-            err = new Error(format('Failed to verify line to %s: %s',
-                request.address, err.name))
-            that.emit('error', err)
-            cb(false)
+            if (err.name == 'actNotFound') {
+                return cb(err)
+            }
+
+            return cb(new Error(format('Failed to verify line to %s: %s',
+                request.address, err.name)))
         }
 
         var line = _.find(lines, {
@@ -103,10 +105,10 @@ RippleOut.prototype.verifyLine = function(request, cb) {
             if (!line) debug('user has no line to %s', that.account)
             debug('user is missing %s in his %s line to %s', diff, request.currency_id,
                 that.account)
-            return cb(false)
+            return cb(null, false)
         }
 
-        cb(true)
+        cb(null, true)
     })
 }
 
@@ -118,7 +120,16 @@ RippleOut.prototype.executeRequest = function(request, cb) {
     async.waterfall([
         // validate line
         function(next) {
-            that.verifyLine(request, function(valid) {
+            that.verifyLine(request, function(err, valid) {
+                if (err) {
+                    if (err.name == 'actNotFound') {
+                        out.cancelRequest(that.client, request, 'Account not found', cb)
+                        return
+                    }
+
+                    return next(err)
+                }
+
                 next(null, valid)
             })
         },

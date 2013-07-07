@@ -1,12 +1,30 @@
 var Q = require('q')
 , activities = require('./activities')
 , validate = require('./validate')
+, Drop = require('drop')
+, debug = require('debug')('snow:ripple')
 , ripple = module.exports = {}
 
 ripple.configure = function(app, conn, auth) {
     app.post('/v1/ripple/out', auth, ripple.withdraw.bind(ripple, conn))
     app.get('/v1/ripple/address', ripple.address.bind(ripple, conn))
     app.get('/ripple/federation', ripple.federation.bind(ripple, app.config, conn))
+    app.get('/v1/ripple/trust/:account', ripple.trust.bind(ripple, app.config, conn))
+
+    ripple.connect()
+}
+
+ripple.connect = function() {
+    debug('connecting to ripple...')
+
+    ripple.drop = new Drop(function() {
+        debug('connected to ripple')
+    })
+
+    ripple.drop.on('close', function() {
+        debug('disconnected from ripple. reconnecting in 10 sec')
+        setTimeout(ripple.connect, 10e3)
+    })
 }
 
 ripple.federation = function(config, conn, req, res) {
@@ -132,4 +150,27 @@ ripple.withdraw = function(conn, req, res, next) {
         next(err)
     })
     .done()
+}
+
+ripple.trust = function(config, conn, req, res, next) {
+    if (!config.ripple_account) {
+        throw new Error('ripple_account not configured')
+    }
+
+    ripple.drop.lines(req.params.account, function(err, lines) {
+        if (err) return next(err)
+
+        lines = lines.reduce(function(p, c) {
+            if (c.account != config.ripple_account) return p
+
+            p[c.currency] = {
+                limit: c.limit,
+                balance: c.balance
+            }
+
+            return p
+        }, {})
+
+        res.send(lines)
+    })
 }

@@ -57,7 +57,7 @@ if (method == 'orders') {
     return client.orders(function(err, orders) {
         if (err) throw err
         var table = new Table({
-            head: ['#', 'Market', 'Side', 'Volume', 'Price', 'Total'],
+            head: ['#', 'Market', 'Type', 'Volume', 'Price', 'Total'],
             colWidths: [8, 10, 6, 20, 20, 20]
         })
 
@@ -66,10 +66,10 @@ if (method == 'orders') {
             table.push([
                 order.id,
                 order.market,
-                order.side.toUpperCase(),
-                order.volume + ' ' + pair[0],
+                order.type.toUpperCase(),
+                order.remaining + ' ' + pair[0],
                 order.price + ' ' + pair[1],
-                num(order.volume).mul(order.price) + ' ' + pair[1]
+                num(order.remaining).mul(order.price) + ' ' + pair[1]
             ])
         })
 
@@ -117,9 +117,9 @@ if (method == 'depth') {
 
         depth.forEach(function(row) {
             table.push([
-                row.side == 'bid' ? row.volume + ' ' + market.substr(0, 3) : '',
+                row.type == 'bid' ? row.volume + ' ' + market.substr(0, 3) : '',
                 row.price + ' ' + market.substr(3),
-                row.side == 'ask' ? row.volume + ' ' + market.substr(0, 3) : ''
+                row.type == 'ask' ? row.volume + ' ' + market.substr(0, 3) : ''
             ])
         })
 
@@ -141,7 +141,7 @@ if (method == 'bid' || method == 'ask') {
     if (!config.key) return demandApiKey()
     return client.order({
         market: argv._[2].toUpperCase() + argv._[4].toUpperCase(),
-        side: method,
+        type: method,
         price: argv._[3] + '',
         volume: argv._[1] + ''
     }, function(err, id) {

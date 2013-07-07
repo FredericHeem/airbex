@@ -77,7 +77,7 @@ describe('bitcoin', function() {
 					query: function(q, c) {
 						if (q.text.match(/activity/)) return
 						expect(q.text).to.match(/btc_withdraw/i)
-						expect(q.values).to.eql([38, andy, 0.15 * 1e8, 'BTC'])
+						expect(q.values).to.eql([38, andy, 0.15 * 1e8])
 						c(null, { rows: [{ request_id: 59 }] })
 					}
 				}

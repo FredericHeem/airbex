@@ -48,7 +48,7 @@ describe('ripple', function() {
 						if (q.text.match(/activity/)) return
 						expect(q.text).to.match(/ripple_withdraw/i)
 						expect(q.values).to.eql([98, 'BTC', addr, 'parsed'])
-						c(null, { rows: [{ request_id: 59 }] })
+						c(null, { rows: [{ rid: 59 }] })
 					}
 				}
 			}

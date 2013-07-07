@@ -1,5 +1,5 @@
 var config = require('konfu')
-, LitecoinAddress = require('../lib/litecoinaddress')
+, LitecoinAddress = require('../litecoinaddress')
 , ep = {
     host: config.ltc_host,
     port: config.ltc_port,

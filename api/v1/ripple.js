@@ -113,7 +113,7 @@ ripple.withdraw = function(conn, req, res, next) {
     }
 
     var queryText = [
-        'SELECT ripple_withdraw(user_currency_account($1, $2), $3, $4)'
+        'SELECT ripple_withdraw(user_currency_account($1, $2), $3, $4) rid'
     ].join('\n')
 
     Q.ninvoke(conn.write, 'query', {
@@ -131,7 +131,7 @@ ripple.withdraw = function(conn, req, res, next) {
             amount: req.body.amount,
             currency: req.body.currency
         })
-        res.send(201, { id: cres.rows[0].request_id })
+        res.send(201, { id: cres.rows[0].rid })
     }, function(err) {
         if (err.message.match(/transaction_amount_check/)) {
             return res.send(400, {

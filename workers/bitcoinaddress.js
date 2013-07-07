@@ -1,6 +1,8 @@
 var debug = require('debug')('snow:bitcoinaddress')
 , async = require('async')
 , _ = require('lodash')
+, EventEmitter = require('events').EventEmitter
+, util = require('util')
 
 var BitcoinAddress = module.exports = function(bitcoinEndpoint, dbClient) {
     _.bindAll(this)
@@ -12,6 +14,8 @@ var BitcoinAddress = module.exports = function(bitcoinEndpoint, dbClient) {
     this.loop()
 }
 
+util.inherits(BitcoinAddress, EventEmitter)
+
 BitcoinAddress.prototype.loop = function() {
     var that = this
 
@@ -19,21 +23,23 @@ BitcoinAddress.prototype.loop = function() {
         this.getAccounts,
         this.processAccounts
     ], function(err) {
-        if (err) throw err
+        if (err) that.emit('error', err)
         setTimeout(that.loop, 5e3)
     })
 }
 
 BitcoinAddress.prototype.saveAddress = function(accountId, address, cb) {
-    console.log('assigning address %s to account %s', address, accountId)
-
     this.client.query({
         text: [
             'INSERT INTO btc_deposit_address (account_id, address)',
             'VALUES ($1, $2)'
         ].join('\n'),
         values: [accountId, address]
-    }, cb)
+    }, function(err) {
+        if (err) return cb(err)
+        console.log('Assigned Bitcoin address %s to account %s', address, accountId)
+        cb()
+    })
 }
 
 BitcoinAddress.prototype.processAccounts = function(rows, cb) {
@@ -46,7 +52,7 @@ BitcoinAddress.prototype.processAccount = function(row, cb) {
     debug('processing %s', row.account_id)
     this.bitcoin.getNewAddress(function(err, address) {
         if (err) return cb(err)
-        that.saveAddress(row.account_id, address)
+        that.saveAddress(row.account_id, address, cb)
     })
 }
 

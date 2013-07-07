@@ -1,5 +1,5 @@
 var config = require('konfu')
-, BitcoinAddress = require('../lib/bitcoinaddress')
+, BitcoinAddress = require('../bitcoinaddress')
 , bitcoinEndPoint = {
     host: config.btc_host,
     port: config.btc_port,

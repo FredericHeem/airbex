@@ -33,8 +33,7 @@ bitcoin.withdraw = function(conn, currencyId, req, res, next) {
         values: [
             req.user,
             req.body.address,
-            req.app.cache.parseCurrency(req.body.amount, currencyId),
-            currencyId
+            req.app.cache.parseCurrency(req.body.amount, currencyId)
         ]
     })
     .then(function(cres) {

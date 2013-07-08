@@ -22,9 +22,21 @@ var RippleIn = module.exports = function(db, uri, account, secret) {
     this.account = account
     this.secret = secret
 
-    this.cacheCurrencies(function(err) {
-        if (err) return that.emit(err)
-        that.connect()
+    async.parallel([
+        that.cacheCurrencies,
+        that.connect
+    ], function(err) {
+        if (err) that.emit(err)
+
+        debug('subscribing...')
+
+        that.subscribeAccounts(function(err) {
+            if (err) return that.emit(err)
+
+            that.catchup(function(err) {
+                if (err) that.emit(err)
+            })
+        })
     })
 }
 
@@ -37,25 +49,14 @@ RippleIn.prototype.connect = function() {
 
     this.drop = new Drop(this.uri)
     this.drop.opts.secrets[this.account] = this.secret
-    this.drop.on('close', this.onClose)
+
+    this.drop.on('close', function() {
+        that.emit('error', new Error('Disconnected from Ripple'))
+    })
+
     this.drop.on('error', function(err) {
         that.emit('error', err)
     })
-
-    debug('subscribing...')
-
-    this.subscribeAccounts(function(err) {
-        if (err) return that.emit(err)
-
-        that.catchup(function(err) {
-            if (err) that.emit(err)
-        })
-    })
-}
-
-RippleIn.prototype.onClose = function() {
-    debug('disconnected')
-    this.emit('error', new Error('Disconnected from Ripple'))
 }
 
 RippleIn.prototype.getCurrentLedgerIndex = function(cb) {

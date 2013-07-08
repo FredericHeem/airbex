@@ -11,32 +11,46 @@ var Drop = require('drop')
 , EventEmitter = require('events').EventEmitter
 
 var RippleOut = module.exports = function(db, account, secret, uri) {
+    _.bindAll(this)
+
     var that = this
     this.client = db
     this.account = account
 
     debug('account %s', account)
 
-    var dropConfig = { secrets: {} }
-    dropConfig.secrets[account] = secret
-
-    if (uri) {
-        dropConfig.uri = uri
+    this.dropConfig = {
+        secrets: {},
+        uri: uri
     }
+    this.dropConfig.secrets[account] = secret
 
-    this.drop = new Drop(dropConfig)
-
-    this.cacheCurrencies(function(err) {
-        if (err) {
-            console.error('failed to cache currencies', err)
-            throw err
-        }
-
+    async.parallel([
+        this.connect,
+        this.cacheCurrencies
+    ], function(err) {
+        if (err) return that.emit(err)
         that.loop()
     })
 }
 
 util.inherits(RippleOut, EventEmitter)
+
+RippleOut.prototype.connect = function(cb) {
+    var that = this
+
+    debug('connecting to Ripple (%s)', this.dropConfig.uri)
+
+    this.drop = new Drop(this.dropConfig, cb)
+
+    this.drop.on('close', function() {
+        that.emit('error', new Error('Disconnected from Ripple'))
+    })
+
+    this.drop.on('error', function(err) {
+        that.emit('error', err)
+    })
+}
 
 RippleOut.prototype.loop = function() {
     var that = this

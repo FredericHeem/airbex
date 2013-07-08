@@ -9,7 +9,7 @@ BEGIN
         PERFORM cancel_withdraw_request(request_id, 'User suspended')
         FROM withdraw_request wr
         INNER JOIN account a ON a.account_id = wr.account_id
-        WHERE a.user_id = OLD.user_id account_id AND
+        WHERE a.user_id = OLD.user_id AND
             wr.state = 'requested';
     END IF;
 

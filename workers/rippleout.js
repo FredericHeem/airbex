@@ -101,8 +101,8 @@ RippleOut.prototype.verifyLine = function(request, cb) {
                 return cb(err)
             }
 
-            return cb(new Error(format('Failed to verify line to %s: %s',
-                request.address, err.name)))
+            return cb(new Error(format('Failed to verify line to %s. %s: %s',
+                request.address, err.name, err.message)))
         }
 
         var line = _.find(lines, {

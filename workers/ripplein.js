@@ -22,9 +22,10 @@ var RippleIn = module.exports = function(db, uri, account, secret) {
     this.account = account
     this.secret = secret
 
+    this.connect()
+
     async.parallel([
-        that.cacheCurrencies,
-        that.connect
+        that.cacheCurrencies
     ], function(err) {
         if (err) that.emit(err)
 
@@ -42,7 +43,7 @@ var RippleIn = module.exports = function(db, uri, account, secret) {
 
 util.inherits(RippleIn, EventEmitter)
 
-RippleIn.prototype.connect = function() {
+RippleIn.prototype.connect = function(cb) {
     var that = this
 
     debug('connecting to %s', this.uri)
@@ -208,8 +209,11 @@ RippleIn.prototype.subscribeAccounts = function(cb) {
     var that = this
     , query = 'SELECT address FROM ripple_account'
 
+    debug('looking for accounts...')
+
     this.client.query(query, function(err, dr) {
         if (err) return cb(err)
+        debug('found %s accounts', dr.rowCount)
         var accounts = _.pluck(dr.rows, 'address')
         async.eachSeries(accounts, that.subscribeAccount, cb)
     })

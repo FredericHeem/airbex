@@ -80,9 +80,8 @@ exports.transfer = function(conn, cache, fromUser, toEmail, amount, currency, cb
         text: [
             'SELECT',
             '   user_transfer_to_email($1, $2, $3, $4) tid,',
-            '   su.email fromEmail,',
-            '   ru.email toEmail,',
-            '   ru.user_id toUserId',
+            '   su.email from_email,',
+            '   ru.user_id to_user_id',
             'FROM "user" su, "user" ru',
             'WHERE su.user_id = $1 AND ru.email_lower = $2'
         ].join('\n'),
@@ -134,8 +133,8 @@ exports.transfer = function(conn, cache, fromUser, toEmail, amount, currency, cb
             currency: currency
         })
 
-        activities.log(conn, row.toUserId, 'ReceiveFomUser', {
-            from:  row.fromEmail,
+        activities.log(conn, row.to_user_id, 'ReceiveFromUser', {
+            from:  row.from_email,
             amount: amount,
             currency: currency
         })

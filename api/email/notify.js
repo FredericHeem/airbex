@@ -31,6 +31,22 @@ notify.process = function(row, cb) {
         locals.price = locals.price ? stripZeroes(details.price) : null
         locals.original = stripZeroes(details.original)
         locals.total = stripZeroes(details.total)
+    } else if (row.type == 'WithdrawComplete') {
+        template = 'withdraw-complete'
+        locals.amount = stripZeroes(details.amount)
+        locals.currency = details.currency
+        locals.method = details.method
+    } else if (row.type == 'ReceiveFromUser') {
+        template = 'receive-from-user'
+        locals.from = details.from
+        locals.amount = stripZeroes(details.amount)
+        locals.currency = details.currency
+    } else if (row.type == 'Credit') {
+        template = 'credit'
+        locals.amount = stripZeroes(details.amount)
+        locals.currency = details.currency
+    } else if (row.type == 'ChangePassword') {
+        template = 'change-password'
     }
 
     if (!template) {

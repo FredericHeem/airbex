@@ -1,0 +1,16 @@
+Withdraw request completed
+<p>
+    Hi <%= firstName || 'there' %>,
+</p>
+
+<p>
+    Your request to withdraw <%= amount %> <%= currency %> has been completed.
+</p>
+
+<% if (method == 'bank') { %>
+    <p>
+        This means that we've queued the transfer with our bank.
+    </p>
+<% } %>
+
+<% include signature.html %>

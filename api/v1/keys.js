@@ -1,4 +1,5 @@
 var validate = require('./validate')
+, activities = require('./activities')
 , crypto = require('crypto')
 , keys = module.exports = {}
 
@@ -24,6 +25,7 @@ keys.replace = function(conn, req, res, next) {
         values: [req.key, req.body.key]
     }, function(err) {
         if (err) return next(err)
+        activities.log(req.user, 'ChangePassword', {})
         res.send(200, {})
     })
 }

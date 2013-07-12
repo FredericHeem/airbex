@@ -47,6 +47,7 @@ if (config.raven) {
 var cache = new Cache(conn, function(err) {
     if (err) throw err
     app.cache = cache
+    app.email = require('./email')(conn, cache)
 
     server.listen(config.port)
     debug('listening on %d', config.port)

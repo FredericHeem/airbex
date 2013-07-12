@@ -1,15 +1,13 @@
 var async = require('async')
-,
-    activities = require('./activities')
+, activities = require('./activities')
 , validate = require('./validate')
 , vouchers = require('./vouchers')
-, format = require('util').format
 
 exports.configure = function(app, conn, auth) {
     app.post('/v1/send', auth, exports.send.bind(exports, conn))
 }
 
-exports.emailVoucher = function(smtp, conn, cache, fromUser, toEmail,
+exports.emailVoucher = function(emailer, conn, cache, fromUser, toEmail,
     amount, currency, cb)
 {
     var voucherId = vouchers.createId()
@@ -28,7 +26,9 @@ exports.emailVoucher = function(smtp, conn, cache, fromUser, toEmail,
             }, function(err, dr) {
                 if (err) return next(err)
                 var row = dr.rows[0]
-                sender = row.first_name + ' ' + row.last_name + ' (' + row.email + ')'
+                sender = row.first_name ?
+                    row.first_name + ' ' + row.last_name + ' (' + row.email + ')' :
+                    row.email
                 next()
             })
         },
@@ -48,37 +48,18 @@ exports.emailVoucher = function(smtp, conn, cache, fromUser, toEmail,
 
         // Send email
         function(next) {
-            var baseUrl = process.env.NODE_ENV == 'production' ?
-                'https://justcoin.com' : process.env.NODE_ENV == 'staging' ?
-                'https://staging.justcoin.com' : 'http://localhost:5073'
-
-            var url = baseUrl + '/client/#' + voucherId
-
-            var currencyFull
-
+            var currencyFull = currency
             if (currency == 'XRP') currencyFull = 'ripples (XRP)'
             else if (currency == 'BTC') currencyFull = 'Bitcoin (BTC)'
             else if (currency == 'LTC') currencyFull = 'Litecoin (LTC)'
-            else throw new Error('Unexpected currency ' + currency)
-
-            var mail = {
-                from: 'Justcoin <hello@justcoin.com>',
-                to: toEmail,
-                subject: format('%s has sent you %s %s on Justcoin',
-                    sender, amount, currencyFull),
-                html: format([
-                    '<p>Hi there,</p><p>%s has sent you %s %s on Justcoin,',
-                    'the digital currency exchange.</p>',
-                    '<p>The transfer <b>is not complete</b> until you',
-                    'finish it with the link below:',
-                    'the sender can cancel the transfer.</p>',
-                    '<p>Claim now: <a href="%s">%s</a></p>',
-                    '<p>Sincerely,<br />Justcoin | www.justcoin.com</p>'
-                ].join('\n'), sender, amount, currencyFull, url, url)
-            }
 
             // TODO: Cancel voucher on failure
-            smtp.sendMail(mail, next)
+            emailer.send(toEmail, 'voucher-invite', {
+                code: voucherId,
+                currency: currencyFull,
+                amount: cache.parseCurrency(amount, currency),
+                from: sender
+            }, next)
         },
 
         // Log activity,
@@ -189,7 +170,7 @@ exports.send = function(conn, req, res, next) {
                 return next(err)
             }
 
-            exports.emailVoucher(req.app.smtp, conn,req.app.cache, req.user,
+            exports.emailVoucher(req.app.email, conn,req.app.cache, req.user,
                 req.body.email, req.body.amount, req.body.currency,
                 function(err, voucher) {
                     if (!err) {

@@ -1,0 +1,18 @@
+E-mail verification
+<p>
+    Hi there,
+</p>
+
+<p>
+    To verify your e-mail address with Justcoin, follow this link:<br>
+    <br>
+    <a href="<%= websiteUrl %>/api/v1/email/verify/<%= code %>">
+        <%= websiteUrl %>/api/v1/email/verify/<%= code %>
+    </a>
+</p>
+
+<p>
+    If you didn't request this, you can safely ignore this email.
+</p>
+
+<% include signature.html %>

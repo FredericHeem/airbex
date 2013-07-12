@@ -1,5 +1,4 @@
 var reset = module.exports = {}
-, _ = require('lodash')
 , crypto = require('crypto')
 , debug = require('debug')('snow:resetPassword')
 , Tropo = require('tropo')
@@ -23,16 +22,6 @@ reset.createPhoneCode = function() {
 
 reset.resetPasswordBegin = function(conn, req, res, next) {
     var emailCode = reset.createEmailCode()
-    , baseUrl = process.env.NODE_ENV == 'production' ?
-        'https://justcoin.com' : process.env.NODE_ENV == 'staging' ?
-        'https://staging.justcoin.com' : 'http://localhost:5073'
-    , url = baseUrl + '/api/v1/resetPassword/continue/' + emailCode
-    , emailTemplate = _.template([
-        '<p>A request has just been made to reset your password at Justcoin.',
-        'If this was not you, ignore and delete this email.</p>',
-        '<p>To reset your password now, follow this link:</p>',
-        '<p><a href="<%= url %>"><%= url %></a></p>'
-    ].join('\n'))
 
     conn.write.query({
         text: 'SELECT reset_password_begin($1, $2, $3)',
@@ -56,14 +45,9 @@ reset.resetPasswordBegin = function(conn, req, res, next) {
             return next(err)
         }
 
-        var mail = {
-            from: 'Justcoin <hello@justcoin.com>',
-            to: req.body.email,
-            subject: 'Password reset',
-            html: emailTemplate({ url: url })
-        }
-
-        req.app.smtp.sendMail(mail, function(err) {
+        req.app.email.send(req.body.email, 'reset-password', {
+            code: emailCode
+        }, function(err) {
             if (err) return next(err)
             res.send(204)
         })
@@ -128,7 +112,7 @@ reset.resetPasswordContinue = function(conn, req, res, next) {
 
         debug('requesting call to %s', phoneNumber)
 
-        res.send(200, 'Email confirmed. Next we will call you. ',
+        res.send('Email confirmed. Next we will call you. ' +
             'Close this window and go back to the password reset window.')
 
         setTimeout(function() {

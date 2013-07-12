@@ -1,16 +1,23 @@
 var email = module.exports = {}
 , nodemailer = require('nodemailer')
 , crypto = require('crypto')
+, smtp
+, conn
+, app
 
-email.configure = function(app, conn, auth) {
-    app.smtp = nodemailer.createTransport(app.config.smtp.service,
+email.configure = function(a, c, auth) {
+    app = a
+    conn = c
+
+    smtp = nodemailer.createTransport(
+        app.config.smtp.service,
         app.config.smtp.options)
 
-    app.post('/v1/email/verify/send', auth, email.verifySend.bind(email, conn))
-    app.get('/v1/email/verify/:code', email.verify.bind(email, conn))
+    app.post('/v1/email/verify/send', auth, email.verifySend)
+    app.get('/v1/email/verify/:code', email.verify)
 }
 
-email.sendVerificationEmail = function(conn, smtp, userId, cb) {
+email.sendVerificationEmail = function(userId, cb) {
     var code = crypto.randomBytes(10).toString('hex')
 
     conn.write.query({
@@ -20,30 +27,13 @@ email.sendVerificationEmail = function(conn, smtp, userId, cb) {
             'WHERE user_id = $1'
         ].join('\n'),
         values: [userId, code]
-    }, function(err, dr) {
+    }, function(err) {
         if (err) return cb(err)
-
-        var baseUrl = process.env.NODE_ENV == 'production' ?
-            'https://justcoin.com' : process.env.NODE_ENV == 'staging' ?
-            'https://staging.justcoin.com' : 'http://localhost:5073'
-
-        var url = baseUrl + '/api/v1/email/verify/' + code
-
-        var mail = {
-            from: 'Justcoin <hello@justcoin.com>',
-            to: dr.rows[0].email,
-            subject: 'E-mail verification',
-            html: '<p>To verify your e-mail address with Justcoin, ' +
-                'follow this link:<br><br>' +
-                '<a href="' + url + '">' + url + '</a></p>' +
-                '<p>If you didn\'t request this, you can safely ignore this email.</p>'
-        }
-
-        smtp.sendMail(mail, cb)
+        app.email.send(userId, 'verify-email', { code: code }, cb)
     })
 }
 
-email.verifySend = function(conn, req, res, next) {
+email.verifySend = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -51,7 +41,7 @@ email.verifySend = function(conn, req, res, next) {
         })
     }
 
-    email.sendVerificationEmail(conn, req.app.smtp, req.user, function(err) {
+    email.sendVerificationEmail(req.user, function(err) {
         if (err) {
             if (err.message == 'E-mail already verified') {
                 return res.send(400, {
@@ -75,7 +65,7 @@ email.verifySend = function(conn, req, res, next) {
     })
 }
 
-email.verify = function(conn, req, res, next) {
+email.verify = function(req, res, next) {
     if (!req.params.code) {
         return res.send(400, 'Email verification code missing from url.')
     }

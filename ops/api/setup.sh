@@ -97,6 +97,7 @@ EOL
 # Config
 tee ~/snow-api/config.${environment}.json << EOL
 {
+    "website_url": "https://staging.justcoin.com",
     "pg_read_url": {
         "user": "postgres",
         "host": "TODO",
@@ -129,7 +130,16 @@ tee ~/snow-api/config.${environment}.json << EOL
     "intercom_secret": "",
     "intercom_app_id": "",
     "bde_api_key": "",
-    "tropo_voice_token": ""
+    "tropo_voice_token": "",
+     "smtp": {
+            "service": "Mandrill",
+            "options": {
+                "auth": {
+                    "user": "",
+                    "pass": ""
+                }
+            }
+        }
 }
 EOL
 

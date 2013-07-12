@@ -18,7 +18,8 @@
     "tropo": "~0.0.5",
     "lodash": "~1.2.1",
     "nodemailer": "~0.4.4",
-    "drop": "~0.2.4"
+    "drop": "~0.2.4",
+    "ejs": "~0.8.4"
   },
   "scripts": {
     "test": "mocha"

@@ -15,9 +15,7 @@ INSERT INTO settings DEFAULT VALUES;
 UPDATE settings
 SET
     notify_email_default = (
-            'CreateOrder => true,' ||
-            'MatchOrder => false,' ||
-            'FillOrder => true'
+        'FillOrder => true'
     )::hstore,
     notify_user_visible = (
         ''

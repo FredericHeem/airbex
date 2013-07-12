@@ -11,6 +11,9 @@ var nodemailer = require('nodemailer')
     assert(c && cc)
     conn = c
     cache = cc
+
+    require('./notify')(conn, email)
+
     return email
 }
 

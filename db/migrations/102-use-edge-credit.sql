@@ -1,3 +1,9 @@
+ALTER TABLE ltc_credited
+    ADD CONSTRAINT ltc_txid_check CHECK (txid ~ E'^[a-f0-9]{64}$');
+
+ALTER TABLE btc_credited
+    ADD CONSTRAINT btc_txid_check CHECK (txid ~ E'^[a-f0-9]{64}$');
+
 CREATE OR REPLACE FUNCTION btc_credit(t character, a character, amnt bigint)
   RETURNS integer AS
 $BODY$
@@ -25,15 +31,16 @@ DECLARE
     aid int;
     uid int;
 BEGIN
-    SELECT account_id, user_id
+    SELECT ac.account_id, ac.user_id
     INTO aid, uid
-    FROM ltc_deposit_address
-    WHERE address = a;
+    FROM ltc_deposit_address lda
+    INNER JOIN account ac ON ac.account_id = lda.account_id
+    WHERE lda.address = a;
 
     INSERT INTO ltc_credited (txid, address)
     VALUES (t, a);
 
-    RETURN edge_credit(uid, 'BTC', amnt);
+    RETURN edge_credit(uid, 'LTC', amnt);
 END; $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

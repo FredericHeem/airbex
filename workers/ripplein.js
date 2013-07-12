@@ -44,7 +44,7 @@ var RippleIn = module.exports = function(db, uri, account, secret) {
 
 util.inherits(RippleIn, EventEmitter)
 
-RippleIn.prototype.connect = function() {
+RippleIn.prototype.connect = function(cb) {
     var that = this
 
     debug('connecting to %s', this.uri)

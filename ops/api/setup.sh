@@ -97,7 +97,7 @@ EOL
 # Config
 tee ~/snow-api/config.${environment}.json << EOL
 {
-    "website_url": "https://staging.justcoin.com",
+    "website_url": "https://${prefix)justcoin.com",
     "pg_read_url": {
         "user": "postgres",
         "host": "TODO",

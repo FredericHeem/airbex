@@ -45,11 +45,18 @@ reset.resetPasswordBegin = function(conn, req, res, next) {
             return next(err)
         }
 
-        req.app.email.send(req.body.email, 'reset-password', {
-            code: emailCode
-        }, function(err) {
+        conn.read.query({
+            text: 'SELECT language FROM "user" WHERE lower($1) = email_lower',
+            values: [req.body.email]
+        }, function(err, dr) {
             if (err) return next(err)
-            res.send(204)
+            var row = dr.rows[0]
+            req.app.email.send(req.body.email, row.language, 'reset-password', {
+                code: emailCode
+            }, function(err) {
+                if (err) return next(err)
+                res.send(204)
+            })
         })
     })
 }

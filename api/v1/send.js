@@ -54,10 +54,11 @@ exports.emailVoucher = function(emailer, conn, cache, fromUser, toEmail,
             else if (currency == 'LTC') currencyFull = 'Litecoin (LTC)'
 
             // TODO: Cancel voucher on failure
-            emailer.send(toEmail, 'voucher-invite', {
+            // TODO: Allow user to change sending language
+            emailer.send(toEmail, 'en-US', 'voucher-invite', {
                 code: voucherId,
                 currency: currencyFull,
-                amount: cache.parseCurrency(amount, currency),
+                amount: amount,
                 from: sender
             }, next)
         },

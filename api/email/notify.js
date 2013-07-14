@@ -55,7 +55,7 @@ notify.process = function(row, cb) {
         return cb()
     }
 
-    notify.emailer.send(row.user_id, template, locals, cb)
+    notify.emailer.send(row.user_id, row.language, template, locals, cb)
 }
 
 notify.schedule = function() {

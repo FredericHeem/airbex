@@ -1,0 +1,17 @@
+Bekreftelse av epost
+<p>
+    Hei og velkommen til Justcoin,
+</p>
+
+<p>
+    For å bekrefte eposten din, følg denne linken:<br>
+    <a href="<%= websiteUrl %>/api/v1/email/verify/<%= code %>">
+        <%= websiteUrl %>/api/v1/email/verify/<%= code %>
+    </a>
+</p>
+
+<p>
+    Om du ikke har bedt om dette, kan du slette denne mailen.
+</p>
+
+<% include signature.html %>

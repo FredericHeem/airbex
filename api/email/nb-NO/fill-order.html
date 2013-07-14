@@ -1,0 +1,19 @@
+Din ordre er utført
+<p>
+    Hei <%= firstName || '' %>,
+</p>
+
+<p>
+    Din ordre for å <%= type == 'bid' ? 'kjøpe' : 'selge' %>
+    <%= original %> <%= base %> for
+
+    <% if (+price) { %>
+    prisen <%= price %>
+    <% } else { %>
+    markedspris
+    <% } %>
+
+    er utført. Ordretotalen er <%= total %> <%= quote %>.
+</p>
+
+<% include signature.html %>

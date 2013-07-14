@@ -1,0 +1,16 @@
+Uttak utført
+<p>
+    Hei <%= firstName || '' %>,
+</p>
+
+<p>
+    Forespørselen din om å ta ut <%= amount %> <%= currency %> er utført.
+</p>
+
+<% if (method == 'bank') { %>
+    <p>
+        Dette betyr at vi har lagt betalingen til forfall i vår bank.
+    </p>
+<% } %>
+
+<% include signature.html %>

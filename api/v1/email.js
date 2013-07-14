@@ -22,14 +22,15 @@ email.sendVerificationEmail = function(userId, cb) {
 
     conn.write.query({
         text: [
-            'SELECT email, create_email_verify_code($1, $2)',
+            'SELECT email, language, create_email_verify_code($1, $2)',
             'FROM "user"',
             'WHERE user_id = $1'
         ].join('\n'),
         values: [userId, code]
-    }, function(err) {
+    }, function(err, dr) {
         if (err) return cb(err)
-        app.email.send(userId, 'verify-email', { code: code }, cb)
+        var row = dr.row
+        app.email.send(row.email, row.language, 'verify-email', { code: code }, cb)
     })
 }
 

@@ -20,6 +20,7 @@ ALTER TABLE settings
         'UpdateUser => true,' ||
         'CreateVoucher => true,' ||
         'Withdraw => true,' ||
+        'FillOrder => true,' ||
         'WithdrawComplete => true'
     )::hstore);
 

@@ -60,7 +60,7 @@ activities.activities = function(conn, req, res, next) {
         res.send(dr.rows.map(function(row) {
             row.details = JSON.parse(row.details)
 
-            var result = _.pick(row, 'type', 'created')
+            var result = _.pick(row, 'type', 'created', 'id')
 
             // Admin activities are sent as is
             if (row.type.match(/^Admin/)) {

@@ -24,14 +24,14 @@ BEGIN
     -- Log activity
     INSERT INTO activity (user_id, type, details)
     SELECT
-        user_id,
+        uid,
         'Credit',
         (SELECT row_to_json(v) FROM (
             SELECT
                 cid currency,
-                (amnt::numeric * 10^c.scale)::varchar amount
-            FROM
-                currency c
+                (amnt::numeric / 10^c.scale)::varchar amount
+            FROM currency c
+            WHERE c.currency_id = cid
         ) v);
 
     RETURN currval('transaction_transaction_id_seq');

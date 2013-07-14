@@ -28,24 +28,27 @@ describe('activities', function() {
 						cb(null, {
 							rows: [{
 								created: 123,
+								type: 'AdminTest',
 								details: JSON.stringify({ a: 1 })
 							}, {
 								created: 234,
-								details: JSON.stringify({ b: 2 })
+								type: 'Credit',
+								details: JSON.stringify({ amount: '2' })
 							}]
 						})
 					}
 				}
 			}
 			, req = {
-				user: 10
+				user: 10,
+				query: {}
 			}
 			, res = {
 				send: function(r) {
 					expect(r).to.be.an('array')
 					expect(r[0].created).to.be(123)
 					expect(r[1].created).to.be(234)
-					expect(r[1].details.b).to.be(2)
+					expect(r[1].details.amount).to.be('2')
 					done()
 				}
 			}

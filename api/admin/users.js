@@ -66,8 +66,6 @@ users.addBankAccount = function(conn, req, res, next) {
         ]
     }
 
-    console.log(query)
-
     conn.write.query(query, function(err) {
         if (err) return next(err)
         res.send(204)

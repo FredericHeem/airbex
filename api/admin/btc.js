@@ -5,9 +5,9 @@ btc.configure = function(app, conn, auth) {
 }
 
 btc.height = function(conn, req, res, next) {
-    conn.read.query('SELECT height FROM btc_block', function(err, dr) {
+    conn.read.query('SELECT bitcoin_height FROM settings', function(err, dr) {
         if (err) return next(err)
         if (!dr.rowCount) return next(new Error('No blocks'))
-        res.send(200, { height: dr.rows[0].height })
+        res.send(200, { height: dr.rows[0].bitcoin_height })
     })
 }

@@ -1,145 +1,114 @@
-var Q = require('q')
-, num = require('num')
+var num = require('num')
 , async = require('async')
 , debug = require('debug')('snow:bitcoinin')
+, _ = require('lodash')
+, EventEmitter = require('events').EventEmitter
+, util = require('util')
 
-var BitcoinIn = module.exports = function(bitcoinEndpoint, dbClient, minConf) {
-    var Bitcoin = require('bitcoin').Client
-    this.bitcoin = new Bitcoin(bitcoinEndpoint)
+var BitcoinIn = module.exports = function(ep, db, minConf) {
+    _.bindAll(this)
+    var that = this
+    , Bitcoin = require('bitcoin').Client
+    this.bitcoin = new Bitcoin(ep)
     this.minConf = minConf || 3
     console.log('bitcoinin minConf %d', this.minConf)
-
-    this.client = dbClient
-    this.loop().done()
-}
-
-BitcoinIn.prototype.loop = function() {
-    var that = this
-    return this.processNewBlocks()
-    .then(function(result) {
-        if (result) {
-            debug('bitcoinin checking for more work immediately')
-            return that.loop()
-        }
-
-        return Q.delay(10e3)
-        .then(function() {
-            return that.loop()
+    this.db = db
+    async.forever(function(cb) {
+        that.check(function(err) {
+            if (err) console.error(err)
+            if (err) that.emit(err)
+            setTimeout(cb, 5e3)
         })
     })
 }
 
-BitcoinIn.prototype.processOutput = function(o, txid) {
+util.inherits(BitcoinIn, EventEmitter)
+
+BitcoinIn.prototype.getDbHeight = function(cb) {
+    if (this.dbHeight) return cb(null, this.dbHeight)
     var that = this
+    , query = 'SELECT bitcoin_height FROM settings'
+    this.db.query(query, function(err, dr) {
+        if (err) return cb(err)
+        that.dbHeight = dr.rows[0].bitcoin_height
+        cb(null, that.dbHeight)
+    })
+}
 
-    if (!o.scriptPubKey) throw new Error('scriptPubKey missing')
+BitcoinIn.prototype.setDbHeight = function(val, cb) {
+    this.dbHeight = val
+    this.db.query({
+        text: 'UPDATE settings SET bitcoin_height = $1',
+        values: [val]
+    }, cb)
+}
 
-    if (!o.scriptPubKey.addresses) {
-        return 'skipped'
-    }
+BitcoinIn.prototype.check = function(cb) {
+    var that = this
+    async.parallel({
+        db: this.getDbHeight,
+        bitcoind: this.bitcoin.getBlockCount.bind(this.bitcoin)
+    }, function(err, res) {
+        if (err) return cb(err)
+        var n = res.db + 1
+        async.whilst(function() {
+            return n + that.minConf <= res.bitcoind
+        }, function(cb) {
+            async.waterfall([
+                that.bitcoin.getBlockHash.bind(that.bitcoin, n),
+                that.bitcoin.getBlock.bind(that.bitcoin),
+                that.processBlock,
+                that.setDbHeight.bind(that, n)
+            ], function(err) {
+                if (err) return cb(err)
+                debug('Finished with block #%d', n)
+                n++
+                cb()
+            })
+        }, cb)
+    })
+}
 
-    if (o.scriptPubKey.addresses.length !== 1) {
-        return
-    }
-
+BitcoinIn.prototype.processOutput = function(txid, o, cb) {
+    if (!o.scriptPubKey) return cb(new Error('scriptPubKey missing'))
+    if (!o.scriptPubKey.addresses) cb()
+    if (o.scriptPubKey.addresses.length !== 1) return cb()
     var address = o.scriptPubKey.addresses[0]
-
-    return Q.ninvoke(this.client, 'query', {
-        text: 'SELECT COUNT(*) count FROM btc_deposit_address WHERE address = $1',
-        values: [address]
-    }).get('rows').get(0).get('count').then(function(internal) {
-        if (!internal) return 'external address'
-
-        var satoshi = +num(o.value).mul(1e8)
-
-        console.log('Crediting %s, %s (%s), to Bitcoin address %s...',
-            txid, o.value, satoshi, address)
-
-        return Q.ninvoke(that.client, 'query', {
-            text: 'SELECT btc_credit($1, $2, $3) tid',
-            values: [txid, address, satoshi]
-        }).fail(function(err) {
+    , satoshi = +num(o.value).mul(1e8)
+    this.db.query({
+        text: [
+            'SELECT btc_credit($1, $2, $3) tid',
+            'FROM btc_deposit_address',
+            'WHERE address = $2'
+        ].join('\n'),
+        values: [txid, address, satoshi]
+    }, function(err, dr) {
+        if (err) {
             if (err.code === '23505') {
                 console.log('Skipped duplicate Bitcoin transaction %s', txid)
-
-                return 'duplicate tx'
+                return cb()
             }
-
-            throw err
-        }).get('rows').get(0).get('tid')
+            return cb(err)
+        }
+        if (!dr.rowCount) return cb()
+        console.log('Credited %s with %s BTC from %s (internal %s)',
+            address, o.value, txid, dr.rows[0].tid)
+        cb(null, dr.rows[0].tid)
     })
 }
 
-BitcoinIn.prototype.processTx = function(txid) {
+BitcoinIn.prototype.processTx = function(txid, cb) {
     var that = this
-    return Q.ninvoke(this.bitcoin, 'getRawTransaction', txid)
-    .then(function(raw) {
-        return Q.ninvoke(that.bitcoin, 'decodeRawTransaction', raw)
-    })
-    .get('vout')
-    .then(function(outs) {
-        return Q.all(outs.map(function(o) {
-            return that.processOutput(o, txid)
-        }))
-    })
+    async.waterfall([
+        this.bitcoin.getRawTransaction.bind(this.bitcoin, txid),
+        this.bitcoin.decodeRawTransaction.bind(this.bitcoin),
+        function(tx, cb) {
+            async.each(tx.vout, that.processOutput.bind(that, txid), cb)
+        }
+    ], cb)
 }
 
-BitcoinIn.prototype.getBlock = function(hash) {
-    return Q.ninvoke(this.bitcoin, 'getBlock', hash)
-}
-
-BitcoinIn.prototype.analyzeBlock = function(block) {
-    var that = this
-
+BitcoinIn.prototype.processBlock = function(block, cb) {
     debug('processing %d transactions', block.tx.length)
-
-    var d = Q.defer()
-
-    async.eachLimit(block.tx, 100, function(tx, next) {
-        that.processTx(tx)
-        .then(function() {
-            next()
-        }, function(err) {
-            next(err)
-        })
-    }, function(err) {
-        err ? d.reject(err) : d.resolve()
-    })
-}
-
-BitcoinIn.prototype.processNewBlocks = function() {
-    var that = this
-
-    return Q.all([
-        Q.ninvoke(this.client, 'query', 'SELECT height FROM btc_block')
-        .get('rows').get(0).get('height'),
-        Q.ninvoke(this.bitcoin, 'getBlockCount').then(function(result) {
-            return result
-        }, function(err) {
-            console.error('failed to getblockcount from bitcoind')
-            throw err
-        })
-    ]).then(function(heights) {
-        var lastHeight = heights[0]
-
-        debug('bitcoin heights: internal=%s; client=%s', lastHeight, heights[1])
-
-        if (heights[1] < lastHeight + that.minConf) return null
-
-        return Q.ninvoke(that.bitcoin, 'getBlockHash', lastHeight + 1)
-        .then(function(hash) {
-            debug('Processing block at height #%s...', lastHeight + 1)
-
-            return that.getBlock(hash)
-            .then(that.analyzeBlock.bind(that))
-            .then(function() {
-                debug('Finished processing block #%s (%s)', lastHeight + 1, hash)
-
-                return Q.ninvoke(that.client, 'query', {
-                    text: 'UPDATE btc_block SET height = $1',
-                    values: [lastHeight + 1]
-                })
-            })
-        })
-    })
+    async.eachLimit(block.tx, 3, this.processTx, cb)
 }

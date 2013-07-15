@@ -64,7 +64,7 @@ LitecoinAddress.prototype.getAccounts = function(cb) {
             'SELECT a.account_id',
             'FROM account a',
             'LEFT JOIN ltc_deposit_address da ON da.account_id = a.account_id',
-            'WHERE a.currency_id = \'BTC\' AND da.address IS NULL'
+            'WHERE a.currency_id = \'LTC\' AND da.address IS NULL'
         ].join('\n')
     }, function(err, dr) {
         cb(err, err ? null : dr.rows)

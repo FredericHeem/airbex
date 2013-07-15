@@ -21,6 +21,7 @@ ALTER TABLE settings
         'CreateVoucher => true,' ||
         'Withdraw => true,' ||
         'FillOrder => true,' ||
+        'Credit => true,' ||
         'WithdrawComplete => true'
     )::hstore);
 

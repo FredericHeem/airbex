@@ -1,4 +1,5 @@
 var _ = require('lodash')
+, activities = require('./activities')
 , validate = require('./validate')
 , bankAccounts = module.exports = {}
 , crypto = require('crypto')
@@ -82,22 +83,38 @@ bankAccounts.verify = function(conn, req, res, next) {
 
     conn.write.query({
         text: [
-            'SELECT verify_bank_account($1, $2, $3) success'
+            'SELECT',
+            '   verify_bank_account($1, $2, $3) success,',
+            '   account_number, iban',
+            'FROM bank_account',
+            'WHERE bank_account_id = $2'
         ].join('\n'),
         values: [
             req.user,
-            req.params.id,
+            +req.params.id,
             req.body.code
         ]
     }, function(err, dr) {
         if (err) return next(err)
+        var row = dr.rows[0]
+        if (!row) {
+            return res.send(404, {
+                name: 'BankAccountNotFound',
+                message: 'Bank account not found'
+            })
+        }
 
-        if (!dr.rows[0].success) {
+        if (!row.success) {
             return res.send(400, {
                 name: 'WrongBankVerifyCode',
                 message: 'Bank account verification failed. Wrong code.'
             })
         }
+
+        activities.log(conn, req.user, 'VerifyBankAccount', {
+            accountNumber: row.account_number,
+            iban: row.iban
+        })
 
         res.send(204)
     })

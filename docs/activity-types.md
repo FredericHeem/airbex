@@ -31,11 +31,6 @@ Fields: id
 Triggers: API
 Fields: id, accountNumber, iban, swiftbic, routingNumber
 
-### VerifyBankAccount
-
-Triggers: API
-Fields: id
-
 ### RequestEmailVerification
 
 Triggers: API
@@ -121,3 +116,7 @@ Fields: address, amount, currency, method
 
 Triggers: Trigger
 Fields: amount, currency, method
+
+### VerifyBankAccount
+Triggers: Trigger
+Fields: accountNumber, iban

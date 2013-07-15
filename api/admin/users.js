@@ -109,7 +109,8 @@ users.setBankAccountVerified = function(conn, req, res, next) {
             '   verify_attempts = null',
             'WHERE',
             '   bank_account_id = $1 AND',
-            '   verified_at IS NULL'
+            '   verified_at IS NULL',
+            'RETURNING user_id, account_number, iban'
         ].join('\n'),
         values: [
             req.params.id
@@ -123,6 +124,18 @@ users.setBankAccountVerified = function(conn, req, res, next) {
                 message: 'Bank account not found or already verifying'
             })
         }
+
+        var row = dr.rows[0]
+
+        activities.log(conn, req.user, 'AdminVerifyBankAccount', {
+            id: +req.params.id,
+            user_id: req.params.user
+        })
+
+        activities.log(conn, row.user_id, 'VerifyBankAccount', {
+            accountNumber: row.account_number,
+            iban: row.iban
+        })
 
         res.send(204)
     })

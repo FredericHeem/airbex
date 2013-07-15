@@ -8,7 +8,6 @@ activities.configure = function(app, conn, auth) {
 
 var detailWhitelist = {
     AddBankAccount: ['accountNumber', 'iban', 'swiftbic', 'routingNumber'],
-    VerifyBankAccount: [],
     RequestEmailVerification: [],
     ChangePassword: [],
     RemoveApiKey: [],
@@ -25,7 +24,8 @@ var detailWhitelist = {
     Withdraw: ['method', 'amount', 'currency', 'address'],
     Credit: ['currency', 'amount'],
     FillOrder: ['market', 'total', 'original', 'type', 'price'],
-    WithdrawComplete: ['amount', 'currency', 'method']
+    WithdrawComplete: ['amount', 'currency', 'method'],
+    VerifyBankAccount: ['accountNumber', 'iban']
 }
 
 activities.activities = function(conn, req, res, next) {

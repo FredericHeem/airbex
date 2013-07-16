@@ -44,7 +44,7 @@ users.removeBankAccount = function(conn, req, res, next) {
 
 users.sendVerificationEmail = function(conn, req, res, next) {
     var email = require('../v1/email')
-    email.sendVerificationEmail(conn, req.app.smtp, req.params.user, function(err) {
+    email.sendVerificationEmail(req.params.user, function(err) {
         if (err) return next(err)
         res.send(204)
     })

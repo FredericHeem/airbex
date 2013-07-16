@@ -1,5 +1,5 @@
 var config = require('konfu')
-, debug = require('debug')('api')
+, debug = require('debug')('snow:api')
 , express = require('express')
 , app = express()
 , http = require('http')

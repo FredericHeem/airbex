@@ -2,7 +2,7 @@ var async = require('async')
 , format = require('util').format
 , request = require('request')
 , config = require('konfu')
-, debug = require('debug')('verifyemail')
+, debug = require('debug')('snow:verifyemail')
 , emailExistence = require('email-existence')
 
 module.exports = function(email, cb) {

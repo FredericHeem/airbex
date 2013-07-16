@@ -5,7 +5,7 @@ var nodemailer = require('nodemailer')
 , fs = require('fs')
 , path = require('path')
 , config = require('konfu')
-, debug = require('debug')('ssnow:email')
+, debug = require('debug')('snow:email')
 , smtp = nodemailer.createTransport(config.smtp.service, config.smtp.options)
 , fallback = 'en-US'
 , conn

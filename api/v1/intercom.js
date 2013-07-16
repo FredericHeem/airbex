@@ -1,5 +1,5 @@
 var crypto = require('crypto')
-, debug = require('debug')('intercom')
+, debug = require('debug')('snow:intercom')
 , intercom = module.exports = {}
 
 intercom.configure = function(app, conn, auth) {

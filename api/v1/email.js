@@ -89,6 +89,6 @@ email.verify = function(req, res, next) {
             return next(err)
         }
 
-        res.send(200, 'Your e-mail has been verified. You can close this window.')
+        res.redirect(req.app.config.website_url)
     })
 }

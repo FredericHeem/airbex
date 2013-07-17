@@ -27,11 +27,13 @@ app.use(function(req, res) {
 })
 
 if (config.raven) {
-    debug('Configuring Raven...')
+    debug('Configuring Raven with %s...', config.raven)
 
     var raven = require('raven')
     app.use(raven.middleware.express(config.raven))
     debug('Raven middleware added')
+
+    raven = new raven.Client(config.raven)
 
     raven.patchGlobal(function(logged, err) {
         console.error(err)

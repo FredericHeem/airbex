@@ -1,7 +1,7 @@
 var config = require('konfu')
 , debug = require('debug')('snow:api')
 , express = require('express')
-, app = express()
+, app = module.exports = express()
 , http = require('http')
 , server = http.createServer(app)
 , conn = {
@@ -50,7 +50,10 @@ if (config.raven) {
 var cache = app.cache = require('./cache')
 cache(module.parent ? null : conn, function(err) {
     if (err) throw err
-    app.email = require('./email')(conn, cache)
+
+    if (module.parent) {
+        app.email = require('./email')(conn, cache)
+    }
 
     server.listen(config.port)
     debug('listening on %d', config.port)

@@ -44,7 +44,7 @@ users.removeBankAccount = function(conn, req, res, next) {
 
 users.sendVerificationEmail = function(conn, req, res, next) {
     var email = require('../v1/email')
-    email.sendVerificationEmail(req.params.user, function(err) {
+    email.sendVerificationEmail(+req.params.user, function(err) {
         if (err) return next(err)
         res.send(204)
     })
@@ -223,20 +223,28 @@ users.accounts = function(conn, req, res, next) {
         text: [
             'SELECT',
             '   a.account_id,',
-            '   a.currency_id AS currency,',
+            '   a.currency_id,',
             '   a.type,',
-            '   a.balance / 10^c.scale balance,',
-            '   a.hold / 10^c.scale "hold",',
-            '   (a.balance - a.hold) / 10^c.scale available',
+            '   a.balance,',
+            '   a.hold,',
+            '   (a.balance - a.hold) available',
             'FROM account a',
-            'INNER JOIN "currency" c ON a.currency_id = c.currency_id',
             'WHERE a.user_id = $1',
-            'ORDER BY currency, type'
+            'ORDER BY currency_id, type ASC'
         ].join('\n'),
         values: [req.params.user]
     }, function(err, dr) {
         if (err) return next(err)
-        res.send(dr.rows)
+        res.send(dr.rows.map(function(row) {
+            return {
+                account_id: row.account_id,
+                currency: row.currency_id,
+                balance: req.app.cache.formatCurrency(row.balance, row.currency_id),
+                hold: req.app.cache.formatCurrency(row.hold, row.currency_id),
+                available: req.app.cache.formatCurrency(row.available, row.currency_id),
+                type: row.type
+            }
+        }))
     })
 }
 

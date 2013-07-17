@@ -6,19 +6,17 @@ credit.configure = function(app, conn, auth) {
 }
 
 credit.bankCredit = function(conn, req, res, next) {
-    // conversion from string to properly scaled bigint is performed
-    // in the actual query
     var query = {
         text: [
-            'SELECT bank_credit($1, $2, ($3::numeric * 10^scale)::bigint, $4) tid',
+            'SELECT bank_credit($1, $2, $3, $4) tid',
             'FROM currency',
             'WHERE currency_id = $2'
         ].join('\n'),
         values: [
-            req.body.user_id, // 1
-            req.body.currency_id, // 2
-            req.body.amount, // 3
-            req.body.reference // 4
+            req.body.user_id,
+            req.body.currency_id,
+            req.app.cache.parseCurrency(req.body.amount, req.body.currency_id),
+            req.body.reference
         ]
     }
 

@@ -8,7 +8,6 @@ var config = require('konfu')
     read: require('./db')(config.pg_read_url, config.pg_native),
     write: require('./db')(config.pg_write_url, config.pg_native)
 }
-, Cache = require('./cache')
 
 debug('starting api web server')
 
@@ -48,9 +47,9 @@ if (config.raven) {
     debug('Raven patched global')
 }
 
-var cache = new Cache(conn, function(err) {
+var cache = app.cache = require('./cache')
+cache(module.parent ? null : conn, function(err) {
     if (err) throw err
-    app.cache = cache
     app.email = require('./email')(conn, cache)
 
     server.listen(config.port)

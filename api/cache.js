@@ -1,8 +1,25 @@
 var async = require('async')
-, assert = require('assert')
+, _ = require('lodash')
 , num = require('num')
-, Cache = module.exports = function(conn, cb) {
-    var that = this
+, hardcoded = {
+    BTCNOK: 3,
+    BTCUSD: 3,
+    BTCLTC: 3,
+    BTCXRP: 3,
+    BTC: 8,
+    USD: 5,
+    NOK: 5,
+    LTC: 8,
+    XRP: 6
+}
+
+module.exports = exports = function(conn, cb) {
+    if (!conn) {
+        _.extend(exports, hardcoded)
+        cb && cb()
+        return exports
+    }
+
     async.parallel({
         currencies: function(cb) {
             conn.read.query({
@@ -14,8 +31,7 @@ var async = require('async')
         },
         markets: function(cb) {
             conn.read.query([
-                'SELECT market_id id, scale,',
-                '   base_currency_id || quote_currency_id pair',
+                'SELECT scale, base_currency_id || quote_currency_id pair',
                 'FROM market'
             ].join('\n'), function(err, res) {
                 if (err) return cb(err)
@@ -25,67 +41,54 @@ var async = require('async')
     }, function(err, res) {
         if (err) return cb(err)
 
-        that.markets = res.markets.reduce(function(p, c) {
-            p[c.pair] = c
-            return p
-        }, {})
+        res.markets.forEach(function(x) {
+            exports[x.pair] = x.scale
+        })
 
-        that.currencies = res.currencies.reduce(function(p, c) {
-            p[c.currency_id] = c
-            return p
-        }, {})
+        res.currencies.forEach(function(x) {
+            exports[x.currency_id] = x.scale
+        })
 
-        cb(null, that)
+        cb && cb()
     })
+
+    return exports
 }
 
-Cache.prototype.parseCurrency = function(value, currency) {
-    var item = this.currencies[currency]
-    , result = num(value).mul(Math.pow(10, item.scale))
+exports.parseCurrency = function(value, currency) {
+    var scale = exports[currency]
+    , result = num(value).mul(Math.pow(10, scale))
     result.set_precision(0)
     return result.toString()
 }
 
-Cache.prototype.parseOrderVolume = function(value, marketId) {
-    var market = this.markets[marketId]
-    , currency = this.currencies[marketId.substr(0, 3)]
-    assert(market)
-    assert(currency)
-
-    var result = num(value).mul(Math.pow(10, currency.scale - market.scale))
+exports.parseOrderVolume = function(value, marketId) {
+    var market = exports[marketId]
+    , currency = exports[marketId.substr(0, 3)]
+    , result = num(value).mul(Math.pow(10, currency - market))
     result.set_precision(0)
     return result.toString()
 }
 
-Cache.prototype.parseOrderPrice = function(value, marketId) {
-    var market = this.markets[marketId]
-    , currency = this.currencies[marketId.substr(0, 3)]
-    assert(market)
-    assert(currency)
-
-    var result = num(value).mul(Math.pow(10, market.scale))
+exports.parseOrderPrice = function(value, marketId) {
+    var market = exports[marketId]
+    , result = num(value).mul(Math.pow(10, market))
     result.set_precision(0)
     return result.toString()
 }
 
-Cache.prototype.formatCurrency = function(value, currency) {
-    var item = this.currencies[currency]
-    assert(item)
-    assert(item.scale)
-    return num(value, item.scale).toString()
+exports.formatCurrency = function(value, currency) {
+    var scale = exports[currency]
+    return num(value, scale).toString()
 }
 
-Cache.prototype.formatOrderPrice = function(value, market) {
-    var item = this.markets[market]
-    assert(item, 'no ' + market)
-    assert(item.scale)
-    return num(value, item.scale).toString()
+exports.formatOrderPrice = function(value, market) {
+    var scale = exports[market]
+    return num(value, scale).toString()
 }
 
-Cache.prototype.formatOrderVolume = function(value, marketId) {
-    var market = this.markets[marketId]
-    , currency = this.currencies[marketId.substr(0, 3)]
-    assert(market)
-    assert(currency)
-    return num(value, currency.scale - market.scale).toString()
+exports.formatOrderVolume = function(value, marketId) {
+    var market = exports[marketId]
+    , currency = exports[marketId.substr(0, 3)]
+    return num(value, currency - market).toString()
 }

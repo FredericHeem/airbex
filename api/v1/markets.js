@@ -24,7 +24,7 @@ Markets.markets = function(conn, req, res, next) {
                 bid: formatPriceOrNull(row.bid, m),
                 ask: formatPriceOrNull(row.ask, m),
                 volume: req.app.cache.formatOrderVolume(row.volume, m),
-                scale: req.app.cache.markets[m].scale
+                scale: req.app.cache[m]
             }
         }))
     }, next)

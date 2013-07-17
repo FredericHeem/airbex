@@ -1,4 +1,5 @@
 {
+    "website_url": "http://localhost:5073",
     "PG_URL": {
         "url": "tcp://postgres@localhost/snow",
         "native": true

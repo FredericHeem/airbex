@@ -29,7 +29,7 @@ email.sendVerificationEmail = function(userId, cb) {
         values: [userId, code]
     }, function(err, dr) {
         if (err) return cb(err)
-        var row = dr.row
+        var row = dr.rows[0]
         app.email.send(row.email, row.language, 'verify-email', { code: code }, cb)
     })
 }

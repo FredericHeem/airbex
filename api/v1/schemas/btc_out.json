@@ -4,7 +4,7 @@
         "address": {
             "type": "string",
             "required": true,
-            "pattern": "^1\\w{26,33}$"
+            "pattern": "^1[1-9A-Za-z]{26,33}$"
         },
         "amount": {
             "type": "string",

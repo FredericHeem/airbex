@@ -51,7 +51,7 @@ var cache = app.cache = require('./cache')
 cache(module.parent ? null : conn, function(err) {
     if (err) throw err
 
-    if (module.parent) {
+    if (!module.parent) {
         app.email = require('./email')(conn, cache)
     }
 

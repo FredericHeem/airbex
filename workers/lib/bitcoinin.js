@@ -71,7 +71,7 @@ BitcoinIn.prototype.check = function(cb) {
 
 BitcoinIn.prototype.processOutput = function(txid, o, cb) {
     if (!o.scriptPubKey) return cb(new Error('scriptPubKey missing'))
-    if (!o.scriptPubKey.addresses) cb()
+    if (!o.scriptPubKey.addresses) return cb()
     if (o.scriptPubKey.addresses.length !== 1) return cb()
     var address = o.scriptPubKey.addresses[0]
     , satoshi = +num(o.value).mul(1e8)

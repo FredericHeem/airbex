@@ -13,6 +13,8 @@ var config = require('konfu')
 debug('starting api web server')
 
 app.config = config
+app.conn = conn
+
 debug('config %j', config)
 
 app.use(express.bodyParser())

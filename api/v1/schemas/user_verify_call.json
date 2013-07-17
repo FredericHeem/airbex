@@ -1,0 +1,10 @@
+{
+    "type": "object",
+    "properties": {
+        "number": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\+\\d{2,13}$"
+        }
+    }
+}

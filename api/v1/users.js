@@ -1,6 +1,5 @@
 /* global TropoWebAPI, TropoJSON */
-var Q = require('q')
-, _ = require('lodash')
+var _ = require('lodash')
 , activities = require('./activities')
 , verifyemail = require('../verifyemail')
 , users = module.exports = {}
@@ -307,16 +306,13 @@ users.replaceApiKey = function(conn, req, res, next) {
         })
     }
 
-    Q.ninvoke(conn.write, 'query', {
+    conn.write.query({
         text: 'SELECT replace_api_key($1, $2)',
         values: [req.key, req.body.key]
-    }).then(function() {
-        res.send(200, {})
     }, function(err) {
-        // TODO: error message when key does not exist.
-        next(err)
+        if (err) return next(err)
+        res.send(200, {})
     })
-    .done()
 }
 
 users.verifyPhone = function(conn, req, res, next) {
@@ -355,6 +351,8 @@ users.verifyPhone = function(conn, req, res, next) {
 }
 
 users.startPhoneVerify = function(conn, req, res, next) {
+    if (!validate(req.body, 'user_verify_call', res)) return
+
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',

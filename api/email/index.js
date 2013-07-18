@@ -6,10 +6,10 @@ var assert = require('assert')
 , config = require('konfu')
 , debug = require('debug')('snow:email')
 , fallback = 'en-US'
-, app
 
-module.exports = exports = function(a) {
-    app = a
+module.exports = exports = function(app) {
+    exports.app = app
+    return exports
 }
 
 exports.resolveLanguage = function(language) {
@@ -60,7 +60,7 @@ exports.template = _.memoize(function(fn) {
 // User can be either user id or email address
 exports.send = function(user, language, templateName, locals, cb) {
     if (typeof user == 'number') {
-        return app.conn.read.query({
+        return exports.app.conn.read.query({
             text: 'SELECT email FROM "user" WHERE user_id = $1',
             values: [user]
         }, function(err, dr) {
@@ -89,5 +89,5 @@ exports.send = function(user, language, templateName, locals, cb) {
         html: body
     }
 
-    app.smtp.sendMail(mail, cb)
+    exports.app.smtp.sendMail(mail, cb)
 }

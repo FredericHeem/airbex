@@ -22,6 +22,8 @@ if (config.smtp) {
 
 app.auth = require('./auth')
 app.validate = require('./validate')
+app.email = require('./email')(app)
+app.ripple = require('./ripple')(app)
 
 debug('config %j', config)
 
@@ -50,9 +52,6 @@ if (config.raven) {
 var cache = app.cache = require('./cache')
 cache(module.parent ? null : app.conn, function(err) {
     if (err) throw err
-    app.email = require('./email')(app)
-    app.ripple = require('./ripple')(app)
-
     if (!module.parent) {
         app.notify = require('./email/notify')(app)
         app.ripple.connect()

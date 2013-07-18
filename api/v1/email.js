@@ -23,7 +23,7 @@ exports.sendVerificationEmail = function(app, userId, cb) {
 }
 
 exports.verifySend = function(req, res, next) {
-    exports.sendVerificationEmail(req.user, function(err) {
+    exports.sendVerificationEmail(req.app, req.user, function(err) {
         if (err) {
             if (err.message == 'E-mail already verified') {
                 return res.send(400, {

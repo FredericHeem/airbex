@@ -3,6 +3,7 @@ var debug = require('debug')('snow:ripple')
 
 module.exports = exports = function(app) {
     exports.app = app
+    return exports
 }
 
 exports.connect = function() {

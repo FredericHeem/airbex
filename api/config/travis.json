@@ -1,6 +1,10 @@
 {
     "website_url": "http://localhost:5073",
-    "PG_URL": {
+    "pg_read_url": {
+        "url": "tcp://postgres@localhost/snow",
+        "native": true
+    },
+    "pg_write_url": {
         "url": "tcp://postgres@localhost/snow",
         "native": true
     }

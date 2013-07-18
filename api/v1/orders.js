@@ -1,17 +1,16 @@
 var Q = require('q')
-, orders = module.exports = {}
 , validate = require('./validate')
 , activities = require('./activities')
 , debug = require('debug')('snow:orders')
 
-orders.configure = function(app, conn, auth) {
-    app.del('/v1/orders/:id', auth, orders.cancel.bind(orders, conn))
-    app.post('/v1/orders', auth, orders.create.bind(orders, conn))
-    app.get('/v1/orders', auth, orders.forUser.bind(orders, conn))
-    app.get('/v1/orders/history', auth, orders.history.bind(orders, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.del('/v1/orders/:id', auth, exports.cancel.bind(exports, conn))
+    app.post('/v1/orders', auth, exports.create.bind(exports, conn))
+    app.get('/v1/orders', auth, exports.forUser.bind(exports, conn))
+    app.get('/v1/orders/history', auth, exports.history.bind(exports, conn))
 }
 
-orders.create = function(conn, req, res, next) {
+exports.create = function(conn, req, res, next) {
     if (!validate(req.body, 'order_create', res)) return
 
     if (req.body.price && !req.body.price.match(/^\d+(\.\d+)?$/)) {
@@ -144,7 +143,7 @@ function formatOrderRow(cache, row) {
     }
 }
 
-orders.forUser = function(conn, req, res, next) {
+exports.forUser = function(conn, req, res, next) {
     Q.ninvoke(conn.read, 'query', {
         text: [
             'SELECT order_id, base_currency_id || quote_currency_id market,',
@@ -163,7 +162,7 @@ orders.forUser = function(conn, req, res, next) {
     .done()
 }
 
-orders.history = function(conn, req, res, next) {
+exports.history = function(conn, req, res, next) {
     Q.ninvoke(conn.read, 'query', {
         text: [
             'SELECT order_id, market, side, volume, matched, cancelled,',
@@ -189,7 +188,7 @@ orders.history = function(conn, req, res, next) {
     .done()
 }
 
-orders.cancel = function(conn, req, res, next) {
+exports.cancel = function(conn, req, res, next) {
     if (!req.apiKey.canTrade) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',

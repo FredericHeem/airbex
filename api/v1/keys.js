@@ -1,16 +1,15 @@
 var validate = require('./validate')
 , activities = require('./activities')
 , crypto = require('crypto')
-, keys = module.exports = {}
 
-keys.configure = function(app, conn, auth) {
-    app.post('/v1/keys/replace', auth, keys.replace.bind(keys, conn))
-    app.post('/v1/keys', auth, keys.create.bind(keys, conn))
-    app.get('/v1/keys', auth, keys.index.bind(keys, conn))
-    app.del('/v1/keys/:id', auth, keys.remove.bind(keys, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.post('/v1/keys/replace', auth, exports.replace.bind(exports, conn))
+    app.post('/v1/keys', auth, exports.create.bind(exports, conn))
+    app.get('/v1/keys', auth, exports.index.bind(exports, conn))
+    app.del('/v1/keys/:id', auth, exports.remove.bind(exports, conn))
 }
 
-keys.replace = function(conn, req, res, next) {
+exports.replace = function(conn, req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -30,7 +29,7 @@ keys.replace = function(conn, req, res, next) {
     })
 }
 
-keys.remove = function(conn, req, res, next) {
+exports.remove = function(conn, req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -59,7 +58,7 @@ keys.remove = function(conn, req, res, next) {
     })
 }
 
-keys.index = function(conn, req, res, next) {
+exports.index = function(conn, req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -87,14 +86,14 @@ keys.index = function(conn, req, res, next) {
     })
 }
 
-keys.generateApiKey = function() {
+exports.generateApiKey = function() {
     var sum = crypto.createHash('sha256')
     , bytes = crypto.randomBytes(32)
     sum.update(bytes)
     return sum.digest('hex')
 }
 
-keys.create = function(conn, req, res, next) {
+exports.create = function(conn, req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -102,7 +101,7 @@ keys.create = function(conn, req, res, next) {
         })
     }
 
-    var key = keys.generateApiKey()
+    var key = exports.generateApiKey()
 
     conn.write.query({
         text: [

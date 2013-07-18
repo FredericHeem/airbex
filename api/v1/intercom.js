@@ -1,12 +1,11 @@
 var crypto = require('crypto')
 , debug = require('debug')('snow:intercom')
-, intercom = module.exports = {}
 
-intercom.configure = function(app, conn, auth) {
-    app.get('/v1/intercom', auth, intercom.intercom.bind(intercom, conn, app.config))
+module.exports = exports = function(app, conn, auth) {
+    app.get('/v1/intercom', auth, exports.intercom.bind(exports, conn, app.config))
 }
 
-intercom.intercom = function(conn, config, req, res, next) {
+exports.intercom = function(conn, config, req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',

@@ -3,7 +3,7 @@ var async = require('async')
 , validate = require('./validate')
 , vouchers = require('./vouchers')
 
-exports.configure = function(app, conn, auth) {
+module.exports = exports = function(app, conn, auth) {
     app.post('/v1/send', auth, exports.send.bind(exports, conn))
 }
 

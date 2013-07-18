@@ -3,31 +3,30 @@ var Q = require('q')
 , validate = require('./validate')
 , Drop = require('drop')
 , debug = require('debug')('snow:ripple')
-, ripple = module.exports = {}
 
-ripple.configure = function(app, conn, auth) {
-    app.post('/v1/ripple/out', auth, ripple.withdraw.bind(ripple, conn))
-    app.get('/v1/ripple/address', ripple.address.bind(ripple, conn))
-    app.get('/ripple/federation', ripple.federation.bind(ripple, app.config, conn))
-    app.get('/v1/ripple/trust/:account', ripple.trust.bind(ripple, app.config, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.post('/v1/ripple/out', auth, exports.withdraw.bind(exports, conn))
+    app.get('/v1/ripple/address', exports.address.bind(exports, conn))
+    app.get('/ripple/federation', exports.federation.bind(exports, app.config, conn))
+    app.get('/v1/ripple/trust/:account', exports.trust.bind(exports, app.config, conn))
 
-    ripple.connect()
+    exports.connect()
 }
 
-ripple.connect = function() {
+exports.connect = function() {
     debug('connecting to ripple...')
 
-    ripple.drop = new Drop(function() {
+    exports.drop = new Drop(function() {
         debug('connected to ripple')
     })
 
-    ripple.drop.on('close', function() {
+    exports.drop.on('close', function() {
         debug('disconnected from ripple. reconnecting in 10 sec')
-        setTimeout(ripple.connect, 10e3)
+        setTimeout(exports.connect, 10e3)
     })
 }
 
-ripple.federation = function(config, conn, req, res) {
+exports.federation = function(config, conn, req, res) {
     var domain = req.query.domain
     , tag = req.query.tag
     , user = req.query.user
@@ -89,7 +88,7 @@ ripple.federation = function(config, conn, req, res) {
     .done()
 }
 
-ripple.address = function(conn, req, res, next) {
+exports.address = function(conn, req, res, next) {
     conn.read.query({
         text: 'SELECT address FROM ripple_account'
     }, function(err, dres) {
@@ -102,7 +101,7 @@ ripple.address = function(conn, req, res, next) {
     })
 }
 
-ripple.withdraw = function(conn, req, res, next) {
+exports.withdraw = function(conn, req, res, next) {
     if (!validate(req.body, 'ripple_out', res)) return
 
     if (!req.apiKey.canWithdraw) {
@@ -152,12 +151,12 @@ ripple.withdraw = function(conn, req, res, next) {
     .done()
 }
 
-ripple.trust = function(config, conn, req, res, next) {
+exports.trust = function(config, conn, req, res, next) {
     if (!config.ripple_account) {
         throw new Error('ripple_account not configured')
     }
 
-    ripple.drop.lines(req.params.account, function(err, lines) {
+    exports.drop.lines(req.params.account, function(err, lines) {
         if (err) return next(err)
 
         lines = lines.reduce(function(p, c) {

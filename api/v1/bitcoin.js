@@ -2,16 +2,15 @@ var Q = require('q')
 , activities = require('./activities')
 , util = require('util')
 , validate = require('./validate')
-, bitcoin = module.exports = {}
 
-bitcoin.configure = function(app, conn, auth, currencyId) {
+module.exports = exports = function(app, conn, auth, currencyId) {
     app.post('/v1/' + currencyId + '/out', auth,
-        bitcoin.withdraw.bind(bitcoin, conn, currencyId))
+        exports.withdraw.bind(exports, conn, currencyId))
     app.get('/v1/' + currencyId + '/address', auth,
-        bitcoin.address.bind(bitcoin, conn, currencyId))
+        exports.address.bind(exports, conn, currencyId))
 }
 
-bitcoin.withdraw = function(conn, currencyId, req, res, next) {
+exports.withdraw = function(conn, currencyId, req, res, next) {
     if (!validate(req.body, currencyId.toLowerCase() + '_out', res)) return
 
     if (!req.apiKey.canWithdraw) {
@@ -55,7 +54,7 @@ bitcoin.withdraw = function(conn, currencyId, req, res, next) {
     .done()
 }
 
-bitcoin.address = function(conn, currencyId, req, res, next) {
+exports.address = function(conn, currencyId, req, res, next) {
     if (!req.apiKey.canDeposit) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',

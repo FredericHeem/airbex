@@ -2,15 +2,14 @@ var validate = require('./validate')
 , crypto = require('crypto')
 , async = require('async')
 , activities = require('./activities')
-, vouchers = module.exports = {}
 
-vouchers.configure = function(app, conn, auth) {
-    app.post('/v1/vouchers', auth, vouchers.create.bind(vouchers, conn))
-    app.post('/v1/vouchers/:id/redeem', auth, vouchers.redeem.bind(vouchers, conn))
-    app.get('/v1/vouchers', auth, vouchers.index.bind(vouchers, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.post('/v1/vouchers', auth, exports.create.bind(exports, conn))
+    app.post('/v1/vouchers/:id/redeem', auth, exports.redeem.bind(exports, conn))
+    app.get('/v1/vouchers', auth, exports.index.bind(exports, conn))
 }
 
-vouchers.createId = function() {
+exports.createId = function() {
     var id = crypto.randomBytes(5).toString('hex').toUpperCase()
     , hash = crypto.createHash('sha256')
     hash.update(id)
@@ -28,7 +27,7 @@ CREATE FUNCTION create_voucher (
     amnt bigint
 ) RETURNS void AS $$
 */
-vouchers.create = function(conn, req, res, next) {
+exports.create = function(conn, req, res, next) {
     if (!validate(req.body, 'voucher_create', res)) return
 
     if (!req.apiKey.canWithdraw) {
@@ -38,7 +37,7 @@ vouchers.create = function(conn, req, res, next) {
         })
     }
 
-    var voucherId = vouchers.createId()
+    var voucherId = exports.createId()
 
     conn.write.query({
         text: [
@@ -62,7 +61,7 @@ vouchers.create = function(conn, req, res, next) {
     })
 }
 
-vouchers.index = function(conn, req, res, next) {
+exports.index = function(conn, req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -97,7 +96,7 @@ CREATE FUNCTION redeem_voucher (
     duid int
 ) RETURNS int AS $$
 */
-vouchers.redeem = function(conn, req, res, next) {
+exports.redeem = function(conn, req, res, next) {
     if (!req.apiKey.canDeposit) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',

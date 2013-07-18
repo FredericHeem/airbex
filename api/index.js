@@ -20,7 +20,7 @@ app.use(express.bodyParser())
 
 var routes = ['bitcoincharts', 'v1', 'admin']
 routes.forEach(function(name) {
-    require('./' + name).configure(app, conn)
+    require('./' + name)(app, conn)
 })
 
 app.use(function(req, res) {

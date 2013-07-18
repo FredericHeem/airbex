@@ -1,10 +1,8 @@
-var btc = module.exports = {}
-
-btc.configure = function(app, conn, auth) {
-    app.get('/admin/btc/height', auth, btc.height.bind(btc, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.get('/admin/btc/height', auth, exports.height.bind(exports, conn))
 }
 
-btc.height = function(conn, req, res, next) {
+exports.height = function(conn, req, res, next) {
     conn.read.query('SELECT bitcoin_height FROM settings', function(err, dr) {
         if (err) return next(err)
         if (!dr.rowCount) return next(new Error('No blocks'))

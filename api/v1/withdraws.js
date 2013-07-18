@@ -1,15 +1,14 @@
 var _ = require('lodash')
 , validate = require('./validate')
 , activities = require('./activities')
-, withdraws = module.exports = {}
 
-withdraws.configure = function(app, conn, auth) {
-    app.del('/v1/withdraws/:id', auth, withdraws.cancel.bind(withdraws, conn))
-    app.get('/v1/withdraws', auth, withdraws.forUser.bind(withdraws, conn))
-    app.post('/v1/withdraws/bank', auth, withdraws.withdrawBank.bind(withdraws, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.del('/v1/withdraws/:id', auth, exports.cancel.bind(exports, conn))
+    app.get('/v1/withdraws', auth, exports.forUser.bind(exports, conn))
+    app.post('/v1/withdraws/bank', auth, exports.withdrawBank.bind(exports, conn))
 }
 
-withdraws.withdrawBank = function(conn, req, res, next) {
+exports.withdrawBank = function(conn, req, res, next) {
     if (!validate(req.body, 'withdraw_bank', res)) return
 
     if (!req.apiKey.canWithdraw) {
@@ -53,7 +52,7 @@ withdraws.withdrawBank = function(conn, req, res, next) {
     })
 }
 
-withdraws.forUser = function(conn, req, res, next) {
+exports.forUser = function(conn, req, res, next) {
     conn.read.query({
         text: 'SELECT * FROM withdraw_request_view WHERE user_id = $1',
         values: [req.user]
@@ -86,7 +85,7 @@ withdraws.forUser = function(conn, req, res, next) {
     })
 }
 
-withdraws.cancel = function(conn, req, res, next) {
+exports.cancel = function(conn, req, res, next) {
     if (!req.apiKey.canWithdraw) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',

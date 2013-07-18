@@ -1,21 +1,19 @@
 var _ = require('lodash')
 , activities = require('./activities')
 , validate = require('./validate')
-, bankAccounts = module.exports = {}
 , crypto = require('crypto')
 
-bankAccounts.configure = function(app, conn, auth) {
-    app.get('/v1/bankAccounts', auth, bankAccounts.index.bind(bankAccounts, conn))
-    app.post('/v1/bankAccounts', auth, bankAccounts.add.bind(bankAccounts, conn))
-    app.post('/v1/bankAccounts/:id/verify', auth,
-        bankAccounts.verify.bind(bankAccounts, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.get('/v1/bankAccounts', auth, exports.index.bind(exports, conn))
+    app.post('/v1/bankAccounts', auth, exports.add.bind(exports, conn))
+    app.post('/v1/bankAccounts/:id/verify', auth, exports.verify.bind(exports, conn))
 }
 
-bankAccounts.createVerifyCode = function() {
+exports.createVerifyCode = function() {
     return crypto.randomBytes(2).toString('hex').toUpperCase()
 }
 
-bankAccounts.index = function(conn, req, res, next) {
+exports.index = function(conn, req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -43,7 +41,7 @@ bankAccounts.index = function(conn, req, res, next) {
     })
 }
 
-bankAccounts.add = function(conn, req, res, next) {
+exports.add = function(conn, req, res, next) {
     if (!validate(req.body, 'bankaccounts_add', res)) return
 
     if (!req.apiKey.primary) {
@@ -65,7 +63,7 @@ bankAccounts.add = function(conn, req, res, next) {
             req.body.iban,
             req.body.swiftbic,
             req.body.routingNumber,
-            bankAccounts.createVerifyCode()
+            exports.createVerifyCode()
         ]
     }, function(err) {
         if (err) return next(err)
@@ -73,7 +71,7 @@ bankAccounts.add = function(conn, req, res, next) {
     })
 }
 
-bankAccounts.verify = function(conn, req, res, next) {
+exports.verify = function(conn, req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',

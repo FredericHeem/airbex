@@ -1,4 +1,4 @@
-module.exports = function(app, conn, auth) {
+module.exports = exports = function(app, conn, auth) {
     app.post('/admin/panic', auth, exports.panic)
 }
 

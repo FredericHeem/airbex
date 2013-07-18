@@ -1,11 +1,10 @@
-var credit = module.exports = {}
-, activities = require('../v1/activities')
+var activities = require('../v1/activities')
 
-credit.configure = function(app, conn, auth) {
-    app.post('/admin/bankCredit', auth, credit.bankCredit.bind(credit, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.post('/admin/bankCredit', auth, exports.bankCredit.bind(exports, conn))
 }
 
-credit.bankCredit = function(conn, req, res, next) {
+exports.bankCredit = function(conn, req, res, next) {
     var query = {
         text: [
             'SELECT bank_credit($1, $2, $3, $4) tid',

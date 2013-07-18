@@ -1,31 +1,30 @@
-var reset = module.exports = {}
-, crypto = require('crypto')
+var crypto = require('crypto')
 , debug = require('debug')('snow:resetPassword')
 , Tropo = require('tropo')
 
-reset.configure = function(app, conn) {
-    app.post('/v1/resetPassword', reset.resetPasswordBegin.bind(reset, conn))
+module.exports = exports = function(app, conn) {
+    app.post('/v1/resetPassword', exports.resetPasswordBegin.bind(exports, conn))
     app.get('/v1/resetPassword/continue/:code',
-        reset.resetPasswordContinue.bind(reset, conn))
-    app.post('/v1/resetPassword/end', reset.resetPasswordEnd.bind(reset, conn))
+        exports.resetPasswordContinue.bind(exports, conn))
+    app.post('/v1/resetPassword/end', exports.resetPasswordEnd.bind(exports, conn))
 }
 
-reset.createEmailCode = function() {
+exports.createEmailCode = function() {
     return crypto.randomBytes(10).toString('hex')
 }
 
-reset.createPhoneCode = function() {
+exports.createPhoneCode = function() {
     // Left pad the string with zeroes
     var s = Math.floor(Math.random() * 1e4).toString()
     return new Array(5 - s.length).join('0') + s
 }
 
-reset.resetPasswordBegin = function(conn, req, res, next) {
-    var emailCode = reset.createEmailCode()
+exports.resetPasswordBegin = function(conn, req, res, next) {
+    var emailCode = exports.createEmailCode()
 
     conn.write.query({
         text: 'SELECT reset_password_begin($1, $2, $3)',
-        values: [req.body.email, emailCode, reset.createPhoneCode()]
+        values: [req.body.email, emailCode, exports.createPhoneCode()]
     }, function(err) {
         if (err) {
             if (err.message == 'User has a recent reset attempt.') {
@@ -61,7 +60,7 @@ reset.resetPasswordBegin = function(conn, req, res, next) {
     })
 }
 
-reset.resetPasswordContinue = function(conn, req, res, next) {
+exports.resetPasswordContinue = function(conn, req, res, next) {
     conn.write.query({
         text: [
             'SELECT code, phone_number',
@@ -132,7 +131,7 @@ reset.resetPasswordContinue = function(conn, req, res, next) {
     })
 }
 
-reset.resetPasswordEnd = function(conn, req, res, next) {
+exports.resetPasswordEnd = function(conn, req, res, next) {
     conn.write.query({
         text: 'SELECT reset_password_end($1, $2, $3)',
         values: [req.body.email, req.body.code, req.body.key]

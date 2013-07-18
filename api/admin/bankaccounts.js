@@ -1,10 +1,8 @@
-var bankaccounts = module.exports = {}
-
-bankaccounts.configure = function(app, conn, auth) {
-    app.get('/admin/bankaccounts', auth, bankaccounts.index.bind(bankaccounts, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.get('/admin/bankaccounts', auth, exports.index.bind(exports, conn))
 }
 
-bankaccounts.index = function(conn, req, res, next) {
+exports.index = function(conn, req, res, next) {
     var query = [
         'SELECT ba.*, u.first_name, u.last_name, u.email',
         'FROM bank_account ba',

@@ -2,8 +2,8 @@ var activities = module.exports = {}
 , _ = require('lodash')
 , assert = require('assert')
 
-activities.configure = function(app, conn, auth) {
-    app.get('/v1/activities', auth, activities.activities.bind(activities, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.get('/v1/activities', auth, exports.activities.bind(exports, conn))
 }
 
 var detailWhitelist = {
@@ -28,7 +28,7 @@ var detailWhitelist = {
     VerifyBankAccount: ['accountNumber', 'iban']
 }
 
-activities.activities = function(conn, req, res, next) {
+exports.activities = function(conn, req, res, next) {
     var query
 
     if (req.query.since !== undefined) {
@@ -76,7 +76,7 @@ activities.activities = function(conn, req, res, next) {
     })
 }
 
-activities.log = function(conn, userId, type, details, retry) {
+exports.log = function(conn, userId, type, details, retry) {
     console.log('user #%d activity: %s %j', userId, type, details)
     conn.write.query({
         text: 'INSERT INTO activity (user_id, "type", details) VALUES ($1, $2, $3)',

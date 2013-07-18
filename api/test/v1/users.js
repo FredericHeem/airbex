@@ -1,58 +1,35 @@
 /* global describe, it */
 var expect = require('expect.js')
-, users = require('../../v1/users')
+, request = require('supertest')
+, mock = require('../mock')
+
+var app = require('../..')
 
 describe('users', function() {
-	describe('configure', function() {
-		it('adds expected routes', function() {
-			var routes = []
-			, app = {
-				post: function(url) { routes.push('post ' + url) },
-				patch: function(url) { routes.push('patch ' + url) },
-				get: function(url) { routes.push('get ' + url) }
-			}
-			users.configure(app)
-			expect(routes).to.contain('post /v1/users')
-			expect(routes).to.contain('patch /v1/users/current')
-			expect(routes).to.contain('get /v1/whoami')
-		})
-	})
+	describe('patch', function() {
+		it('allows updating permitted values', function(done) {
+			mock(app.conn.write, 'query', function(query, cb) {
+				expect(query.values).to.eql([123, 'nb-NO'])
+				cb()
+			})
 
-	describe('create', function() {
-		it('returns user', function(done) {
-			var emailExistence = require('email-existence')
-			, check = emailExistence.check
-			, key = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBB'
-			, conn = {
-				write: {
-					query: function(q, c) {
-						if (q.text.match(/activity/)) return
-						expect(q.text).to.match(/select create_user/i)
-						expect(q.values).to.eql(['bob@bob.com', key])
-						c(null, { rows: [{ user_id: 89 }] })
-					}
-				}
-			}
-			, req = {
-				body: {
-					email: 'bob@bob.com',
-					key: key
-				}
-			}
-			, res = {
-				send: function(code, r) {
-					expect(code).to.be(201)
-					expect(r.id).to.be(89)
-					done()
-				}
-			}
+			mock(app.userAuth, 'primary', function() {
+				arguments[arguments.length - 1]()
+			})
 
-			emailExistence.check = function(email, cb) {
-				emailExistence.check = check
-				cb(null, true)
-			}
+			console.log(request.get, request.del, request.patch)
 
-			users.create(conn, req, res, done)
+			request(app)
+			.patch('/v1/users/current')
+			.send({
+				language: 'nb-NO'
+			})
+			.expect(204)
+			.end(function(err) {
+				app.conn.write.query.restore()
+				app.userAuth.primary.restore()
+				done(err)
+			})
 		})
 	})
 })

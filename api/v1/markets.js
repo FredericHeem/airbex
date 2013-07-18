@@ -1,12 +1,11 @@
 var Q = require('q')
-, Markets = module.exports = {}
 
-Markets.configure = function(app, conn) {
-    app.get('/v1/markets', Markets.markets.bind(Markets, conn))
-    app.get('/v1/markets/:id/depth', Markets.depth.bind(Markets, conn))
+module.exports = exports = function(app, conn) {
+    app.get('/v1/markets', exports.markets.bind(exports, conn))
+    app.get('/v1/markets/:id/depth', exports.depth.bind(exports, conn))
 }
 
-Markets.markets = function(conn, req, res, next) {
+exports.markets = function(conn, req, res, next) {
     function formatPriceOrNull(m, p) {
         if (p === null) return null
         return req.app.cache.formatOrderPrice(m, p)
@@ -31,7 +30,7 @@ Markets.markets = function(conn, req, res, next) {
     .done()
 }
 
-Markets.depth = function(conn, req, res, next) {
+exports.depth = function(conn, req, res, next) {
     var query = [
         'SELECT price, volume, side "type"',
         'FROM order_depth_view odv',

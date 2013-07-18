@@ -1,12 +1,11 @@
-var withdraws = module.exports = {}
-, activities = require('../v1/activities')
+var activities = require('../v1/activities')
 
-withdraws.configure = function(app, conn, auth) {
-    app.get('/admin/withdraws', auth, withdraws.index.bind(withdraws, conn))
-    app.patch('/admin/withdraws/:id', auth, withdraws.patch.bind(withdraws, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.get('/admin/withdraws', auth, exports.index.bind(exports, conn))
+    app.patch('/admin/withdraws/:id', auth, exports.patch.bind(exports, conn))
 }
 
-withdraws.index = function(conn, req, res, next) {
+exports.index = function(conn, req, res, next) {
     var query = [
         'SELECT *',
         'FROM bank_withdraw_request_view',
@@ -22,7 +21,7 @@ withdraws.index = function(conn, req, res, next) {
     })
 }
 
-withdraws.cancel = function(conn, req, res, next) {
+exports.cancel = function(conn, req, res, next) {
     conn.write.query({
         text: 'SELECT cancel_withdraw_request($1, $2);',
         values: [+req.params.id, req.body.error || null]
@@ -45,7 +44,7 @@ withdraws.cancel = function(conn, req, res, next) {
     })
 }
 
-withdraws.process = function(conn, req, res, next) {
+exports.process = function(conn, req, res, next) {
     conn.write.query({
         text: [
             'UPDATE withdraw_request',
@@ -68,7 +67,7 @@ withdraws.process = function(conn, req, res, next) {
     })
 }
 
-withdraws.complete = function(conn, req, res, next) {
+exports.complete = function(conn, req, res, next) {
     conn.write.query({
         text: [
             'SELECT confirm_withdraw($1)',
@@ -92,7 +91,7 @@ withdraws.complete = function(conn, req, res, next) {
     })
 }
 
-withdraws.patch = function(conn, req, res, next) {
+exports.patch = function(conn, req, res, next) {
     if (req.body.state == 'processing') {
         return withdraws.process(conn, req, res, next)
     }

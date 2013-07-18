@@ -1,30 +1,30 @@
-var users = module.exports = {}
-, _ = require('lodash')
+var _ = require('lodash')
 , format = require('util').format
 , activities = require('../v1/activities')
 
-users.configure = function(app, conn, auth) {
-    app.get('/admin/users', auth, users.users.bind(users, conn))
-    app.get('/admin/users/:id', auth, users.user.bind(users, conn))
-    app.patch('/admin/users/:id', auth, users.patch.bind(users, conn))
-    app.get('/admin/users/:user/bankAccounts', auth, users.bankAccounts.bind(users, conn))
+module.exports = exports = function(app, conn, auth) {
+    app.get('/admin/users', auth, exports.users.bind(exports, conn))
+    app.get('/admin/users/:id', auth, exports.user.bind(exports, conn))
+    app.patch('/admin/users/:id', auth, exports.patch.bind(exports, conn))
+    app.get('/admin/users/:user/bankAccounts',
+        auth, exports.bankAccounts.bind(exports, conn))
     app.post('/admin/users/:user/bankAccounts/:id/startVerify',
-        auth, users.startBankAccountVerify.bind(users, conn))
+        auth, exports.startBankAccountVerify.bind(exports, conn))
     app.get('/admin/users/:user/withdrawRequests', auth,
-        users.withdrawRequests.bind(users, conn))
-    app.get('/admin/users/:user/activity', auth, users.activity.bind(users, conn))
+        exports.withdrawRequests.bind(exports, conn))
+    app.get('/admin/users/:user/activity', auth, exports.activity.bind(exports, conn))
     app.post('/admin/users/:user/sendVerificationEmail', auth,
-        users.sendVerificationEmail.bind(users, conn))
+        exports.sendVerificationEmail.bind(exports, conn))
     app.post('/admin/users/:user/bankAccounts', auth,
-        users.addBankAccount.bind(users, conn))
-    app.get('/admin/users/:user/accounts', auth, users.accounts.bind(users, conn))
+        exports.addBankAccount.bind(exports, conn))
+    app.get('/admin/users/:user/accounts', auth, exports.accounts.bind(exports, conn))
     app.post('/admin/users/:user/bankAccounts/:id/setVerified', auth,
-        users.setBankAccountVerified.bind(users, conn))
+        exports.setBankAccountVerified.bind(exports, conn))
     app.del('/admin/users/:user/bankAccounts/:id', auth,
-        users.removeBankAccount.bind(users, conn))
+        exports.removeBankAccount.bind(exports, conn))
 }
 
-users.removeBankAccount = function(conn, req, res, next) {
+exports.removeBankAccount = function(conn, req, res, next) {
     conn.write.query({
         text: 'DELETE FROM bank_account WHERE bank_account_id = $1',
         values: [req.params.id]
@@ -42,7 +42,7 @@ users.removeBankAccount = function(conn, req, res, next) {
     })
 }
 
-users.sendVerificationEmail = function(conn, req, res, next) {
+exports.sendVerificationEmail = function(conn, req, res, next) {
     var email = require('../v1/email')
     email.sendVerificationEmail(+req.params.user, function(err) {
         if (err) return next(err)
@@ -50,7 +50,7 @@ users.sendVerificationEmail = function(conn, req, res, next) {
     })
 }
 
-users.addBankAccount = function(conn, req, res, next) {
+exports.addBankAccount = function(conn, req, res, next) {
     var query = {
         text: [
             'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
@@ -72,7 +72,7 @@ users.addBankAccount = function(conn, req, res, next) {
     })
 }
 
-users.startBankAccountVerify = function(conn, req, res, next) {
+exports.startBankAccountVerify = function(conn, req, res, next) {
     conn.write.query({
         text: [
             'UPDATE bank_account',
@@ -98,7 +98,7 @@ users.startBankAccountVerify = function(conn, req, res, next) {
     })
 }
 
-users.setBankAccountVerified = function(conn, req, res, next) {
+exports.setBankAccountVerified = function(conn, req, res, next) {
     conn.write.query({
         text: [
             'UPDATE bank_account',
@@ -141,7 +141,7 @@ users.setBankAccountVerified = function(conn, req, res, next) {
     })
 }
 
-users.user = function(conn, req, res, next) {
+exports.user = function(conn, req, res, next) {
     conn.read.query({
         text: [
             'SELECT * FROM admin_user_view WHERE user_id = $1'
@@ -161,7 +161,7 @@ users.user = function(conn, req, res, next) {
     })
 }
 
-users.patch = function(conn, req, res, next) {
+exports.patch = function(conn, req, res, next) {
     var updates = {}
     , values = [req.params.id]
     , allowed = ['email', 'first_name', 'last_name', 'phone_number', 'country',
@@ -204,7 +204,7 @@ users.patch = function(conn, req, res, next) {
     })
 }
 
-users.bankAccounts = function(conn, req, res, next) {
+exports.bankAccounts = function(conn, req, res, next) {
     conn.read.query({
         text: [
             'SELECT * FROM bank_account WHERE user_id = $1'
@@ -218,7 +218,7 @@ users.bankAccounts = function(conn, req, res, next) {
     })
 }
 
-users.accounts = function(conn, req, res, next) {
+exports.accounts = function(conn, req, res, next) {
     conn.read.query({
         text: [
             'SELECT',
@@ -248,7 +248,7 @@ users.accounts = function(conn, req, res, next) {
     })
 }
 
-users.activity = function(conn, req, res, next) {
+exports.activity = function(conn, req, res, next) {
     conn.read.query({
         text: [
             'SELECT * FROM activity WHERE user_id = $1 ORDER BY created DESC LIMIT 100'
@@ -263,7 +263,7 @@ users.activity = function(conn, req, res, next) {
     })
 }
 
-users.withdrawRequests = function(conn, req, res, next) {
+exports.withdrawRequests = function(conn, req, res, next) {
     conn.read.query({
         text: 'SELECT * FROM withdraw_request_view WHERE user_id = $1',
         values: [req.params.user]
@@ -294,7 +294,7 @@ users.withdrawRequests = function(conn, req, res, next) {
     })
 }
 
-users.buildQuery = function(params) {
+exports.buildQuery = function(params) {
     var query = ['SELECT * FROM "user"']
     , conditions = []
     , values = []
@@ -342,7 +342,7 @@ users.buildQuery = function(params) {
     }
 }
 
-users.users = function(conn, req, res, next) {
+exports.users = function(conn, req, res, next) {
     var query = users.buildQuery(req.query)
     conn.read.query(query, function(err, dr) {
         if (err) return next(err)

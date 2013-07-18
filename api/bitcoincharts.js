@@ -1,14 +1,13 @@
 var Q = require('q')
-, bitcoincharts = module.exports = {}
 
-bitcoincharts.configure = function(app, conn) {
+module.exports = exports = function(app, conn) {
     app.get('/bitcoincharts/:currencyId/trades.json',
-        bitcoincharts.trades.bind(bitcoincharts, conn))
+        exports.trades.bind(exports, conn))
     app.get('/bitcoincharts/:currencyId/orderbook.json',
-        bitcoincharts.orderbook.bind(bitcoincharts, conn))
+        exports.orderbook.bind(exports, conn))
 }
 
-bitcoincharts.trades = function(conn, req, res, next) {
+exports.trades = function(conn, req, res, next) {
     var since = req.query.since || 0
     Q.ninvoke(conn.read, 'query', {
         text:
@@ -31,7 +30,7 @@ bitcoincharts.trades = function(conn, req, res, next) {
     .done()
 }
 
-bitcoincharts.orderbook = function(conn, req, res, next) {
+exports.orderbook = function(conn, req, res, next) {
     Q.ninvoke(conn.read, 'query', {
         text: [
             'SELECT *',

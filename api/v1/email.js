@@ -1,11 +1,10 @@
-var email = module.exports = {}
-, nodemailer = require('nodemailer')
+var nodemailer = require('nodemailer')
 , crypto = require('crypto')
 , smtp
 , conn
 , app
 
-email.configure = function(a, c, auth) {
+module.exports = exports = function(a, c, auth) {
     app = a
     conn = c
 
@@ -13,11 +12,11 @@ email.configure = function(a, c, auth) {
         app.config.smtp.service,
         app.config.smtp.options)
 
-    app.post('/v1/email/verify/send', auth, email.verifySend)
-    app.get('/v1/email/verify/:code', email.verify)
+    app.post('/v1/email/verify/send', auth, exports.verifySend)
+    app.get('/v1/email/verify/:code', exports.verify)
 }
 
-email.sendVerificationEmail = function(userId, cb) {
+exports.sendVerificationEmail = function(userId, cb) {
     var code = crypto.randomBytes(10).toString('hex')
 
     conn.write.query({
@@ -34,7 +33,7 @@ email.sendVerificationEmail = function(userId, cb) {
     })
 }
 
-email.verifySend = function(req, res, next) {
+exports.verifySend = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -42,7 +41,7 @@ email.verifySend = function(req, res, next) {
         })
     }
 
-    email.sendVerificationEmail(req.user, function(err) {
+    exports.sendVerificationEmail(req.user, function(err) {
         if (err) {
             if (err.message == 'E-mail already verified') {
                 return res.send(400, {
@@ -66,7 +65,7 @@ email.verifySend = function(req, res, next) {
     })
 }
 
-email.verify = function(req, res, next) {
+exports.verify = function(req, res, next) {
     if (!req.params.code) {
         return res.send(400, 'Email verification code missing from url.')
     }

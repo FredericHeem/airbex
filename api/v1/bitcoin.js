@@ -1,5 +1,4 @@
 var util = require('util')
-, validate = require('./validate')
 
 module.exports = exports = function(app, currencyId) {
     app.post('/v1/' + currencyId + '/out', app.auth.withdraw,
@@ -9,7 +8,9 @@ module.exports = exports = function(app, currencyId) {
 }
 
 exports.withdraw = function(currencyId, req, res, next) {
-    if (!validate(req.body, currencyId.toLowerCase() + '_out', res)) return
+    if (!req.app.validate(req.body, 'v1/' + currencyId.toLowerCase() + '_out', res)) {
+        return
+    }
 
     console.log('processing withdraw request of %d %s from user #%s to %s',
         req.body.amount, currencyId, req.user, req.body.address)

@@ -1,5 +1,4 @@
-var validate = require('./validate')
-, crypto = require('crypto')
+var crypto = require('crypto')
 
 module.exports = exports = function(app) {
     app.post('/v1/keys/replace', app.auth.primary, exports.replace)
@@ -9,7 +8,7 @@ module.exports = exports = function(app) {
 }
 
 exports.replace = function(req, res, next) {
-    if (!validate(req.body, 'keys_replace', res)) return
+    if (!req.app.validate(req.body, 'v1/keys_replace', res)) return
 
     req.app.conn.write.query({
         text: 'SELECT replace_api_key($1, $2)',

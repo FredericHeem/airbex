@@ -1,11 +1,9 @@
-var validate = require('./validate')
-
 module.exports = exports = function(app) {
     app.post('/v1/spend', app.auth.trade, exports.spend)
 }
 
 exports.spend = function(req, res, next) {
-    if (!validate(req.body, 'spend', res)) return
+    if (!req.app.validate(req.body, 'v1/spend', res)) return
 
     var quote = req.body.market.substr(3, 3)
 

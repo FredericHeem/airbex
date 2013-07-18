@@ -2,7 +2,6 @@
 var _ = require('lodash')
 , verifyemail = require('../verifyemail')
 , async = require('async')
-, validate = require('./validate')
 , Tropo = require('tropo')
 , debug = require('debug')('snow:users')
 , crypto = require('crypto')
@@ -104,7 +103,7 @@ exports.whoami = function(req, res, next) {
 }
 
 exports.create = function(req, res, next) {
-    if (!validate(req.body, 'user_create', res)) return
+    if (!req.app.validate(req.body, 'v1/user_create', res)) return
 
     verifyemail(req.body.email, function(err, ok) {
         if (err) {
@@ -152,7 +151,7 @@ exports.create = function(req, res, next) {
 }
 
 exports.identity = function(req, res, next) {
-    if (!validate(req.body, 'user_identity', res)) return
+    if (!req.app.validate(req.body, 'v1/user_identity', res)) return
 
     var query = {
         text: [
@@ -218,7 +217,7 @@ exports.verifyPhone = function(req, res, next) {
 }
 
 exports.startPhoneVerify = function(req, res, next) {
-    if (!validate(req.body, 'user_verify_call', res)) return
+    if (!req.app.validate(req.body, 'v1/user_verify_call', res)) return
 
     debug('processing request to start phone verification')
 

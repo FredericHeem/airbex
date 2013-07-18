@@ -1,5 +1,4 @@
-var validate = require('./validate')
-, crypto = require('crypto')
+var crypto = require('crypto')
 , async = require('async')
 
 module.exports = exports = function(app) {
@@ -19,7 +18,7 @@ exports.createId = function() {
 }
 
 exports.create = function(req, res, next) {
-    if (!validate(req.body, 'voucher_create', res)) return
+    if (!req.app.validate(req.body, 'v1/voucher_create', res)) return
 
     var voucherId = exports.createId()
 

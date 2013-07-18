@@ -1,5 +1,3 @@
-var validate = require('./validate')
-
 module.exports = exports = function(app) {
     app.post('/v1/ripple/out', app.auth.withdraw, exports.withdraw)
     app.get('/v1/ripple/address', exports.address)
@@ -89,7 +87,7 @@ exports.address = function(req, res, next) {
 }
 
 exports.withdraw = function(req, res, next) {
-    if (!validate(req.body, 'ripple_out', res)) return
+    if (!req.app.validate(req.body, 'v1/ripple_out', res)) return
 
     var queryText = [
         'SELECT ripple_withdraw(user_currency_account($1, $2), $3, $4) rid'

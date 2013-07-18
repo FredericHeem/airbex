@@ -1,5 +1,4 @@
 var _ = require('lodash')
-, validate = require('./validate')
 , crypto = require('crypto')
 
 module.exports = exports = function(app) {
@@ -34,7 +33,7 @@ exports.index = function(req, res, next) {
 }
 
 exports.add = function(req, res, next) {
-    if (!validate(req.body, 'bankaccounts_add', res)) return
+    if (!req.app.validate(req.body, 'v1/bankaccounts_add', res)) return
 
     req.app.conn.write.query({
         text: [

@@ -1,5 +1,4 @@
 var _ = require('lodash')
-, validate = require('./validate')
 
 module.exports = exports = function(app) {
     app.del('/v1/withdraws/:id', app.auth.withdraw, exports.cancel)
@@ -8,7 +7,7 @@ module.exports = exports = function(app) {
 }
 
 exports.withdrawBank = function(req, res, next) {
-    if (!validate(req.body, 'withdraw_bank', res)) return
+    if (!req.app.validate(req.body, 'v1/withdraw_bank', res)) return
 
     if (!req.apiKey.canWithdraw) {
         return res.send(401, {

@@ -1,5 +1,4 @@
 var async = require('async')
-, validate = require('./validate')
 , vouchers = require('./vouchers')
 
 module.exports = exports = function(app) {
@@ -143,7 +142,7 @@ exports.transfer = function(app, fromUser, toEmail, amount, currency, cb) {
 }
 
 exports.send = function(req, res, next) {
-    if (!validate(req.body, 'transfer', res)) return
+    if (!req.app.validate(req.body, 'v1/transfer', res)) return
     if (req.body.currency == 'NOK') throw new Error('Cannot transfer fiat')
 
     exports.transfer(req.app, req.user, req.body.email,

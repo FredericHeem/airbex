@@ -1,5 +1,4 @@
-var validate = require('./validate')
-, debug = require('debug')('snow:orders')
+var debug = require('debug')('snow:orders')
 
 module.exports = exports = function(app) {
     app.del('/v1/orders/:id', app.auth.primary, exports.cancel)
@@ -9,7 +8,7 @@ module.exports = exports = function(app) {
 }
 
 exports.create = function(req, res, next) {
-    if (!validate(req.body, 'order_create', res)) return
+    if (!req.app.validate(req.body, 'v1/order_create', res)) return
 
     if (req.body.price && !req.body.price.match(/^\d+(\.\d+)?$/)) {
         res.send({

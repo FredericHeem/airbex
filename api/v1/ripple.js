@@ -1,5 +1,4 @@
-var Q = require('q')
-, activities = require('./activities')
+var activities = require('./activities')
 , validate = require('./validate')
 , Drop = require('drop')
 , debug = require('debug')('snow:ripple')
@@ -65,9 +64,16 @@ exports.federation = function(conn, req, res) {
         values: [tag]
     }
 
-    Q.ninvoke(req.app.conn.read, 'query', query)
-    .then(function(dres) {
-        if (!dres.rows.length) return sendError(user ? 'noSuchUser' : 'noSuchTag')
+    req.app.conn.read.query(query, function(err, dr) {
+        if (err) {
+            console.error(err)
+            return sendError('unavailable')
+        }
+
+        if (!dr.rows.length) {
+            return sendError(user ? 'noSuchUser' : 'noSuchTag')
+        }
+
         var result = {
             result: 'success',
             federation_json: {
@@ -80,14 +86,11 @@ exports.federation = function(conn, req, res) {
             public_key: null,
             signature: null
         }
-        if (user) result.federation_json.tag = dres.rows[0].user_id
-        else result.federation_json.user = dres.rows[0].username
+        var row = dr.rows[0]
+        if (user) result.federation_json.tag = row.user_id
+        else result.federation_json.user = row.username
         res.send(result)
-    }, function(err) {
-        console.error(err)
-        sendError('unavailable')
     })
-    .done()
 }
 
 exports.address = function(req, res, next) {
@@ -117,7 +120,7 @@ exports.withdraw = function(req, res, next) {
         'SELECT ripple_withdraw(user_currency_account($1, $2), $3, $4) rid'
     ].join('\n')
 
-    Q.ninvoke(req.app.conn.write, 'query', {
+    req.app.conn.write.query({
         text: queryText,
         values: [
             req.user,
@@ -125,32 +128,33 @@ exports.withdraw = function(req, res, next) {
             req.body.address,
             req.app.cache.parseCurrency(req.body.amount, req.body.currency)
         ]
-    })
-    .then(function(cres) {
+    }, function(err, dr) {
+        if (err) {
+            if (err.message.match(/transaction_amount_check/)) {
+                return res.send(400, {
+                    name: 'InvalidAmount',
+                    message: 'The requested transfer amount is invalid/out of range'
+                })
+            }
+
+            if (err.message.match(/non_negative_available/)) {
+                return res.send(400, {
+                    name: 'InsufficientFunds',
+                    message: 'Insufficient funds'
+                })
+            }
+
+            return next(err)
+        }
+
         activities.log(req.app.conn, req.user, 'RippleWithdraw', {
             address: req.body.address,
             amount: req.body.amount,
             currency: req.body.currency
         })
-        res.send(201, { id: cres.rows[0].rid })
-    }, function(err) {
-        if (err.message.match(/transaction_amount_check/)) {
-            return res.send(400, {
-                name: 'InvalidAmount',
-                message: 'The requested transfer amount is invalid/out of range'
-            })
-        }
 
-        if (err.message.match(/non_negative_available/)) {
-            return res.send(400, {
-                name: 'InsufficientFunds',
-                message: 'Insufficient funds'
-            })
-        }
-
-        next(err)
+        res.send(201, { id: dr.rows[0].rid })
     })
-    .done()
 }
 
 exports.trust = function(config, conn, req, res, next) {

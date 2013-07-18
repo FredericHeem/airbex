@@ -1,5 +1,4 @@
-var Q = require('q')
-, activities = require('./activities')
+var activities = require('./activities')
 , util = require('util')
 , validate = require('./validate')
 
@@ -27,31 +26,32 @@ exports.withdraw = function(currencyId, req, res, next) {
         'SELECT %s_withdraw($1, $2, $3) request_id',
         currencyId)
 
-    Q.ninvoke(req.app.conn.write, 'query', {
+    req.app.conn.write.query({
         text: queryText,
         values: [
             req.user,
             req.body.address,
             req.app.cache.parseCurrency(req.body.amount, currencyId)
         ]
-    })
-    .then(function(cres) {
+    }, function(err, dr) {
+        if (err) {
+            if (err.message.match(/non_negative_available/)) {
+                return res.send(500, {
+                    name: 'NoFunds',
+                    message: 'insufficient funds'
+                })
+            }
+
+            return next(err)
+        }
+
         activities.log(req.user, currencyId + 'Withdraw', {
             address: req.body.address,
             amount: req.body.amount
         })
-        res.send(201, { id: cres.rows[0].request_id })
-    }, function(err) {
-        if (err.code === '23514' && err.message.match(/non_negative_available/)) {
-            return res.send(500, {
-                name: 'NoFunds',
-                message: 'insufficient funds'
-            })
-        }
 
-        next(err)
-    }, next)
-    .done()
+        res.send(201, { id: dr.rows[0].request_id })
+    })
 }
 
 exports.address = function(currencyId, req, res, next) {
@@ -68,13 +68,12 @@ exports.address = function(currencyId, req, res, next) {
         'WHERE account_id = user_currency_account($1, $2)'
     ].join('\n'), currencyId)
 
-    Q.ninvoke(req.app.conn.read, 'query', {
+    req.app.conn.read.query({
         text: queryText,
         values: [req.user, currencyId]
-    })
-    .then(function(cres) {
-        var address = cres.rows.length ? cres.rows[0].address : null
+    }, function(err, dr) {
+        if (err) return next(err)
+        var address = dr.rows.length ? dr.rows[0].address : null
         res.send(200, { address: address })
-    }, next)
-    .done()
+    })
 }

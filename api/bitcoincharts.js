@@ -1,5 +1,3 @@
-var Q = require('q')
-
 module.exports = exports = function(app) {
     app.get('/bitcoincharts/:currencyId/trades.json', exports.trades)
     app.get('/bitcoincharts/:currencyId/orderbook.json', exports.orderbook)
@@ -7,7 +5,7 @@ module.exports = exports = function(app) {
 
 exports.trades = function(req, res, next) {
     var since = req.query.since || 0
-    Q.ninvoke(req.app.conn.read, 'query', {
+    req.app.conn.read.query({
         text:
             'SELECT ' +
             'price_decimal::varchar price, ' +
@@ -21,15 +19,14 @@ exports.trades = function(req, res, next) {
             'WHERE m.quote_currency_id = $1 AND om.match_id > $2 ' +
             'ORDER BY om.match_id ASC;',
         values: [req.params.currencyId, since]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(dr.rows)
     })
-    .then(function(cres) {
-        res.send(cres.rows)
-    }, next)
-    .done()
 }
 
 exports.orderbook = function(req, res, next) {
-    Q.ninvoke(req.app.conn.read, 'query', {
+    req.app.conn.read.query({
         text: [
             'SELECT *',
             'FROM order_depth_view od',
@@ -37,20 +34,20 @@ exports.orderbook = function(req, res, next) {
             'WHERE m.base_currency_id = \'BTC\' AND m.quote_currency_id = $1'
         ].join('\n'),
         values: [req.params.currencyId]
-    })
-    .then(function(dres) {
-        return res.send({
-            asks: dres.rows.filter(function(r) {
+    }, function(err, dr) {
+        if (err) return next(err)
+
+        res.send({
+            asks: dr.rows.filter(function(r) {
                 return r.side === 1
             }).map(function(r) {
                 return [r.price_decimal, r.volume_decimal]
             }),
-            bids: dres.rows.filter(function(r) {
+            bids: dr.rows.filter(function(r) {
                 return r.side === 0
             }).map(function(r) {
                 return [r.price_decimal, r.volume_decimal]
             })
         })
-    }, next)
-    .done()
+    })
 }

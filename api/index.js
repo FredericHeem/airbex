@@ -13,6 +13,7 @@ debug('starting api web server')
 
 app.config = config
 app.conn = conn
+app.tarpit = require('./tarpit')()
 
 debug('config %j', config)
 

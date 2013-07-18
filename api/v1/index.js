@@ -1,8 +1,4 @@
-var tarpit = require('../tarpit')()
-
 module.exports = function(app) {
-    app.tarpit = tarpit
-
     var routes = ['balances', 'markets', 'orders', 'ripple', 'intercom',
     'currencies', 'activities', 'users', 'withdraws',
     'keys', 'email', 'resetPassword', 'spend', 'bankaccounts',

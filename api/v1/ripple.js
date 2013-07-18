@@ -4,11 +4,11 @@ var Q = require('q')
 , Drop = require('drop')
 , debug = require('debug')('snow:ripple')
 
-module.exports = exports = function(app, conn, auth) {
-    app.post('/v1/ripple/out', auth, exports.withdraw.bind(exports, conn))
-    app.get('/v1/ripple/address', exports.address.bind(exports, conn))
-    app.get('/ripple/federation', exports.federation.bind(exports, app.config, conn))
-    app.get('/v1/ripple/trust/:account', exports.trust.bind(exports, app.config, conn))
+module.exports = exports = function(app) {
+    app.post('/v1/ripple/out', app.userAuth, exports.withdraw)
+    app.get('/v1/ripple/address', exports.address)
+    app.get('/ripple/federation', exports.federation)
+    app.get('/v1/ripple/trust/:account', exports.trust)
 
     exports.connect()
 }
@@ -26,7 +26,7 @@ exports.connect = function() {
     })
 }
 
-exports.federation = function(config, conn, req, res) {
+exports.federation = function(conn, req, res) {
     var domain = req.query.domain
     , tag = req.query.tag
     , user = req.query.user
@@ -50,7 +50,9 @@ exports.federation = function(config, conn, req, res) {
     if (!domain) return sendError('invalidParams')
     if (!user && !tag) return sendError('invalidParams')
     if (user && tag) return sendError('invalidParams')
-    if (domain !== config.ripple_federation.domain) return sendError('noSuchDomain')
+    if (domain !== req.app.config.ripple_federation.domain) {
+        return sendError('noSuchDomain')
+    }
 
     var query = user ? {
         text: 'SELECT user_id FROM "user" WHERE REPLACE(email_lower, \'@\', \'_\') = $1',
@@ -63,16 +65,16 @@ exports.federation = function(config, conn, req, res) {
         values: [tag]
     }
 
-    Q.ninvoke(conn.read, 'query', query)
+    Q.ninvoke(req.app.conn.read, 'query', query)
     .then(function(dres) {
         if (!dres.rows.length) return sendError(user ? 'noSuchUser' : 'noSuchTag')
         var result = {
             result: 'success',
             federation_json: {
                 type: 'federation_record',
-                currencies: config.ripple_federation_currencies,
+                currencies: req.app.config.ripple_federation_currencies,
                 expires: Math.round(+new Date() / 1e3) + 3600 * 24 * 7,
-                domain: config.ripple_federation.domain,
+                domain: req.app.config.ripple_federation.domain,
                 signer: null
             },
             public_key: null,
@@ -88,8 +90,8 @@ exports.federation = function(config, conn, req, res) {
     .done()
 }
 
-exports.address = function(conn, req, res, next) {
-    conn.read.query({
+exports.address = function(req, res, next) {
+    req.app.conn.read.query({
         text: 'SELECT address FROM ripple_account'
     }, function(err, dres) {
         if (err) return next(err)
@@ -101,7 +103,7 @@ exports.address = function(conn, req, res, next) {
     })
 }
 
-exports.withdraw = function(conn, req, res, next) {
+exports.withdraw = function(req, res, next) {
     if (!validate(req.body, 'ripple_out', res)) return
 
     if (!req.apiKey.canWithdraw) {
@@ -115,7 +117,7 @@ exports.withdraw = function(conn, req, res, next) {
         'SELECT ripple_withdraw(user_currency_account($1, $2), $3, $4) rid'
     ].join('\n')
 
-    Q.ninvoke(conn.write, 'query', {
+    Q.ninvoke(req.app.conn.write, 'query', {
         text: queryText,
         values: [
             req.user,
@@ -125,7 +127,7 @@ exports.withdraw = function(conn, req, res, next) {
         ]
     })
     .then(function(cres) {
-        activities.log(conn, req.user, 'RippleWithdraw', {
+        activities.log(req.app.conn, req.user, 'RippleWithdraw', {
             address: req.body.address,
             amount: req.body.amount,
             currency: req.body.currency

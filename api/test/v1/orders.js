@@ -57,7 +57,7 @@ describe('orders', function() {
 				}
 			}
 
-			orders.forUser(conn, req, res, done)
+			orders.forUser(req, res, done)
 		})
 
 		it('formats numbers', function(done) {
@@ -99,7 +99,7 @@ describe('orders', function() {
 				}
 			}
 
-			orders.forUser(conn, req, res, done)
+			orders.forUser(req, res, done)
 		})
 	})
 
@@ -152,7 +152,7 @@ describe('orders', function() {
 				}
 			}
 
-			orders.create(conn, req, res, done)
+			orders.create(req, res, done)
 		})
 
 		it('requires canTrade api key permission', function(done) {
@@ -188,7 +188,7 @@ describe('orders', function() {
 				}
 			}
 
-			orders.create(conn, req, res, done)
+			orders.create(req, res, done)
 		})
 	})
 
@@ -219,7 +219,7 @@ describe('orders', function() {
 				}
 			}
 
-			orders.cancel(conn, req, res, done)
+			orders.cancel(req, res, done)
 		})
 
 		it('requires canTrade api key permission', function(done) {
@@ -248,7 +248,7 @@ describe('orders', function() {
 				}
 			}
 
-			orders.cancel(conn, req, res, done)
+			orders.cancel(req, res, done)
 		})
 	})
 })

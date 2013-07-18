@@ -1,25 +1,20 @@
 var nodemailer = require('nodemailer')
 , crypto = require('crypto')
 , smtp
-, conn
-, app
 
-module.exports = exports = function(a, c, auth) {
-    app = a
-    conn = c
-
+module.exports = exports = function(app) {
     smtp = nodemailer.createTransport(
         app.config.smtp.service,
         app.config.smtp.options)
 
-    app.post('/v1/email/verify/send', auth, exports.verifySend)
+    app.post('/v1/email/verify/send', app.userAuth, exports.verifySend)
     app.get('/v1/email/verify/:code', exports.verify)
 }
 
-exports.sendVerificationEmail = function(userId, cb) {
+exports.sendVerificationEmail = function(app, userId, cb) {
     var code = crypto.randomBytes(10).toString('hex')
 
-    conn.write.query({
+    app.conn.write.query({
         text: [
             'SELECT email, language, create_email_verify_code($1, $2)',
             'FROM "user"',
@@ -74,7 +69,7 @@ exports.verify = function(req, res, next) {
         return res.send(400, 'Invalid email verification code in url.')
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: 'SELECT verify_email($1)',
         values: [req.params.code]
     }, function(err) {

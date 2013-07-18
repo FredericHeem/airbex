@@ -10,18 +10,18 @@ var _ = require('lodash')
 
 require('tropo-webapi')
 
-module.exports = exports = function(app, conn, auth) {
-    app.get('/v1/whoami', auth, exports.whoami.bind(exports, conn))
-    app.post('/v1/users', exports.create.bind(exports, conn))
-    app.post('/v1/users/identity', auth, exports.identity.bind(exports, conn))
-    app.post('/v1/replaceApiKey', auth, exports.replaceApiKey.bind(exports, conn))
-    app.post('/v1/users/verify/call', auth, exports.startPhoneVerify.bind(exports, conn))
-    app.post('/v1/users/verify', auth, exports.verifyPhone.bind(exports, conn))
-    app.post('/tropo', exports.tropo.bind(exports, conn))
-    app.patch('/v1/users/current', auth, exports.patch.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/v1/whoami', app.userAuth, exports.whoami)
+    app.post('/v1/users', exports.create)
+    app.post('/v1/users/identity', app.userAuth, exports.identity)
+    app.post('/v1/replaceApiKey', app.userAuth, exports.replaceApiKey)
+    app.post('/v1/users/verify/call', app.userAuth, exports.startPhoneVerify)
+    app.post('/v1/users/verify', app.userAuth, exports.verifyPhone)
+    app.post('/tropo', exports.tropo)
+    app.patch('/v1/users/current', app.userAuth, exports.patch)
 }
 
-exports.patch = function(conn, req, res, next) {
+exports.patch = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -48,7 +48,7 @@ exports.patch = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'UPDATE "user"',
             'SET ' + updateText,
@@ -66,9 +66,9 @@ exports.createBankVerifyCode = function() {
     return crypto.randomBytes(2).toString('hex')
 }
 
-exports.whoami = function(conn, req, res, next) {
+exports.whoami = function(req, res, next) {
     // TODO: extract to view
-	conn.read.query({
+	req.app.conn.read.query({
 		text: [
             'SELECT',
             '   user_id id,',
@@ -112,7 +112,7 @@ exports.whoami = function(conn, req, res, next) {
 	})
 }
 
-exports.create = function(conn, req, res, next) {
+exports.create = function(req, res, next) {
     if (!validate(req.body, 'user_create', res)) return
 
     verifyemail(req.body.email, function(err, ok) {
@@ -130,12 +130,12 @@ exports.create = function(conn, req, res, next) {
             })
         }
 
-        conn.write.query({
+        req.app.conn.write.query({
             text: 'SELECT create_user($1, $2) user_id',
             values: [req.body.email, req.body.key]
         }, function(err, cres) {
             if (!err) {
-                activities.log(conn, cres.rows[0].user_id, 'Created', {})
+                activities.log(cres.rows[0].user_id, 'Created', {})
                 return res.send(201, { id: cres.rows[0].user_id })
             }
 
@@ -160,7 +160,7 @@ exports.create = function(conn, req, res, next) {
     })
 }
 
-exports.identity = function(conn, req, res, next) {
+exports.identity = function(req, res, next) {
     if (!validate(req.body, 'user_identity', res)) return
 
     if (!req.apiKey.primary) {
@@ -188,7 +188,7 @@ exports.identity = function(conn, req, res, next) {
             req.body.country, req.body.city, req.body.postalArea]
     }
 
-    conn.write.query(query, function(err, dr) {
+    req.app.conn.write.query(query, function(err, dr) {
         if (err) {
             return next(err)
         }
@@ -200,12 +200,12 @@ exports.identity = function(conn, req, res, next) {
             })
         }
 
-        activities.log(conn, req.user, 'IdentitySet', {})
+        activities.log(req.user, 'IdentitySet', {})
         return res.send(204)
     })
 }
 
-exports.replaceApiKey = function(conn, req, res, next) {
+exports.replaceApiKey = function(req, res, next) {
     if (!validate(req.body, 'user_replace_api_key', res)) return
 
     if (!req.apiKey.primary) {
@@ -215,7 +215,7 @@ exports.replaceApiKey = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: 'SELECT replace_api_key($1, $2)',
         values: [req.key, req.body.key]
     }, function(err) {
@@ -224,7 +224,7 @@ exports.replaceApiKey = function(conn, req, res, next) {
     })
 }
 
-exports.verifyPhone = function(conn, req, res, next) {
+exports.verifyPhone = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -232,7 +232,7 @@ exports.verifyPhone = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: 'SELECT verify_phone($1, $2) success',
         values: [req.user, req.body.code]
     }, function(err, dr) {
@@ -259,7 +259,7 @@ exports.verifyPhone = function(conn, req, res, next) {
     })
 }
 
-exports.startPhoneVerify = function(conn, req, res, next) {
+exports.startPhoneVerify = function(req, res, next) {
     if (!validate(req.body, 'user_verify_call', res)) return
 
     if (!req.apiKey.primary) {
@@ -271,7 +271,7 @@ exports.startPhoneVerify = function(conn, req, res, next) {
 
     debug('processing request to start phone verification')
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: 'SELECT create_phone_number_verify_code($2, $1) code',
         values: [req.user, req.body.number]
     }, function(err, dr) {
@@ -349,7 +349,7 @@ exports.startPhoneVerify = function(conn, req, res, next) {
     })
 }
 
-exports.tropo = function(conn, req, res) {
+exports.tropo = function(req, res) {
     var params = req.body.session.parameters
 
     debug('processing tropo request with params %j', params)

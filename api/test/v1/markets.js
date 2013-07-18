@@ -52,7 +52,7 @@ describe('markets', function() {
 				}
 			}
 
-			markets.markets(conn, req, res, done)
+			markets.markets(req, res, done)
 		})
 	})
 
@@ -107,7 +107,7 @@ describe('markets', function() {
 				}
 			}
 
-			markets.depth(conn, req, res, done)
+			markets.depth(req, res, done)
 		})
 	})
 })

@@ -1,4 +1,4 @@
-module.exports = function(conn) {
+module.exports = function() {
     return function(req, res, next) {
         if (req.user) return next()
 
@@ -9,7 +9,7 @@ module.exports = function(conn) {
             })
         }
 
-        conn.read.query({
+        req.app.conn.read.query({
             text: [
                 'SELECT u.user_id',
                 'FROM api_key a',

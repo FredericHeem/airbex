@@ -48,7 +48,7 @@ describe('balances', function() {
 				}
 			}
 
-			balances.forUser(conn, req, res, done)
+			balances.forUser(req, res, done)
 		})
 	})
 })

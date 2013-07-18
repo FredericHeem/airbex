@@ -1,11 +1,11 @@
 var Q = require('q')
 
-module.exports = exports = function(app, conn, auth) {
-    app.get('/v1/balances', auth, exports.forUser.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/v1/balances', app.userAuth, exports.forUser)
 }
 
-exports.forUser = function(conn, req, res, next) {
-    Q.ninvoke(conn.read, 'query', {
+exports.forUser = function(req, res, next) {
+    Q.ninvoke(req.app.conn.read, 'query', {
         text: [
             'SELECT currency_id currency, SUM(available) available',
             'FROM account_view',

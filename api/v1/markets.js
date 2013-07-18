@@ -1,17 +1,17 @@
 var Q = require('q')
 
-module.exports = exports = function(app, conn) {
-    app.get('/v1/markets', exports.markets.bind(exports, conn))
-    app.get('/v1/markets/:id/depth', exports.depth.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/v1/markets', exports.markets)
+    app.get('/v1/markets/:id/depth', exports.depth)
 }
 
-exports.markets = function(conn, req, res, next) {
+exports.markets = function(req, res, next) {
     function formatPriceOrNull(m, p) {
         if (p === null) return null
         return req.app.cache.formatOrderPrice(m, p)
     }
 
-    Q.ninvoke(conn.read, 'query', 'SELECT * FROM market_summary_view')
+    Q.ninvoke(req.app.conn.read, 'query', 'SELECT * FROM market_summary_view')
     .then(function(cres) {
         res.send(cres.rows.map(function(row) {
             var m = row.base_currency_id + row.quote_currency_id
@@ -30,7 +30,7 @@ exports.markets = function(conn, req, res, next) {
     .done()
 }
 
-exports.depth = function(conn, req, res, next) {
+exports.depth = function(req, res, next) {
     var query = [
         'SELECT price, volume, side "type"',
         'FROM order_depth_view odv',
@@ -39,7 +39,7 @@ exports.depth = function(conn, req, res, next) {
         'ORDER BY CASE WHEN side = 1 THEN price ELSE -price END'
     ].join('\n')
 
-    Q.ninvoke(conn.read, 'query', {
+    Q.ninvoke(req.app.conn.read, 'query', {
         text: query,
         values: [req.params.id]
     })

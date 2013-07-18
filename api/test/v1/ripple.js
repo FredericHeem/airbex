@@ -35,7 +35,7 @@ describe('ripple', function() {
 				}
 			}
 
-			ripple.address(conn, req, res, done)
+			ripple.address(req, res, done)
 		})
 	})
 
@@ -76,7 +76,7 @@ describe('ripple', function() {
 				}
 			}
 
-			ripple.withdraw(conn, req, res, done)
+			ripple.withdraw(req, res, done)
 		})
 
 		it('enqueues', function(done) {
@@ -114,7 +114,7 @@ describe('ripple', function() {
 				}
 			}
 
-			ripple.withdraw(conn, req, res, done)
+			ripple.withdraw(req, res, done)
 		})
 	})
 })

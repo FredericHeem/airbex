@@ -75,7 +75,7 @@ describe('vouchers', function() {
                 }
             }
 
-            vouchers.create(conn, req, res, done)
+            vouchers.create(req, res, done)
         })
 
         it('requires canWithdraw api key permission', function(done) {
@@ -116,7 +116,7 @@ describe('vouchers', function() {
                 }
             }
 
-            vouchers.create(conn, req, res, done)
+            vouchers.create(req, res, done)
         })
     })
 
@@ -150,7 +150,7 @@ describe('vouchers', function() {
                 }
             }
 
-            vouchers.redeem(conn, req, res, done)
+            vouchers.redeem(req, res, done)
         })
 
         it('requires canDeposit api key permission', function(done) {
@@ -182,7 +182,7 @@ describe('vouchers', function() {
                 }
             }
 
-            vouchers.redeem(conn, req, res, done)
+            vouchers.redeem(req, res, done)
         })
     })
 })

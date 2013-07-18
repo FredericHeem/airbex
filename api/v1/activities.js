@@ -2,8 +2,8 @@ var activities = module.exports = {}
 , _ = require('lodash')
 , assert = require('assert')
 
-module.exports = exports = function(app, conn, auth) {
-    app.get('/v1/activities', auth, exports.activities.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/v1/activities', app.userAuth, exports.activities)
 }
 
 var detailWhitelist = {
@@ -28,7 +28,7 @@ var detailWhitelist = {
     VerifyBankAccount: ['accountNumber', 'iban']
 }
 
-exports.activities = function(conn, req, res, next) {
+exports.activities = function(req, res, next) {
     var query
 
     if (req.query.since !== undefined) {
@@ -55,7 +55,7 @@ exports.activities = function(conn, req, res, next) {
         }
     }
 
-    conn.read.query(query, function(err, dr) {
+    req.app.conn.read.query(query, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows.map(function(row) {
             row.details = JSON.parse(row.details)
@@ -87,7 +87,7 @@ exports.log = function(conn, userId, type, details, retry) {
         console.error(err)
         if (retry == 3) return
         setTimeout(function() {
-            activities.log(conn, userId, type, details, (retry || 0) + 1)
+            activities.log(userId, type, details, (retry || 0) + 1)
         }, 1000)
     })
 }

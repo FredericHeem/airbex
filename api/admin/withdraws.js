@@ -1,18 +1,18 @@
 var activities = require('../v1/activities')
 
-module.exports = exports = function(app, conn, auth) {
-    app.get('/admin/withdraws', auth, exports.index.bind(exports, conn))
-    app.patch('/admin/withdraws/:id', auth, exports.patch.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/admin/withdraws', app.adminAuth, exports.index)
+    app.patch('/admin/withdraws/:id', app.adminAuth, exports.patch)
 }
 
-exports.index = function(conn, req, res, next) {
+exports.index = function(req, res, next) {
     var query = [
         'SELECT *',
         'FROM bank_withdraw_request_view',
         'WHERE state NOT IN (\'cancelled\', \'completed\')'
     ].join('\n')
 
-    conn.read.query(query, function(err, dr) {
+    req.app.conn.read.query(query, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows.map(function(row) {
             row.amount = req.app.cache.formatCurrency(row.amount, row.currency_id)
@@ -21,14 +21,14 @@ exports.index = function(conn, req, res, next) {
     })
 }
 
-exports.cancel = function(conn, req, res, next) {
-    conn.write.query({
+exports.cancel = function(req, res, next) {
+    req.app.conn.write.query({
         text: 'SELECT cancel_withdraw_request($1, $2);',
         values: [+req.params.id, req.body.error || null]
     }, function(err, dr) {
         if (err) return next(err)
         if (dr.rowCount) {
-            activities.log(conn, req.user, 'AdminWithdrawCancel', {
+            activities.log(req.app.conn, req.user, 'AdminWithdrawCancel', {
                 id: req.params.id,
                 error: req.body.error || null
             })
@@ -44,8 +44,8 @@ exports.cancel = function(conn, req, res, next) {
     })
 }
 
-exports.process = function(conn, req, res, next) {
-    conn.write.query({
+exports.process = function(req, res, next) {
+    req.app.conn.write.query({
         text: [
             'UPDATE withdraw_request',
             'SET state = \'processing\'',
@@ -56,7 +56,8 @@ exports.process = function(conn, req, res, next) {
         if (err) return next(err)
 
         if (dr.rowCount) {
-            activities.log(conn, req.user, 'AdminWithdrawProcess', { id: req.params.id })
+            activities.log(req.app.conn, req.user, 'AdminWithdrawProcess',
+                { id: req.params.id })
             return res.send(204)
         }
 
@@ -67,8 +68,8 @@ exports.process = function(conn, req, res, next) {
     })
 }
 
-exports.complete = function(conn, req, res, next) {
-    conn.write.query({
+exports.complete = function(req, res, next) {
+    req.app.conn.write.query({
         text: [
             'SELECT confirm_withdraw($1)',
             'FROM withdraw_request',
@@ -79,7 +80,8 @@ exports.complete = function(conn, req, res, next) {
         if (err) return next(err)
 
         if (dr.rowCount) {
-            activities.log(conn, req.user, 'AdminWithdrawComplete', { id: req.params.id })
+            activities.log(req.app.conn, req.user, 'AdminWithdrawComplete',
+                { id: req.params.id })
             return res.send(204)
         }
 
@@ -91,17 +93,17 @@ exports.complete = function(conn, req, res, next) {
     })
 }
 
-exports.patch = function(conn, req, res, next) {
+exports.patch = function(req, res, next) {
     if (req.body.state == 'processing') {
-        return withdraws.process(conn, req, res, next)
+        return exports.process(req, res, next)
     }
 
     if (req.body.state == 'completed') {
-        return withdraws.complete(conn, req, res, next)
+        return exports.complete(req, res, next)
     }
 
     if (req.body.state == 'cancelled') {
-        return withdraws.cancel(conn, req, res, next)
+        return exports.cancel(req, res, next)
     }
 
     return next(new Error('not sure what to do with patch request'))

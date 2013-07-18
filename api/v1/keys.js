@@ -2,14 +2,14 @@ var validate = require('./validate')
 , activities = require('./activities')
 , crypto = require('crypto')
 
-module.exports = exports = function(app, conn, auth) {
-    app.post('/v1/keys/replace', auth, exports.replace.bind(exports, conn))
-    app.post('/v1/keys', auth, exports.create.bind(exports, conn))
-    app.get('/v1/keys', auth, exports.index.bind(exports, conn))
-    app.del('/v1/keys/:id', auth, exports.remove.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.post('/v1/keys/replace', app.userAuth, exports.replace)
+    app.post('/v1/keys', app.userAuth, exports.create)
+    app.get('/v1/keys', app.userAuth, exports.index)
+    app.del('/v1/keys/:id', app.userAuth, exports.remove)
 }
 
-exports.replace = function(conn, req, res, next) {
+exports.replace = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -19,17 +19,17 @@ exports.replace = function(conn, req, res, next) {
 
     if (!validate(req.body, 'keys_replace', res)) return
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: 'SELECT replace_api_key($1, $2)',
         values: [req.key, req.body.key]
     }, function(err) {
         if (err) return next(err)
-        activities.log(conn, req.user, 'ChangePassword', {})
+        activities.log(req.user, 'ChangePassword', {})
         res.send(200, {})
     })
 }
 
-exports.remove = function(conn, req, res, next) {
+exports.remove = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -37,7 +37,7 @@ exports.remove = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'DELETE',
             'FROM api_key',
@@ -58,7 +58,7 @@ exports.remove = function(conn, req, res, next) {
     })
 }
 
-exports.index = function(conn, req, res, next) {
+exports.index = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -66,7 +66,7 @@ exports.index = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'SELECT api_key_id, can_trade, can_withdraw, can_deposit',
             'FROM api_key',
@@ -93,7 +93,7 @@ exports.generateApiKey = function() {
     return sum.digest('hex')
 }
 
-exports.create = function(conn, req, res, next) {
+exports.create = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -103,7 +103,7 @@ exports.create = function(conn, req, res, next) {
 
     var key = exports.generateApiKey()
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'INSERT INTO api_key (api_key_id, user_id, "primary",',
             '   can_trade, can_deposit, can_withdraw)',

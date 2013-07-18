@@ -3,14 +3,14 @@ var Q = require('q')
 , util = require('util')
 , validate = require('./validate')
 
-module.exports = exports = function(app, conn, auth, currencyId) {
-    app.post('/v1/' + currencyId + '/out', auth,
-        exports.withdraw.bind(exports, conn, currencyId))
-    app.get('/v1/' + currencyId + '/address', auth,
-        exports.address.bind(exports, conn, currencyId))
+module.exports = exports = function(app, currencyId) {
+    app.post('/v1/' + currencyId + '/out', app.userAuth,
+        exports.withdraw.bind(exports, currencyId))
+    app.get('/v1/' + currencyId + '/address', app.userAuth,
+        exports.address.bind(exports, currencyId))
 }
 
-exports.withdraw = function(conn, currencyId, req, res, next) {
+exports.withdraw = function(currencyId, req, res, next) {
     if (!validate(req.body, currencyId.toLowerCase() + '_out', res)) return
 
     if (!req.apiKey.canWithdraw) {
@@ -27,7 +27,7 @@ exports.withdraw = function(conn, currencyId, req, res, next) {
         'SELECT %s_withdraw($1, $2, $3) request_id',
         currencyId)
 
-    Q.ninvoke(conn.write, 'query', {
+    Q.ninvoke(req.app.conn.write, 'query', {
         text: queryText,
         values: [
             req.user,
@@ -36,7 +36,7 @@ exports.withdraw = function(conn, currencyId, req, res, next) {
         ]
     })
     .then(function(cres) {
-        activities.log(conn, req.user, currencyId + 'Withdraw', {
+        activities.log(req.user, currencyId + 'Withdraw', {
             address: req.body.address,
             amount: req.body.amount
         })
@@ -54,7 +54,7 @@ exports.withdraw = function(conn, currencyId, req, res, next) {
     .done()
 }
 
-exports.address = function(conn, currencyId, req, res, next) {
+exports.address = function(currencyId, req, res, next) {
     if (!req.apiKey.canDeposit) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -68,7 +68,7 @@ exports.address = function(conn, currencyId, req, res, next) {
         'WHERE account_id = user_currency_account($1, $2)'
     ].join('\n'), currencyId)
 
-    Q.ninvoke(conn.read, 'query', {
+    Q.ninvoke(req.app.conn.read, 'query', {
         text: queryText,
         values: [req.user, currencyId]
     })

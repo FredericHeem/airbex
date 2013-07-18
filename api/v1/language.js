@@ -2,12 +2,12 @@ var debug = require('debug')('snow:language')
 , util = require('util')
 , languageRe = /^([a-z]{1,8}(?:-[a-z]{1,8})?)(?:;q=([0-9](?:\.[0-9])?))?$/i
 
-module.exports = exports = function(app, conn) {
-    app.get('/v1/language', exports.language.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/v1/language', exports.language)
 }
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-exports.language = function(conn, req, res) {
+exports.language = function(req, res) {
     var header = req.get('Accept-Language')
     , language = null
 

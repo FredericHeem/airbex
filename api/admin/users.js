@@ -2,30 +2,30 @@ var _ = require('lodash')
 , format = require('util').format
 , activities = require('../v1/activities')
 
-module.exports = exports = function(app, conn, auth) {
-    app.get('/admin/users', auth, exports.users.bind(exports, conn))
-    app.get('/admin/users/:id', auth, exports.user.bind(exports, conn))
-    app.patch('/admin/users/:id', auth, exports.patch.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/admin/users', app.adminAuth, exports.users)
+    app.get('/admin/users/:id', app.adminAuth, exports.user)
+    app.patch('/admin/users/:id', app.adminAuth, exports.patch)
     app.get('/admin/users/:user/bankAccounts',
-        auth, exports.bankAccounts.bind(exports, conn))
+        app.adminAuth, exports.bankAccounts)
     app.post('/admin/users/:user/bankAccounts/:id/startVerify',
-        auth, exports.startBankAccountVerify.bind(exports, conn))
-    app.get('/admin/users/:user/withdrawRequests', auth,
-        exports.withdrawRequests.bind(exports, conn))
-    app.get('/admin/users/:user/activity', auth, exports.activity.bind(exports, conn))
-    app.post('/admin/users/:user/sendVerificationEmail', auth,
-        exports.sendVerificationEmail.bind(exports, conn))
-    app.post('/admin/users/:user/bankAccounts', auth,
-        exports.addBankAccount.bind(exports, conn))
-    app.get('/admin/users/:user/accounts', auth, exports.accounts.bind(exports, conn))
-    app.post('/admin/users/:user/bankAccounts/:id/setVerified', auth,
-        exports.setBankAccountVerified.bind(exports, conn))
-    app.del('/admin/users/:user/bankAccounts/:id', auth,
-        exports.removeBankAccount.bind(exports, conn))
+        app.adminAuth, exports.startBankAccountVerify)
+    app.get('/admin/users/:user/withdrawRequests', app.adminAuth,
+        exports.withdrawRequests)
+    app.get('/admin/users/:user/activity', app.adminAuth, exports.activity)
+    app.post('/admin/users/:user/sendVerificationEmail', app.adminAuth,
+        exports.sendVerificationEmail)
+    app.post('/admin/users/:user/bankAccounts', app.adminAuth,
+        exports.addBankAccount)
+    app.get('/admin/users/:user/accounts', app.adminAuth, exports.accounts)
+    app.post('/admin/users/:user/bankAccounts/:id/setVerified', app.adminAuth,
+        exports.setBankAccountVerified)
+    app.del('/admin/users/:user/bankAccounts/:id', app.adminAuth,
+        exports.removeBankAccount)
 }
 
-exports.removeBankAccount = function(conn, req, res, next) {
-    conn.write.query({
+exports.removeBankAccount = function(req, res, next) {
+    req.app.conn.write.query({
         text: 'DELETE FROM bank_account WHERE bank_account_id = $1',
         values: [req.params.id]
     }, function(err, dr) {
@@ -42,7 +42,7 @@ exports.removeBankAccount = function(conn, req, res, next) {
     })
 }
 
-exports.sendVerificationEmail = function(conn, req, res, next) {
+exports.sendVerificationEmail = function(req, res, next) {
     var email = require('../v1/email')
     email.sendVerificationEmail(+req.params.user, function(err) {
         if (err) return next(err)
@@ -50,7 +50,7 @@ exports.sendVerificationEmail = function(conn, req, res, next) {
     })
 }
 
-exports.addBankAccount = function(conn, req, res, next) {
+exports.addBankAccount = function(req, res, next) {
     var query = {
         text: [
             'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
@@ -66,14 +66,14 @@ exports.addBankAccount = function(conn, req, res, next) {
         ]
     }
 
-    conn.write.query(query, function(err) {
+    req.app.conn.write.query(query, function(err) {
         if (err) return next(err)
         res.send(204)
     })
 }
 
-exports.startBankAccountVerify = function(conn, req, res, next) {
-    conn.write.query({
+exports.startBankAccountVerify = function(req, res, next) {
+    req.app.conn.write.query({
         text: [
             'UPDATE bank_account',
             'SET verify_started_at = current_timestamp',
@@ -98,8 +98,8 @@ exports.startBankAccountVerify = function(conn, req, res, next) {
     })
 }
 
-exports.setBankAccountVerified = function(conn, req, res, next) {
-    conn.write.query({
+exports.setBankAccountVerified = function(req, res, next) {
+    req.app.conn.write.query({
         text: [
             'UPDATE bank_account',
             'SET',
@@ -127,12 +127,12 @@ exports.setBankAccountVerified = function(conn, req, res, next) {
 
         var row = dr.rows[0]
 
-        activities.log(conn, req.user, 'AdminVerifyBankAccount', {
+        activities.log(req.app.conn, req.user, 'AdminVerifyBankAccount', {
             id: +req.params.id,
             user_id: req.params.user
         })
 
-        activities.log(conn, row.user_id, 'VerifyBankAccount', {
+        activities.log(req.app.conn, row.user_id, 'VerifyBankAccount', {
             accountNumber: row.account_number,
             iban: row.iban
         })
@@ -141,8 +141,8 @@ exports.setBankAccountVerified = function(conn, req, res, next) {
     })
 }
 
-exports.user = function(conn, req, res, next) {
-    conn.read.query({
+exports.user = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
             'SELECT * FROM admin_user_view WHERE user_id = $1'
         ].join('\n'),
@@ -161,7 +161,7 @@ exports.user = function(conn, req, res, next) {
     })
 }
 
-exports.patch = function(conn, req, res, next) {
+exports.patch = function(req, res, next) {
     var updates = {}
     , values = [req.params.id]
     , allowed = ['email', 'first_name', 'last_name', 'phone_number', 'country',
@@ -184,7 +184,7 @@ exports.patch = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'UPDATE "user"',
             'SET ' + updateText,
@@ -195,7 +195,7 @@ exports.patch = function(conn, req, res, next) {
         if (err) return next(err)
         if (!dr.rowCount) return next(new Error('User ' + req.user + ' not found'))
 
-        activities.log(conn, req.user, 'AdminEditUser', {
+        activities.log(req.app.conn, req.user, 'AdminEditUser', {
             user_id: req.params.id,
             edits: req.body
         })
@@ -204,8 +204,8 @@ exports.patch = function(conn, req, res, next) {
     })
 }
 
-exports.bankAccounts = function(conn, req, res, next) {
-    conn.read.query({
+exports.bankAccounts = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
             'SELECT * FROM bank_account WHERE user_id = $1'
         ].join('\n'),
@@ -218,8 +218,8 @@ exports.bankAccounts = function(conn, req, res, next) {
     })
 }
 
-exports.accounts = function(conn, req, res, next) {
-    conn.read.query({
+exports.accounts = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
             'SELECT',
             '   a.account_id,',
@@ -248,8 +248,8 @@ exports.accounts = function(conn, req, res, next) {
     })
 }
 
-exports.activity = function(conn, req, res, next) {
-    conn.read.query({
+exports.activity = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
             'SELECT * FROM activity WHERE user_id = $1 ORDER BY created DESC LIMIT 100'
         ].join('\n'),
@@ -263,8 +263,8 @@ exports.activity = function(conn, req, res, next) {
     })
 }
 
-exports.withdrawRequests = function(conn, req, res, next) {
-    conn.read.query({
+exports.withdrawRequests = function(req, res, next) {
+    req.app.conn.read.query({
         text: 'SELECT * FROM withdraw_request_view WHERE user_id = $1',
         values: [req.params.user]
     }, function(err, dr) {
@@ -342,9 +342,9 @@ exports.buildQuery = function(params) {
     }
 }
 
-exports.users = function(conn, req, res, next) {
-    var query = users.buildQuery(req.query)
-    conn.read.query(query, function(err, dr) {
+exports.users = function(req, res, next) {
+    var query = exports.buildQuery(req.query)
+    req.app.conn.read.query(query, function(err, dr) {
         if (err) return next(err)
         return res.send(dr.rows)
     })

@@ -68,7 +68,7 @@ email.template = _.memoize(function(fn) {
 // User can be either user id or email address
 email.send = function(user, language, templateName, locals, cb) {
     if (typeof user == 'number') {
-        return conn.read.query({
+        return req.app.conn.read.query({
             text: 'SELECT email FROM "user" WHERE user_id = $1',
             values: [user]
         }, function(err, dr) {

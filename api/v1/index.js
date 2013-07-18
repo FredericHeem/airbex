@@ -1,18 +1,17 @@
 var tarpit = require('../tarpit')()
 
-module.exports = function(app, conn) {
+module.exports = function(app) {
     app.tarpit = tarpit
 
-    var auth = require('./auth')(conn)
-    , routes = ['balances', 'markets', 'orders', 'ripple', 'intercom',
+    var routes = ['balances', 'markets', 'orders', 'ripple', 'intercom',
     'currencies', 'activities', 'users', 'withdraws',
     'keys', 'email', 'resetPassword', 'spend', 'bankaccounts',
     'language', 'vouchers', 'send']
 
     routes.forEach(function(name) {
-        require('./' + name)(app, conn, auth)
+        require('./' + name)(app)
     })
 
-    require('./bitcoin')(app, conn, auth, 'BTC')
-    require('./bitcoin')(app, conn, auth, 'LTC')
+    require('./bitcoin')(app, 'BTC')
+    require('./bitcoin')(app, 'LTC')
 }

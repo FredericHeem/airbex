@@ -1,10 +1,10 @@
 var validate = require('./validate')
 
-module.exports = exports = function(app, conn, auth) {
-    app.post('/v1/spend', auth, exports.spend.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.post('/v1/spend', app.userAuth, exports.spend)
 }
 
-exports.spend = function(conn, req, res, next) {
+exports.spend = function(req, res, next) {
     if (!validate(req.body, 'spend', res)) return
 
     if (!req.apiKey.primary) {
@@ -16,7 +16,7 @@ exports.spend = function(conn, req, res, next) {
 
     var quote = req.body.market.substr(3, 3)
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'SELECT convert_bid($1, market_id, $2) oid',
             'FROM market',

@@ -3,17 +3,17 @@ var _ = require('lodash')
 , validate = require('./validate')
 , crypto = require('crypto')
 
-module.exports = exports = function(app, conn, auth) {
-    app.get('/v1/bankAccounts', auth, exports.index.bind(exports, conn))
-    app.post('/v1/bankAccounts', auth, exports.add.bind(exports, conn))
-    app.post('/v1/bankAccounts/:id/verify', auth, exports.verify.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/v1/bankAccounts', app.userAuth, exports.index)
+    app.post('/v1/bankAccounts', app.userAuth, exports.add)
+    app.post('/v1/bankAccounts/:id/verify', app.userAuth, exports.verify)
 }
 
 exports.createVerifyCode = function() {
     return crypto.randomBytes(2).toString('hex').toUpperCase()
 }
 
-exports.index = function(conn, req, res, next) {
+exports.index = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -21,7 +21,7 @@ exports.index = function(conn, req, res, next) {
         })
     }
 
-    conn.read.query({
+    req.app.conn.read.query({
         text: [
             'SELECT * FROM bank_account WHERE user_id = $1'
         ].join('\n'),
@@ -41,7 +41,7 @@ exports.index = function(conn, req, res, next) {
     })
 }
 
-exports.add = function(conn, req, res, next) {
+exports.add = function(req, res, next) {
     if (!validate(req.body, 'bankaccounts_add', res)) return
 
     if (!req.apiKey.primary) {
@@ -51,7 +51,7 @@ exports.add = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
             'routing_number, verify_code)',
@@ -71,7 +71,7 @@ exports.add = function(conn, req, res, next) {
     })
 }
 
-exports.verify = function(conn, req, res, next) {
+exports.verify = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -79,7 +79,7 @@ exports.verify = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'SELECT',
             '   verify_bank_account($1, $2, $3) success,',
@@ -109,7 +109,7 @@ exports.verify = function(conn, req, res, next) {
             })
         }
 
-        activities.log(conn, req.user, 'VerifyBankAccount', {
+        activities.log(req.user, 'VerifyBankAccount', {
             accountNumber: row.account_number,
             iban: row.iban
         })

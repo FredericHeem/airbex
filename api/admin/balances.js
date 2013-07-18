@@ -1,9 +1,9 @@
-module.exports = exports = function(app, conn, auth) {
-    app.get('/admin/balances', auth, exports.summary.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/admin/balances', app.adminAuth, exports.summary)
 }
 
-exports.summary = function(conn, req, res, next) {
-    conn.read.query([
+exports.summary = function(req, res, next) {
+    req.app.conn.read.query([
         'SELECT a.currency_id currency, a.type, SUM(a.balance) balance',
         'FROM account a',
         'INNER JOIN "currency" c ON a.currency_id = c.currency_id',

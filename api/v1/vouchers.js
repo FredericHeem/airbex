@@ -3,10 +3,10 @@ var validate = require('./validate')
 , async = require('async')
 , activities = require('./activities')
 
-module.exports = exports = function(app, conn, auth) {
-    app.post('/v1/vouchers', auth, exports.create.bind(exports, conn))
-    app.post('/v1/vouchers/:id/redeem', auth, exports.redeem.bind(exports, conn))
-    app.get('/v1/vouchers', auth, exports.index.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.post('/v1/vouchers', app.userAuth, exports.create)
+    app.post('/v1/vouchers/:id/redeem', app.userAuth, exports.redeem)
+    app.get('/v1/vouchers', app.userAuth, exports.index)
 }
 
 exports.createId = function() {
@@ -27,7 +27,7 @@ CREATE FUNCTION create_voucher (
     amnt bigint
 ) RETURNS void AS $$
 */
-exports.create = function(conn, req, res, next) {
+exports.create = function(req, res, next) {
     if (!validate(req.body, 'voucher_create', res)) return
 
     if (!req.apiKey.canWithdraw) {
@@ -39,7 +39,7 @@ exports.create = function(conn, req, res, next) {
 
     var voucherId = exports.createId()
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'SELECT create_voucher($1, $2, $3, $4)'
         ].join('\n'),
@@ -52,7 +52,7 @@ exports.create = function(conn, req, res, next) {
     }, function(err) {
         if (err) return next(err)
 
-        activities.log(conn, req.user, 'CreateVoucher', {
+        activities.log(req.user, 'CreateVoucher', {
             currency: req.body.currency,
             amount: req.body.amount
         })
@@ -61,7 +61,7 @@ exports.create = function(conn, req, res, next) {
     })
 }
 
-exports.index = function(conn, req, res, next) {
+exports.index = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -69,7 +69,7 @@ exports.index = function(conn, req, res, next) {
         })
     }
 
-    conn.read.query({
+    req.app.conn.read.query({
         text: [
             'SELECT v.voucher_id, h.amount, a.currency_id',
             'FROM voucher v',
@@ -96,7 +96,7 @@ CREATE FUNCTION redeem_voucher (
     duid int
 ) RETURNS int AS $$
 */
-exports.redeem = function(conn, req, res, next) {
+exports.redeem = function(req, res, next) {
     if (!req.apiKey.canDeposit) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -106,7 +106,7 @@ exports.redeem = function(conn, req, res, next) {
 
     async.waterfall([
         function(next) {
-            conn.write.query({
+            req.app.conn.write.query({
                 text: [
                     'SELECT redeem_voucher($1, $2) tid'
                 ].join('\n'),
@@ -122,7 +122,7 @@ exports.redeem = function(conn, req, res, next) {
                 return res.send(204)
             }
 
-            conn.read.query({
+            req.app.conn.read.query({
                 text: [
                     'SELECT t.amount, a.currency_id',
                     'FROM "transaction" t',

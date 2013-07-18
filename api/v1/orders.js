@@ -3,14 +3,14 @@ var Q = require('q')
 , activities = require('./activities')
 , debug = require('debug')('snow:orders')
 
-module.exports = exports = function(app, conn, auth) {
-    app.del('/v1/orders/:id', auth, exports.cancel.bind(exports, conn))
-    app.post('/v1/orders', auth, exports.create.bind(exports, conn))
-    app.get('/v1/orders', auth, exports.forUser.bind(exports, conn))
-    app.get('/v1/orders/history', auth, exports.history.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.del('/v1/orders/:id', app.userAuth, exports.cancel)
+    app.post('/v1/orders', app.userAuth, exports.create)
+    app.get('/v1/orders', app.userAuth, exports.forUser)
+    app.get('/v1/orders/history', app.userAuth, exports.history)
 }
 
-exports.create = function(conn, req, res, next) {
+exports.create = function(req, res, next) {
     if (!validate(req.body, 'order_create', res)) return
 
     if (req.body.price && !req.body.price.match(/^\d+(\.\d+)?$/)) {
@@ -68,7 +68,7 @@ exports.create = function(conn, req, res, next) {
         }
     }
 
-    conn.write.query(query, function(err, dr) {
+    req.app.conn.write.query(query, function(err, dr) {
         if (err) {
             if (err.message.match(/transaction_amount_check/)) {
                 return res.send(400, {
@@ -117,7 +117,7 @@ exports.create = function(conn, req, res, next) {
             })
         }
 
-        activities.log(conn, req.user, 'CreateOrder', {
+        activities.log(req.user, 'CreateOrder', {
             market: req.body.market,
             type: req.body.type,
             price: req.body.price,
@@ -143,8 +143,8 @@ function formatOrderRow(cache, row) {
     }
 }
 
-exports.forUser = function(conn, req, res, next) {
-    Q.ninvoke(conn.read, 'query', {
+exports.forUser = function(req, res, next) {
+    Q.ninvoke(req.app.conn.read, 'query', {
         text: [
             'SELECT order_id, base_currency_id || quote_currency_id market,',
             '   side, price, volume,',
@@ -162,8 +162,8 @@ exports.forUser = function(conn, req, res, next) {
     .done()
 }
 
-exports.history = function(conn, req, res, next) {
-    Q.ninvoke(conn.read, 'query', {
+exports.history = function(req, res, next) {
+    Q.ninvoke(req.app.conn.read, 'query', {
         text: [
             'SELECT order_id, market, side, volume, matched, cancelled,',
             '   original, price, average_price',
@@ -188,7 +188,7 @@ exports.history = function(conn, req, res, next) {
     .done()
 }
 
-exports.cancel = function(conn, req, res, next) {
+exports.cancel = function(req, res, next) {
     if (!req.apiKey.canTrade) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -206,7 +206,7 @@ exports.cancel = function(conn, req, res, next) {
         '   user_id = $2 AND volume > 0'
     ].join('\n')
 
-    Q.ninvoke(conn.write, 'query', {
+    Q.ninvoke(req.app.conn.write, 'query', {
         text: q,
         values: [+req.params.id, req.user]
     })
@@ -214,7 +214,7 @@ exports.cancel = function(conn, req, res, next) {
     .then(function(cancelled) {
         if (!cancelled) return res.send(404)
         res.send(204)
-        activities.log(conn, req.user, 'CancelOrder', { id: +req.params.id })
+        activities.log(req.user, 'CancelOrder', { id: +req.params.id })
     }, next)
     .done()
 }

@@ -53,7 +53,7 @@ describe('activities', function() {
 				}
 			}
 
-			activities.activities(conn, req, res, done)
+			activities.activities(req, res, done)
 		})
 	})
 })

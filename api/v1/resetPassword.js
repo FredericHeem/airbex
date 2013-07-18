@@ -2,11 +2,11 @@ var crypto = require('crypto')
 , debug = require('debug')('snow:resetPassword')
 , Tropo = require('tropo')
 
-module.exports = exports = function(app, conn) {
-    app.post('/v1/resetPassword', exports.resetPasswordBegin.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.post('/v1/resetPassword', exports.resetPasswordBegin)
     app.get('/v1/resetPassword/continue/:code',
-        exports.resetPasswordContinue.bind(exports, conn))
-    app.post('/v1/resetPassword/end', exports.resetPasswordEnd.bind(exports, conn))
+        exports.resetPasswordContinue)
+    app.post('/v1/resetPassword/end', exports.resetPasswordEnd)
 }
 
 exports.createEmailCode = function() {
@@ -19,10 +19,10 @@ exports.createPhoneCode = function() {
     return new Array(5 - s.length).join('0') + s
 }
 
-exports.resetPasswordBegin = function(conn, req, res, next) {
+exports.resetPasswordBegin = function(req, res, next) {
     var emailCode = exports.createEmailCode()
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: 'SELECT reset_password_begin($1, $2, $3)',
         values: [req.body.email, emailCode, exports.createPhoneCode()]
     }, function(err) {
@@ -44,7 +44,7 @@ exports.resetPasswordBegin = function(conn, req, res, next) {
             return next(err)
         }
 
-        conn.read.query({
+        req.app.conn.read.query({
             text: 'SELECT language FROM "user" WHERE lower($1) = email_lower',
             values: [req.body.email]
         }, function(err, dr) {
@@ -60,8 +60,8 @@ exports.resetPasswordBegin = function(conn, req, res, next) {
     })
 }
 
-exports.resetPasswordContinue = function(conn, req, res, next) {
-    conn.write.query({
+exports.resetPasswordContinue = function(req, res, next) {
+    req.app.conn.write.query({
         text: [
             'SELECT code, phone_number',
             'FROM reset_password_continue($1)'
@@ -131,8 +131,8 @@ exports.resetPasswordContinue = function(conn, req, res, next) {
     })
 }
 
-exports.resetPasswordEnd = function(conn, req, res, next) {
-    conn.write.query({
+exports.resetPasswordEnd = function(req, res, next) {
+    req.app.conn.write.query({
         text: 'SELECT reset_password_end($1, $2, $3)',
         values: [req.body.email, req.body.code, req.body.key]
     }, function(err) {

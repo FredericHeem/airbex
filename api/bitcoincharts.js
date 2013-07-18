@@ -1,15 +1,13 @@
 var Q = require('q')
 
-module.exports = exports = function(app, conn) {
-    app.get('/bitcoincharts/:currencyId/trades.json',
-        exports.trades.bind(exports, conn))
-    app.get('/bitcoincharts/:currencyId/orderbook.json',
-        exports.orderbook.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/bitcoincharts/:currencyId/trades.json', exports.trades)
+    app.get('/bitcoincharts/:currencyId/orderbook.json', exports.orderbook)
 }
 
-exports.trades = function(conn, req, res, next) {
+exports.trades = function(req, res, next) {
     var since = req.query.since || 0
-    Q.ninvoke(conn.read, 'query', {
+    Q.ninvoke(req.app.conn.read, 'query', {
         text:
             'SELECT ' +
             'price_decimal::varchar price, ' +
@@ -30,8 +28,8 @@ exports.trades = function(conn, req, res, next) {
     .done()
 }
 
-exports.orderbook = function(conn, req, res, next) {
-    Q.ninvoke(conn.read, 'query', {
+exports.orderbook = function(req, res, next) {
+    Q.ninvoke(req.app.conn.read, 'query', {
         text: [
             'SELECT *',
             'FROM order_depth_view od',

@@ -3,8 +3,8 @@ var async = require('async')
 , validate = require('./validate')
 , vouchers = require('./vouchers')
 
-module.exports = exports = function(app, conn, auth) {
-    app.post('/v1/send', auth, exports.send.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.post('/v1/send', app.userAuth, exports.send)
 }
 
 exports.emailVoucher = function(emailer, conn, cache, fromUser, toEmail,
@@ -65,7 +65,7 @@ exports.emailVoucher = function(emailer, conn, cache, fromUser, toEmail,
 
         // Log activity,
         function (next) {
-            activities.log(conn, fromUser, 'SendToUser', {
+            activities.log(fromUser, 'SendToUser', {
                 to: toEmail,
                 amount: amount,
                 currency: currency
@@ -128,13 +128,13 @@ exports.transfer = function(conn, cache, fromUser, toEmail, amount, currency, cb
             return cb(err)
         }
 
-        activities.log(conn, fromUser, 'SendToUser', {
+        activities.log(fromUser, 'SendToUser', {
             to: toEmail,
             amount: amount,
             currency: currency
         })
 
-        activities.log(conn, row.to_user_id, 'ReceiveFromUser', {
+        activities.log(row.to_user_id, 'ReceiveFromUser', {
             from:  row.from_email,
             amount: amount,
             currency: currency
@@ -144,7 +144,7 @@ exports.transfer = function(conn, cache, fromUser, toEmail, amount, currency, cb
     })
 }
 
-exports.send = function(conn, req, res, next) {
+exports.send = function(req, res, next) {
     if (!validate(req.body, 'transfer', res)) return
     if (req.body.currency == 'NOK') throw new Error('Cannot transfer fiat')
 
@@ -155,7 +155,7 @@ exports.send = function(conn, req, res, next) {
         })
     }
 
-    exports.transfer(conn, req.app.cache, req.user, req.body.email,
+    exports.transfer(req.app.conn, req.app.cache, req.user, req.body.email,
         req.body.amount, req.body.currency, function(err) {
             if (!err) return res.send(204)
 
@@ -170,7 +170,7 @@ exports.send = function(conn, req, res, next) {
                 return next(err)
             }
 
-            exports.emailVoucher(req.app.email, conn,req.app.cache, req.user,
+            exports.emailVoucher(req.app.email, req.app.conn, req.app.cache, req.user,
                 req.body.email, req.body.amount, req.body.currency,
                 function(err, voucher) {
                     if (!err) {

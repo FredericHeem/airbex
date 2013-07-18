@@ -1,11 +1,11 @@
 var crypto = require('crypto')
 , debug = require('debug')('snow:intercom')
 
-module.exports = exports = function(app, conn, auth) {
-    app.get('/v1/intercom', auth, exports.intercom.bind(exports, conn, app.config))
+module.exports = exports = function(app) {
+    app.get('/v1/intercom', app.userAuth, exports.intercom)
 }
 
-exports.intercom = function(conn, config, req, res, next) {
+exports.intercom = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -13,7 +13,7 @@ exports.intercom = function(conn, config, req, res, next) {
         })
     }
 
-    conn.read.query({
+    req.app.conn.read.query({
         text: [
             'SELECT user_id, email_lower,',
             'FLOOR(EXTRACT(epoch FROM created))::int created',
@@ -24,17 +24,17 @@ exports.intercom = function(conn, config, req, res, next) {
     }, function(err, dres) {
         if (err) return next(err)
 
-        var hmac = crypto.createHmac('sha256', config.intercom_secret)
+        var hmac = crypto.createHmac('sha256', req.app.config.intercom_secret)
         , user = dres.rows[0]
         hmac.update('' + user.user_id)
 
         var userHash = hmac.digest('hex')
 
         debug('hashed user id %s with secret %s to get %s',
-            user.user_id, config.intercom_secret, userHash)
+            user.user_id, req.app.config.intercom_secret, userHash)
 
         res.send({
-            app_id: config.intercom_app_id,
+            app_id: req.app.config.intercom_app_id,
             user_id: user.user_id,
             email: user.email_lower,
             user_hash: userHash,

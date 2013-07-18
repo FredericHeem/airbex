@@ -1,5 +1,5 @@
-module.exports = exports = function(app, conn, auth) {
-    app.post('/admin/panic', auth, exports.panic)
+module.exports = exports = function(app) {
+    app.post('/admin/panic', app.adminAuth, exports.panic)
 }
 
 exports.panic = function(req, res, next) {

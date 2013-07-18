@@ -1,10 +1,10 @@
 var activities = require('../v1/activities')
 
-module.exports = exports = function(app, conn, auth) {
-    app.post('/admin/bankCredit', auth, exports.bankCredit.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.post('/admin/bankCredit', app.adminAuth, exports.bankCredit)
 }
 
-exports.bankCredit = function(conn, req, res, next) {
+exports.bankCredit = function(req, res, next) {
     var query = {
         text: [
             'SELECT bank_credit($1, $2, $3, $4) tid',
@@ -19,17 +19,17 @@ exports.bankCredit = function(conn, req, res, next) {
         ]
     }
 
-    conn.write.query(query, function(err, dr) {
+    req.app.conn.write.query(query, function(err, dr) {
         if (err) return next(err)
         if (!dr.rowCount) {
             return next(new Error('currency not found ' + req.body.currency_id))
         }
 
         // Log for admin
-        activities.log(conn, req.user, 'AdminBankAccountCredit', req.body)
+        activities.log(req.app.conn, req.user, 'AdminBankAccountCredit', req.body)
 
         // Log for user
-        activities.log(conn, req.body.user_id, 'BankCredit', {
+        activities.log(req.app.conn, req.body.user_id, 'BankCredit', {
             currency: req.body.currency_id,
             amount: req.body.amount,
             reference: req.body.reference

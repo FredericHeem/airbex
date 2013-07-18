@@ -33,7 +33,7 @@ describe('currencies', function() {
 				}
 			}
 
-			currencies.currencies(conn, req, res, done)
+			currencies.currencies(req, res, done)
 		})
 	})
 })

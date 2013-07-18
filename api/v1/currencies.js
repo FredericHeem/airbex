@@ -1,14 +1,14 @@
-module.exports = exports = function(app, conn) {
-    app.get('/v1/currencies', exports.currencies.bind(exports, conn))
+module.exports = exports = function(app) {
+    app.get('/v1/currencies', exports.currencies)
 }
 
-exports.currencies = function(conn, req, res, next) {
+exports.currencies = function(req, res, next) {
     var query = [
         'SELECT currency_id id, scale',
         'FROM "currency" ORDER BY currency_id'
     ].join('\n')
 
-    conn.read.query(query, function(err, dr) {
+    req.app.conn.read.query(query, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows)
     })

@@ -76,11 +76,11 @@ exports.permission = function(type, req, res, next) {
             throw new Error('Mapping not found for ' + type)
         }
 
-        if (req.user[mapping] === undefined) {
+        if (req.apiKey[mapping] === undefined) {
             throw new Error('Mapping attr ' + mapping + ' not set on user')
         }
 
-        if (req.user[mapping] !== true) {
+        if (req.apiKey[mapping] !== true) {
             return res.send(401, {
                 name: 'AccessDenied',
                 message: 'API key/user must have ' + type + ' permission'

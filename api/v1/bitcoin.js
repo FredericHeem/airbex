@@ -16,7 +16,7 @@ exports.withdraw = function(currencyId, req, res, next) {
         req.body.amount, currencyId, req.user, req.body.address)
 
     var queryText = util.format(
-        'SELECT %s_withdraw($1, $2, $3) request_id',
+        'SELECT %s_withdraw($1, $2, $3) rid',
         currencyId)
 
     req.app.conn.write.query({
@@ -43,7 +43,7 @@ exports.withdraw = function(currencyId, req, res, next) {
             amount: req.body.amount
         })
 
-        res.send(201, { id: dr.rows[0].request_id })
+        res.send(201, { id: dr.rows[0].rid })
     })
 }
 

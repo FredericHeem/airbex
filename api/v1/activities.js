@@ -66,11 +66,13 @@ exports.index = function(req, res, next) {
                 result.details = row.details
             } else {
                 var whitelist = detailWhitelist[row.type]
-                assert(whitelist, 'No whitelist entry for ' + row.type)
+                if (!whitelist) return null
                 result.details = _.pick(row.details, whitelist)
             }
 
             return result
+        }).filter(function(row) {
+            return !!row
         }))
     })
 }

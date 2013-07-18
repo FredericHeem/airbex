@@ -1,8 +1,6 @@
-var debug = require('debug')('snow:orders')
-
 module.exports = exports = function(app) {
-    app.del('/v1/orders/:id', app.auth.primary, exports.cancel)
-    app.post('/v1/orders', app.auth.primary, exports.create)
+    app.del('/v1/orders/:id', app.auth.trade, exports.cancel)
+    app.post('/v1/orders', app.auth.trade, exports.create)
     app.get('/v1/orders', app.auth.any, exports.index)
     app.get('/v1/orders/history', app.auth.any, exports.history)
 }
@@ -17,15 +15,7 @@ exports.create = function(req, res, next) {
         })
     }
 
-    if (!req.apiKey.canTrade) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must have trade permission'
-        })
-    }
-
-    var marketId = req.app.cache.markets[req.body.market].id
-    , price = null
+    var price = null
     , amount = req.app.cache.parseOrderVolume(req.body.amount, req.body.market)
     , query
 
@@ -33,16 +23,16 @@ exports.create = function(req, res, next) {
         price = req.app.cache.parseOrderPrice(req.body.price, req.body.market)
     }
 
-    debug('price %s --> %s', req.body.price, price)
-
     if (req.body.aon) {
         query = {
             text: [
-                'SELECT create_order_aon($1, $2, $3, $4, $5) oid'
+                'SELECT create_order_aon($1, market_id, $3, $4, $5) oid',
+                'FROM market',
+                'WHERE base_currency_id || quote_currency_id = $2'
             ].join('\n'),
             values: [
                 req.user,
-                marketId,
+                req.body.market,
                 req.body.type == 'bid' ? 0 : 1,
                 price,
                 amount
@@ -52,12 +42,14 @@ exports.create = function(req, res, next) {
         query = {
             text: [
                 'INSERT INTO "order" (user_id, market_id, side, price, volume)',
-                'VALUES ($1, $2, $3, $4, $5)',
+                'SELECT $1, market_id, $3, $4, $5',
+                'FROM market',
+                'WHERE base_currency_id || quote_currency_id = $2',
                 'RETURNING order_id oid'
             ].join('\n'),
             values: [
                 req.user,
-                marketId,
+                req.body.market,
                 req.body.type == 'bid' ? 0 : 1,
                 price,
                 amount
@@ -130,13 +122,13 @@ exports.create = function(req, res, next) {
 function formatOrderRow(cache, row) {
     return {
         id: row.order_id,
+        market: row.market,
         type: row.side ? 'ask' : 'bid',
         price: cache.formatOrderPrice(row.price, row.market),
-        remaining: cache.formatOrderVolume(row.volume, row.market),
         amount: cache.formatOrderVolume(row.original, row.market),
+        remaining: cache.formatOrderVolume(row.volume, row.market),
         matched: cache.formatOrderVolume(row.matched, row.market),
-        cancelled: cache.formatOrderVolume(row.cancelled, row.market),
-        market: row.market
+        cancelled: cache.formatOrderVolume(row.cancelled, row.market)
     }
 }
 

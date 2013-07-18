@@ -3,7 +3,7 @@ var _ = require('lodash')
 
 module.exports = exports = function(app) {
     app.del('/v1/withdraws/:id', app.userAuth, exports.cancel)
-    app.get('/v1/withdraws', app.userAuth, exports.forUser)
+    app.get('/v1/withdraws', app.userAuth, exports.index)
     app.post('/v1/withdraws/bank', app.userAuth, exports.withdrawBank)
 }
 
@@ -51,7 +51,7 @@ exports.withdrawBank = function(req, res, next) {
     })
 }
 
-exports.forUser = function(req, res, next) {
+exports.index = function(req, res, next) {
     req.app.conn.read.query({
         text: 'SELECT * FROM withdraw_request_view WHERE user_id = $1',
         values: [req.user]

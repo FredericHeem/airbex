@@ -1,11 +1,10 @@
 var validate = require('./validate')
-, activities = require('./activities')
 , debug = require('debug')('snow:orders')
 
 module.exports = exports = function(app) {
     app.del('/v1/orders/:id', app.userAuth, exports.cancel)
     app.post('/v1/orders', app.userAuth, exports.create)
-    app.get('/v1/orders', app.userAuth, exports.forUser)
+    app.get('/v1/orders', app.userAuth, exports.index)
     app.get('/v1/orders/history', app.userAuth, exports.history)
 }
 
@@ -142,7 +141,7 @@ function formatOrderRow(cache, row) {
     }
 }
 
-exports.forUser = function(req, res, next) {
+exports.index = function(req, res, next) {
     req.app.conn.read.query({
         text: [
             'SELECT order_id, base_currency_id || quote_currency_id market,',

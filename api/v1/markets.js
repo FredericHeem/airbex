@@ -1,9 +1,9 @@
 module.exports = exports = function(app) {
-    app.get('/v1/markets', exports.markets)
+    app.get('/v1/markets', exports.index)
     app.get('/v1/markets/:id/depth', exports.depth)
 }
 
-exports.markets = function(req, res, next) {
+exports.index = function(req, res, next) {
     function formatPriceOrNull(m, p) {
         if (p === null) return null
         return req.app.cache.formatOrderPrice(m, p)

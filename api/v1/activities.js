@@ -2,7 +2,7 @@ var _ = require('lodash')
 , assert = require('assert')
 
 module.exports = exports = function(app) {
-    app.get('/v1/activities', app.userAuth, exports.activities)
+    app.get('/v1/activities', app.userAuth, exports.index)
 }
 
 var detailWhitelist = {
@@ -27,7 +27,7 @@ var detailWhitelist = {
     VerifyBankAccount: ['accountNumber', 'iban']
 }
 
-exports.activities = function(req, res, next) {
+exports.index = function(req, res, next) {
     var query
 
     if (req.query.since !== undefined) {

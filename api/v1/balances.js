@@ -1,8 +1,8 @@
 module.exports = exports = function(app) {
-    app.get('/v1/balances', app.userAuth, exports.forUser)
+    app.get('/v1/balances', app.userAuth, exports.index)
 }
 
-exports.forUser = function(req, res, next) {
+exports.index = function(req, res, next) {
     req.app.conn.read.query({
         text: [
             'SELECT currency_id currency, SUM(available) available',

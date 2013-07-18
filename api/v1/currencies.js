@@ -1,8 +1,8 @@
 module.exports = exports = function(app) {
-    app.get('/v1/currencies', exports.currencies)
+    app.get('/v1/currencies', exports.index)
 }
 
-exports.currencies = function(req, res, next) {
+exports.index = function(req, res, next) {
     var query = [
         'SELECT currency_id id, scale',
         'FROM "currency" ORDER BY currency_id'

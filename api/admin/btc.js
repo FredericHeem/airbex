@@ -1,5 +1,5 @@
 module.exports = exports = function(app) {
-    app.get('/admin/btc/height', app.adminAuth, exports.height)
+    app.get('/admin/btc/height', app.auth.admin, exports.height)
 }
 
 exports.height = function(req, res, next) {

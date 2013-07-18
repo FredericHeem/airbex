@@ -1,5 +1,5 @@
 module.exports = exports = function(app) {
-    app.get('/admin/bankaccounts', app.adminAuth, exports.index)
+    app.get('/admin/bankaccounts', app.auth.admin, exports.index)
 }
 
 exports.index = function(req, res, next) {

@@ -3,7 +3,7 @@ var async = require('async')
 , vouchers = require('./vouchers')
 
 module.exports = exports = function(app) {
-    app.post('/v1/send', app.userAuth, exports.send)
+    app.post('/v1/send', app.auth.withdraw, exports.send)
 }
 
 exports.emailVoucher = function(app, fromUser, toEmail, amount, currency, cb)
@@ -145,13 +145,6 @@ exports.transfer = function(app, fromUser, toEmail, amount, currency, cb) {
 exports.send = function(req, res, next) {
     if (!validate(req.body, 'transfer', res)) return
     if (req.body.currency == 'NOK') throw new Error('Cannot transfer fiat')
-
-    if (!req.apiKey.canWithdraw) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must have withdraw permission'
-        })
-    }
 
     exports.transfer(req.app, req.user, req.body.email,
         req.body.amount, req.body.currency, function(err) {

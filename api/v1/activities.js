@@ -2,7 +2,7 @@ var _ = require('lodash')
 , assert = require('assert')
 
 module.exports = exports = function(app) {
-    app.get('/v1/activities', app.userAuth, exports.index)
+    app.get('/v1/activities', app.auth.primary, exports.index)
 }
 
 var detailWhitelist = {

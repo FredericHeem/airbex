@@ -1,13 +1,8 @@
 var nodemailer = require('nodemailer')
 , crypto = require('crypto')
-, smtp
 
 module.exports = exports = function(app) {
-    smtp = nodemailer.createTransport(
-        app.config.smtp.service,
-        app.config.smtp.options)
-
-    app.post('/v1/email/verify/send', app.userAuth, exports.verifySend)
+    app.post('/v1/email/verify/send', app.auth.primary, exports.verifySend)
     app.get('/v1/email/verify/:code', exports.verify)
 }
 
@@ -29,13 +24,6 @@ exports.sendVerificationEmail = function(app, userId, cb) {
 }
 
 exports.verifySend = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     exports.sendVerificationEmail(req.user, function(err) {
         if (err) {
             if (err.message == 'E-mail already verified') {

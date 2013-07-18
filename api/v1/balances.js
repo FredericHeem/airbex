@@ -1,5 +1,5 @@
 module.exports = exports = function(app) {
-    app.get('/v1/balances', app.userAuth, exports.index)
+    app.get('/v1/balances', app.auth.primary, exports.index)
 }
 
 exports.index = function(req, res, next) {

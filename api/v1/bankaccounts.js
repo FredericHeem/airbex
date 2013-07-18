@@ -3,9 +3,9 @@ var _ = require('lodash')
 , crypto = require('crypto')
 
 module.exports = exports = function(app) {
-    app.get('/v1/bankAccounts', app.userAuth, exports.index)
-    app.post('/v1/bankAccounts', app.userAuth, exports.add)
-    app.post('/v1/bankAccounts/:id/verify', app.userAuth, exports.verify)
+    app.get('/v1/bankAccounts', app.auth.primary, exports.index)
+    app.post('/v1/bankAccounts', app.auth.primary, exports.add)
+    app.post('/v1/bankAccounts/:id/verify', app.auth.primary, exports.verify)
 }
 
 exports.createVerifyCode = function() {
@@ -13,13 +13,6 @@ exports.createVerifyCode = function() {
 }
 
 exports.index = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     req.app.conn.read.query({
         text: [
             'SELECT * FROM bank_account WHERE user_id = $1'
@@ -43,13 +36,6 @@ exports.index = function(req, res, next) {
 exports.add = function(req, res, next) {
     if (!validate(req.body, 'bankaccounts_add', res)) return
 
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     req.app.conn.write.query({
         text: [
             'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
@@ -71,13 +57,6 @@ exports.add = function(req, res, next) {
 }
 
 exports.verify = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     req.app.conn.write.query({
         text: [
             'SELECT',

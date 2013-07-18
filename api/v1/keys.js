@@ -2,20 +2,13 @@ var validate = require('./validate')
 , crypto = require('crypto')
 
 module.exports = exports = function(app) {
-    app.post('/v1/keys/replace', app.userAuth, exports.replace)
-    app.post('/v1/keys', app.userAuth, exports.create)
-    app.get('/v1/keys', app.userAuth, exports.index)
-    app.del('/v1/keys/:id', app.userAuth, exports.remove)
+    app.post('/v1/keys/replace', app.auth.primary, exports.replace)
+    app.post('/v1/keys', app.auth.primary, exports.create)
+    app.get('/v1/keys', app.auth.primary, exports.index)
+    app.del('/v1/keys/:id', app.auth.primary, exports.remove)
 }
 
 exports.replace = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary key'
-        })
-    }
-
     if (!validate(req.body, 'keys_replace', res)) return
 
     req.app.conn.write.query({
@@ -29,13 +22,6 @@ exports.replace = function(req, res, next) {
 }
 
 exports.remove = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     req.app.conn.write.query({
         text: [
             'DELETE',
@@ -58,13 +44,6 @@ exports.remove = function(req, res, next) {
 }
 
 exports.index = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     req.app.conn.write.query({
         text: [
             'SELECT api_key_id, can_trade, can_withdraw, can_deposit',
@@ -93,13 +72,6 @@ exports.generateApiKey = function() {
 }
 
 exports.create = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     var key = exports.generateApiKey()
 
     req.app.conn.write.query({

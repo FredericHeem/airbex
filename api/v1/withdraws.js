@@ -2,9 +2,9 @@ var _ = require('lodash')
 , validate = require('./validate')
 
 module.exports = exports = function(app) {
-    app.del('/v1/withdraws/:id', app.userAuth, exports.cancel)
-    app.get('/v1/withdraws', app.userAuth, exports.index)
-    app.post('/v1/withdraws/bank', app.userAuth, exports.withdrawBank)
+    app.del('/v1/withdraws/:id', app.auth.withdraw, exports.cancel)
+    app.get('/v1/withdraws', app.auth.any, exports.index)
+    app.post('/v1/withdraws/bank', app.auth.withdraw, exports.withdrawBank)
 }
 
 exports.withdrawBank = function(req, res, next) {

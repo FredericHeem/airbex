@@ -10,24 +10,16 @@ var _ = require('lodash')
 require('tropo-webapi')
 
 module.exports = exports = function(app) {
-    app.get('/v1/whoami', app.userAuth, exports.whoami)
+    app.get('/v1/whoami', app.auth.any, exports.whoami)
     app.post('/v1/users', exports.create)
-    app.post('/v1/users/identity', app.userAuth, exports.identity)
-    app.post('/v1/replaceApiKey', app.userAuth, exports.replaceApiKey)
-    app.post('/v1/users/verify/call', app.userAuth, exports.startPhoneVerify)
-    app.post('/v1/users/verify', app.userAuth, exports.verifyPhone)
+    app.post('/v1/users/identity', app.auth.primary, exports.identity)
+    app.post('/v1/users/verify/call', app.auth.primary, exports.startPhoneVerify)
+    app.post('/v1/users/verify', app.auth.primary, exports.verifyPhone)
     app.post('/tropo', exports.tropo)
-    app.patch('/v1/users/current', app.userAuth, exports.patch)
+    app.patch('/v1/users/current', app.auth.primary, exports.patch)
 }
 
 exports.patch = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     var updates = {}
     , values = [req.user]
 
@@ -162,13 +154,6 @@ exports.create = function(req, res, next) {
 exports.identity = function(req, res, next) {
     if (!validate(req.body, 'user_identity', res)) return
 
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     var query = {
         text: [
             'UPDATE "user"',
@@ -204,33 +189,7 @@ exports.identity = function(req, res, next) {
     })
 }
 
-exports.replaceApiKey = function(req, res, next) {
-    if (!validate(req.body, 'user_replace_api_key', res)) return
-
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
-    req.app.conn.write.query({
-        text: 'SELECT replace_api_key($1, $2)',
-        values: [req.key, req.body.key]
-    }, function(err) {
-        if (err) return next(err)
-        res.send(200, {})
-    })
-}
-
 exports.verifyPhone = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     req.app.conn.write.query({
         text: 'SELECT verify_phone($1, $2) success',
         values: [req.user, req.body.code]
@@ -260,13 +219,6 @@ exports.verifyPhone = function(req, res, next) {
 
 exports.startPhoneVerify = function(req, res, next) {
     if (!validate(req.body, 'user_verify_call', res)) return
-
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
 
     debug('processing request to start phone verification')
 

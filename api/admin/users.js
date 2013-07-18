@@ -2,24 +2,24 @@ var _ = require('lodash')
 , format = require('util').format
 
 module.exports = exports = function(app) {
-    app.get('/admin/users', app.adminAuth, exports.users)
-    app.get('/admin/users/:id', app.adminAuth, exports.user)
-    app.patch('/admin/users/:id', app.adminAuth, exports.patch)
+    app.get('/admin/users', app.auth.admin, exports.users)
+    app.get('/admin/users/:id', app.auth.admin, exports.user)
+    app.patch('/admin/users/:id', app.auth.admin, exports.patch)
     app.get('/admin/users/:user/bankAccounts',
-        app.adminAuth, exports.bankAccounts)
+        app.auth.admin, exports.bankAccounts)
     app.post('/admin/users/:user/bankAccounts/:id/startVerify',
-        app.adminAuth, exports.startBankAccountVerify)
-    app.get('/admin/users/:user/withdrawRequests', app.adminAuth,
+        app.auth.admin, exports.startBankAccountVerify)
+    app.get('/admin/users/:user/withdrawRequests', app.auth.admin,
         exports.withdrawRequests)
-    app.get('/admin/users/:user/activity', app.adminAuth, exports.activity)
-    app.post('/admin/users/:user/sendVerificationEmail', app.adminAuth,
+    app.get('/admin/users/:user/activity', app.auth.admin, exports.activity)
+    app.post('/admin/users/:user/sendVerificationEmail', app.auth.admin,
         exports.sendVerificationEmail)
-    app.post('/admin/users/:user/bankAccounts', app.adminAuth,
+    app.post('/admin/users/:user/bankAccounts', app.auth.admin,
         exports.addBankAccount)
-    app.get('/admin/users/:user/accounts', app.adminAuth, exports.accounts)
-    app.post('/admin/users/:user/bankAccounts/:id/setVerified', app.adminAuth,
+    app.get('/admin/users/:user/accounts', app.auth.admin, exports.accounts)
+    app.post('/admin/users/:user/bankAccounts/:id/setVerified', app.auth.admin,
         exports.setBankAccountVerified)
-    app.del('/admin/users/:user/bankAccounts/:id', app.adminAuth,
+    app.del('/admin/users/:user/bankAccounts/:id', app.auth.admin,
         exports.removeBankAccount)
 }
 

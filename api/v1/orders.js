@@ -2,10 +2,10 @@ var validate = require('./validate')
 , debug = require('debug')('snow:orders')
 
 module.exports = exports = function(app) {
-    app.del('/v1/orders/:id', app.userAuth, exports.cancel)
-    app.post('/v1/orders', app.userAuth, exports.create)
-    app.get('/v1/orders', app.userAuth, exports.index)
-    app.get('/v1/orders/history', app.userAuth, exports.history)
+    app.del('/v1/orders/:id', app.auth.primary, exports.cancel)
+    app.post('/v1/orders', app.auth.primary, exports.create)
+    app.get('/v1/orders', app.auth.any, exports.index)
+    app.get('/v1/orders/history', app.auth.any, exports.history)
 }
 
 exports.create = function(req, res, next) {
@@ -185,13 +185,6 @@ exports.history = function(req, res, next) {
 }
 
 exports.cancel = function(req, res, next) {
-    if (!req.apiKey.canTrade) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must have trade permission'
-        })
-    }
-
     req.app.conn.write.query({
         text: [
             'UPDATE "order"',

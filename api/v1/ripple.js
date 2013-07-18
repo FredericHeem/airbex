@@ -3,7 +3,7 @@ var validate = require('./validate')
 , debug = require('debug')('snow:ripple')
 
 module.exports = exports = function(app) {
-    app.post('/v1/ripple/out', app.userAuth, exports.withdraw)
+    app.post('/v1/ripple/out', app.auth.withdraw, exports.withdraw)
     app.get('/v1/ripple/address', exports.address)
     app.get('/ripple/federation', exports.federation)
     app.get('/v1/ripple/trust/:account', exports.trust)
@@ -105,13 +105,6 @@ exports.address = function(req, res, next) {
 
 exports.withdraw = function(req, res, next) {
     if (!validate(req.body, 'ripple_out', res)) return
-
-    if (!req.apiKey.canWithdraw) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must have withdraw permission'
-        })
-    }
 
     var queryText = [
         'SELECT ripple_withdraw(user_currency_account($1, $2), $3, $4) rid'

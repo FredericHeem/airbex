@@ -3,9 +3,9 @@ var validate = require('./validate')
 , async = require('async')
 
 module.exports = exports = function(app) {
-    app.post('/v1/vouchers', app.userAuth, exports.create)
-    app.post('/v1/vouchers/:id/redeem', app.userAuth, exports.redeem)
-    app.get('/v1/vouchers', app.userAuth, exports.index)
+    app.post('/v1/vouchers', app.auth.withdraw, exports.create)
+    app.post('/v1/vouchers/:id/redeem', app.auth.deposit, exports.redeem)
+    app.get('/v1/vouchers', app.auth.any, exports.index)
 }
 
 exports.createId = function() {
@@ -20,13 +20,6 @@ exports.createId = function() {
 
 exports.create = function(req, res, next) {
     if (!validate(req.body, 'voucher_create', res)) return
-
-    if (!req.apiKey.canWithdraw) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must have withdraw permission'
-        })
-    }
 
     var voucherId = exports.createId()
 
@@ -53,13 +46,6 @@ exports.create = function(req, res, next) {
 }
 
 exports.index = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
     req.app.conn.read.query({
         text: [
             'SELECT v.voucher_id, h.amount, a.currency_id',
@@ -81,20 +67,7 @@ exports.index = function(req, res, next) {
     })
 }
 
-/*
-CREATE FUNCTION redeem_voucher (
-    vid voucher_id,
-    duid int
-) RETURNS int AS $$
-*/
 exports.redeem = function(req, res, next) {
-    if (!req.apiKey.canDeposit) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must have deposit permission'
-        })
-    }
-
     async.waterfall([
         function(next) {
             req.app.conn.write.query({

@@ -1,18 +1,11 @@
 var validate = require('./validate')
 
 module.exports = exports = function(app) {
-    app.post('/v1/spend', app.userAuth, exports.spend)
+    app.post('/v1/spend', app.auth.trade, exports.spend)
 }
 
 exports.spend = function(req, res, next) {
     if (!validate(req.body, 'spend', res)) return
-
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
 
     var quote = req.body.market.substr(3, 3)
 

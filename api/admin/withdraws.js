@@ -1,6 +1,6 @@
 module.exports = exports = function(app) {
-    app.get('/admin/withdraws', app.adminAuth, exports.index)
-    app.patch('/admin/withdraws/:id', app.adminAuth, exports.patch)
+    app.get('/admin/withdraws', app.auth.admin, exports.index)
+    app.patch('/admin/withdraws/:id', app.auth.admin, exports.patch)
 }
 
 exports.index = function(req, res, next) {

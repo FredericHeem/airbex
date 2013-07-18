@@ -2,7 +2,7 @@ var crypto = require('crypto')
 , debug = require('debug')('snow:intercom')
 
 module.exports = exports = function(app) {
-    app.get('/v1/intercom', app.userAuth, exports.intercom)
+    app.get('/v1/intercom', app.auth.primary, exports.intercom)
 }
 
 exports.intercom = function(req, res, next) {

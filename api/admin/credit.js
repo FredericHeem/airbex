@@ -1,5 +1,5 @@
 module.exports = exports = function(app) {
-    app.post('/admin/bankCredit', app.adminAuth, exports.bankCredit)
+    app.post('/admin/bankCredit', app.auth.admin, exports.bankCredit)
 }
 
 exports.bankCredit = function(req, res, next) {

@@ -2,21 +2,14 @@ var util = require('util')
 , validate = require('./validate')
 
 module.exports = exports = function(app, currencyId) {
-    app.post('/v1/' + currencyId + '/out', app.userAuth,
+    app.post('/v1/' + currencyId + '/out', app.auth.withdraw,
         exports.withdraw.bind(exports, currencyId))
-    app.get('/v1/' + currencyId + '/address', app.userAuth,
+    app.get('/v1/' + currencyId + '/address', app.auth.deposit,
         exports.address.bind(exports, currencyId))
 }
 
 exports.withdraw = function(currencyId, req, res, next) {
     if (!validate(req.body, currencyId.toLowerCase() + '_out', res)) return
-
-    if (!req.apiKey.canWithdraw) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must have withdraw permission'
-        })
-    }
 
     console.log('processing withdraw request of %d %s from user #%s to %s',
         req.body.amount, currencyId, req.user, req.body.address)
@@ -54,13 +47,6 @@ exports.withdraw = function(currencyId, req, res, next) {
 }
 
 exports.address = function(currencyId, req, res, next) {
-    if (!req.apiKey.canDeposit) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must have deposit permission'
-        })
-    }
-
     var queryText = util.format([
         'SELECT address',
         'FROM %s_deposit_address',

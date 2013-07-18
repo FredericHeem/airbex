@@ -1,5 +1,3 @@
-var crypto = require('crypto')
-
 exports.number = function(min, max) {
     min = min || 1
     max = max || 100

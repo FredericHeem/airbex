@@ -22,7 +22,7 @@ module.exports = exports = function(conn, cb) {
 
     async.parallel({
         currencies: function(cb) {
-            req.app.conn.read.query({
+            conn.read.query({
                 text: 'SELECT currency_id, scale FROM currency'
             }, function(err, res) {
                 if (err) return cb(err)
@@ -30,7 +30,7 @@ module.exports = exports = function(conn, cb) {
             })
         },
         markets: function(cb) {
-            req.app.conn.read.query([
+            conn.read.query([
                 'SELECT scale, base_currency_id || quote_currency_id pair',
                 'FROM market'
             ].join('\n'), function(err, res) {

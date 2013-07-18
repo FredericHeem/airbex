@@ -1,5 +1,4 @@
-var nodemailer = require('nodemailer')
-, crypto = require('crypto')
+var crypto = require('crypto')
 
 module.exports = exports = function(app) {
     app.post('/v1/email/verify/send', app.auth.primary, exports.verifySend)

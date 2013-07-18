@@ -54,6 +54,10 @@ cache(module.parent ? null : app.conn, function(err) {
 
     if (!module.parent) {
         app.email = require('./email')(app)
+
+        // TODO: Separate connection from route
+        app.ripple = require('./v1/ripple')
+        app.ripple.connect()
     }
 
     server.listen(config.port)

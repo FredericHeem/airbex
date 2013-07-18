@@ -7,8 +7,6 @@ module.exports = exports = function(app) {
     app.get('/v1/ripple/address', exports.address)
     app.get('/ripple/federation', exports.federation)
     app.get('/v1/ripple/trust/:account', exports.trust)
-
-    exports.connect()
 }
 
 exports.connect = function() {

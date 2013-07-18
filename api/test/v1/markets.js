@@ -47,4 +47,44 @@ describe('markets', function() {
             })
         })
     })
+
+    describe('depth', function() {
+        it('returns depth', function(done) {
+            var read = mock(app.conn.read, 'query', function(query, cb) {
+                expect(query.text).to.match(/FROM order_depth_view/)
+                expect(query.values).to.eql(['BTCLTC'])
+                cb(null, {
+                    rows: [
+                        {
+                            price: 550.5e3,
+                            volume: 12345.12345,
+                            type: 0
+                        },
+                        {
+                            price: 560.5e3,
+                            volume: 32345.12345,
+                            type: 1
+                        }
+                    ]
+                })
+            })
+
+            request(app)
+            .get('/v1/markets/BTCLTC/depth')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect({
+                bids: [
+                    ['550.500', '12345.12345']
+                ],
+                asks: [
+                    ['560.500', '32345.12345']
+                ]
+            })
+            .end(function(err) {
+                read.restore()
+                done(err)
+            })
+        })
+    })
 })

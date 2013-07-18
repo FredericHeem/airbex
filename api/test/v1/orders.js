@@ -54,7 +54,7 @@ describe('orders', function() {
         })
     })
 
-    describe('index', function() {
+    describe('create', function() {
         it('creates order', function(done) {
             var uid =  dummy.number(1, 1e6)
             , impersonate = mock.impersonate(app, uid, { canTrade: true })
@@ -84,6 +84,35 @@ describe('orders', function() {
             .expect({
                 id: 999
             })
+            .end(function(err) {
+                activity.restore()
+                impersonate.restore()
+                write.restore()
+                done(err)
+            })
+        })
+    })
+
+    describe('cancel', function() {
+        it('cancels order', function(done) {
+            var uid =  dummy.number(1, 1e6)
+            , oid =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, uid, { canTrade: true })
+            , activity = mock(app, 'activity', function() {})
+            , write = mock(app.conn.write, 'query', function(query, cb) {
+                expect(query.text).to.match(/UPDATE "order"/)
+                expect(query.text).to.match(/volume = 0/)
+                expect(query.text).to.match(/order_id = \$1/)
+                expect(query.text).to.match(/user_id = \$2/)
+                expect(query.values).to.eql([oid, uid])
+                cb(null, {
+                    rowCount: 1
+                })
+            })
+
+            request(app)
+            .del('/v1/orders/' + oid)
+            .expect(204)
             .end(function(err) {
                 activity.restore()
                 impersonate.restore()

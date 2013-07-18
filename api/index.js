@@ -53,13 +53,11 @@ if (config.raven) {
 var cache = app.cache = require('./cache')
 cache(module.parent ? null : app.conn, function(err) {
     if (err) throw err
+    app.email = require('./email')(app)
+    app.ripple = require('./ripple')(app)
 
     if (!module.parent) {
-        app.email = require('./email')(app)
         app.notify = require('./email/notify')(app)
-
-        // TODO: Separate connection from route
-        app.ripple = require('./v1/ripple')
         app.ripple.connect()
     }
 

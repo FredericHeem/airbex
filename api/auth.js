@@ -1,4 +1,4 @@
-exports.any = function(req, res, next) {
+exports.user = function(req, res, next) {
     if (req.user) return next()
 
     if (!req.query.key) {
@@ -61,13 +61,14 @@ var mappings = {
     deposit: 'canDeposit',
     withdraw: 'canWithdraw',
     admin: 'admin',
-    primary: 'primary'
+    primary: 'primary',
+    any: null
 }
-
 
 exports.permission = function(type, req, res, next) {
     exports.any(req, res, function(err) {
         if (err) return next(err)
+        if (type == 'any') return next()
 
         var mapping = mappings[type]
 
@@ -91,5 +92,7 @@ exports.permission = function(type, req, res, next) {
 }
 
 Object.keys(mappings).forEach(function(type) {
-    exports[type] = exports.permission.bind(exports, type)
+    exports[type] = function(req, res, next) {
+        exports.permission(type, req, res, next)
+    }
 })

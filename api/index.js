@@ -16,19 +16,11 @@ app.conn = {
 app.tarpit = require('./tarpit')()
 app.activity = require('./activity')(app)
 app.smtp = nodemailer.createTransport(config.smtp.service, config.smtp.options)
+app.auth = require('./auth')
 
 debug('config %j', config)
 
 app.use(express.bodyParser())
-
-var routes = ['bitcoincharts', 'v1', 'admin']
-routes.forEach(function(name) {
-    require('./' + name)(app)
-})
-
-app.use(function(req, res) {
-    res.send(404)
-})
 
 if (config.raven) {
     debug('Configuring Raven with %s...', config.raven)
@@ -60,6 +52,15 @@ cache(module.parent ? null : app.conn, function(err) {
         app.notify = require('./email/notify')(app)
         app.ripple.connect()
     }
+
+    var routes = ['bitcoincharts', 'v1', 'admin']
+    routes.forEach(function(name) {
+        require('./' + name)(app)
+    })
+
+    app.use(function(req, res) {
+        res.send(404)
+    })
 
     server.listen(config.port)
     debug('listening on %d', config.port)

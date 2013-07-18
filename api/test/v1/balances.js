@@ -1,54 +1,50 @@
 /* global describe, it */
 var expect = require('expect.js')
-, balances = require('../../v1/balances')
+, request = require('supertest')
+, app = require('../..')
+, mock = require('../mock')
 
 describe('balances', function() {
-	describe('configure', function() {
-		it('adds expected routes', function() {
-			var routes = []
-			, app = {
-				post: function(url) { routes.push('post ' + url) },
-				get: function(url) { routes.push('get ' + url) }
-			}
-			balances.configure(app, null, 'BTC')
-			expect(routes).to.contain('get /v1/balances')
-		})
-	})
-
-	describe('forUser', function() {
+	describe('index', function() {
 		it('returns balances', function(done) {
-			var conn = {
-				read: {
-					query: function(q, c) {
-						expect(q.text).to.match(/from account_view/i)
-						expect(q.text).to.match(/currency_id/i)
-						expect(q.values).to.eql([25])
-						c(null, { rows: [{ currency: 'XRP', available: '1.2' }] })
-					}
-				}
-			}
-			, req = {
-				user: 25,
-				app: {
-					cache: {
-						formatCurrency: function(v, c) {
-							expect(v).to.be('1.2')
-							expect(c).to.be('XRP')
-							return 'formatted'
+			var impersonate = mock.impersonate(app, 123)
+			, read = mock(app.conn.read, 'query', function(query, cb) {
+				expect(query.text).to.match(/FROM account/)
+				expect(query.text).to.match(/user_id =/)
+				expect(query.values).to.eql([123])
+				cb(null, {
+					rows: [
+						{
+							currency_id: 'BTC',
+							available: 123000000
+						},
+						{
+							currency_id: 'NOK',
+							available: 12345
 						}
-					}
-				}
-			}
-			, res = {
-				send: function(r) {
-					expect(r).to.be.an('array')
-					expect(r[0].currency).to.be('XRP')
-					expect(r[0].available).to.be('formatted')
-					done()
-				}
-			}
+					]
+				})
+			})
 
-			balances.forUser(req, res, done)
+			request(app)
+			.get('/v1/balances')
+			.expect(200)
+			.expect('Content-Type', /json/)
+			.expect([
+				{
+					currency: 'BTC',
+					available: '1.23000000'
+				},
+				{
+					currency: 'NOK',
+					available: '0.12345'
+				}
+			])
+			.end(function(err) {
+				impersonate.restore()
+				read.restore()
+				done(err)
+			})
 		})
 	})
 })

@@ -15,7 +15,11 @@ app.conn = {
 }
 app.tarpit = require('./tarpit')()
 app.activity = require('./activity')(app)
-app.smtp = nodemailer.createTransport(config.smtp.service, config.smtp.options)
+
+if (config.smtp) {
+    app.smtp = nodemailer.createTransport(config.smtp.service, config.smtp.options)
+}
+
 app.auth = require('./auth')
 app.validate = require('./validate')
 

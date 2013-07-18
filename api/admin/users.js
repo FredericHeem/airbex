@@ -43,7 +43,7 @@ exports.removeBankAccount = function(req, res, next) {
 
 exports.sendVerificationEmail = function(req, res, next) {
     var email = require('../v1/email')
-    email.sendVerificationEmail(+req.params.user, function(err) {
+    email.sendVerificationEmail(+req.params.user, req.app, function(err) {
         if (err) return next(err)
         res.send(204)
     })

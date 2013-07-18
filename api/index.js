@@ -1,4 +1,5 @@
 var config = require('konfu')
+, nodemailer = require('nodemailer')
 , debug = require('debug')('snow:api')
 , express = require('express')
 , app = module.exports = express()
@@ -14,6 +15,7 @@ app.conn = {
 }
 app.tarpit = require('./tarpit')()
 app.activity = require('./activity')(app)
+app.smtp = nodemailer.createTransport(config.smtp.service, config.smtp.options)
 
 debug('config %j', config)
 
@@ -54,6 +56,7 @@ cache(module.parent ? null : app.conn, function(err) {
 
     if (!module.parent) {
         app.email = require('./email')(app)
+        app.notify = require('./email/notify')(app)
 
         // TODO: Separate connection from route
         app.ripple = require('./v1/ripple')

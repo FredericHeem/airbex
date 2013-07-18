@@ -1,5 +1,4 @@
 var async = require('async')
-, activities = require('./activities')
 , validate = require('./validate')
 , vouchers = require('./vouchers')
 
@@ -54,7 +53,7 @@ exports.emailVoucher = function(app, fromUser, toEmail, amount, currency, cb)
 
             // TODO: Cancel voucher on failure
             // TODO: Allow user to change sending language
-            app.emailer.send(toEmail, 'en-US', 'voucher-invite', {
+            app.email.send(toEmail, 'en-US', 'voucher-invite', {
                 code: voucherId,
                 currency: currencyFull,
                 amount: amount,
@@ -154,7 +153,7 @@ exports.send = function(req, res, next) {
         })
     }
 
-    exports.transfer(req.app.conn, req.app.cache, req.user, req.body.email,
+    exports.transfer(req.app, req.user, req.body.email,
         req.body.amount, req.body.currency, function(err) {
             if (!err) return res.send(204)
 

@@ -1,26 +1,18 @@
-var nodemailer = require('nodemailer')
-, assert = require('assert')
+var assert = require('assert')
 , _ = require('lodash')
 , ejs = require('ejs')
 , fs = require('fs')
 , path = require('path')
 , config = require('konfu')
 , debug = require('debug')('snow:email')
-, smtp = nodemailer.createTransport(config.smtp.service, config.smtp.options)
 , fallback = 'en-US'
-, conn
-, cache
-, email = module.exports = function(c, cc) {
-    assert(c && cc)
-    conn = c
-    cache = cc
+, app
 
-    require('./notify')(conn, email)
-
-    return email
+module.exports = exports = function(a) {
+    app = a
 }
 
-email.resolveLanguage = function(language) {
+exports.resolveLanguage = function(language) {
     language || (language = fallback)
 
     var mappings = {
@@ -39,8 +31,8 @@ email.resolveLanguage = function(language) {
     return language
 }
 
-email.templateFilename = function(name, language) {
-    language = email.resolveLanguage(language)
+exports.templateFilename = function(name, language) {
+    language = exports.resolveLanguage(language)
 
     function resolve(x) {
         return path.join(path.dirname(__filename), x, name + '.html')
@@ -59,27 +51,27 @@ email.templateFilename = function(name, language) {
     return fn
 }
 
-email.template = _.memoize(function(fn) {
+exports.template = _.memoize(function(fn) {
     return fs.readFileSync(fn, 'utf8')
 }, function() {
     return _.toArray(arguments).join()
 })
 
 // User can be either user id or email address
-email.send = function(user, language, templateName, locals, cb) {
+exports.send = function(user, language, templateName, locals, cb) {
     if (typeof user == 'number') {
-        return req.app.conn.read.query({
+        return app.conn.read.query({
             text: 'SELECT email FROM "user" WHERE user_id = $1',
             values: [user]
         }, function(err, dr) {
             if (err) return cb(err)
             if (!dr.rowCount) return cb(new Error('User not found'))
-            email.send(dr.rows[0].email, language, templateName, locals, cb)
+            exports.send(dr.rows[0].email, language, templateName, locals, cb)
         })
     }
 
-    var templateFn = email.templateFilename(templateName, language)
-    , template = email.template(templateFn)
+    var templateFn = exports.templateFilename(templateName, language)
+    , template = exports.template(templateFn)
 
     locals || (locals = {})
     locals.websiteUrl = config.website_url
@@ -97,5 +89,5 @@ email.send = function(user, language, templateName, locals, cb) {
         html: body
     }
 
-    smtp.sendMail(mail, cb)
+    app.smtp.sendMail(mail, cb)
 }

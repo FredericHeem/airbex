@@ -1,5 +1,4 @@
-var activities = require('./activities')
-, util = require('util')
+var util = require('util')
 , validate = require('./validate')
 
 module.exports = exports = function(app, currencyId) {
@@ -45,7 +44,7 @@ exports.withdraw = function(currencyId, req, res, next) {
             return next(err)
         }
 
-        activities.log(req.user, currencyId + 'Withdraw', {
+        req.app.activity(req.user, currencyId + 'Withdraw', {
             address: req.body.address,
             amount: req.body.amount
         })

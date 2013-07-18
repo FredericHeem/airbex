@@ -1,5 +1,3 @@
-var activities = require('../v1/activities')
-
 module.exports = exports = function(app) {
     app.post('/admin/bankCredit', app.adminAuth, exports.bankCredit)
 }
@@ -26,10 +24,10 @@ exports.bankCredit = function(req, res, next) {
         }
 
         // Log for admin
-        activities.log(req.app.conn, req.user, 'AdminBankAccountCredit', req.body)
+        req.app.activity(req.app.conn, req.user, 'AdminBankAccountCredit', req.body)
 
         // Log for user
-        activities.log(req.app.conn, req.body.user_id, 'BankCredit', {
+        req.app.activity(req.app.conn, req.body.user_id, 'BankCredit', {
             currency: req.body.currency_id,
             amount: req.body.amount,
             reference: req.body.reference

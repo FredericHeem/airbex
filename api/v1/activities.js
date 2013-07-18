@@ -1,5 +1,4 @@
-var activities = module.exports = {}
-, _ = require('lodash')
+var _ = require('lodash')
 , assert = require('assert')
 
 module.exports = exports = function(app) {
@@ -73,21 +72,5 @@ exports.activities = function(req, res, next) {
 
             return result
         }))
-    })
-}
-
-exports.log = function(conn, userId, type, details, retry) {
-    console.log('user #%d activity: %s %j', userId, type, details)
-    conn.write.query({
-        text: 'INSERT INTO activity (user_id, "type", details) VALUES ($1, $2, $3)',
-        values: [userId, type, JSON.stringify(details)]
-    }, function(err) {
-        if (!err) return
-        console.error('Failed to log activity (try #%d)', (retry || 0) + 1)
-        console.error(err)
-        if (retry == 3) return
-        setTimeout(function() {
-            activities.log(userId, type, details, (retry || 0) + 1)
-        }, 1000)
     })
 }

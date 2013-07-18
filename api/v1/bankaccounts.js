@@ -1,5 +1,4 @@
 var _ = require('lodash')
-, activities = require('./activities')
 , validate = require('./validate')
 , crypto = require('crypto')
 
@@ -109,7 +108,7 @@ exports.verify = function(req, res, next) {
             })
         }
 
-        activities.log(req.user, 'VerifyBankAccount', {
+        req.app.activity(req.user, 'VerifyBankAccount', {
             accountNumber: row.account_number,
             iban: row.iban
         })

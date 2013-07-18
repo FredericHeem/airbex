@@ -7,8 +7,7 @@ module.exports = exports = function(app) {
     app.post('/v1/send', app.userAuth, exports.send)
 }
 
-exports.emailVoucher = function(emailer, conn, cache, fromUser, toEmail,
-    amount, currency, cb)
+exports.emailVoucher = function(app, fromUser, toEmail, amount, currency, cb)
 {
     var voucherId = vouchers.createId()
     var sender
@@ -16,7 +15,7 @@ exports.emailVoucher = function(emailer, conn, cache, fromUser, toEmail,
     async.series([
         // Find information about sender
         function(next) {
-            conn.read.query({
+            app.conn.read.query({
                 text: [
                     'SELECT first_name, last_name, email',
                     'FROM "user"',
@@ -35,13 +34,13 @@ exports.emailVoucher = function(emailer, conn, cache, fromUser, toEmail,
 
         // Create voucher
         function(next) {
-            conn.write.query({
+            app.conn.write.query({
                 text: 'SELECT create_voucher($1, $2, $3, $4)',
                 values: [
                     voucherId,
                     fromUser,
                     currency,
-                    cache.parseCurrency(amount, currency)
+                    app.cache.parseCurrency(amount, currency)
                 ]
             }, next)
         },
@@ -55,7 +54,7 @@ exports.emailVoucher = function(emailer, conn, cache, fromUser, toEmail,
 
             // TODO: Cancel voucher on failure
             // TODO: Allow user to change sending language
-            emailer.send(toEmail, 'en-US', 'voucher-invite', {
+            app.emailer.send(toEmail, 'en-US', 'voucher-invite', {
                 code: voucherId,
                 currency: currencyFull,
                 amount: amount,
@@ -65,7 +64,7 @@ exports.emailVoucher = function(emailer, conn, cache, fromUser, toEmail,
 
         // Log activity,
         function (next) {
-            activities.log(fromUser, 'SendToUser', {
+            app.activity(fromUser, 'SendToUser', {
                 to: toEmail,
                 amount: amount,
                 currency: currency
@@ -76,8 +75,8 @@ exports.emailVoucher = function(emailer, conn, cache, fromUser, toEmail,
     ], cb)
 }
 
-exports.transfer = function(conn, cache, fromUser, toEmail, amount, currency, cb) {
-    conn.write.query({
+exports.transfer = function(app, fromUser, toEmail, amount, currency, cb) {
+    app.conn.write.query({
         text: [
             'SELECT',
             '   user_transfer_to_email($1, $2, $3, $4) tid,',
@@ -86,7 +85,7 @@ exports.transfer = function(conn, cache, fromUser, toEmail, amount, currency, cb
             'FROM "user" su, "user" ru',
             'WHERE su.user_id = $1 AND ru.email_lower = $2'
         ].join('\n'),
-        values: [fromUser, toEmail, currency, cache.parseCurrency(amount, currency)]
+        values: [fromUser, toEmail, currency, app.cache.parseCurrency(amount, currency)]
     }, function(err, dr) {
         if (err) {
             if (err.message.match(/^User with email/)) {
@@ -128,13 +127,13 @@ exports.transfer = function(conn, cache, fromUser, toEmail, amount, currency, cb
             return cb(err)
         }
 
-        activities.log(fromUser, 'SendToUser', {
+        app.activity(fromUser, 'SendToUser', {
             to: toEmail,
             amount: amount,
             currency: currency
         })
 
-        activities.log(row.to_user_id, 'ReceiveFromUser', {
+        app.activity(row.to_user_id, 'ReceiveFromUser', {
             from:  row.from_email,
             amount: amount,
             currency: currency

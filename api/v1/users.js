@@ -1,6 +1,5 @@
 /* global TropoWebAPI, TropoJSON */
 var _ = require('lodash')
-, activities = require('./activities')
 , verifyemail = require('../verifyemail')
 , async = require('async')
 , validate = require('./validate')
@@ -135,7 +134,7 @@ exports.create = function(req, res, next) {
             values: [req.body.email, req.body.key]
         }, function(err, cres) {
             if (!err) {
-                activities.log(cres.rows[0].user_id, 'Created', {})
+                req.app.activity(cres.rows[0].user_id, 'Created', {})
                 return res.send(201, { id: cres.rows[0].user_id })
             }
 
@@ -200,7 +199,7 @@ exports.identity = function(req, res, next) {
             })
         }
 
-        activities.log(req.user, 'IdentitySet', {})
+        req.app.activity(req.user, 'IdentitySet', {})
         return res.send(204)
     })
 }

@@ -116,7 +116,7 @@ exports.create = function(req, res, next) {
             })
         }
 
-        activities.log(req.user, 'CreateOrder', {
+        req.app.activity(req.user, 'CreateOrder', {
             market: req.body.market,
             type: req.body.type,
             price: req.body.price,
@@ -208,6 +208,6 @@ exports.cancel = function(req, res, next) {
         if (err) return next(err)
         if (!dr.rowCount) return res.send(404)
         res.send(204)
-        activities.log(req.user, 'CancelOrder', { id: +req.params.id })
+        req.app.activity(req.user, 'CancelOrder', { id: +req.params.id })
     })
 }

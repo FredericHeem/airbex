@@ -1,5 +1,4 @@
-var activities = require('./activities')
-, validate = require('./validate')
+var validate = require('./validate')
 , Drop = require('drop')
 , debug = require('debug')('snow:ripple')
 
@@ -147,7 +146,7 @@ exports.withdraw = function(req, res, next) {
             return next(err)
         }
 
-        activities.log(req.app.conn, req.user, 'RippleWithdraw', {
+        req.app.activity(req.user, 'RippleWithdraw', {
             address: req.body.address,
             amount: req.body.amount,
             currency: req.body.currency

@@ -4,16 +4,16 @@ var config = require('konfu')
 , app = module.exports = express()
 , http = require('http')
 , server = http.createServer(app)
-, conn = {
-    read: require('./db')(config.pg_read_url, config.pg_native),
-    write: require('./db')(config.pg_write_url, config.pg_native)
-}
 
 debug('starting api web server')
 
 app.config = config
-app.conn = conn
+app.conn = {
+    read: require('./db')(config.pg_read_url, config.pg_native),
+    write: require('./db')(config.pg_write_url, config.pg_native)
+}
 app.tarpit = require('./tarpit')()
+app.activity = require('./activity')(app)
 
 debug('config %j', config)
 
@@ -21,7 +21,7 @@ app.use(express.bodyParser())
 
 var routes = ['bitcoincharts', 'v1', 'admin']
 routes.forEach(function(name) {
-    require('./' + name)(app, conn)
+    require('./' + name)(app)
 })
 
 app.use(function(req, res) {
@@ -49,11 +49,11 @@ if (config.raven) {
 }
 
 var cache = app.cache = require('./cache')
-cache(module.parent ? null : conn, function(err) {
+cache(module.parent ? null : app.conn, function(err) {
     if (err) throw err
 
     if (!module.parent) {
-        app.email = require('./email')(conn, cache)
+        app.email = require('./email')(app)
     }
 
     server.listen(config.port)

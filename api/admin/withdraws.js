@@ -1,5 +1,3 @@
-var activities = require('../v1/activities')
-
 module.exports = exports = function(app) {
     app.get('/admin/withdraws', app.adminAuth, exports.index)
     app.patch('/admin/withdraws/:id', app.adminAuth, exports.patch)
@@ -28,7 +26,7 @@ exports.cancel = function(req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         if (dr.rowCount) {
-            activities.log(req.app.conn, req.user, 'AdminWithdrawCancel', {
+            req.app.activity(req.user, 'AdminWithdrawCancel', {
                 id: req.params.id,
                 error: req.body.error || null
             })
@@ -56,7 +54,7 @@ exports.process = function(req, res, next) {
         if (err) return next(err)
 
         if (dr.rowCount) {
-            activities.log(req.app.conn, req.user, 'AdminWithdrawProcess',
+            req.app.activity(req.user, 'AdminWithdrawProcess',
                 { id: req.params.id })
             return res.send(204)
         }
@@ -80,7 +78,7 @@ exports.complete = function(req, res, next) {
         if (err) return next(err)
 
         if (dr.rowCount) {
-            activities.log(req.app.conn, req.user, 'AdminWithdrawComplete',
+            req.app.activity(req.user, 'AdminWithdrawComplete',
                 { id: req.params.id })
             return res.send(204)
         }

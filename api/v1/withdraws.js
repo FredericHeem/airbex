@@ -1,6 +1,5 @@
 var _ = require('lodash')
 , validate = require('./validate')
-, activities = require('./activities')
 
 module.exports = exports = function(app) {
     app.del('/v1/withdraws/:id', app.userAuth, exports.cancel)
@@ -114,8 +113,7 @@ exports.cancel = function(req, res, next) {
             })
         }
 
-        activities.log(req.app.conn, req.user, 'CancelWithdrawRequest',
-            { id: +req.params.id })
+        req.app.activity(req.user, 'CancelWithdrawRequest', { id: +req.params.id })
 
         res.send(204)
     })

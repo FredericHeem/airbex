@@ -1,6 +1,5 @@
 var _ = require('lodash')
 , format = require('util').format
-, activities = require('../v1/activities')
 
 module.exports = exports = function(app) {
     app.get('/admin/users', app.adminAuth, exports.users)
@@ -127,12 +126,12 @@ exports.setBankAccountVerified = function(req, res, next) {
 
         var row = dr.rows[0]
 
-        activities.log(req.app.conn, req.user, 'AdminVerifyBankAccount', {
+        req.app.activity(req.user, 'AdminVerifyBankAccount', {
             id: +req.params.id,
             user_id: req.params.user
         })
 
-        activities.log(req.app.conn, row.user_id, 'VerifyBankAccount', {
+        req.app.activity(row.user_id, 'VerifyBankAccount', {
             accountNumber: row.account_number,
             iban: row.iban
         })
@@ -195,7 +194,7 @@ exports.patch = function(req, res, next) {
         if (err) return next(err)
         if (!dr.rowCount) return next(new Error('User ' + req.user + ' not found'))
 
-        activities.log(req.app.conn, req.user, 'AdminEditUser', {
+        req.app.activity(req.user, 'AdminEditUser', {
             user_id: req.params.id,
             edits: req.body
         })

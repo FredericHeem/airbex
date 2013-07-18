@@ -1,7 +1,6 @@
 var validate = require('./validate')
 , crypto = require('crypto')
 , async = require('async')
-, activities = require('./activities')
 
 module.exports = exports = function(app) {
     app.post('/v1/vouchers', app.userAuth, exports.create)
@@ -19,14 +18,6 @@ exports.createId = function() {
     return id + checksum
 }
 
-/*
-CREATE FUNCTION create_voucher (
-    vid voucher_id,
-    uid int,
-    cid currency_id,
-    amnt bigint
-) RETURNS void AS $$
-*/
 exports.create = function(req, res, next) {
     if (!validate(req.body, 'voucher_create', res)) return
 
@@ -52,7 +43,7 @@ exports.create = function(req, res, next) {
     }, function(err) {
         if (err) return next(err)
 
-        activities.log(req.user, 'CreateVoucher', {
+        req.app.activity(req.user, 'CreateVoucher', {
             currency: req.body.currency,
             amount: req.body.amount
         })

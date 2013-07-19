@@ -43,7 +43,7 @@ exports.remove = function(req, res, next) {
 }
 
 exports.index = function(req, res, next) {
-    req.app.conn.write.query({
+    req.app.conn.read.query({
         text: [
             'SELECT api_key_id, can_trade, can_withdraw, can_deposit',
             'FROM api_key',
@@ -52,7 +52,7 @@ exports.index = function(req, res, next) {
         values: [req.user]
     }, function(err, dr) {
         if (err) return next(err)
-        res.send(200, dr.rows.map(function(row) {
+        res.send(dr.rows.map(function(row) {
             return {
                 id: row.api_key_id,
                 canTrade: row.can_trade,

@@ -1,43 +1,45 @@
+if (module.parent && process.env.NODE_ENV != 'travis') {
+    process.env.NODE_ENV = 'test'
+}
+
 var config = require('konfu')
-, nodemailer = require('nodemailer')
-, debug = require('debug')('snow:api')
+, createSmtpTransport = require('nodemailer').createTransport
 , express = require('express')
 , app = module.exports = express()
 , http = require('http')
 , server = http.createServer(app)
-
-debug('starting api web server')
+, pg = require('./pg')
 
 app.config = config
 app.conn = {
-    read: require('./db')(config.pg_read_url, config.pg_native),
-    write: require('./db')(config.pg_write_url, config.pg_native)
+    read: config.pg_read_url ? pg(config.pg_read_url, config.pg_native) : {},
+    write: config.pg_write_url ? pg(config.pg_write_url, config.pg_native) : {}
 }
+
+app.smtp = config.smtp ? createSmtpTransport(config.smtp.service, config.smtp.options) : {}
 app.tarpit = require('./tarpit')()
 app.activity = require('./activity')(app)
-
-if (config.smtp) {
-    app.smtp = nodemailer.createTransport(config.smtp.service, config.smtp.options)
-}
-
 app.auth = require('./auth')
 app.validate = require('./validate')
 app.email = require('./email')(app)
 app.ripple = require('./ripple')(app)
-
-debug('config %j', config)
-
 app.use(express.bodyParser())
 
-if (config.raven) {
-    debug('Configuring Raven with %s...', config.raven)
+if (!module.parent) {
+    app.notify = require('./email/notify')(app)
+    app.ripple.connect()
+}
 
+var routes = ['bitcoincharts', 'v1', 'admin']
+routes.forEach(function(name) {
+    require('./' + name)(app)
+})
+
+if (config.raven) {
     var raven = require('raven')
     app.use(raven.middleware.express(config.raven))
-    debug('Raven middleware added')
 
     raven = new raven.Client(config.raven)
-
     raven.patchGlobal(function(logged, err) {
         console.error(err)
         console.error(err.stack)
@@ -45,27 +47,20 @@ if (config.raven) {
         console.error('exiting process (after global patch)')
         process.exit(1)
     })
-
-    debug('Raven patched global')
+} else {
+    app.use(function(err, req, res, next) {
+        console.error(err)
+        console.error(err.stack)
+        next(err)
+    })
 }
+
+app.use(function(req, res) {
+    res.send(404)
+})
 
 var cache = app.cache = require('./cache')
 cache(module.parent ? null : app.conn, function(err) {
     if (err) throw err
-    if (!module.parent) {
-        app.notify = require('./email/notify')(app)
-        app.ripple.connect()
-    }
-
-    var routes = ['bitcoincharts', 'v1', 'admin']
-    routes.forEach(function(name) {
-        require('./' + name)(app)
-    })
-
-    app.use(function(req, res) {
-        res.send(404)
-    })
-
     server.listen(config.port)
-    debug('listening on %d', config.port)
 })

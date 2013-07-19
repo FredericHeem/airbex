@@ -1,3 +1,5 @@
+var crypto = require('crypto')
+
 exports.number = function(min, max) {
     min = min || 1
     max = max || 100
@@ -11,6 +13,15 @@ exports.fromAlphabet = function(alphabet, length) {
         result += alphabet[exports.number(0, alphabet.length - 1)]
     }
     return result
+}
+
+exports.phoneCode = function() {
+    return exports.fromAlphabet('1234567890', 4)
+}
+
+exports.hex = function(length) {
+    var hex = crypto.randomBytes(Math.ceil(length / 2)).toString('hex').toUpperCase()
+    return hex.substr(0, length)
 }
 
 exports.bitcoinAddress = function() {
@@ -27,4 +38,47 @@ exports.litecoinAddress = function() {
     , alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
     , hash = exports.fromAlphabet(alphabet, len - 1)
     return prefix + hash
+}
+
+var rand = function(arr, count) {
+    var offset = Math.floor(Math.random() * (arr.length - (count || 1) - 1))
+
+    return count > 1 ? arr.slice(offset, offset + count) : arr[offset]
+}
+
+var firstNames = [
+    'Skrue',
+    'Bestemor',
+    'Donald',
+    'Ole',
+    'Dole',
+    'Doffen',
+    'Dolly',
+    'Hetti',
+    'Netti',
+    'Letti',
+    'Mikke',
+    'Minni',
+    'Langbein',
+    'Guffen',
+    'Anton',
+    'Politimester',
+    'Petter',
+    'Svarte-Petter',
+    'Ordfører',
+    'Klara',
+    'Klaus',
+    'Klodrik',
+    'Pluto'
+]
+
+var emailProviders = [
+    'gmail.com',
+    'hotmail.com',
+    'hotmail.co.uk',
+    'mail.com'
+]
+
+exports.email = function() {
+    return rand(firstNames) + '@' + rand(emailProviders)
 }

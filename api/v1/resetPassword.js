@@ -21,20 +21,25 @@ exports.createPhoneCode = function() {
 
 exports.resetPasswordBegin = function(req, res, next) {
     var emailCode = exports.createEmailCode()
+    , phoneCode = exports.createPhoneCode()
 
     req.app.conn.write.query({
-        text: 'SELECT reset_password_begin($1, $2, $3)',
-        values: [req.body.email, emailCode, exports.createPhoneCode()]
-    }, function(err) {
+        text: [
+            'SELECT reset_password_begin($1, $2, $3), language',
+            'FROM "user"',
+            'WHERE email_lower = $1'
+        ].join('\n'),
+        values: [req.body.email.toLowerCase(), emailCode, phoneCode]
+    }, function(err, dr) {
         if (err) {
-            if (err.message == 'User has a recent reset attempt.') {
+            if (err.message.match(/recent reset attempt/)) {
                 return res.send(403, {
                     name: 'ResetPasswordLockedOut',
                     message: 'An attempt to reset the password has been made too recently'
                 })
             }
 
-            if (err.message == 'User not found') {
+            if (err.message.match(/User not found/)) {
                 return res.send(400, {
                     name: 'UserNotFound',
                     message: 'User not found'
@@ -44,18 +49,20 @@ exports.resetPasswordBegin = function(req, res, next) {
             return next(err)
         }
 
-        req.app.conn.read.query({
-            text: 'SELECT language FROM "user" WHERE lower($1) = email_lower',
-            values: [req.body.email]
-        }, function(err, dr) {
-            if (err) return next(err)
-            var row = dr.rows[0]
-            req.app.email.send(req.body.email, row.language, 'reset-password', {
-                code: emailCode
-            }, function(err) {
-                if (err) return next(err)
-                res.send(204)
+        var row = dr.rows[0]
+
+        if (!row) {
+            return res.send(400, {
+                name: 'UserNotFound',
+                message: 'User not found'
             })
+        }
+
+        req.app.email.send(req.body.email, row.language, 'reset-password', {
+            code: emailCode
+        }, function(err) {
+            if (err) return next(err)
+            res.send(204)
         })
     })
 }

@@ -66,7 +66,7 @@ var mappings = {
 }
 
 exports.permission = function(type, req, res, next) {
-    exports.any(req, res, function(err) {
+    exports.user(req, res, function(err) {
         if (err) return next(err)
         if (type == 'any') return next()
 

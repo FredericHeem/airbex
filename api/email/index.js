@@ -57,6 +57,18 @@ exports.template = _.memoize(function(fn) {
     return _.toArray(arguments).join()
 })
 
+exports.from = function() {
+    if (process.env.NODE_ENV == 'production') {
+        return 'Justcoin <support@justcoin.com>'
+    }
+
+    if (process.env.NODE_ENV == 'staging') {
+        return 'Justcoin STAGING <hello@justcoin.com>'
+    }
+
+    return 'Justcoin TESTING <hello@justcoin.com>'
+}
+
 // User can be either user id or email address
 exports.send = function(user, language, templateName, locals, cb) {
     if (typeof user == 'number') {
@@ -83,7 +95,7 @@ exports.send = function(user, language, templateName, locals, cb) {
     , body = lines.slice(1).join('\n')
 
     var mail = {
-        from: 'Justcoin <hello@justcoin.com>',
+        from: exports.from(),
         to: user,
         subject: subject,
         html: body

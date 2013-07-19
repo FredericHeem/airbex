@@ -81,8 +81,8 @@ exports.redeem = function(req, res, next) {
         },
 
         function(dr, next) {
-            if (!dr.rows[0].tid) {
-                return res.send(204)
+            if (!dr.rowCount || !dr.rows[0].tid) {
+                return res.send(400)
             }
 
             req.app.conn.read.query({
@@ -98,7 +98,7 @@ exports.redeem = function(req, res, next) {
 
         function(dr) {
             var row = dr.rows[0]
-            res.send(200, {
+            res.send({
                 currency: row.currency_id,
                 amount: req.app.cache.formatCurrency(row.amount, row.currency_id)
             })

@@ -21,9 +21,7 @@ module.exports = function(email, cb) {
                 url: url,
                 json: true
             }, function(err, res, data) {
-                console.log(data)
                 if (err) return next(err)
-                console.log('status code %s', res.statusCode)
 
                 if (res.statusCode != 200) {
                     return next(new Error(format('Status code %d', res.statusCode)))
@@ -31,7 +29,7 @@ module.exports = function(email, cb) {
 
                 debug('Email check for domain of %s:\n%j', email, data)
                 if (data.domain_status != 'ok') return cb(null, false)
-                //next()
+
                 cb(null, true)
             })
         },
@@ -39,7 +37,6 @@ module.exports = function(email, cb) {
         function(next) {
             debug('checking email existence')
             emailExistence.check(email, function(err, exists) {
-                console.log(arguments)
                 if (err) return next(err)
                 debug('Email check for %s: %s', email, exists)
                 cb(null, exists)

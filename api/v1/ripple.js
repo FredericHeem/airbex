@@ -73,7 +73,7 @@ exports.federation = function(conn, req, res) {
     })
 }
 
-exports.address = function(req, res, next) {
+exports.address = function(req, res) {
     res.send({ address: req.app.config.ripple_account })
 }
 

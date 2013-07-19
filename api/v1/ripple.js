@@ -135,7 +135,7 @@ exports.trust = function(req, res, next) {
         throw new Error('ripple_account not configured')
     }
 
-    req.app.drop.lines(req.params.account, function(err, lines) {
+    req.app.ripple.drop.lines(req.params.account, function(err, lines) {
         if (err) return next(err)
 
         lines = lines.reduce(function(p, c) {

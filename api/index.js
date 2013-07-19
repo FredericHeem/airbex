@@ -25,7 +25,9 @@ app.email = require('./email')(app)
 app.ripple = require('./ripple')(app)
 app.use(express.bodyParser())
 
-if (!module.parent) {
+if (module.parent) {
+    app.ripple.drop = {}
+} else {
     app.notify = require('./email/notify')(app)
     app.ripple.connect()
 }

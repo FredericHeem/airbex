@@ -40,6 +40,14 @@ exports.litecoinAddress = function() {
     return prefix + hash
 }
 
+exports.rippleAddress = function() {
+    var len = exports.number(27, 34)
+    , prefix = 'r'
+    , alphabet = 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz'
+    , hash = exports.fromAlphabet(alphabet, len - 1)
+    return prefix + hash
+}
+
 var rand = function(arr, count) {
     var offset = Math.floor(Math.random() * (arr.length - (count || 1) - 1))
 

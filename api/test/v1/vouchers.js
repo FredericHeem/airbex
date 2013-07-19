@@ -20,7 +20,6 @@ describe('vouchers', function() {
 
             mock.once(vouchers, 'createId', function() {
                 res.voucher = vouchers.createId.real()
-                console.log(res)
                 return res.voucher
             })
 

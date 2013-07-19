@@ -33,4 +33,19 @@ describe('ripple', function() {
             })
         })
     })
+
+    describe('address', function() {
+        it('returns address from config', function(done) {
+            request(app)
+            .get('/v1/ripple/address')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect({
+                address: app.config.ripple_account
+            })
+            .end(function(err) {
+                done(err)
+            })
+        })
+    })
 })

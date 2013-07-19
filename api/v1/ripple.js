@@ -74,16 +74,7 @@ exports.federation = function(conn, req, res) {
 }
 
 exports.address = function(req, res, next) {
-    req.app.conn.read.query({
-        text: 'SELECT address FROM ripple_account'
-    }, function(err, dres) {
-        if (err) return next(err)
-        if (!dres.rows.length) {
-            console.error('Ripple account missing from database')
-            return res.send(500)
-        }
-        res.send(200, { address: dres.rows[0].address })
-    })
+    res.send({ address: req.app.config.ripple_account })
 }
 
 exports.withdraw = function(req, res, next) {

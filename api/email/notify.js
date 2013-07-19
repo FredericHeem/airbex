@@ -1,10 +1,9 @@
 var debug = require('debug')('snow:email:notify')
 , _ = require('lodash')
 , async = require('async')
-, app
 
-module.exports = exports = function(a) {
-    app = a
+module.exports = exports = function(app) {
+    exports.app = app
     exports.schedule()
 }
 
@@ -59,7 +58,7 @@ exports.process = function(row, cb) {
         return cb()
     }
 
-    app.email.send(row.user_id, row.language, template, locals, cb)
+    exports.app.email.send(row.user_id, row.language, template, locals, cb)
 }
 
 exports.schedule = function() {
@@ -72,7 +71,7 @@ exports.tick = function() {
 
     var query = 'SELECT * FROM pending_email_notify'
 
-    app.conn.read.query(query, function(err, dr) {
+    exports.app.conn.read.query(query, function(err, dr) {
         if (err) {
             // TODO: Raven
             console.error('Failed to check for new email notifications')
@@ -92,7 +91,7 @@ exports.tick = function() {
 
             debug('setting tip to %s', tip)
 
-            exports.conn.write.query({
+            exports.app.conn.write.query({
                 text: [
                     'UPDATE settings SET notify_tip = $1',
                     'WHERE notify_tip < $1'

@@ -1,6 +1,5 @@
 /* global TropoWebAPI, TropoJSON */
 var _ = require('lodash')
-, verifyemail = require('../verifyemail')
 , async = require('async')
 , Tropo = require('tropo')
 , debug = require('debug')('snow:users')
@@ -105,7 +104,7 @@ exports.whoami = function(req, res, next) {
 exports.create = function(req, res, next) {
     if (!req.app.validate(req.body, 'v1/user_create', res)) return
 
-    verifyemail(req.body.email, function(err, ok) {
+    req.app.verifyEmail(req.body.email, function(err, ok) {
         if (err) {
             debug('E-mail validation failed for %s:\n', req.body.email, err)
         }
@@ -123,10 +122,11 @@ exports.create = function(req, res, next) {
         req.app.conn.write.query({
             text: 'SELECT create_user($1, $2) user_id',
             values: [req.body.email, req.body.key]
-        }, function(err, cres) {
+        }, function(err, dr) {
             if (!err) {
-                req.app.activity(cres.rows[0].user_id, 'Created', {})
-                return res.send(201, { id: cres.rows[0].user_id })
+                var row = dr.rows[0]
+                req.app.activity(row.user_id, 'Created', {})
+                return res.send(201, { id: row.user_id })
             }
 
             if (err.message.match(/email_regex/)) {

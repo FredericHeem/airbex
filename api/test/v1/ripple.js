@@ -48,4 +48,49 @@ describe('ripple', function() {
             })
         })
     })
+
+    describe('withdraw', function() {
+        it('returns lines', function(done) {
+            var req = {
+                address: dummy.rippleAddress(),
+                amount: '1.234',
+                currency: 'BTC'
+            }
+            , res = {
+                id: dummy.number(1, 1e6)
+            }
+            , userId = dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { canWithdraw: true })
+
+            mock.once(app.conn.write, 'query', function(q, cb) {
+                expect(q.text).to.match(/ripple_withdraw\(/)
+                expect(q.values).to.eql([
+                    userId,
+                    req.currency,
+                    req.address,
+                    1.234e8
+                ])
+                cb(null, {
+                    rows: [
+                        {
+                            rid: res.id
+                        }
+                    ]
+                })
+            })
+
+            mock.once(app, 'activity', function() {})
+
+            request(app)
+            .post('/v1/ripple/out')
+            .send(req)
+            .expect(201)
+            .expect('Content-Type', /json/)
+            .expect(res)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
+        })
+    })
 })

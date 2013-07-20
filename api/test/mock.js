@@ -4,7 +4,7 @@ module.exports = exports = function(target, name, fake) {
     var real = target[name]
     , wrapper = function() {
         wrapper.invokes++
-        return fake.apply(this, arguments)
+        return fake ? fake.apply(this, arguments) : null
     }
 
     wrapper.real = real

@@ -228,4 +228,17 @@ describe('bankaccounts', function() {
             })
         })
     })
+
+    describe('createVerifyCode', function() {
+        it('is four characters', function() {
+            var code = bankaccounts.createVerifyCode()
+            expect(code).to.match(/^[A-Z0-9]{4}$/)
+        })
+
+        it('does not repeat', function() {
+            var code1 = bankaccounts.createVerifyCode()
+            , code2 = bankaccounts.createVerifyCode()
+            expect(code1).to.not.be(code2)
+        })
+    })
 })

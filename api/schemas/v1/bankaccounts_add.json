@@ -2,19 +2,19 @@
     "type": "object",
     "properties": {
         "accountNumber": {
-            "type": "string",
+            "type": ["string", "null"],
             "pattern": "^[0-9]{1,25}$"
         },
         "iban": {
-            "type": "string",
+            "type": ["string", "null"],
             "pattern": "^[A-Za-z0-9 ]{1,35}$"
         },
         "swiftbic": {
-            "type": "string",
+            "type": ["string", "null"],
             "pattern": "^[A-Za-z0-9]{1,15}$"
         },
         "routingNumber": {
-            "type": "string",
+            "type": ["string", "null"],
             "pattern": "^[A-Za-z0-9]{1,15}$"
         }
     }

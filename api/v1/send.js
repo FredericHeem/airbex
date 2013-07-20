@@ -143,7 +143,13 @@ exports.transfer = function(app, fromUser, toEmail, amount, currency, cb) {
 
 exports.send = function(req, res, next) {
     if (!req.app.validate(req.body, 'v1/transfer', res)) return
-    if (req.body.currency == 'NOK') throw new Error('Cannot transfer fiat')
+
+    if (req.body.currency == 'NOK') {
+        return res.send(400, {
+            name: 'CannotSendFiat',
+            message: 'Cannot send FIAT to other users at this time'
+        })
+    }
 
     exports.transfer(req.app, req.user, req.body.email,
         req.body.amount, req.body.currency, function(err) {

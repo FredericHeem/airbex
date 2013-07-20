@@ -53,5 +53,76 @@ describe('bankaccounts', function() {
                 done(err)
             })
         })
+
+        it('requires primary', function(done) {
+            var userId =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { primary: false })
+
+            request(app)
+            .get('/v1/bankaccounts')
+            .expect(401)
+            .expect('Content-Type', /json/)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
+        })
+    })
+
+    describe('add', function() {
+        it('success', function(done) {
+            var userId =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { primary: true })
+            , req = {
+                displayName: null,
+                iban: null,
+                accountNumber: dummy.number(1e6, 1.9e6).toString(),
+                routingNumber: null,
+                swiftbic: null,
+                verified: false,
+                verifying: true
+            }
+
+            mock.once(bankaccounts, 'createVerifyCode', function() {
+                return 'code mocked'
+            })
+
+            var write = mock.once(app.conn.write, 'query', function(query, cb) {
+                expect(query.text).to.match(/INSERT INTO bank_account/)
+                expect(query.values).to.eql([
+                    userId,
+                    req.accountNumber,
+                    req.iban,
+                    req.swiftbic,
+                    req.routingNumber,
+                    'code mocked'
+                ])
+                cb()
+            })
+
+            request(app)
+            .post('/v1/bankaccounts')
+            .send(req)
+            .expect(204)
+            .end(function(err) {
+                if (err) return done(err)
+                impersonate.restore()
+                expect(write.invokes).to.be(1)
+                done()
+            })
+        })
+
+        it('requires primary', function(done) {
+            var userId =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { primary: false })
+
+            request(app)
+            .post('/v1/bankaccounts')
+            .expect(401)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
+        })
     })
 })

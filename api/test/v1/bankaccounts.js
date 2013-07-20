@@ -4,6 +4,7 @@ var expect = require('expect.js')
 , app = require('../..')
 , mock = require('../mock')
 , dummy = require('../dummy')
+, bankaccounts = require('../../v1/bankaccounts')
 
 describe('bankaccounts', function() {
     describe('index', function() {
@@ -15,6 +16,7 @@ describe('bankaccounts', function() {
                     id: dummy.number(1, 1e6),
                     displayName: null,
                     accountNumber: dummy.number(1e6, 1.9e6),
+                    iban: null,
                     routingNumber: null,
                     verified: false,
                     verifying: true
@@ -32,6 +34,7 @@ describe('bankaccounts', function() {
                             display_name: res[0].displayName,
                             account_number: res[0].accountNumber,
                             routing_number: res[0].routingNumber,
+                            iban: res[0].iban,
                             verified_at: null,
                             verify_started_at: 'yes'
                         }

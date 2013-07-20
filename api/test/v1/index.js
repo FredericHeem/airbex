@@ -1,13 +1,6 @@
-require('./activities')
-require('./balances')
-require('./bitcoin')
-require('./currencies')
-require('./markets')
-require('./orders')
-require('./ripple')
-require('./users')
-require('./resetPassword')
-require('./vouchers')
-require('./email')
-require('./keys')
-require('./spend')
+require('fs').readdirSync(__dirname)
+.forEach(function(fn) {
+    if (!fn.match(/\.js$/)) return
+    if (fn == 'index.js') return
+    require('./' + fn)
+})

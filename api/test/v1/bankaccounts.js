@@ -124,6 +124,22 @@ describe('bankaccounts', function() {
                 done(err)
             })
         })
+
+        it('validates', function(done) {
+            var userId =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { primary: true })
+
+            request(app)
+            .post('/v1/bankaccounts')
+            .send({
+                iban: '!'
+            })
+            .expect(400)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
+        })
     })
 
     describe('verify', function() {

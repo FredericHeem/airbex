@@ -24,6 +24,7 @@ exports.index = function(req, res, next) {
                 id: row.bank_account_id,
                 displayName: row.display_name,
                 accountNumber: row.account_number,
+                iban: row.iban,
                 routingNumber: row.routing_number,
                 verified: !!row.verified_at,
                 verifying: !!row.verify_started_at

@@ -74,16 +74,14 @@ exports.verify = function(req, res, next) {
         if (err) return next(err)
         var row = dr.rows[0]
         if (!row) {
-            return res.send(404, {
-                name: 'BankAccountNotFound',
-                message: 'Bank account not found'
+            return res.send(400, {
+                name: 'BankAccountNotFound'
             })
         }
 
         if (!row.success) {
             return res.send(400, {
-                name: 'WrongBankVerifyCode',
-                message: 'Bank account verification failed. Wrong code.'
+                name: 'WrongBankAccountVerifyCode'
             })
         }
 

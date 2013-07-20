@@ -1,3 +1,5 @@
+var _ = require('lodash')
+
 module.exports = exports = function(target, name, fake) {
     var real = target[name]
     , wrapper = function() {
@@ -19,7 +21,7 @@ module.exports = exports = function(target, name, fake) {
 
 exports.once = function(target, name, fake) {
     var wrapper = exports(target, name, function() {
-        var result = fake.apply(this, arguments)
+        var result = fake ? fake.apply(this, arguments) : null
         wrapper.restore()
         return result
     })
@@ -32,4 +34,17 @@ exports.impersonate = function(app, uid, permissions) {
         req.apiKey = permissions || {}
         next()
     })
+}
+
+exports.rows = function(rows) {
+    rows || (rows = [])
+
+    if (!_.isArray(rows)) {
+        return exports.rows([rows])
+    }
+
+    return {
+        rowCount: rows.length,
+        rows: rows
+    }
 }

@@ -125,4 +125,107 @@ describe('bankaccounts', function() {
             })
         })
     })
+
+    describe('verify', function() {
+        it('success', function(done) {
+            var userId =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { primary: true })
+            , req = {
+                code: dummy.hex(4)
+            }
+            , id = dummy.number(1, 1e6)
+
+            mock.once(app.conn.write, 'query', function(query, cb) {
+                expect(query.text).to.match(/verify_bank_account/)
+                expect(query.values).to.eql([
+                    userId,
+                    id,
+                    req.code
+                ])
+                cb(null, {
+                    rows: [
+                        {
+                            account_number: '1234',
+                            iban: null,
+                            success: true
+                        }
+                    ]
+                })
+            })
+
+            var log = mock.once(app, 'activity')
+
+            request(app)
+            .post('/v1/bankaccounts/' + id + '/verify')
+            .send(req)
+            .expect(204)
+            .end(function(err) {
+                if (err) return done(err)
+                impersonate.restore()
+                expect(log.invokes).to.be(1)
+                done()
+            })
+        })
+
+        it('returns error on wrong code', function(done) {
+            var userId =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { primary: true })
+
+            mock.once(app.conn.write, 'query', function(query, cb) {
+                cb(null, mock.rows({
+                    account_number: null,
+                    iban: null,
+                    success: false
+                }))
+            })
+
+            request(app)
+            .post('/v1/bankaccounts/123/verify')
+            .send({ code: 'ABCDE'})
+            .expect(400)
+            .expect({
+                name: 'WrongBankAccountVerifyCode'
+            })
+            .end(function(err) {
+                if (err) return done(err)
+                impersonate.restore()
+                done()
+            })
+        })
+
+        it('returns error when account is not found', function(done) {
+            var userId =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { primary: true })
+
+            mock.once(app.conn.write, 'query', function(query, cb) {
+                cb(null, mock.rows())
+            })
+
+            request(app)
+            .post('/v1/bankaccounts/123/verify')
+            .send({ code: 'ABCDE'})
+            .expect(400)
+            .expect({
+                name: 'BankAccountNotFound'
+            })
+            .end(function(err) {
+                if (err) return done(err)
+                impersonate.restore()
+                done()
+            })
+        })
+
+        it('requires primary', function(done) {
+            var userId =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { primary: false })
+
+            request(app)
+            .post('/v1/bankaccounts/123/verify')
+            .expect(401)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
+        })
+    })
 })

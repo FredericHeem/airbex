@@ -22,7 +22,7 @@ before_script:
   # xwindows
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
-  - "sleep 1"
+  - sudo apt-get install -y lynx
 script:
   # db
   - "psql -c 'create database travis;' -U postgres"
@@ -36,6 +36,7 @@ script:
   - "npm install"
   - "which mocha"
   - "npm test"
+  - npm run-script coverage-text
   - "popd"
   # workers
   - "pushd workers"
@@ -53,4 +54,4 @@ script:
   - "npm test"
   - "popd"
   - "npm install jshint"
-  - "jshint `find | grep -P '\\.js$' | grep -vP '(/node_modules/|/vendor/|/web/components/)' | sed ':a;N;$!ba;s/\\n/ /g'`"
+  - "jshint `find | grep -P '\\.js$' | grep -vP '(/node_modules/|/vendor/|/web/components/|/coverage/)' | sed ':a;N;$!ba;s/\\n/ /g'`"

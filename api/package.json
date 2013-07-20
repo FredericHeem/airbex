@@ -22,13 +22,16 @@
     "ejs": "~0.8.4"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "coverage": "node node_modules/istanbul/lib/cli cover node_modules/mocha/bin/_mocha",
+    "coverage-text": "node node_modules/istanbul/lib/cli cover node_modules/mocha/bin/_mocha --report text"
   },
   "devDependencies": {
     "mocha": "~1.10.0",
     "expect.js": "0.2.0",
     "shelljs": "x",
-    "supertest": "~0.7.1"
+    "supertest": "~0.7.1",
+    "istanbul": "~0.1.42"
   },
   "engines": {
     "node": ">=0.8",

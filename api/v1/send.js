@@ -5,14 +5,87 @@ module.exports = exports = function(app) {
     app.post('/v1/send', app.auth.withdraw, exports.send)
 }
 
-exports.emailVoucher = function(app, fromUser, toEmail, amount, currency, cb)
+exports.sendToEmail = function(app, from, to, currency, amount, allowNew, cb) {
+    exports.sendToExistingUser(app, from, to, currency, amount,
+        function(err) {
+            if (!err) return cb()
+            if (err.name == 'UserNotFound') {
+                if (!allowNew) return cb(err)
+                exports.sendVoucher(app, from, to, currency, amount, cb)
+            }
+            cb(err)
+        }
+    )
+}
+
+exports.friendlyCurrency = function(currency) {
+    var currencyFull = currency
+    if (currency == 'XRP') currencyFull = 'ripples (XRP)'
+    else if (currency == 'BTC') currencyFull = 'Bitcoin (BTC)'
+    else if (currency == 'LTC') currencyFull = 'Litecoin (LTC)'
+    return currencyFull
+}
+
+exports.sendToExistingUser = function(app, from, to, currency, amount, cb) {
+    app.conn.write.query({
+        text: [
+            'SELECT',
+            '   user_transfer_to_email($1, $2, $3, $4) tid,',
+            '   su.email from_email,',
+            '   ru.user_id to_user_id',
+            'FROM "user" su, "user" ru',
+            'WHERE su.user_id = $1 AND ru.email_lower = $2'
+        ].join('\n'),
+        values: [
+            from,
+            to,
+            currency,
+            app.cache.parseCurrency(amount, currency)
+        ]
+    }, function(err, dr) {
+        if (err) return cb(err)
+
+        var row = dr.rows[0]
+
+        if (!row) {
+            err = new Error('User not found')
+            err.name = 'UserNotFound'
+            return cb(err)
+        }
+
+        app.activity(from, 'SendToUser', {
+            to: to,
+            amount: amount,
+            currency: currency
+        })
+
+        app.activity(row.to_user_id, 'ReceiveFromUser', {
+            from:  row.from_email,
+            amount: amount,
+            currency: currency
+        })
+
+        cb()
+    })
+}
+
+exports.sendVoucher = function(app, fromUser, toEmail, amount, currency, cb)
 {
     var voucherId = vouchers.createId()
     var sender
 
     async.series([
+        // Create voucher
+        function(cb) {
+            vouchers.create(app, fromUser, currency, amount, function(err, res) {
+                if (err) return cb(err)
+                voucherId = res
+                cb()
+            })
+        },
+
         // Find information about sender
-        function(next) {
+        function(voucher, next) {
             app.conn.read.query({
                 text: [
                     'SELECT first_name, last_name, email',
@@ -30,25 +103,9 @@ exports.emailVoucher = function(app, fromUser, toEmail, amount, currency, cb)
             })
         },
 
-        // Create voucher
-        function(next) {
-            app.conn.write.query({
-                text: 'SELECT create_voucher($1, $2, $3, $4)',
-                values: [
-                    voucherId,
-                    fromUser,
-                    currency,
-                    app.cache.parseCurrency(amount, currency)
-                ]
-            }, next)
-        },
-
         // Send email
         function(next) {
-            var currencyFull = currency
-            if (currency == 'XRP') currencyFull = 'ripples (XRP)'
-            else if (currency == 'BTC') currencyFull = 'Bitcoin (BTC)'
-            else if (currency == 'LTC') currencyFull = 'Litecoin (LTC)'
+            var currencyFull = exports.friendlyCurrency(currency)
 
             // TODO: Cancel voucher on failure
             // TODO: Allow user to change sending language
@@ -73,74 +130,6 @@ exports.emailVoucher = function(app, fromUser, toEmail, amount, currency, cb)
     ], cb)
 }
 
-exports.transfer = function(app, fromUser, toEmail, amount, currency, cb) {
-    app.conn.write.query({
-        text: [
-            'SELECT',
-            '   user_transfer_to_email($1, $2, $3, $4) tid,',
-            '   su.email from_email,',
-            '   ru.user_id to_user_id',
-            'FROM "user" su, "user" ru',
-            'WHERE su.user_id = $1 AND ru.email_lower = $2'
-        ].join('\n'),
-        values: [fromUser, toEmail, currency, app.cache.parseCurrency(amount, currency)]
-    }, function(err, dr) {
-        if (err) {
-            if (err.message.match(/^User with email/)) {
-                err = new Error('The user ' + toEmail + ' does not exist')
-                err.friendly = true
-                return cb(err)
-            }
-
-            if (err.message.match(/transaction_debit_credit_not_same/)) {
-                err = new Error('Cannot transfer to yourself')
-                err.name = 'CannotTransferToSelf'
-                err.friendly = true
-                return cb(err)
-            }
-
-            if (err.message.match(/transaction_amount_check/)) {
-                err = new Error('The requested transfer amount is invalid/out of range')
-                err.name = 'InvalidAmount'
-                err.friendly = true
-                return cb(err)
-            }
-
-            if (err.message.match(/non_negative_available/)) {
-                err = new Error('Insufficient funds')
-                err.name = 'InsufficientFunds'
-                err.friendly = true
-                return cb(err)
-            }
-
-            return cb(err)
-        }
-
-        var row = dr.rows[0]
-
-        if (!row) {
-            err = new Error('User not found')
-            err.friendly = true
-            err.name = 'UserNotFound'
-            return cb(err)
-        }
-
-        app.activity(fromUser, 'SendToUser', {
-            to: toEmail,
-            amount: amount,
-            currency: currency
-        })
-
-        app.activity(row.to_user_id, 'ReceiveFromUser', {
-            from:  row.from_email,
-            amount: amount,
-            currency: currency
-        })
-
-        cb()
-    })
-}
-
 exports.send = function(req, res, next) {
     if (!req.app.validate(req.body, 'v1/transfer', res)) return
 
@@ -151,38 +140,19 @@ exports.send = function(req, res, next) {
         })
     }
 
-    exports.transfer(req.app, req.user, req.body.email,
-        req.body.amount, req.body.currency, function(err) {
+    exports.sendToEmail(req.app, req.user, req.body.email,
+        req.body.currency, req.body.amount, req.body.allowNewUser,
+        function(err) {
             if (!err) return res.send(204)
 
-            if (err.name != 'UserNotFound' || !req.body.allowNewUser) {
-                if (err.friendly) {
-                    return res.send(400, {
-                        name: err.name,
-                        message: err.message
-                    })
-                }
-
-                return next(err)
+            if (err.name != 'UserNotFound') {
+                return res.send(400, {
+                    name: 'UserNotFound',
+                    message: 'User not found'
+                })
             }
 
-            exports.emailVoucher(req.app.email, req.app.conn, req.app.cache, req.user,
-                req.body.email, req.body.amount, req.body.currency,
-                function(err, voucher) {
-                    if (!err) {
-                        return res.send(200, { voucher: voucher })
-                    }
-
-                    if (err.friendly) {
-                        return res.send(400, {
-                            name: err.name,
-                            message: err.message
-                        })
-                    }
-
-                    return next(err)
-                }
-            )
+            next(err)
         }
     )
 }

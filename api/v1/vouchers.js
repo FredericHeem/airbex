@@ -2,9 +2,64 @@ var crypto = require('crypto')
 , async = require('async')
 
 module.exports = exports = function(app) {
-    app.post('/v1/vouchers', app.auth.withdraw, exports.create)
-    app.post('/v1/vouchers/:id/redeem', app.auth.deposit, exports.redeem)
+    app.post('/v1/vouchers', app.auth.withdraw, function(req, res, next) {
+        if (!req.app.validate(req.body, 'v1/voucher_create', res)) return
+
+        exports.create(
+            req.app,
+            req.user,
+            req.body.currency,
+            req.body.amount,
+            function(err, code) {
+                if (err) return next(err)
+                res.send(201, { voucher: code })
+            }
+        )
+    })
+
+    app.post('/v1/vouchers/:id/redeem', app.auth.deposit, function(req, res, next) {
+        exports.redeem(req.app, req.user, req.params.id, function(err, details) {
+            if (!err) {
+                return res.send(details)
+            }
+
+            if (err.name == 'VoucherNotFound') {
+                return res.send(400, {
+                    name: 'VoucherNotFound',
+                    message: 'Voucher not found'
+                })
+            }
+
+            next(err)
+        })
+    })
+
     app.get('/v1/vouchers', app.auth.any, exports.index)
+}
+
+exports.create = function(app, userId, currency, amount, cb) {
+    var voucherId = exports.createId()
+
+    app.conn.write.query({
+        text: [
+            'SELECT create_voucher($1, $2, $3, $4)'
+        ].join('\n'),
+        values: [
+            voucherId,
+            userId,
+            currency,
+            app.cache.parseCurrency(amount, currency)
+        ]
+    }, function(err) {
+        if (err) return cb(err)
+
+        app.activity(userId, 'CreateVoucher', {
+            currency: currency,
+            amount: amount
+        })
+
+        cb(null, voucherId)
+    })
 }
 
 exports.createId = function() {
@@ -15,33 +70,6 @@ exports.createId = function() {
     var checksum = hash.digest('hex').substr(0, 2).toUpperCase()
 
     return id + checksum
-}
-
-exports.create = function(req, res, next) {
-    if (!req.app.validate(req.body, 'v1/voucher_create', res)) return
-
-    var voucherId = exports.createId()
-
-    req.app.conn.write.query({
-        text: [
-            'SELECT create_voucher($1, $2, $3, $4)'
-        ].join('\n'),
-        values: [
-            voucherId,
-            req.user,
-            req.body.currency,
-            req.app.cache.parseCurrency(req.body.amount, req.body.currency)
-        ]
-    }, function(err) {
-        if (err) return next(err)
-
-        req.app.activity(req.user, 'CreateVoucher', {
-            currency: req.body.currency,
-            amount: req.body.amount
-        })
-
-        res.send(201, { voucher: voucherId })
-    })
 }
 
 exports.index = function(req, res, next) {
@@ -66,26 +94,28 @@ exports.index = function(req, res, next) {
     })
 }
 
-exports.redeem = function(req, res, next) {
+exports.redeem = function(app, user, voucher, cb) {
     async.waterfall([
-        function(next) {
-            req.app.conn.write.query({
+        function(cb) {
+            app.conn.write.query({
                 text: [
                     'SELECT redeem_voucher($1, $2) tid'
                 ].join('\n'),
                 values: [
-                    req.params.id,
-                    req.user
+                    voucher,
+                    user
                 ]
-            }, next)
+            }, cb)
         },
 
-        function(dr, next) {
+        function(dr, cb) {
             if (!dr.rowCount || !dr.rows[0].tid) {
-                return res.send(400)
+                var err = new Error('Voucher not found')
+                err.name = 'VoucherNotFound'
+                return cb(err)
             }
 
-            req.app.conn.read.query({
+            app.conn.read.query({
                 text: [
                     'SELECT t.amount, a.currency_id',
                     'FROM "transaction" t',
@@ -93,15 +123,16 @@ exports.redeem = function(req, res, next) {
                     'WHERE t.transaction_id = $1'
                 ].join('\n'),
                 values: [dr.rows[0].tid]
-            }, next)
+            }, cb)
         },
 
-        function(dr) {
+        function(dr, cb) {
             var row = dr.rows[0]
-            res.send({
+
+            cb(null, {
                 currency: row.currency_id,
-                amount: req.app.cache.formatCurrency(row.amount, row.currency_id)
+                amount: app.cache.formatCurrency(row.amount, row.currency_id)
             })
         }
-    ], next)
+    ], cb)
 }

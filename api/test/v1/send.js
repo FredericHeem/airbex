@@ -94,6 +94,7 @@ describe('send', function() {
                 expect(createVoucher.invokes).to.be(1)
                 expect(getSenderName.invokes).to.be(1)
                 expect(email.invokes).to.be(1)
+                expect(friendlyCurrency.invokes).to.be(1)
                 expect(activity.invokes).to.be(1)
                 done()
             })

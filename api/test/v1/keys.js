@@ -4,6 +4,7 @@ var expect = require('expect.js')
 , app = require('../..')
 , mock = require('../mock')
 , dummy = require('../dummy')
+, keys = require('../../v1/keys')
 
 describe('keys', function() {
     describe('index', function() {
@@ -42,6 +43,23 @@ describe('keys', function() {
                 impersonate.restore()
                 done(err)
             })
+        })
+    })
+
+    describe('generateApiKey', function() {
+        it('has correct format', function() {
+            var key = keys.generateApiKey()
+            expect(key).to.match(/^[a-f0-9]{64}$/)
+        })
+
+        it('does not repeat', function() {
+            var known = []
+
+            for (var i = 0; i < 100; i++) {
+                var key = keys.generateApiKey()
+                expect(known).to.not.contain(key)
+                known.push(key)
+            }
         })
     })
 })

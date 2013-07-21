@@ -21,6 +21,10 @@ exports.phoneCode = function() {
     return exports.fromAlphabet('1234567890', 4)
 }
 
+exports.bool = exports.boolean = function() {
+    return Math.random() < 0.5
+}
+
 exports.hex = function(length) {
     var hex = crypto.randomBytes(Math.ceil(length / 2)).toString('hex')
     return hex.substr(0, length)

@@ -71,6 +71,46 @@ describe('keys', function() {
         })
     })
 
+    describe('creates', function() {
+        it('succeeds', function(done) {
+            var uid = dummy.number(1, 1e6)
+            , req = {
+                canTrade: dummy.bool(),
+                canWithdraw: dummy.bool(),
+                canDeposit: dummy.bool()
+            }
+            , res = {
+                id: dummy.hex(64)
+            }
+            , impersonate = mock.impersonate(app, uid, { primary: true })
+
+            mock.once(keys, 'generateApiKey', function() {
+                return res.kid
+            })
+
+            mock.once(app.conn.write, 'query', function(query, cb) {
+                expect(query.text).to.match(/^INSERT INTO api_key/)
+                expect(query.values).to.eql([
+                    res.kid,
+                    uid,
+                    req.canTrade,
+                    req.canDeposit,
+                    req.canWithdraw
+                ])
+                cb(null, mock.rows({}))
+            })
+
+            request(app)
+            .post('/v1/keys')
+            .send(req)
+            .expect(201)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
+        })
+    })
+
     describe('replace', function() {
         it('replacs the key', function(done) {
             var uid = dummy.number(1, 1e6)

@@ -15,6 +15,8 @@ exports.fromAlphabet = function(alphabet, length) {
     return result
 }
 
+exports.id = exports.number.bind(exports, 1, 1e6)
+
 exports.phoneCode = function() {
     return exports.fromAlphabet('1234567890', 4)
 }

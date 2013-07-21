@@ -1,6 +1,5 @@
 var crypto = require('crypto')
 , debug = require('debug')('snow:resetPassword')
-, Tropo = require('tropo')
 
 module.exports = exports = function(app) {
     app.post('/v1/resetPassword', exports.resetPasswordBegin)
@@ -95,13 +94,6 @@ exports.resetPasswordContinue = function(req, res, next) {
 
         debug('correct code is %s', code)
 
-        var tropo = new Tropo({
-            voiceToken: req.app.config.tropo_voice_token,
-            messagingToken: req.app.config.tropo_messaging_token
-        })
-
-        debug('using tropo token %s', req.app.config.tropo_voice_token)
-
         var codeMsg = [
             '<prosody rate=\'-5%\'>',
             'Your code is:' ,
@@ -121,22 +113,22 @@ exports.resetPasswordContinue = function(req, res, next) {
             '</speak>'
         ].join('')
 
-        debug('message %s', msg)
-
         debug('requesting call to %s', phoneNumber)
 
         res.send('Email confirmed. Next we will call you. ' +
             'Close this window and go back to the password reset window.')
 
         setTimeout(function() {
-            tropo.call(phoneNumber, msg, function(err) {
+            req.app.tropo.say(phoneNumber, msg, function(err) {
                 if (!err) return debug('call placed')
                 console.error('Failed to call user at %s', phoneNumber)
                 console.error(err)
             })
-        }, 10e3)
+        }, exports.callDelay)
     })
 }
+
+exports.callDelay = 10e3
 
 exports.resetPasswordEnd = function(req, res, next) {
     req.app.conn.write.query({

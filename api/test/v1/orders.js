@@ -121,4 +121,48 @@ describe('orders', function() {
             })
         })
     })
+
+    describe('history', function() {
+        it('returns order history', function(done) {
+            var uid =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, uid)
+            , res = [{
+                id: dummy.id(),
+                market: 'BTCLTC',
+                type: 'ask',
+                price: '44.900',
+                amount: '0.55550',
+                remaining: '0.45550',
+                matched: '0.10000',
+                cancelled: '0.00000'
+            }]
+            , read = mock(app.conn.read, 'query', function(query, cb) {
+                expect(query.text).to.match(/FROM order_view/)
+                expect(query.text).to.match(/user_id = \$/)
+                expect(query.values).to.eql([uid])
+                cb(null, mock.rows({
+                    order_id: res[0].id,
+                    market: res[0].market,
+                    side: res[0].type == 'ask' ? 1 : 0,
+                    volume: res[0].remaining * 1e5,
+                    matched: res[0].matched * 1e5,
+                    cancelled: res[0].cancelled * 1e5,
+                    original: res[0].amount * 1e5,
+                    price: res[0].price * 1e3,
+                    average_price: res[0].price * 1e3
+                }))
+            })
+
+            request(app)
+            .get('/v1/orders')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect(res)
+            .end(function(err) {
+                impersonate.restore()
+                read.restore()
+                done(err)
+            })
+        })
+    })
 })

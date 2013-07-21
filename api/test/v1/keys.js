@@ -46,6 +46,63 @@ describe('keys', function() {
         })
     })
 
+    describe('remove', function() {
+        it('removes the key', function(done) {
+            var uid = dummy.number(1, 1e6)
+            , kid = dummy.hex(64)
+            , impersonate = mock.impersonate(app, uid, { primary: true })
+
+            mock.once(app.conn.write, 'query', function(query, cb) {
+                expect(query.text).to.match(/^DELETE/)
+                expect(query.text).to.match(/FROM api_key/)
+                expect(query.text).to.match(/user_id = \$1/)
+                expect(query.text).to.match(/api_key_id = \$2/)
+                expect(query.values).to.eql([uid, kid])
+                cb(null, mock.rows({}))
+            })
+
+            request(app)
+            .del('/v1/keys/' + kid)
+            .expect(204)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
+        })
+    })
+
+    describe('replace', function() {
+        it('replacs the key', function(done) {
+            var uid = dummy.number(1, 1e6)
+            , oldKid = dummy.hex(64)
+            , newKid = dummy.hex(64)
+            , impersonate = mock.impersonate(app, uid, { primary: true }, oldKid)
+
+            mock.once(app.conn.write, 'query', function(query, cb) {
+                expect(query.text).to.match(/replace_api_key/)
+                expect(query.values).to.eql([oldKid, newKid])
+                cb(null, mock.rows({}))
+            })
+
+            mock.once(app, 'activity', function(u, n, d) {
+                expect(u).to.be(uid)
+                expect(n).to.be('ChangePassword')
+                expect(d).to.eql({})
+            })
+
+            request(app)
+            .post('/v1/keys/replace')
+            .send({
+                key: newKid
+            })
+            .expect(204)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
+        })
+    })
+
     describe('generateApiKey', function() {
         it('has correct format', function() {
             var key = keys.generateApiKey()

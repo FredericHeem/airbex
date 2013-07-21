@@ -22,7 +22,7 @@ exports.phoneCode = function() {
 }
 
 exports.hex = function(length) {
-    var hex = crypto.randomBytes(Math.ceil(length / 2)).toString('hex').toUpperCase()
+    var hex = crypto.randomBytes(Math.ceil(length / 2)).toString('hex')
     return hex.substr(0, length)
 }
 

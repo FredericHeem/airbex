@@ -16,7 +16,7 @@ exports.replace = function(req, res, next) {
     }, function(err) {
         if (err) return next(err)
         req.app.activity(req.user, 'ChangePassword', {})
-        res.send(200, {})
+        res.send(204)
     })
 }
 

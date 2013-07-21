@@ -28,9 +28,10 @@ exports.once = function(target, name, fake) {
     return wrapper
 }
 
-exports.impersonate = function(app, uid, permissions) {
+exports.impersonate = function(app, uid, permissions, key) {
     return exports(app.auth, 'user', function(req, res, next) {
         req.user = uid
+        req.key = key || null
         req.apiKey = permissions || {}
         next()
     })

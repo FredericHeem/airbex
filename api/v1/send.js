@@ -1,5 +1,6 @@
 var async = require('async')
 , vouchers = require('./vouchers')
+, util = require('util')
 
 module.exports = exports = function(app) {
     app.post('/v1/send', app.auth.withdraw, exports.send)
@@ -69,36 +70,42 @@ exports.sendToExistingUser = function(app, from, to, currency, amount, cb) {
     })
 }
 
-exports.sendVoucher = function(app, fromUser, toEmail, amount, currency, cb)
+exports.getSenderName = function(app, email, cb) {
+    app.conn.read.query({
+        text: [
+            'SELECT first_name, last_name, email',
+            'FROM "user"',
+            'WHERE user_id = $1'
+        ].join('\n'),
+        values: [email]
+    }, function(err, dr) {
+        if (err) return cb(err)
+        var row = dr.rows[0]
+        if (!row.first_name) return cb(null, row.email)
+        cb(null, util.format('%s %s (%s', row.first_name, row.last_name, row.email))
+    })
+}
+
+exports.sendVoucher = function(app, from, to, currency, amount, cb)
 {
-    var voucherId = vouchers.createId()
-    var sender
+    var voucherId
+    , sender
 
     async.series([
         // Create voucher
-        function(cb) {
-            vouchers.create(app, fromUser, currency, amount, function(err, res) {
-                if (err) return cb(err)
+        function(next) {
+            vouchers.create(app, from, currency, amount, function(err, res) {
+                if (err) return next(err)
                 voucherId = res
-                cb()
+                next()
             })
         },
 
         // Find information about sender
-        function(voucher, next) {
-            app.conn.read.query({
-                text: [
-                    'SELECT first_name, last_name, email',
-                    'FROM "user"',
-                    'WHERE user_id = $1'
-                ].join('\n'),
-                values: [fromUser]
-            }, function(err, dr) {
+        function(next) {
+            exports.getSenderName(app, from, function(err, res) {
                 if (err) return next(err)
-                var row = dr.rows[0]
-                sender = row.first_name ?
-                    row.first_name + ' ' + row.last_name + ' (' + row.email + ')' :
-                    row.email
+                sender = res
                 next()
             })
         },
@@ -109,7 +116,7 @@ exports.sendVoucher = function(app, fromUser, toEmail, amount, currency, cb)
 
             // TODO: Cancel voucher on failure
             // TODO: Allow user to change sending language
-            app.email.send(toEmail, 'en-US', 'voucher-invite', {
+            app.email.send(to, 'en-US', 'voucher-invite', {
                 code: voucherId,
                 currency: currencyFull,
                 amount: amount,
@@ -119,8 +126,8 @@ exports.sendVoucher = function(app, fromUser, toEmail, amount, currency, cb)
 
         // Log activity,
         function (next) {
-            app.activity(fromUser, 'SendToUser', {
-                to: toEmail,
+            app.activity(from, 'SendToUser', {
+                to: to,
                 amount: amount,
                 currency: currency
             })

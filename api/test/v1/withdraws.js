@@ -93,13 +93,35 @@ describe('withdraws', function() {
                 done(err)
             })
         })
+    })
+
+    describe('cancel', function() {
+        it('succeeds', function(done) {
+            var uid =  dummy.id()
+            , id = dummy.id()
+            , impersonate = mock.impersonate(app, uid, { canWithdraw: true })
+
+            mock.once(app.conn.write, 'query', function(query, cb) {
+                expect(query.text).to.match(/cancel_withdraw_request/)
+                expect(query.values).to.eql([id, uid])
+                cb(null, mock.rows({}))
+            })
+
+            request(app)
+            .del('/v1/withdraws/' + id)
+            .expect(204)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
+        })
 
         it('requires canWithdraw', function(done) {
             var uid =  dummy.number(1, 1e6)
             , impersonate = mock.impersonate(app, uid, { canWithdraw: false })
 
             request(app)
-            .post('/v1/withdraws/bank')
+            .del('/v1/withdraws/123')
             .expect(401)
             .end(function(err) {
                 impersonate.restore()

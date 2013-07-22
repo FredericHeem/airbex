@@ -1,18 +1,12 @@
-var Q = require('q')
-, orders = module.exports = {}
-, validate = require('./validate')
-, activities = require('./activities')
-, debug = require('debug')('snow:orders')
-
-orders.configure = function(app, conn, auth) {
-    app.del('/v1/orders/:id', auth, orders.cancel.bind(orders, conn))
-    app.post('/v1/orders', auth, orders.create.bind(orders, conn))
-    app.get('/v1/orders', auth, orders.forUser.bind(orders, conn))
-    app.get('/v1/orders/history', auth, orders.history.bind(orders, conn))
+module.exports = exports = function(app) {
+    app.del('/v1/orders/:id', app.auth.trade, exports.cancel)
+    app.post('/v1/orders', app.auth.trade, exports.create)
+    app.get('/v1/orders', app.auth.any, exports.index)
+    app.get('/v1/orders/history', app.auth.any, exports.history)
 }
 
-orders.create = function(conn, req, res, next) {
-    if (!validate(req.body, 'order_create', res)) return
+exports.create = function(req, res, next) {
+    if (!req.app.validate(req.body, 'v1/order_create', res)) return
 
     if (req.body.price && !req.body.price.match(/^\d+(\.\d+)?$/)) {
         res.send({
@@ -21,15 +15,7 @@ orders.create = function(conn, req, res, next) {
         })
     }
 
-    if (!req.apiKey.canTrade) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must have trade permission'
-        })
-    }
-
-    var marketId = req.app.cache.markets[req.body.market].id
-    , price = null
+    var price = null
     , amount = req.app.cache.parseOrderVolume(req.body.amount, req.body.market)
     , query
 
@@ -37,16 +23,16 @@ orders.create = function(conn, req, res, next) {
         price = req.app.cache.parseOrderPrice(req.body.price, req.body.market)
     }
 
-    debug('price %s --> %s', req.body.price, price)
-
     if (req.body.aon) {
         query = {
             text: [
-                'SELECT create_order_aon($1, $2, $3, $4, $5) oid'
+                'SELECT create_order_aon($1, market_id, $3, $4, $5) oid',
+                'FROM market',
+                'WHERE base_currency_id || quote_currency_id = $2'
             ].join('\n'),
             values: [
                 req.user,
-                marketId,
+                req.body.market,
                 req.body.type == 'bid' ? 0 : 1,
                 price,
                 amount
@@ -56,12 +42,14 @@ orders.create = function(conn, req, res, next) {
         query = {
             text: [
                 'INSERT INTO "order" (user_id, market_id, side, price, volume)',
-                'VALUES ($1, $2, $3, $4, $5)',
+                'SELECT $1, market_id, $3, $4, $5',
+                'FROM market',
+                'WHERE base_currency_id || quote_currency_id = $2',
                 'RETURNING order_id oid'
             ].join('\n'),
             values: [
                 req.user,
-                marketId,
+                req.body.market,
                 req.body.type == 'bid' ? 0 : 1,
                 price,
                 amount
@@ -69,7 +57,7 @@ orders.create = function(conn, req, res, next) {
         }
     }
 
-    conn.write.query(query, function(err, dr) {
+    req.app.conn.write.query(query, function(err, dr) {
         if (err) {
             if (err.message.match(/transaction_amount_check/)) {
                 return res.send(400, {
@@ -118,7 +106,7 @@ orders.create = function(conn, req, res, next) {
             })
         }
 
-        activities.log(conn, req.user, 'CreateOrder', {
+        req.app.activity(req.user, 'CreateOrder', {
             market: req.body.market,
             type: req.body.type,
             price: req.body.price,
@@ -134,18 +122,18 @@ orders.create = function(conn, req, res, next) {
 function formatOrderRow(cache, row) {
     return {
         id: row.order_id,
+        market: row.market,
         type: row.side ? 'ask' : 'bid',
         price: cache.formatOrderPrice(row.price, row.market),
-        remaining: cache.formatOrderVolume(row.volume, row.market),
         amount: cache.formatOrderVolume(row.original, row.market),
+        remaining: cache.formatOrderVolume(row.volume, row.market),
         matched: cache.formatOrderVolume(row.matched, row.market),
-        cancelled: cache.formatOrderVolume(row.cancelled, row.market),
-        market: row.market
+        cancelled: cache.formatOrderVolume(row.cancelled, row.market)
     }
 }
 
-orders.forUser = function(conn, req, res, next) {
-    Q.ninvoke(conn.read, 'query', {
+exports.index = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
             'SELECT order_id, base_currency_id || quote_currency_id market,',
             '   side, price, volume,',
@@ -156,15 +144,14 @@ orders.forUser = function(conn, req, res, next) {
             'ORDER BY order_id DESC'
         ].join('\n'),
         values: [req.user]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(dr.rows.map(formatOrderRow.bind(this, req.app.cache)))
     })
-    .then(function(r) {
-        res.send(r.rows.map(formatOrderRow.bind(this, req.app.cache)))
-    }, next)
-    .done()
 }
 
-orders.history = function(conn, req, res, next) {
-    Q.ninvoke(conn.read, 'query', {
+exports.history = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
             'SELECT order_id, market, side, volume, matched, cancelled,',
             '   original, price, average_price',
@@ -175,9 +162,9 @@ orders.history = function(conn, req, res, next) {
             'LIMIT 100'
         ].join('\n'),
         values: [req.user]
-    })
-    .then(function(r) {
-        res.send(r.rows.map(function(row) {
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(dr.rows.map(function(row) {
             var result = formatOrderRow(req.app.cache, row)
 
             result.averagePrice = req.app.cache.formatOrderPrice(row.average_price,
@@ -185,37 +172,25 @@ orders.history = function(conn, req, res, next) {
 
             return result
         }))
-    }, next)
-    .done()
+    })
 }
 
-orders.cancel = function(conn, req, res, next) {
-    if (!req.apiKey.canTrade) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must have trade permission'
-        })
-    }
-
-    var q = [
-        'UPDATE "order"',
-        'SET',
-        '   cancelled = volume,',
-        '   volume = 0',
-        'WHERE',
-        '   order_id = $1 AND',
-        '   user_id = $2 AND volume > 0'
-    ].join('\n')
-
-    Q.ninvoke(conn.write, 'query', {
-        text: q,
+exports.cancel = function(req, res, next) {
+    req.app.conn.write.query({
+        text: [
+            'UPDATE "order"',
+            'SET',
+            '   cancelled = volume,',
+            '   volume = 0',
+            'WHERE',
+            '   order_id = $1 AND',
+            '   user_id = $2 AND volume > 0'
+        ].join('\n'),
         values: [+req.params.id, req.user]
-    })
-    .get('rowCount')
-    .then(function(cancelled) {
-        if (!cancelled) return res.send(404)
+    }, function(err, dr) {
+        if (err) return next(err)
+        if (!dr.rowCount) return res.send(404)
         res.send(204)
-        activities.log(conn, req.user, 'CancelOrder', { id: +req.params.id })
-    }, next)
-    .done()
+        req.app.activity(req.user, 'CancelOrder', { id: +req.params.id })
+    })
 }

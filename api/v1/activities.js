@@ -1,9 +1,7 @@
-var activities = module.exports = {}
-, _ = require('lodash')
-, assert = require('assert')
+var _ = require('lodash')
 
-activities.configure = function(app, conn, auth) {
-    app.get('/v1/activities', auth, activities.activities.bind(activities, conn))
+module.exports = exports = function(app) {
+    app.get('/v1/activities', app.auth.primary, exports.index)
 }
 
 var detailWhitelist = {
@@ -28,7 +26,7 @@ var detailWhitelist = {
     VerifyBankAccount: ['accountNumber', 'iban']
 }
 
-activities.activities = function(conn, req, res, next) {
+exports.index = function(req, res, next) {
     var query
 
     if (req.query.since !== undefined) {
@@ -55,7 +53,7 @@ activities.activities = function(conn, req, res, next) {
         }
     }
 
-    conn.read.query(query, function(err, dr) {
+    req.app.conn.read.query(query, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows.map(function(row) {
             row.details = JSON.parse(row.details)
@@ -67,27 +65,13 @@ activities.activities = function(conn, req, res, next) {
                 result.details = row.details
             } else {
                 var whitelist = detailWhitelist[row.type]
-                assert(whitelist, 'No whitelist entry for ' + row.type)
+                if (!whitelist) return null
                 result.details = _.pick(row.details, whitelist)
             }
 
             return result
+        }).filter(function(row) {
+            return !!row
         }))
-    })
-}
-
-activities.log = function(conn, userId, type, details, retry) {
-    console.log('user #%d activity: %s %j', userId, type, details)
-    conn.write.query({
-        text: 'INSERT INTO activity (user_id, "type", details) VALUES ($1, $2, $3)',
-        values: [userId, type, JSON.stringify(details)]
-    }, function(err) {
-        if (!err) return
-        console.error('Failed to log activity (try #%d)', (retry || 0) + 1)
-        console.error(err)
-        if (retry == 3) return
-        setTimeout(function() {
-            activities.log(conn, userId, type, details, (retry || 0) + 1)
-        }, 1000)
     })
 }

@@ -1,23 +1,13 @@
-var validate = require('./validate')
-, spend = module.exports = {}
-
-spend.configure = function(app, conn, auth) {
-    app.post('/v1/spend', auth, spend.spend.bind(spend, conn))
+module.exports = exports = function(app) {
+    app.post('/v1/spend', app.auth.trade, exports.spend)
 }
 
-spend.spend = function(conn, req, res, next) {
-    if (!validate(req.body, 'spend', res)) return
-
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
+exports.spend = function(req, res, next) {
+    if (!req.app.validate(req.body, 'v1/spend', res)) return
 
     var quote = req.body.market.substr(3, 3)
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'SELECT convert_bid($1, market_id, $2) oid',
             'FROM market',

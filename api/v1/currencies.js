@@ -1,17 +1,21 @@
-var currencies = module.exports = {}
-
-currencies.configure = function(app, conn) {
-    app.get('/v1/currencies', currencies.currencies.bind(currencies, conn))
+module.exports = exports = function(app) {
+    app.get('/v1/currencies', exports.index)
 }
 
-currencies.currencies = function(conn, req, res, next) {
+exports.index = function(req, res, next) {
     var query = [
-        'SELECT currency_id id, scale',
-        'FROM "currency" ORDER BY currency_id'
+        'SELECT currency_id, scale',
+        'FROM currency',
+        'ORDER BY currency_id'
     ].join('\n')
 
-    conn.read.query(query, function(err, dr) {
+    req.app.conn.read.query(query, function(err, dr) {
         if (err) return next(err)
-        res.send(dr.rows)
+        res.send(dr.rows.map(function(row) {
+            return {
+                id: row.currency_id,
+                scale: row.scale
+            }
+        }))
     })
 }

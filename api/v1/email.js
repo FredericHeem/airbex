@@ -1,26 +1,14 @@
-var email = module.exports = {}
-, nodemailer = require('nodemailer')
-, crypto = require('crypto')
-, smtp
-, conn
-, app
+var crypto = require('crypto')
 
-email.configure = function(a, c, auth) {
-    app = a
-    conn = c
-
-    smtp = nodemailer.createTransport(
-        app.config.smtp.service,
-        app.config.smtp.options)
-
-    app.post('/v1/email/verify/send', auth, email.verifySend)
-    app.get('/v1/email/verify/:code', email.verify)
+module.exports = exports = function(app) {
+    app.post('/v1/email/verify/send', app.auth.primary, exports.verifySend)
+    app.get('/v1/email/verify/:code', exports.verify)
 }
 
-email.sendVerificationEmail = function(userId, cb) {
+exports.sendVerificationEmail = function(app, userId, cb) {
     var code = crypto.randomBytes(10).toString('hex')
 
-    conn.write.query({
+    app.conn.write.query({
         text: [
             'SELECT email, language, create_email_verify_code($1, $2)',
             'FROM "user"',
@@ -34,15 +22,8 @@ email.sendVerificationEmail = function(userId, cb) {
     })
 }
 
-email.verifySend = function(req, res, next) {
-    if (!req.apiKey.primary) {
-        return res.send(401, {
-            name: 'MissingApiKeyPermission',
-            message: 'Must be primary api key'
-        })
-    }
-
-    email.sendVerificationEmail(req.user, function(err) {
+exports.verifySend = function(req, res, next) {
+    exports.sendVerificationEmail(req.app, req.user, function(err) {
         if (err) {
             if (err.message == 'E-mail already verified') {
                 return res.send(400, {
@@ -66,7 +47,7 @@ email.verifySend = function(req, res, next) {
     })
 }
 
-email.verify = function(req, res, next) {
+exports.verify = function(req, res, next) {
     if (!req.params.code) {
         return res.send(400, 'Email verification code missing from url.')
     }
@@ -75,7 +56,7 @@ email.verify = function(req, res, next) {
         return res.send(400, 'Invalid email verification code in url.')
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: 'SELECT verify_email($1)',
         values: [req.params.code]
     }, function(err) {

@@ -1,140 +1,79 @@
 /* global describe, it */
 var expect = require('expect.js')
-, bitcoin = require('../../v1/bitcoin')
-, andy = '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt'
+, request = require('supertest')
+, app = require('../..')
+, mock = require('../mock')
+, dummy = require('../dummy')
 
 describe('bitcoin', function() {
-	describe('configure', function() {
-		it('adds expected routes', function() {
-			var routes = []
-			, app = {
-				post: function(url) { routes.push('post ' + url) },
-				get: function(url) { routes.push('get ' + url) }
-			}
-			bitcoin.configure(app, null, null, 'BTC')
-			expect(routes).to.contain('post /v1/BTC/out')
-			expect(routes).to.contain('get /v1/BTC/address')
-		})
-	})
+    describe('address', function() {
+        it('returns address', function(done) {
+            var uid = dummy.number(1, 1e6)
+            , addr = dummy.bitcoinAddress()
+            , impersonate = mock.impersonate(app, uid, { canDeposit: true })
+            , read = mock(app.conn.read, 'query', function(query, cb) {
+                expect(query.text).to.match(/FROM BTC_deposit_address/)
+                expect(query.text).to.match(/= user_currency_acc/)
+                expect(query.values).to.eql([uid, 'BTC'])
+                cb(null, {
+                    rows: [
+                        {
+                            address: addr
+                        }
+                    ]
+                })
+            })
 
-	describe('address', function() {
-		it('returns address', function(done) {
-			var conn = {
-				read: {
-					query: function(q, c) {
-						expect(q.text).to.match(/user_currency_account/i)
-						expect(q.text).to.match(/from btc_deposit_address/i)
-						expect(q.values).to.eql([25, 'BTC'])
-						c(null, { rows: [{ address: '1someaddress' }] })
-					}
-				}
-			}
-			, req = {
-				user: 25,
-				apiKey: { canDeposit: true }
-			}
-			, res = {
-				send: function(code, r) {
-					expect(code).to.be(200)
-					expect(r.address).to.be('1someaddress')
-					done()
-				}
-			}
+            request(app)
+            .get('/v1/BTC/address')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect({
+                address: addr
+            })
+            .end(function(err) {
+                impersonate.restore()
+                read.restore()
+                done(err)
+            })
+        })
+    })
 
-			bitcoin.address(conn, 'BTC', req, res, done)
-		})
+    it('allows withdraw', function(done) {
+        var uid = dummy.number(1, 1e6)
+        , addr = dummy.bitcoinAddress()
+        , impersonate = mock.impersonate(app, uid, { canWithdraw: true })
+        , rid = dummy.number(1, 1e6)
+        , write = mock(app.conn.write, 'query', function(query, cb) {
+            expect(query.text).to.match(/BTC_withdraw\(\$1, \$2, \$3/)
+            expect(query.values).to.eql([uid, addr, 10e8])
+            cb(null, {
+                rows: [
+                    {
+                        rid: rid
+                    }
+                ]
+            })
+        })
 
-		it('requires canDeposit permission', function(done) {
-			var conn = {
-				read: {
-					query: function(q, c) {
-						expect(q.text).to.match(/user_currency_account/i)
-						expect(q.text).to.match(/from btc_deposit_address/i)
-						expect(q.values).to.eql([25, 'BTC'])
-						c(null, { rows: [{ address: '1someaddress' }] })
-					}
-				}
-			}
-			, req = {
-				user: 25,
-				apiKey: {}
-			}
-			, res = {
-				send: function(code) {
-					expect(code).to.be(401)
-					done()
-				}
-			}
+        mock(app, 'activity', function() {})
 
-			bitcoin.address(conn, 'BTC', req, res, done)
-		})
-	})
-
-	describe('withdraw', function() {
-		it('enqueues', function(done) {
-			var conn = {
-				write: {
-					query: function(q, c) {
-						if (q.text.match(/activity/)) return
-						expect(q.text).to.match(/btc_withdraw/i)
-						expect(q.values).to.eql([38, andy, 0.15 * 1e8])
-						c(null, { rows: [{ request_id: 59 }] })
-					}
-				}
-			}
-			, req = {
-				user: 38,
-				apiKey: { canWithdraw: true },
-				body: {
-					address: '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt',
-					amount: '0.15'
-				},
-				app: {
-					cache: {
-						parseCurrency: function(n) {
-							return n * 1e8
-						}
-					}
-				}
-			}
-			, res = {
-				send: function(code, r) {
-					expect(code).to.be(201)
-					expect(r.id).to.be(59)
-					done()
-				}
-			}
-
-			bitcoin.withdraw(conn, 'BTC', req, res, done)
-		})
-
-		it('requires canWithdraw api key permission', function(done) {
-			var conn = {
-				write: {
-					query: function(q, c) {
-						if (q.text.match(/activity/)) return
-						expect(q.text).to.match(/btc_withdraw/i)
-						expect(q.values).to.eql([38, andy, '0.15', 'BTC'])
-						c(null, { rows: [{ request_id: 59 }] })
-					}
-				}
-			}
-			, req = {
-				user: 38,
-				apiKey: {},
-				body: {
-					address: '1abrknajSFpnz7MHjLkVnuvCbwd96wSYt',
-					amount: '0.15'
-				}
-			}
-			, res = {
-				send: function(code) {
-					expect(code).to.be(401)
-					done()
-				}
-			}
-
-			bitcoin.withdraw(conn, 'BTC', req, res, done)
-		})
-	})
+        request(app)
+        .post('/v1/BTC/out')
+        .send({
+            amount: '10',
+            address: addr
+        })
+        .expect(201)
+        .expect('Content-Type', /json/)
+        .expect({
+            id: rid
+        })
+        .end(function(err) {
+            app.activity.restore()
+            impersonate.restore()
+            write.restore()
+            done(err)
+        })
+    })
 })

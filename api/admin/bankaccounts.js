@@ -1,10 +1,8 @@
-var bankaccounts = module.exports = {}
-
-bankaccounts.configure = function(app, conn, auth) {
-    app.get('/admin/bankaccounts', auth, bankaccounts.index.bind(bankaccounts, conn))
+module.exports = exports = function(app) {
+    app.get('/admin/bankaccounts', app.auth.admin, exports.index)
 }
 
-bankaccounts.index = function(conn, req, res, next) {
+exports.index = function(req, res, next) {
     var query = [
         'SELECT ba.*, u.first_name, u.last_name, u.email',
         'FROM bank_account ba',
@@ -12,7 +10,7 @@ bankaccounts.index = function(conn, req, res, next) {
         'WHERE verify_started_at IS NULL'
     ].join('\n')
 
-    conn.read.query(query, function(err, dr) {
+    req.app.conn.read.query(query, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows)
     })

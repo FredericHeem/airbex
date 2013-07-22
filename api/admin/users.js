@@ -1,31 +1,30 @@
-var users = module.exports = {}
-, _ = require('lodash')
+var _ = require('lodash')
 , format = require('util').format
-, activities = require('../v1/activities')
 
-users.configure = function(app, conn, auth) {
-    app.get('/admin/users', auth, users.users.bind(users, conn))
-    app.get('/admin/users/:id', auth, users.user.bind(users, conn))
-    app.patch('/admin/users/:id', auth, users.patch.bind(users, conn))
-    app.get('/admin/users/:user/bankAccounts', auth, users.bankAccounts.bind(users, conn))
+module.exports = exports = function(app) {
+    app.get('/admin/users', app.auth.admin, exports.users)
+    app.get('/admin/users/:id', app.auth.admin, exports.user)
+    app.patch('/admin/users/:id', app.auth.admin, exports.patch)
+    app.get('/admin/users/:user/bankAccounts',
+        app.auth.admin, exports.bankAccounts)
     app.post('/admin/users/:user/bankAccounts/:id/startVerify',
-        auth, users.startBankAccountVerify.bind(users, conn))
-    app.get('/admin/users/:user/withdrawRequests', auth,
-        users.withdrawRequests.bind(users, conn))
-    app.get('/admin/users/:user/activity', auth, users.activity.bind(users, conn))
-    app.post('/admin/users/:user/sendVerificationEmail', auth,
-        users.sendVerificationEmail.bind(users, conn))
-    app.post('/admin/users/:user/bankAccounts', auth,
-        users.addBankAccount.bind(users, conn))
-    app.get('/admin/users/:user/accounts', auth, users.accounts.bind(users, conn))
-    app.post('/admin/users/:user/bankAccounts/:id/setVerified', auth,
-        users.setBankAccountVerified.bind(users, conn))
-    app.del('/admin/users/:user/bankAccounts/:id', auth,
-        users.removeBankAccount.bind(users, conn))
+        app.auth.admin, exports.startBankAccountVerify)
+    app.get('/admin/users/:user/withdrawRequests', app.auth.admin,
+        exports.withdrawRequests)
+    app.get('/admin/users/:user/activity', app.auth.admin, exports.activity)
+    app.post('/admin/users/:user/sendVerificationEmail', app.auth.admin,
+        exports.sendVerificationEmail)
+    app.post('/admin/users/:user/bankAccounts', app.auth.admin,
+        exports.addBankAccount)
+    app.get('/admin/users/:user/accounts', app.auth.admin, exports.accounts)
+    app.post('/admin/users/:user/bankAccounts/:id/setVerified', app.auth.admin,
+        exports.setBankAccountVerified)
+    app.del('/admin/users/:user/bankAccounts/:id', app.auth.admin,
+        exports.removeBankAccount)
 }
 
-users.removeBankAccount = function(conn, req, res, next) {
-    conn.write.query({
+exports.removeBankAccount = function(req, res, next) {
+    req.app.conn.write.query({
         text: 'DELETE FROM bank_account WHERE bank_account_id = $1',
         values: [req.params.id]
     }, function(err, dr) {
@@ -42,15 +41,15 @@ users.removeBankAccount = function(conn, req, res, next) {
     })
 }
 
-users.sendVerificationEmail = function(conn, req, res, next) {
+exports.sendVerificationEmail = function(req, res, next) {
     var email = require('../v1/email')
-    email.sendVerificationEmail(+req.params.user, function(err) {
+    email.sendVerificationEmail(+req.params.user, req.app, function(err) {
         if (err) return next(err)
         res.send(204)
     })
 }
 
-users.addBankAccount = function(conn, req, res, next) {
+exports.addBankAccount = function(req, res, next) {
     var query = {
         text: [
             'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
@@ -66,14 +65,14 @@ users.addBankAccount = function(conn, req, res, next) {
         ]
     }
 
-    conn.write.query(query, function(err) {
+    req.app.conn.write.query(query, function(err) {
         if (err) return next(err)
         res.send(204)
     })
 }
 
-users.startBankAccountVerify = function(conn, req, res, next) {
-    conn.write.query({
+exports.startBankAccountVerify = function(req, res, next) {
+    req.app.conn.write.query({
         text: [
             'UPDATE bank_account',
             'SET verify_started_at = current_timestamp',
@@ -98,8 +97,8 @@ users.startBankAccountVerify = function(conn, req, res, next) {
     })
 }
 
-users.setBankAccountVerified = function(conn, req, res, next) {
-    conn.write.query({
+exports.setBankAccountVerified = function(req, res, next) {
+    req.app.conn.write.query({
         text: [
             'UPDATE bank_account',
             'SET',
@@ -127,12 +126,12 @@ users.setBankAccountVerified = function(conn, req, res, next) {
 
         var row = dr.rows[0]
 
-        activities.log(conn, req.user, 'AdminVerifyBankAccount', {
+        req.app.activity(req.user, 'AdminVerifyBankAccount', {
             id: +req.params.id,
             user_id: req.params.user
         })
 
-        activities.log(conn, row.user_id, 'VerifyBankAccount', {
+        req.app.activity(row.user_id, 'VerifyBankAccount', {
             accountNumber: row.account_number,
             iban: row.iban
         })
@@ -141,8 +140,8 @@ users.setBankAccountVerified = function(conn, req, res, next) {
     })
 }
 
-users.user = function(conn, req, res, next) {
-    conn.read.query({
+exports.user = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
             'SELECT * FROM admin_user_view WHERE user_id = $1'
         ].join('\n'),
@@ -161,7 +160,7 @@ users.user = function(conn, req, res, next) {
     })
 }
 
-users.patch = function(conn, req, res, next) {
+exports.patch = function(req, res, next) {
     var updates = {}
     , values = [req.params.id]
     , allowed = ['email', 'first_name', 'last_name', 'phone_number', 'country',
@@ -184,7 +183,7 @@ users.patch = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'UPDATE "user"',
             'SET ' + updateText,
@@ -195,7 +194,7 @@ users.patch = function(conn, req, res, next) {
         if (err) return next(err)
         if (!dr.rowCount) return next(new Error('User ' + req.user + ' not found'))
 
-        activities.log(conn, req.user, 'AdminEditUser', {
+        req.app.activity(req.user, 'AdminEditUser', {
             user_id: req.params.id,
             edits: req.body
         })
@@ -204,8 +203,8 @@ users.patch = function(conn, req, res, next) {
     })
 }
 
-users.bankAccounts = function(conn, req, res, next) {
-    conn.read.query({
+exports.bankAccounts = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
             'SELECT * FROM bank_account WHERE user_id = $1'
         ].join('\n'),
@@ -218,8 +217,8 @@ users.bankAccounts = function(conn, req, res, next) {
     })
 }
 
-users.accounts = function(conn, req, res, next) {
-    conn.read.query({
+exports.accounts = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
             'SELECT',
             '   a.account_id,',
@@ -248,8 +247,8 @@ users.accounts = function(conn, req, res, next) {
     })
 }
 
-users.activity = function(conn, req, res, next) {
-    conn.read.query({
+exports.activity = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
             'SELECT * FROM activity WHERE user_id = $1 ORDER BY created DESC LIMIT 100'
         ].join('\n'),
@@ -263,8 +262,8 @@ users.activity = function(conn, req, res, next) {
     })
 }
 
-users.withdrawRequests = function(conn, req, res, next) {
-    conn.read.query({
+exports.withdrawRequests = function(req, res, next) {
+    req.app.conn.read.query({
         text: 'SELECT * FROM withdraw_request_view WHERE user_id = $1',
         values: [req.params.user]
     }, function(err, dr) {
@@ -294,7 +293,7 @@ users.withdrawRequests = function(conn, req, res, next) {
     })
 }
 
-users.buildQuery = function(params) {
+exports.buildQuery = function(params) {
     var query = ['SELECT * FROM "user"']
     , conditions = []
     , values = []
@@ -342,9 +341,9 @@ users.buildQuery = function(params) {
     }
 }
 
-users.users = function(conn, req, res, next) {
-    var query = users.buildQuery(req.query)
-    conn.read.query(query, function(err, dr) {
+exports.users = function(req, res, next) {
+    var query = exports.buildQuery(req.query)
+    req.app.conn.read.query(query, function(err, dr) {
         if (err) return next(err)
         return res.send(dr.rows)
     })

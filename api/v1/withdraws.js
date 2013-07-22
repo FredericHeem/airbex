@@ -1,16 +1,13 @@
 var _ = require('lodash')
-, validate = require('./validate')
-, activities = require('./activities')
-, withdraws = module.exports = {}
 
-withdraws.configure = function(app, conn, auth) {
-    app.del('/v1/withdraws/:id', auth, withdraws.cancel.bind(withdraws, conn))
-    app.get('/v1/withdraws', auth, withdraws.forUser.bind(withdraws, conn))
-    app.post('/v1/withdraws/bank', auth, withdraws.withdrawBank.bind(withdraws, conn))
+module.exports = exports = function(app) {
+    app.del('/v1/withdraws/:id', app.auth.withdraw, exports.cancel)
+    app.get('/v1/withdraws', app.auth.any, exports.index)
+    app.post('/v1/withdraws/bank', app.auth.withdraw, exports.withdrawBank)
 }
 
-withdraws.withdrawBank = function(conn, req, res, next) {
-    if (!validate(req.body, 'withdraw_bank', res)) return
+exports.withdrawBank = function(req, res, next) {
+    if (!req.app.validate(req.body, 'v1/withdraw_bank', res)) return
 
     if (!req.apiKey.canWithdraw) {
         return res.send(401, {
@@ -19,7 +16,7 @@ withdraws.withdrawBank = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'SELECT withdraw_bank($2, $3, $4)',
             'FROM bank_account',
@@ -53,8 +50,8 @@ withdraws.withdrawBank = function(conn, req, res, next) {
     })
 }
 
-withdraws.forUser = function(conn, req, res, next) {
-    conn.read.query({
+exports.index = function(req, res, next) {
+    req.app.conn.read.query({
         text: 'SELECT * FROM withdraw_request_view WHERE user_id = $1',
         values: [req.user]
     }, function(err, dr) {
@@ -86,7 +83,7 @@ withdraws.forUser = function(conn, req, res, next) {
     })
 }
 
-withdraws.cancel = function(conn, req, res, next) {
+exports.cancel = function(req, res, next) {
     if (!req.apiKey.canWithdraw) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -94,7 +91,7 @@ withdraws.cancel = function(conn, req, res, next) {
         })
     }
 
-    conn.write.query({
+    req.app.conn.write.query({
         text: [
             'SELECT cancel_withdraw_request($1, null) request_id',
             'FROM withdraw_request wr',
@@ -115,7 +112,8 @@ withdraws.cancel = function(conn, req, res, next) {
             })
         }
 
-        activities.log(conn, req.user, 'CancelWithdrawRequest', { id: +req.params.id })
+        req.app.activity(req.user, 'CancelWithdrawRequest', { id: +req.params.id })
+
         res.send(204)
     })
 }

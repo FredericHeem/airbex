@@ -1,188 +1,99 @@
 /* global describe, it */
 var expect = require('expect.js')
-, crypto = require('crypto')
+, request = require('supertest')
+, app = require('../..')
+, mock = require('../mock')
+, dummy = require('../dummy')
 , vouchers = require('../../v1/vouchers')
 
 describe('vouchers', function() {
-    describe('configure', function() {
-        it('adds expected routes', function() {
-            var routes = []
-            , app = {
-                get: function(url) { routes.push('get ' + url) },
-                post: function(url) { routes.push('post ' + url) }
-            }
-            vouchers.configure(app)
-            expect(routes).to.contain('post /v1/vouchers')
-            expect(routes).to.contain('post /v1/vouchers/:id/redeem')
-        })
-    })
-
-    describe('createId', function() {
-        it('creates a valid voucher id', function() {
-            var id = vouchers.createId()
-            expect(id).to.have.length(12)
-
-            var cs = crypto.createHash('sha256')
-            cs.update(id.substr(0, 10))
-
-            var expected = cs.digest('hex').substr(0, 2).toUpperCase()
-            , actual = id.substr(10, 2)
-
-            expect(actual).to.be(expected)
-        })
-    })
-
     describe('create', function() {
-        it('creates the voucher', function(done) {
-            var cid = vouchers.createId
-            vouchers.createId = function() {
-                return 'aaaaaaaaaaaa'
-            }
-
-            var conn = {
-                write: {
-                    query: function(q, c) {
-                        if (q.text.match(/activity/)) return
-                        expect(q.text).to.contain('create_voucher($1, $2, $3, $4')
-                        expect(q.values).to.eql(['aaaaaaaaaaaa', 101, 'BTC', 10e8])
-                        c(null, { rows: [{ }] })
-                    }
-                }
-            }
-            , req = {
-                user: 101,
-                apiKey: { canWithdraw: true },
-                body: {
-                    amount: '10',
-                    currency: 'BTC'
-                },
-                app: {
-                    cache: {
-                        parseCurrency: function(n, c) {
-                            expect(n).to.be('10')
-                            expect(c).to.be('BTC')
-                            return 10e8
-                        }
-                    }
-                }
+        it('returns voucher code', function(done) {
+            var req = {
+                amount: '1.234',
+                currency: 'XRP'
             }
             , res = {
-                send: function(n, r) {
-                    expect(n).to.be(201)
-                    expect(r.voucher).to.be('aaaaaaaaaaaa')
-                    vouchers.createId = cid
-                    done()
-                }
             }
+            , userId = dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { canWithdraw: true })
 
-            vouchers.create(conn, req, res, done)
-        })
+            mock.once(vouchers, 'createId', function() {
+                res.voucher = vouchers.createId.real()
+                return res.voucher
+            })
 
-        it('requires canWithdraw api key permission', function(done) {
-            vouchers.createId = function() {
-                return 'aaaaaaaaaaaa'
-            }
+            mock.once(app.conn.write, 'query', function(q, cb) {
+                expect(q.text).to.match(/create_voucher\(/)
+                expect(q.values).to.eql([
+                    res.voucher,
+                    userId,
+                    req.currency,
+                    1.234e6
+                ])
+                cb()
+            })
 
-            var conn = {
-                write: {
-                    query: function(q, c) {
-                        expect(q.text).to.contain('create_voucher($1, $2, $3, $4')
-                        expect(q.values).to.eql(['aaaaaaaaaaaa', 101, 'BTC', 10e8])
-                        c(null, { rows: [{ }] })
-                    }
-                }
-            }
-            , req = {
-                user: 101,
-                apiKey: {},
-                body: {
-                    amount: '10',
-                    currency: 'BTC'
-                },
-                app: {
-                    cache: {
-                        parseCurrency: function(n, c) {
-                            expect(n).to.be('10')
-                            expect(c).to.be('BTC')
-                            return 10e8
-                        }
-                    }
-                }
-            }
-            , res = {
-                send: function(n) {
-                    expect(n).to.be(401)
-                    done()
-                }
-            }
+            mock.once(app, 'activity', function() {})
 
-            vouchers.create(conn, req, res, done)
+            request(app)
+            .post('/v1/vouchers')
+            .send(req)
+            .expect(201)
+            .expect('Content-Type', /json/)
+            .expect(res)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
         })
     })
 
     describe('redeem', function() {
-        it('redeems the voucher', function(done) {
-            var conn = {
-                write: {
-                    query: function(q, c) {
-                        expect(q.text).to.contain('redeem_voucher($1, $2')
-                        expect(q.values).to.eql(['aaaaaaaaaaaa', 102])
-                        c(null, { rows: [{ }] })
-                    }
-                },
-                read: {
-                    query: function(q, c) {
-                        c(null, { rows: [{ amount: 1e8, currency: 'BTC' }] })
-                    }
-                }
-            }
-            , req = {
-                user: 102,
-                apiKey: { canDeposit: true },
-                params: {
-                    id: 'aaaaaaaaaaaa'
-                }
-            }
+        it('redeems', function(done) {
+            var userId = dummy.number(1, 1e6)
+            , tid = dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, userId, { canDeposit: true })
+            , voucher = dummy.hex(8).toUpperCase()
             , res = {
-                send: function(n) {
-                    expect(n).to.be(204)
-                    done()
-                }
+                currency: 'BTC',
+                amount: '78.93200000'
             }
 
-            vouchers.redeem(conn, req, res, done)
-        })
+            mock.once(app.conn.write, 'query', function(query, cb) {
+                expect(query.text).to.match(/redeem_voucher\(\$1, \$2/)
+                expect(query.values).to.eql([voucher, userId])
+                cb(null, {
+                    rowCount: 1,
+                    rows: [
+                        {
+                            tid: tid
+                        }
+                    ]
+                })
+            })
 
-        it('requires canDeposit api key permission', function(done) {
-            var conn = {
-                write: {
-                    query: function(q, c) {
-                        expect(q.text).to.contain('redeem_voucher($1, $2')
-                        expect(q.values).to.eql(['aaaaaaaaaaaa', 102])
-                        c(null, { rows: [{ }] })
-                    }
-                },
-                read: {
-                    query: function(q, c) {
-                        c(null, { rows: [{ amount: 1e8, currency: 'BTC' }] })
-                    }
-                }
-            }
-            , req = {
-                user: 102,
-                apiKey: {},
-                params: {
-                    id: 'aaaaaaaaaaaa'
-                }
-            }
-            , res = {
-                send: function(n) {
-                    expect(n).to.be(401)
-                    done()
-                }
-            }
+            mock.once(app.conn.read, 'query', function(query, cb) {
+                expect(query.values).to.eql([tid])
+                cb(null, {
+                    rows: [
+                        {
+                            currency_id: 'BTC',
+                            amount: 78.932e8
+                        }
+                    ]
+                })
+            })
 
-            vouchers.redeem(conn, req, res, done)
+            request(app)
+            .post('/v1/vouchers/' + voucher + '/redeem')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect(res)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
         })
     })
 })

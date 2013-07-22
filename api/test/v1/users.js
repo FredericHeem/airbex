@@ -1,58 +1,49 @@
 /* global describe, it */
 var expect = require('expect.js')
-, users = require('../../v1/users')
+, request = require('supertest')
+, app = require('../..')
+, mock = require('../mock')
+, dummy = require('../dummy')
 
 describe('users', function() {
-	describe('configure', function() {
-		it('adds expected routes', function() {
-			var routes = []
-			, app = {
-				post: function(url) { routes.push('post ' + url) },
-				patch: function(url) { routes.push('patch ' + url) },
-				get: function(url) { routes.push('get ' + url) }
-			}
-			users.configure(app)
-			expect(routes).to.contain('post /v1/users')
-			expect(routes).to.contain('patch /v1/users/current')
-			expect(routes).to.contain('get /v1/whoami')
-		})
-	})
+    describe('create', function() {
+        it('creates user', function(done) {
+            var req = {
+                email: dummy.email(),
+                key: dummy.hex(64)
+            }
+            , userId = dummy.number(1, 1e6)
 
-	describe('create', function() {
-		it('returns user', function(done) {
-			var emailExistence = require('email-existence')
-			, check = emailExistence.check
-			, key = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBB'
-			, conn = {
-				write: {
-					query: function(q, c) {
-						if (q.text.match(/activity/)) return
-						expect(q.text).to.match(/select create_user/i)
-						expect(q.values).to.eql(['bob@bob.com', key])
-						c(null, { rows: [{ user_id: 89 }] })
-					}
-				}
-			}
-			, req = {
-				body: {
-					email: 'bob@bob.com',
-					key: key
-				}
-			}
-			, res = {
-				send: function(code, r) {
-					expect(code).to.be(201)
-					expect(r.id).to.be(89)
-					done()
-				}
-			}
+            mock.once(app, 'verifyEmail', function(email, cb) {
+                expect(email).to.be(req.email)
+                cb(null, true)
+            })
 
-			emailExistence.check = function(email, cb) {
-				emailExistence.check = check
-				cb(null, true)
-			}
+            mock.once(app.conn.write, 'query', function(q, cb) {
+                expect(q.text).to.match(/create_user\(/)
+                expect(q.values).to.eql([
+                    req.email,
+                    req.key
+                ])
+                cb(null, {
+                    rows: [
+                        {
+                            uid: userId
+                        }
+                    ]
+                })
+            })
 
-			users.create(conn, req, res, done)
-		})
-	})
+            mock.once(app, 'activity', function() {})
+
+            request(app)
+            .post('/v1/users')
+            .send(req)
+            .expect(201)
+            .expect('Content-Type', /json/)
+            .end(function(err) {
+                done(err)
+            })
+        })
+    })
 })

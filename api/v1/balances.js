@@ -1,27 +1,23 @@
-var Q = require('q')
-, Balances = module.exports = {}
-
-Balances.configure = function(app, conn, auth) {
-    app.get('/v1/balances', auth, Balances.forUser.bind(Balances, conn))
+module.exports = exports = function(app) {
+    app.get('/v1/balances', app.auth.any, exports.index)
 }
 
-Balances.forUser = function(conn, req, res, next) {
-    Q.ninvoke(conn.read, 'query', {
+exports.index = function(req, res, next) {
+    req.app.conn.read.query({
         text: [
-            'SELECT currency_id currency, SUM(available) available',
+            'SELECT currency_id, SUM(available) available',
             'FROM account_view',
             'WHERE user_id = $1',
             'GROUP BY user_id, currency_id'
         ].join('\n'),
         values: [req.user]
-    })
-    .get('rows')
-    .then(function(balances) {
-        res.send(balances.map(function(balance) {
-            balance.available = req.app.cache.formatCurrency(balance.available,
-                balance.currency)
-            return balance
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.send(dr.rows.map(function(row) {
+            return {
+                currency: row.currency_id,
+                available: req.app.cache.formatCurrency(row.available, row.currency_id)
+            }
         }))
-    }, next)
-    .done()
+    })
 }

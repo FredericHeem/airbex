@@ -1,39 +1,46 @@
 /* global describe, it */
 var expect = require('expect.js')
-, currencies = require('../../v1/currencies')
+, request = require('supertest')
+, app = require('../..')
+, mock = require('../mock')
 
 describe('currencies', function() {
-	describe('configure', function() {
-		it('adds expected routes', function() {
-			var routes = []
-			, app = {
-				get: function(url) { routes.push('get ' + url) }
-			}
-			currencies.configure(app)
-			expect(routes).to.contain('get /v1/currencies')
-		})
-	})
+    describe('index', function() {
+        it('returns currencies', function(done) {
+            var read = mock(app.conn.read, 'query', function(query, cb) {
+                expect(query).to.match(/FROM currency/)
+                cb(null, {
+                    rows: [
+                        {
+                            currency_id: 'BTC',
+                            scale: 8
+                        },
+                        {
+                            currency_id: 'NOK',
+                            scale: 5
+                        }
+                    ]
+                })
+            })
 
-	describe('currencies', function() {
-		it('returns the currencies', function(done) {
-			var conn = {
-				read: {
-					query: function(q, c) {
-						expect(q).to.match(/from "currency"/i)
-						c(null, { rows: [{ currency: 'QQQ' }] })
-					}
-				}
-			}
-			, req = {
-			}
-			, res = {
-				send: function(r) {
-					expect(r[0].currency).to.be('QQQ')
-					done()
-				}
-			}
-
-			currencies.currencies(conn, req, res, done)
-		})
-	})
+            request(app)
+            .get('/v1/currencies')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect([
+                {
+                    id: 'BTC',
+                    scale: 8
+                },
+                {
+                    id: 'NOK',
+                    scale: 5
+                }
+            ])
+            .end(function(err) {
+                read.restore()
+                done(err)
+            })
+        })
+    })
 })

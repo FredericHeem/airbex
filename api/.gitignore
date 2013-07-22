@@ -3,3 +3,4 @@ config/dev.json
 node_modules/
 *.ps1
 /*.tgz
+/coverage

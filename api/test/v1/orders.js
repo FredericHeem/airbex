@@ -1,254 +1,207 @@
 /* global describe, it */
 var expect = require('expect.js')
-, orders = require('../../v1/orders')
+, request = require('supertest')
+, app = require('../..')
+, mock = require('../mock')
+, dummy = require('../dummy')
 
 describe('orders', function() {
-	describe('configure', function() {
-		it('adds expected routes', function() {
-			var routes = []
-			, app = {
-				del: function(url) { routes.push('delete ' + url) },
-				post: function(url) { routes.push('post ' + url) },
-				get: function(url) { routes.push('get ' + url) }
-			}
-			orders.configure(app)
-			expect(routes).to.contain('delete /v1/orders/:id')
-			expect(routes).to.contain('post /v1/orders')
-			expect(routes).to.contain('get /v1/orders')
-		})
-	})
+    describe('index', function() {
+        it('returns orders', function(done) {
+            var uid =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, uid)
+            , read = mock(app.conn.read, 'query', function(query, cb) {
+                expect(query.text).to.match(/FROM order_view/)
+                expect(query.text).to.match(/user_id = \$/)
+                expect(query.values).to.eql([uid])
+                cb(null, {
+                    rows: [
+                        {
+                            order_id: 5,
+                            side: 1,
+                            market: 'BTCXRP',
+                            price: 123.456e3,
+                            remaining: 0e5,
+                            original: 10e5,
+                            matched: 10e5,
+                            cancelled: 0
+                        }
+                    ]
+                })
+            })
 
-	describe('forUser', function() {
-		it('gets orders for the user', function(done) {
-			var conn = {
-				read: {
-					query: function(q, cb) {
-						expect(q.text).to.match(/user_id = \$1/)
-						expect(q.values).to.eql([10])
-						cb(null, {
-							rows: [{
-								order_id: 1
-							}, {
-								order_id: 7
-							}]
-						})
-					}
-				}
-			}
-			, req = {
-				user: 10,
-				app: {
-					cache: {
-						formatOrderVolume: function() {
-							return 'formatted-v'
-						},
-						formatOrderPrice: function() {
-							return 'formatted-p'
-						}
-					}
-				}
-			}
-			, res = {
-				send: function(r) {
-					expect(r).to.be.an('array')
-					expect(r[0].id).to.be(1)
-					expect(r[1].id).to.be(7)
-					done()
-				}
-			}
+            request(app)
+            .get('/v1/orders')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect([
+                {
+                    id: 5,
+                    market: 'BTCXRP',
+                    type: 'ask',
+                    price: '123.456',
+                    amount: '10.00000',
+                    remaining: '0.00000',
+                    matched: '10.00000',
+                    cancelled: '0.00000'
+                }
+            ])
+            .end(function(err) {
+                impersonate.restore()
+                read.restore()
+                done(err)
+            })
+        })
+    })
 
-			orders.forUser(conn, req, res, done)
-		})
+    describe('create', function() {
+        it('creates order', function(done) {
+            var uid =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, uid, { canTrade: true })
+            , activity = mock(app, 'activity', function() {})
+            , write = mock(app.conn.write, 'query', function(query, cb) {
+                expect(query.text).to.match(/INTO "order"/)
+                expect(query.values).to.eql([uid, 'BTCLTC', 1, 550.7e3, 1.251e5])
+                cb(null, {
+                    rows: [
+                        {
+                            oid: 999
+                        }
+                    ]
+                })
+            })
 
-		it('formats numbers', function(done) {
-			var conn = {
-				read: {
-					query: function(q, cb) {
-						expect(q.text).to.match(/user_id = \$1/)
-						expect(q.values).to.eql([10])
-						cb(null, {
-							rows: [{
-								order_id: 1,
-								price: '1.2',
-								volume: '1.34'
-							}]
-						})
-					}
-				}
-			}
-			, req = {
-				user: 10,
-				app: {
-					cache: {
-						formatOrderVolume: function() {
-							return 'formatted-v'
-						},
-						formatOrderPrice: function() {
-							return 'formatted-p'
-						}
-					}
-				}
-			}
-			, res = {
-				send: function(r) {
-					expect(r).to.be.an('array')
-					expect(r[0].id).to.be(1)
-					expect(r[0].amount).to.be('formatted-v')
-					expect(r[0].price).to.be('formatted-p')
-					done()
-				}
-			}
+            request(app)
+            .post('/v1/orders')
+            .send({
+                price: '550.7',
+                amount: '1.251',
+                type: 'ask',
+                market: 'BTCLTC'
+            })
+            .expect(201)
+            .expect('Content-Type', /json/)
+            .expect({
+                id: 999
+            })
+            .end(function(err) {
+                activity.restore()
+                impersonate.restore()
+                write.restore()
+                done(err)
+            })
+        })
+    })
 
-			orders.forUser(conn, req, res, done)
-		})
-	})
+    describe('cancel', function() {
+        it('cancels order', function(done) {
+            var uid =  dummy.number(1, 1e6)
+            , oid =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, uid, { canTrade: true })
+            , activity = mock(app, 'activity', function() {})
+            , write = mock(app.conn.write, 'query', function(query, cb) {
+                expect(query.text).to.match(/UPDATE "order"/)
+                expect(query.text).to.match(/volume = 0/)
+                expect(query.text).to.match(/order_id = \$1/)
+                expect(query.text).to.match(/user_id = \$2/)
+                expect(query.values).to.eql([oid, uid])
+                cb(null, {
+                    rowCount: 1
+                })
+            })
 
-	describe('create', function() {
-		it('creates the order', function(done) {
-			var conn = {
-				build: {
-					insert: function() {
-						return 'built'
-					}
-				},
+            request(app)
+            .del('/v1/orders/' + oid)
+            .expect(204)
+            .end(function(err) {
+                activity.restore()
+                impersonate.restore()
+                write.restore()
+                done(err)
+            })
+        })
 
-				write: {
-					query: function(q, cb) {
-						if (q.text.match(/activity/)) return
-						expect(q.text).to.match(/INSERT INTO "order"/i)
-						cb(null, { rows: [{ oid: 17 }] })
-					}
-				}
-			}
-			, req = {
-				user: 8,
-				apiKey: { canTrade: true },
-				body: {
-					market: 'BTCUSD',
-					amount: '9',
-					price: '12',
-					type: 'ask'
-				},
-				app: {
-					cache: {
-						markets: {
-							BTCUSD: {
-							}
-						},
-						parseOrderVolume: function(n) {
-							return n * 1e5
-						},
-						parseOrderPrice: function(n) {
-							return n * 1e3
-						}
-					}
-				}
-			}
-			, res = {
-				send: function(code, r) {
-					expect(code).to.be(201)
-					expect(r.id).to.be(17)
-					done()
-				}
-			}
+        it('returns 404 if order is not found', function(done) {
+            var uid =  dummy.number(1, 1e6)
+            , oid =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, uid, { canTrade: true })
 
-			orders.create(conn, req, res, done)
-		})
+            mock.once(app.conn.write, 'query', function(query, cb) {
+                cb(null, mock.rows([]))
+            })
 
-		it('requires canTrade api key permission', function(done) {
-			var conn = {
-				build: {
-					insert: function() {
-						return 'built'
-					}
-				},
+            request(app)
+            .del('/v1/orders/' + oid)
+            .expect(404)
+            .end(function(err) {
+                impersonate.restore()
+                done(err)
+            })
+        })
+    })
 
-				write: {
-					query: function(q, cb) {
-						if (q.text.match(/activity/)) return
-						expect(q.text).to.match(/INSERT INTO "order"/i)
-						cb(null, { rows: [{ order_id: 17 }] })
-					}
-				}
-			}
-			, req = {
-				user: 8,
-				apiKey: {},
-				body: {
-					market: 'BTCUSD',
-					amount: '9',
-					price: '12',
-					type: 'ask'
-				}
-			}
-			, res = {
-				send: function(code) {
-					expect(code).to.be(401)
-					done()
-				}
-			}
+    describe('history', function() {
+        it('returns order history', function(done) {
+            var uid =  dummy.number(1, 1e6)
+            , impersonate = mock.impersonate(app, uid)
+            , res = [{
+                id: dummy.id(),
+                market: 'BTCLTC',
+                type: 'ask',
+                price: '44.900',
+                amount: '0.55550',
+                remaining: '0.45550',
+                matched: '0.10000',
+                cancelled: '0.00000',
+                averagePrice: '44.900'
+            }, {
+                id: dummy.id(),
+                market: 'BTCNOK',
+                type: 'bid',
+                price: '500.900',
+                amount: '0.33333',
+                remaining: '0.45550',
+                matched: '0.10000',
+                cancelled: '0.00000',
+                averagePrice: '500.900'
+            }]
+            , read = mock(app.conn.read, 'query', function(query, cb) {
+                expect(query.text).to.match(/FROM order_history/)
+                expect(query.text).to.match(/user_id = \$/)
+                expect(query.values).to.eql([uid])
+                cb(null, mock.rows([{
+                    order_id: res[0].id,
+                    market: res[0].market,
+                    side: res[0].type == 'ask' ? 1 : 0,
+                    volume: res[0].remaining * 1e5,
+                    matched: res[0].matched * 1e5,
+                    cancelled: res[0].cancelled * 1e5,
+                    original: res[0].amount * 1e5,
+                    price: res[0].price * 1e3,
+                    average_price: res[0].price * 1e3
+                }, {
+                    order_id: res[1].id,
+                    market: res[1].market,
+                    side: res[1].type == 'ask' ? 1 : 0,
+                    volume: res[1].remaining * 1e5,
+                    matched: res[1].matched * 1e5,
+                    cancelled: res[1].cancelled * 1e5,
+                    original: res[1].amount * 1e5,
+                    price: res[1].price * 1e3,
+                    average_price: res[1].price * 1e3
+                }]))
+            })
 
-			orders.create(conn, req, res, done)
-		})
-	})
-
-	describe('cancel', function() {
-		it('cancels the order', function(done) {
-			var conn = {
-				write: {
-					query: function(q, cb) {
-						if (q.text.match(/activity/)) return
-						expect(q.text).to.match(/UPDATE "order"/)
-						expect(q.text).to.match(/cancelled = volume/)
-						expect(q.values)
-						cb(null, { rowCount: 1 })
-					}
-				}
-			}
-			, req = {
-				user: 3,
-				apiKey: { canTrade: true },
-				params: {
-					id: 9
-				}
-			}
-			, res = {
-				send: function(code) {
-					expect(code).to.be(204)
-					done()
-				}
-			}
-
-			orders.cancel(conn, req, res, done)
-		})
-
-		it('requires canTrade api key permission', function(done) {
-			var conn = {
-				write: {
-					query: function(q, cb) {
-						if (q.text.match(/activity/)) return
-						expect(q.text).to.match(/UPDATE "order"/)
-						expect(q.text).to.match(/cancelled = volume/)
-						expect(q.values)
-						cb(null, { rowCount: 1 })
-					}
-				}
-			}
-			, req = {
-				user: 3,
-				apiKey: {},
-				params: {
-					id: 9
-				}
-			}
-			, res = {
-				send: function(code) {
-					expect(code).to.be(401)
-					done()
-				}
-			}
-
-			orders.cancel(conn, req, res, done)
-		})
-	})
+            request(app)
+            .get('/v1/orders/history')
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect(res)
+            .end(function(err) {
+                impersonate.restore()
+                read.restore()
+                done(err)
+            })
+        })
+    })
 })

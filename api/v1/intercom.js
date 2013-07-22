@@ -1,12 +1,16 @@
 var crypto = require('crypto')
-, debug = require('debug')('snow:intercom')
-, intercom = module.exports = {}
 
-intercom.configure = function(app, conn, auth) {
-    app.get('/v1/intercom', auth, intercom.intercom.bind(intercom, conn, app.config))
+module.exports = exports = function(app) {
+    app.get('/v1/intercom', app.auth.primary, exports.intercom)
 }
 
-intercom.intercom = function(conn, config, req, res, next) {
+exports.hash = function(app, userId) {
+    var hmac = crypto.createHmac('sha256', app.config.intercom_secret)
+    hmac.update('' + userId)
+    return hmac.digest('hex')
+}
+
+exports.intercom = function(req, res, next) {
     if (!req.apiKey.primary) {
         return res.send(401, {
             name: 'MissingApiKeyPermission',
@@ -14,7 +18,7 @@ intercom.intercom = function(conn, config, req, res, next) {
         })
     }
 
-    conn.read.query({
+    req.app.conn.read.query({
         text: [
             'SELECT user_id, email_lower,',
             'FLOOR(EXTRACT(epoch FROM created))::int created',
@@ -24,22 +28,14 @@ intercom.intercom = function(conn, config, req, res, next) {
         values: [req.user]
     }, function(err, dres) {
         if (err) return next(err)
-
-        var hmac = crypto.createHmac('sha256', config.intercom_secret)
-        , user = dres.rows[0]
-        hmac.update('' + user.user_id)
-
-        var userHash = hmac.digest('hex')
-
-        debug('hashed user id %s with secret %s to get %s',
-            user.user_id, config.intercom_secret, userHash)
+        var row = dres.rows[0]
 
         res.send({
-            app_id: config.intercom_app_id,
-            user_id: user.user_id,
-            email: user.email_lower,
-            user_hash: userHash,
-            created_at: user.created
+            app_id: req.app.config.intercom_app_id,
+            user_id: row.user_id,
+            email: row.email_lower,
+            user_hash: exports.hash(req.app, row.user_id),
+            created_at: row.created
         })
     })
 }

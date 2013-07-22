@@ -10,10 +10,14 @@ exports.sendToEmail = function(app, from, to, currency, amount, allowNew, cb) {
     exports.sendToExistingUser(app, from, to, currency, amount,
         function(err) {
             if (!err) return cb()
+
             if (err.name == 'UserNotFound') {
-                if (!allowNew) return cb(err)
-                exports.sendVoucher(app, from, to, currency, amount, cb)
+                if (allowNew) {
+                    exports.sendVoucher(app, from, to, currency, amount, cb)
+                    return
+                }
             }
+
             cb(err)
         }
     )
@@ -152,7 +156,7 @@ exports.send = function(req, res, next) {
         function(err) {
             if (!err) return res.send(204)
 
-            if (err.name != 'UserNotFound') {
+            if (err.name == 'UserNotFound') {
                 return res.send(400, {
                     name: 'UserNotFound',
                     message: 'User not found'

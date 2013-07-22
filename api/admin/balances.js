@@ -1,8 +1,8 @@
 module.exports = exports = function(app) {
-    app.get('/admin/balances', app.auth.admin, exports.summary)
+    app.get('/admin/balances', app.auth.admin, exports.index)
 }
 
-exports.summary = function(req, res, next) {
+exports.index = function(req, res, next) {
     req.app.conn.read.query([
         'SELECT a.currency_id currency, a.type, SUM(a.balance) balance',
         'FROM account a',

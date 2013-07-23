@@ -2,7 +2,7 @@ var debug = require('debug')('snow')
 , assert = require('assert')
 , request = require('request')
 , Snow = module.exports = function(key, ep) {
-    this.url = ep || 'https://justcoin.com/api/v1/'
+    this.url = ep
     debug('using endpoint %s', ep)
 
     this.key = key

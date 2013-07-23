@@ -23,7 +23,7 @@ mkdir log public
 tee /home/ubuntu/snow-web/nginx.conf << EOL
 server {
     listen 8001;
-    server_name ${prefix}justcoin.com;
+    server_name ${prefix}snow;
     root /home/ubuntu/snow-web/public/;
     access_log /home/ubuntu/snow-web/log/access.log;
     error_log /home/ubuntu/snow-web/log/error.log;
@@ -46,8 +46,8 @@ server {
 
 server {
     listen 8002;
-    server_name ${prefix}justcoin.com;
-    rewrite ^ https://${prefix}justcoin.com\$request_uri? permanent;
+    server_name ${prefix}snow;
+    rewrite ^ https://${prefix}snow\$request_uri? permanent;
 }
 EOL
 
@@ -55,7 +55,7 @@ sudo nginx -s reload
 vim /home/ubuntu/snow-web/nginx.conf
 
 # --- make site available and enabled
-sudo ln nginx.conf /etc/nginx/sites-available/justcoin.com
-sudo ln /etc/nginx/sites-available/justcoin.com /etc/nginx/sites-enabled/justcoin.com
+sudo ln nginx.conf /etc/nginx/sites-available/snow
+sudo ln /etc/nginx/sites-available/snow /etc/nginx/sites-enabled/snow
 
 sudo reboot

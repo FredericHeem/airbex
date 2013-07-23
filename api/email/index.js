@@ -59,14 +59,14 @@ exports.template = _.memoize(function(fn) {
 
 exports.from = function() {
     if (process.env.NODE_ENV == 'production') {
-        return 'Justcoin <support@justcoin.com>'
+        return 'Snow <support@snow>'
     }
 
     if (process.env.NODE_ENV == 'staging') {
-        return 'Justcoin STAGING <hello@justcoin.com>'
+        return 'Snow STAGING <hello@snow>'
     }
 
-    return 'Justcoin TESTING <hello@justcoin.com>'
+    return 'Snow TESTING <hello@snow>'
 }
 
 // User can be either user id or email address

@@ -1,6 +1,6 @@
 # Ubuntu 12.04 ebs (8gb) from http://alestic.com/
 # Zone: eu-west-1a
-# Security group: justcoin-prod-workers
+# Security group: prod-workers
 
 echo "127.0.0.1 workers" | sudo tee -a /etc/hosts
 sudo hostname workers
@@ -75,7 +75,7 @@ sudo tee /etc/monit/monitrc << EOL
 set daemon 120
 set logfile syslog
 #set alert a@abrkn.com
-set mail-format { from: webmaster@${environment}.justcoin.com }
+set mail-format { from: webmaster@${environment}.snow }
 set mailserver localhost
 
 set httpd port 2812

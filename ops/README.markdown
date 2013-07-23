@@ -1,7 +1,7 @@
 snow-ops
 ===
 
-This repository contains schematics of the [Justcoin](https://justcoin.com) deployment and installation instructions.
+This repository contains schematics of Snow's deployment and installation instructions.
 
 Network topology
 ---

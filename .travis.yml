@@ -43,15 +43,10 @@ script:
   - "npm install"
   - "npm test"
   - "popd"
-  # web
-  #- "pushd web"
-  #- "npm install"
-  #- "npm test"
-  #- "popd"
   # client
   - "pushd client"
   - "npm install"
   - "npm test"
   - "popd"
   - "npm install jshint"
-  - "jshint `find | grep -P '\\.js$' | grep -vP '(/node_modules/|/vendor/|/web/components/|/coverage/)' | sed ':a;N;$!ba;s/\\n/ /g'`"
+  - "jshint `find | grep -P '\\.js$' | grep -vP '(/node_modules/|/vendor/|/admin/components/|/coverage/)' | sed ':a;N;$!ba;s/\\n/ /g'`"

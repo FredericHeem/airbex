@@ -1,0 +1,13 @@
+<tr class="withdraw">
+    <td><%= request_id %></td>
+    <td><%= created %></td>
+    <td><%= state %></td>
+    <td><a href="#users/<%= user_id %>" data-user-id="<%= user_id %>"><%= user_id %></a></td>
+    <td><%= amount %> <%= currency_id %></td>
+    <td><%= destination %></td>
+    <td>
+        <button class="process btn">Process</button>
+        <button class="complete btn btn-success">Complete</button>
+        <button class="cancel btn btn-danger">Cancel</button>
+    </td>
+</tr>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xml:lang="en" lang="en">
+<head>
+    <title>Snow Admin</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Language" content="en" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <% if (minify) { %>
+        <link href="styles.min.css?ts=<%= timestamp %>" rel="stylesheet">
+    <% } else { %>
+        <link href="styles.css?ts=<%= timestamp %>" rel="stylesheet">
+    <% } %>
+
+    <% if (minify) { %>
+        <script src="head.min.js?ts=<%= timestamp %>"></script>
+    <% } else { %>
+        <script src="head.js?ts=<%= timestamp %>"></script>
+    <% } %>
+</head>
+
+<body>
+    <% if (minify) { %>
+        <script src="vendor.min.js?ts=<%= timestamp %>"></script>
+    <% } else { %>
+        <script src="vendor.js?ts=<%= timestamp %>"></script>
+    <% } %>
+
+    <% if (minify) { %>
+        <script src="index.min.js?ts=<%= timestamp %>"></script>
+    <% } else { %>
+        <script src="index.js?ts=<%= timestamp %>"></script>
+    <% } %>
+</body>
+</html>

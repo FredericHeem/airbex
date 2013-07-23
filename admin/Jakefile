@@ -1,0 +1,11 @@
+/* global task, config, rm, directory */
+require('shelljs/global')
+config.silent = true
+
+task('clean', function() {
+    rm('-Rf', 'build/*')
+})
+
+directory('build')
+
+task('default', ['dist'])

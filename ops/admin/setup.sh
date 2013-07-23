@@ -1,10 +1,9 @@
 # Ubuntu 12.04 from http://alestic.com/
 # Ports:
-#   8001 (HTTP)
-#   8002 HTTP (redirect http to https)
+#   9001 (HTTP)
 
 export environment=production
-export prefix=production.
+export prefix=""
 export api=10.0.0.184:8010
 
 sudo apt-get update
@@ -14,19 +13,17 @@ sudo apt-get upgrade -y
 sudo apt-get install -y nginx
 
 cd ~
-mkdir snow-web
-cd snow-web
-mkdir log
+mkdir snow-admin
+cd snow-admin
 mkdir log public
 
-# --- /home/ubuntu/snow-web/nginx.conf
-tee /home/ubuntu/snow-web/nginx.conf << EOL
+tee /home/ubuntu/snow-admin/nginx.conf << EOL
 server {
-    listen 8001;
+    listen 9001;
     server_name ${prefix}snow;
-    root /home/ubuntu/snow-web/public/;
-    access_log /home/ubuntu/snow-web/log/access.log;
-    error_log /home/ubuntu/snow-web/log/error.log;
+    root /home/ubuntu/snow-admin/public/;
+    access_log /home/ubuntu/snow-admin/log/access.log;
+    error_log /home/ubuntu/snow-admin/log/error.log;
 
     gzip on;
     gzip_http_version 1.1;
@@ -43,19 +40,13 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
     }
 }
-
-server {
-    listen 8002;
-    server_name ${prefix}snow;
-    rewrite ^ https://${prefix}snow\$request_uri? permanent;
-}
 EOL
 
 sudo nginx -s reload
-vim /home/ubuntu/snow-web/nginx.conf
 
-# --- make site available and enabled
-sudo ln nginx.conf /etc/nginx/sites-available/snow
-sudo ln /etc/nginx/sites-available/snow /etc/nginx/sites-enabled/snow
+sudo ln nginx.conf /etc/nginx/sites-available/snow-admin
+sudo ln /etc/nginx/sites-available/snow-admin /etc/nginx/sites-enabled/snow-admin
+
+sudo nginx -s reload
 
 sudo reboot

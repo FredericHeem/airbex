@@ -1,0 +1,30 @@
+<div class="control-group amount">
+    <label class="control-label" for="amount">
+        Amount
+        (<a href="#" data-action="all"><!--
+            -->All<!--
+        --></a>)
+    </label>
+
+    <div class="controls">
+        <div class="input-append">
+            <input type="text" name="amount" value="<%= value %>" class="field" />
+
+            <% if (fixedCurrency) { %>
+                <span class="add-on"><%= currency %></span>
+            <% } else { %>
+                <select name="currency" class="field">
+                </select>
+            <% } %>
+        </div>
+
+        <span class="help-inline">
+            <span class="visible-insufficient-funds hidden-precision-too-high">
+                Insufficient funds
+            </span>
+            <span class="visible-precision-too-high">
+                Precision
+            </span>
+        </span>
+    </div>
+</div>

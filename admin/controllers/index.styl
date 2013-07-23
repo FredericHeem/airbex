@@ -1,0 +1,36 @@
+@import "../node_modules/nib/lib/nib/vendor.styl"
+@import "loading.styl"
+@import "states.styl"
+@import "square.styl"
+
+-animation()
+    animation arguments
+    -webkit-animation arguments
+    -moz-animation arguments
+
+body
+    position relative
+    padding-top 50px
+    padding-top: 60px
+
+@media (max-width: 979px)
+    body
+        padding-top 0px
+
+footer {
+    text-align: center;
+}
+
+.sidebar-nav
+    padding: 9px 0;
+
+#section > .admin
+    .bank-accounts-pending-verify
+        states empty
+
+@import "top"
+@import "shared"
+@import "users"
+@import "user"
+@import "user"
+@import "login"

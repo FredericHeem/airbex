@@ -1,0 +1,8 @@
+<tr class="user" data-user-id="<%= user_id %>">
+    <td class="user-id"><a href="#users/<%= user_id %>"><%= user_id %></a></td>
+    <td class="name"><%= first_name ? last_name + ', ' + first_name : '' %></td>
+    <td class="email"><%= email %></td>
+    <td class="country"><%= country || '' %></td>
+    <td class="actions">
+    </td>
+</tr>

@@ -1,0 +1,14 @@
+<tr data-id="<%= request_id %>" class="withdraw-request">
+    <td><%= request_id %></td>
+    <td><%= created %></td>
+    <td><%= state %></td>
+    <td><%= method %></td>
+    <td><%= completed %></td>
+    <td><%= amount %></td>
+    <td><%= destination %></td>
+    <td>
+        <% if (state == 'requested' || state == 'processing') { %>
+            <button class="cancel btn btn-danger">Cancel</button>
+        <% } %>
+    </td>
+</tr>

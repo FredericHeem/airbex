@@ -35,7 +35,7 @@ exports.orderbook = function(req, res, next) {
             'FROM order_depth_view od',
             'INNER JOIN market m ON m.market_id = od.market_id',
             'WHERE',
-            '   m.base_currency_id = \'BTC\'',
+            '   m.base_currency_id = \'BTC\' AND',
             '   m.quote_currency_id = $1'
         ].join('\n'),
         values: [req.params.currencyId]

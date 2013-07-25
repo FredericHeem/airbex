@@ -33,7 +33,7 @@ api.bootstrap().done(function() {
 
         if ($.cookie('existingUser')) {
             debug('routing to login (existing user cookie)')
-            require('./authorize').user()
+            require('./authorize').admin()
         } else {
             debug('routing')
             router.now()

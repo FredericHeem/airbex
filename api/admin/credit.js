@@ -24,10 +24,10 @@ exports.bankCredit = function(req, res, next) {
         }
 
         // Log for admin
-        req.app.activity(req.app, req.user, 'AdminBankAccountCredit', req.body)
+        req.app.activity(req.user, 'AdminBankAccountCredit', req.body)
 
         // Log for user
-        req.app.activity(req.app, req.body.user_id, 'BankCredit', {
+        req.app.activity(req.body.user_id, 'BankCredit', {
             currency: req.body.currency_id,
             amount: req.body.amount,
             reference: req.body.reference

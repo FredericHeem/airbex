@@ -1,9 +1,10 @@
 var template = require('./template.html')
 , _ = require('lodash')
 , itemTemplate = require('./bank-account-pending-verify.html')
+, recentUserTemplate = require('./recent-user.html')
 
 module.exports = function() {
-    var $el = $('<div class="admin">').html(template())
+    var $el = $('<div class="overview">').html(template())
     , controller = {
         $el: $el
     }
@@ -44,9 +45,23 @@ module.exports = function() {
         })
     }
 
+    function refreshRecentUsers() {
+        var recentCookie = $.cookie('recent-users')
+        , recent = recentCookie ? JSON.parse(recentCookie) : []
+        , $recent = $el.find('.recent-users')
+
+        $recent
+        .toggleClass('is-empty', !recent.length)
+        .find('tbody')
+        .html($.map(recent, function(user) {
+            return recentUserTemplate(user)
+        }))
+    }
+
     refreshBtcHeight()
     refreshLtcHeight()
     refreshBankAccountsPendingVerify()
+    refreshRecentUsers()
 
     return controller
 }

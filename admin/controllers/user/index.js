@@ -75,7 +75,28 @@ module.exports = function(userId) {
             $el.removeClass('is-loading')
         })
         .fail(errors.alertFromXhr)
-        .done(renderProfile)
+        .done(function(user) {
+            renderProfile(user)
+            addToRecentUsers(user)
+        })
+    }
+
+    function addToRecentUsers(user) {
+        var recentCookie = $.cookie('recent-users')
+        , recent = recentCookie ? JSON.parse(recentCookie) : []
+        , duplicate = _.find(recent, { user_id: user.user_id })
+
+        if (duplicate) {
+            recent.splice(recent.indexOf(duplicate), 1)
+        }
+
+        recent.unshift(user)
+
+        while (recent.length > 10) {
+            recent.pop()
+        }
+
+        $.cookie('recent-users', JSON.stringify(recent), { expires: 10 * 356 * 7 })
     }
 
     // Begin ewdit

@@ -57,18 +57,6 @@ exports.template = _.memoize(function(fn) {
     return _.toArray(arguments).join()
 })
 
-exports.from = function() {
-    if (process.env.NODE_ENV == 'production') {
-        return 'Snow <support@snow>'
-    }
-
-    if (process.env.NODE_ENV == 'staging') {
-        return 'Snow STAGING <hello@snow>'
-    }
-
-    return 'Snow TESTING <hello@snow>'
-}
-
 // User can be either user id or email address
 exports.send = function(user, language, templateName, locals, cb) {
     if (typeof user == 'number') {
@@ -95,11 +83,13 @@ exports.send = function(user, language, templateName, locals, cb) {
     , body = lines.slice(1).join('\n')
 
     var mail = {
-        from: exports.from(),
+        from: config.email_from,
         to: user,
         subject: subject,
         html: body
     }
+
+    debug('sending email %s', JSON.stringify(mail, null, 4))
 
     exports.app.smtp.sendMail(mail, cb)
 }

@@ -250,7 +250,7 @@ exports.accounts = function(req, res, next) {
 exports.activity = function(req, res, next) {
     req.app.conn.read.query({
         text: [
-            'SELECT * FROM activity WHERE user_id = $1 ORDER BY created DESC LIMIT 100'
+            'SELECT * FROM activity WHERE user_id = $1 ORDER BY created_at DESC LIMIT 100'
         ].join('\n'),
         values: [req.params.user]
     }, function(err, dr) {

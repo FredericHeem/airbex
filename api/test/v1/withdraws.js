@@ -75,7 +75,7 @@ describe('withdraws', function() {
                     request_id: res[0].id,
                     method: res[0].method,
                     bitcoin_address: res[0].destination,
-                    created: res[0].created,
+                    created_at: res[0].created,
                     completed: res[0].completed,
                     state: res[0].state,
                     amount: '987.12311111',

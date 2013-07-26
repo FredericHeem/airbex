@@ -32,7 +32,7 @@ exports.index = function(req, res, next) {
     if (req.query.since !== undefined) {
         query = {
             text: [
-                'SELECT activity_id id, created, "type", details',
+                'SELECT activity_id id, created_at, "type", details',
                 'FROM activity_web',
                 'WHERE user_id = $1 AND activity_id > $2',
                 'ORDER BY activity_id ASC',
@@ -43,7 +43,7 @@ exports.index = function(req, res, next) {
     } else {
         query = {
             text: [
-                'SELECT activity_id id, created, "type", details',
+                'SELECT activity_id id, created_at, "type", details',
                 'FROM activity_web',
                 'WHERE user_id = $1',
                 'ORDER BY activity_id DESC',
@@ -58,7 +58,8 @@ exports.index = function(req, res, next) {
         res.send(dr.rows.map(function(row) {
             row.details = JSON.parse(row.details)
 
-            var result = _.pick(row, 'type', 'created', 'id')
+            var result = _.pick(row, 'type', 'id')
+            result.created = row.created_at
 
             // Admin activities are sent as is
             if (row.type.match(/^Admin/)) {

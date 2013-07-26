@@ -10,7 +10,7 @@ exports.trades = function(req, res, next) {
             'SELECT',
             '   price_decimal::varchar price,',
             '   volume_decimal::varchar amount,',
-            '   extract(epoch from om.created)::int date,',
+            '   extract(epoch from om.created_at)::int date,',
             '   match_id tid',
             'FROM match_view om',
             'INNER JOIN "order" bo ON bo.order_id = om.bid_order_id',

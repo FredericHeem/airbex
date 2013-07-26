@@ -77,8 +77,9 @@ exports.index = function(req, res, next) {
                 currency: row.currency_id,
                 amount: req.app.cache.formatCurrency(row.amount, row.currency_id),
                 id: row.request_id,
-                destination:  destination
-            }, _.pick(row, 'created', 'completed', 'method', 'state', 'error'))
+                destination:  destination,
+                created: row.created_at
+            }, _.pick(row, 'completed', 'method', 'state', 'error'))
         }))
     })
 }

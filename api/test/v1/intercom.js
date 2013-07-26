@@ -27,7 +27,7 @@ describe('intercom', function() {
                     {
                         user_id: res.user_id,
                         email_lower: res.email,
-                        created: res.created_at
+                        created_at: res.created_at
                     }
                 ]
             })

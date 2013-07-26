@@ -21,7 +21,7 @@ exports.intercom = function(req, res, next) {
     req.app.conn.read.query({
         text: [
             'SELECT user_id, email_lower,',
-            'FLOOR(EXTRACT(epoch FROM created))::int created',
+            'FLOOR(EXTRACT(epoch FROM created_at))::int created_at',
             'FROM "user"',
             'WHERE user_id = $1'
         ].join('\n'),
@@ -35,7 +35,7 @@ exports.intercom = function(req, res, next) {
             user_id: row.user_id,
             email: row.email_lower,
             user_hash: exports.hash(req.app, row.user_id),
-            created_at: row.created
+            created_at: row.created_at
         })
     })
 }

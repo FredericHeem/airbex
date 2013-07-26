@@ -38,9 +38,7 @@ describe('admin', function() {
                 var adminActivity
                 , userActivity
 
-                var activity = mock(app, 'activity', function(a, u, t, d) {
-                    expect(a).to.be(app)
-
+                var activity = mock(app, 'activity', function(u, t, d) {
                     if (u == uid) {
                         expect(t).to.eql('AdminBankAccountCredit')
                         expect(d).to.eql(req)

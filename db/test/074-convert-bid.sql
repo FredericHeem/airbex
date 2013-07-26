@@ -16,8 +16,8 @@ BEGIN
     mid := (SELECT market_id FROM market WHERE base_currency_id = 'BTC' AND
         quote_currency_id = 'XRP');
 
-    INSERT INTO "order" (user_id, market_id, side, volume, price)
-    VALUES (bid_uid, mid, 0, 2e5, 10000e3);
+    INSERT INTO "order" (user_id, market_id, type, volume, price)
+    VALUES (bid_uid, mid, 'bid', 2e5, 10000e3);
 
     sold := convert_ask(ask_uid, mid, (1e8 / 1e3)::bigint);
 

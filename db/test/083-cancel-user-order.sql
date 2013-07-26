@@ -12,8 +12,8 @@ BEGIN
         base_currency_id || quote_currency_id = 'BTCNOK');
     PERFORM edge_credit(uid, 'BTC', 1e8::bigint);
 
-    INSERT INTO "order" (user_id, market_id, side, price, volume)
-    VALUES (uid, mid, 1, 700e3, 1e5)
+    INSERT INTO "order" (user_id, market_id, type, price, volume)
+    VALUES (uid, mid, 'ask', 700e3, 1e5)
     RETURNING order_id INTO oid;
 
     PERFORM cancel_user_order(uid, oid);

@@ -25,8 +25,8 @@ BEGIN
     VALUES (special_account('edge', 'XRP'), user_currency_account(alice, 'XRP'), 10000e6);
 
     -- Create Bob's order
-    INSERT INTO "order" (market_id, user_id, side, price, volume)
-    VALUES (bid, bob, 1, 150000e3, 1*10^(8-3));
+    INSERT INTO "order" (market_id, user_id, type, price, volume)
+    VALUES (bid, bob, 'ask', 150000e3, 1*10^(8-3));
 
     -- Bob, should now have a hold of 1 BTC
     IF (SELECT hold FROM "account" WHERE account_id = user_currency_account(bob, 'BTC')) <> 1e8 THEN
@@ -34,8 +34,8 @@ BEGIN
     END IF;
 
     -- Create Alice's order
-    INSERT INTO "order" (market_id, user_id, side, price, volume)
-    VALUES (bid, alice, 0, 175000e3, 0.05*10^(8-3));
+    INSERT INTO "order" (market_id, user_id, type, price, volume)
+    VALUES (bid, alice, 'bid', 175000e3, 0.05*10^(8-3));
 
     mid := currval('match_match_id_seq');
 

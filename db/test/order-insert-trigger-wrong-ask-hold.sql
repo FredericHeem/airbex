@@ -16,8 +16,8 @@ BEGIN
 
   RAISE NOTICE 'balance %', (SELECT balance FROM "account" WHERE account_id = user_currency_account(uid, 'BTC'));
 
-  INSERT INTO "order" (market_id, side, price, volume, user_id)
-  VALUES (bid, 1, 100, 1e8 / 1e3, uid);
+  INSERT INTO "order" (market_id, type, price, volume, user_id)
+  VALUES (bid, 'ask', 100, 1e8 / 1e3, uid);
 
   oid := currval('order_order_id_seq');
 

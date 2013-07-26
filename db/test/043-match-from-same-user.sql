@@ -20,10 +20,10 @@ BEGIN
     VALUES (special_account('edge', 'XRP'), user_currency_account(fn.user_id, 'XRP'), 10e6);
 
     -- Create bid order (BID 1 BTC @ 10 XRP)
-    INSERT INTO "order" (market_id, user_id, side, price, volume)
-    VALUES (fn.market_id, fn.user_id, 0, 10e3, 1*10^(8-3));
+    INSERT INTO "order" (market_id, user_id, type, price, volume)
+    VALUES (fn.market_id, fn.user_id, 'bid', 10e3, 1*10^(8-3));
 
     -- Create ask order (ASK 1 BTC @ 10 XRP)
-    INSERT INTO "order" (market_id, user_id, side, price, volume)
-    VALUES (fn.market_id, fn.user_id, 1, 10e3, 1*10^(8-3));
+    INSERT INTO "order" (market_id, user_id, type, price, volume)
+    VALUES (fn.market_id, fn.user_id, 'ask', 10e3, 1*10^(8-3));
 END; $$; ROLLBACK;

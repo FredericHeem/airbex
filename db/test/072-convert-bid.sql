@@ -20,8 +20,8 @@ BEGIN
     PERFORM edge_credit(bid_uid, 'XRP', 5000e6::bigint);
 
     -- ASK 10 BTC @ 750 XRP (7500 XRP)
-    INSERT INTO "order" (user_id, market_id, side, volume, price)
-    VALUES (ask_uid, mrid, 1, 10e5, 750e3); -- = 7500 XRP
+    INSERT INTO "order" (user_id, market_id, type, volume, price)
+    VALUES (ask_uid, mrid, 'ask', 10e5, 750e3); -- = 7500 XRP
     ask_oid := currval('order_order_id_seq');
 
     RAISE NOTICE '-----------------------------------------------------------------------------------';

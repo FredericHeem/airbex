@@ -20,8 +20,8 @@ BEGIN
     PERFORM edge_credit(bid_uid, 'NOK', 10000e5::bigint);
     PERFORM edge_credit(ask_uid, 'BTC', 5e8::bigint);
 
-    INSERT INTO "order" (user_id, market_id, side, volume, price)
-    VALUES (bid_uid, mid, 0, 10e5, 750e3);
+    INSERT INTO "order" (user_id, market_id, type, volume, price)
+    VALUES (bid_uid, mid, 'bid', 10e5, 750e3);
 
     INSERT INTO bank_account (account_number, user_id, verify_attempts, verify_started_at, verified_at)
     VALUES ('12345', ask_uid, NULL, current_timestamp - '1 day'::interval, current_timestamp);

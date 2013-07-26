@@ -41,7 +41,7 @@ exports.create = function(req, res, next) {
     } else {
         query = {
             text: [
-                'INSERT INTO "order" (user_id, market_id, side, price, volume)',
+                'INSERT INTO "order" (user_id, market_id, "type", price, volume)',
                 'SELECT $1, market_id, $3, $4, $5',
                 'FROM market',
                 'WHERE base_currency_id || quote_currency_id = $2',
@@ -50,7 +50,7 @@ exports.create = function(req, res, next) {
             values: [
                 req.user,
                 req.body.market,
-                req.body.type == 'bid' ? 0 : 1,
+                req.body.type,
                 price,
                 amount
             ]
@@ -123,7 +123,7 @@ function formatOrderRow(cache, row) {
     return {
         id: row.order_id,
         market: row.market,
-        type: row.side ? 'ask' : 'bid',
+        type: row.type,
         price: cache.formatOrderPrice(row.price, row.market),
         amount: cache.formatOrderVolume(row.original, row.market),
         remaining: cache.formatOrderVolume(row.volume, row.market),
@@ -136,7 +136,7 @@ exports.index = function(req, res, next) {
     req.app.conn.read.query({
         text: [
             'SELECT order_id, base_currency_id || quote_currency_id market,',
-            '   side, price, volume,',
+            '   type, price, volume,',
             '   original, matched, cancelled',
             'FROM order_view o',
             'INNER JOIN market m ON m.market_id = o.market_id',
@@ -153,7 +153,7 @@ exports.index = function(req, res, next) {
 exports.history = function(req, res, next) {
     req.app.conn.read.query({
         text: [
-            'SELECT order_id, market, side, volume, matched, cancelled,',
+            'SELECT order_id, market, type, volume, matched, cancelled,',
             '   original, price, average_price',
             'FROM order_history o',
             'INNER JOIN market m ON m.market_id = o.market_id',

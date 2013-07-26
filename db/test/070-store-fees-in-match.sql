@@ -18,13 +18,13 @@ BEGIN
     PERFORM edge_credit(bid_uid, 'NOK', 5000e5::bigint);
 
     -- ASK 10 BTC @ 750 NOK (7500 NOK)
-    INSERT INTO "order" (user_id, market_id, side, volume, price)
-    VALUES (ask_uid, mrid, 1, 10e5, 750e3); -- = 7500 NOK
+    INSERT INTO "order" (user_id, market_id, type, volume, price)
+    VALUES (ask_uid, mrid, 'ask', 10e5, 750e3); -- = 7500 NOK
     ask_oid := currval('order_order_id_seq');
 
     -- BID 5 BTC @ 800 NOK (4000 NOK)
-    INSERT INTO "order" (user_id, market_id, side, volume, price)
-    VALUES (bid_uid, mrid, 0, 5e5, 800e3); -- = 4000 NOK
+    INSERT INTO "order" (user_id, market_id, type, volume, price)
+    VALUES (bid_uid, mrid, 'bid', 5e5, 800e3); -- = 4000 NOK
     bid_oid := currval('order_order_id_seq');
 
     -- Match will be 5 BTC @ 750 NOK (3750 NOK)
@@ -67,13 +67,13 @@ BEGIN
     PERFORM edge_credit(bid_uid, 'NOK', 5000e5::bigint);
 
     -- ASK 10 BTC @ 750 NOK (7500 NOK)
-    INSERT INTO "order" (user_id, market_id, side, volume, price)
-    VALUES (ask_uid, mrid, 1, 10e5, 750e3); -- = 7500 NOK
+    INSERT INTO "order" (user_id, market_id, type, volume, price)
+    VALUES (ask_uid, mrid, 'ask', 10e5, 750e3); -- = 7500 NOK
     ask_oid := currval('order_order_id_seq');
 
     -- BID 5 BTC @ 800 NOK (4000 NOK)
-    INSERT INTO "order" (user_id, market_id, side, volume, price)
-    VALUES (bid_uid, mrid, 0, 5e5, 800e3); -- = 4000 NOK
+    INSERT INTO "order" (user_id, market_id, type, volume, price)
+    VALUES (bid_uid, mrid, 'bid', 5e5, 800e3); -- = 4000 NOK
     bid_oid := currval('order_order_id_seq');
 
     -- Match will be 5 BTC @ 750 NOK (3750 NOK)

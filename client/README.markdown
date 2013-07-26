@@ -56,7 +56,7 @@ client.cancel(123, function(err) {
 // Create an order
 client.order({
     market: 'BTCXRP',
-    side: 'bid', // bid or ask
+    type: 'bid', // bid or ask
     price: '0.23', // must be string
     volume: '100.5' // must be string
 }, function(err, id) {

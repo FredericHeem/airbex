@@ -42,14 +42,16 @@ exports.orderbook = function(req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
 
+        console.log(dr.rows)
+
         res.send({
             bids: dr.rows.filter(function(r) {
-                return r.side === 0
+                return r.type == 'bid'
             }).map(function(r) {
                 return [r.price_decimal, r.volume_decimal]
             }),
             asks: dr.rows.filter(function(r) {
-                return r.side === 1
+                return r.type == 'ask'
             }).map(function(r) {
                 return [r.price_decimal, r.volume_decimal]
             })

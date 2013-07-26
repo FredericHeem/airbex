@@ -58,12 +58,12 @@ describe('markets', function() {
                         {
                             price: 550.5e3,
                             volume: 12345.12345,
-                            type: 0
+                            type: 'bid'
                         },
                         {
                             price: 560.5e3,
                             volume: 32345.12345,
-                            type: 1
+                            type: 'ask'
                         }
                     ]
                 })

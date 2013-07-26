@@ -18,7 +18,7 @@ describe('orders', function() {
                     rows: [
                         {
                             order_id: 5,
-                            side: 1,
+                            type: 'ask',
                             market: 'BTCXRP',
                             price: 123.456e3,
                             remaining: 0e5,
@@ -61,7 +61,7 @@ describe('orders', function() {
             , activity = mock(app, 'activity', function() {})
             , write = mock(app.conn.write, 'query', function(query, cb) {
                 expect(query.text).to.match(/INTO "order"/)
-                expect(query.values).to.eql([uid, 'BTCLTC', 1, 550.7e3, 1.251e5])
+                expect(query.values).to.eql([uid, 'BTCLTC', 'ask', 550.7e3, 1.251e5])
                 cb(null, {
                     rows: [
                         {
@@ -172,7 +172,7 @@ describe('orders', function() {
                 cb(null, mock.rows([{
                     order_id: res[0].id,
                     market: res[0].market,
-                    side: res[0].type == 'ask' ? 1 : 0,
+                    type: res[0].type,
                     volume: res[0].remaining * 1e5,
                     matched: res[0].matched * 1e5,
                     cancelled: res[0].cancelled * 1e5,
@@ -182,7 +182,7 @@ describe('orders', function() {
                 }, {
                     order_id: res[1].id,
                     market: res[1].market,
-                    side: res[1].type == 'ask' ? 1 : 0,
+                    type: res[1].type,
                     volume: res[1].remaining * 1e5,
                     matched: res[1].matched * 1e5,
                     cancelled: res[1].cancelled * 1e5,

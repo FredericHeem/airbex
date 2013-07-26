@@ -31,11 +31,11 @@ exports.index = function(req, res, next) {
 exports.depth = function(req, res, next) {
     req.app.conn.read.query({
         text: [
-            'SELECT price, volume, side "type"',
+            'SELECT price, volume, "type"',
             'FROM order_depth_view odv',
             'INNER JOIN market m ON m.market_id = odv.market_id',
             'WHERE m.base_currency_id || m.quote_currency_id = $1',
-            'ORDER BY CASE WHEN side = 1 THEN price ELSE -price END'
+            'ORDER BY CASE WHEN type = \'ask\' THEN price ELSE -price END'
         ].join('\n'),
         values: [req.params.id]
     }, function(err, dr) {
@@ -43,7 +43,7 @@ exports.depth = function(req, res, next) {
 
         res.send({
             bids: dr.rows.filter(function(row) {
-                return row.type === 0
+                return row.type == 'bid'
             }).map(function(row) {
                 return [
                     req.app.cache.formatOrderPrice(row.price, req.params.id),
@@ -52,7 +52,7 @@ exports.depth = function(req, res, next) {
             }),
 
             asks: dr.rows.filter(function(row) {
-                return row.type == 1
+                return row.type == 'ask'
             }).map(function(row) {
                 return [
                     req.app.cache.formatOrderPrice(row.price, req.params.id),

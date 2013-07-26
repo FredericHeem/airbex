@@ -27,13 +27,13 @@ BEGIN
         quote_currency_id = 'LTC');
 
     -- create order for user1 to sell 0.71234 btc @ 34.999
-    INSERT INTO "order" (user_id, market_id, side, price, volume)
-    VALUES (uid1, mid, 1, 34.999e3, 0.71234e5)
+    INSERT INTO "order" (user_id, market_id, type, price, volume)
+    VALUES (uid1, mid, 'ask', 34.999e3, 0.71234e5)
     RETURNING order_id INTO o1;
 
     -- create order for user2 to buy 1 btc for 35 ltc
-    INSERT INTO "order" (user_id, market_id, side, price, volume)
-    VALUES (uid2, mid, 0, 35e3, 1e5)
+    INSERT INTO "order" (user_id, market_id, type, price, volume)
+    VALUES (uid2, mid, 'bid', 35e3, 1e5)
     RETURNING order_id INTO o2;
 
     u1_ltc_actual := (SELECT balance FROM account WHERE user_id = uid1 AND currency_id = 'LTC');

@@ -48,12 +48,12 @@ describe('bitcoincharts', function() {
                     {
                         price_decimal: res.bids[0][0],
                         volume_decimal: res.bids[0][1],
-                        side: 0
+                        type: 'bid'
                     },
                     {
                         price_decimal: res.asks[0][0],
                         volume_decimal: res.asks[0][1],
-                        side: 1
+                        type: 'ask'
                     }
                 ]))
             })

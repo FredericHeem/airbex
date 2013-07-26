@@ -100,8 +100,8 @@ LitecoinIn.prototype.processNewBlocks = function() {
     var that = this
 
     return Q.all([
-        Q.ninvoke(this.client, 'query', 'SELECT height FROM ltc_block')
-        .get('rows').get(0).get('height'),
+        Q.ninvoke(this.client, 'query', 'SELECT litecoin_height FROM settings')
+        .get('rows').get(0).get('litecoin_height'),
         Q.ninvoke(this.litecoin, 'getBlockCount').then(function(result) {
             return result
         }, function(err) {
@@ -123,7 +123,7 @@ LitecoinIn.prototype.processNewBlocks = function() {
             })
             .then(function() {
                 return Q.ninvoke(that.client, 'query', {
-                    text: 'UPDATE ltc_block SET height = $1',
+                    text: 'UPDATE settings SET litecoin_height = $1',
                     values: [lastHeight + 1]
                 })
             })

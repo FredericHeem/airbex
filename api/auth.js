@@ -1,3 +1,5 @@
+var debug = require('debug')('snow:auth')
+
 exports.user = function(req, res, next) {
     if (req.user) return next()
 
@@ -7,6 +9,46 @@ exports.user = function(req, res, next) {
             message:'key parameter missing from query string'
         })
     }
+
+    function checkRow(row) {
+        if (row.suspended) {
+            return res.send(401, {
+                name: 'UserSuspended',
+                message: 'User account is suspended. Contact support.'
+            })
+        }
+
+        req.user = row.user_id
+        req.key = req.query.key
+
+        req.apiKey = {
+            canTrade: row.can_trade,
+            canDeposit: row.can_deposit,
+            canWithdraw: row.can_withdraw,
+            primary: row.primary,
+            admin: row.admin
+        }
+
+        next()
+    }
+
+    function unknownKey() {
+        req.app.tarpit(function() {
+            res.send(401, { name: 'UnknownApiKey', message: 'Unknown API key' })
+        })
+    }
+
+    var cached = req.app.apiKeys[req.query.key]
+
+    if (cached === false) {
+        return unknownKey()
+    }
+
+    if (cached) {
+        return checkRow(cached)
+    }
+
+    debug('cache miss for api key %s', req.query.key)
 
     req.app.conn.read.query({
         text: [
@@ -27,32 +69,14 @@ exports.user = function(req, res, next) {
         if (err) return next(err)
 
         if (!dres.rowCount) {
-            return req.app.tarpit(function() {
-                res.send(401, { name: 'UnknownApiKey', message: 'Unknown API key' })
-            })
+            req.app.apiKeys[req.query.key] = false
+
+            return unknownKey()
         }
 
-        var row = dres.rows[0]
+        req.app.apiKeys[req.query.key] = dres.rows[0]
 
-        if (row.suspended) {
-            return res.send(401, {
-                name: 'UserSuspended',
-                message: 'User account is suspended. Contact support.'
-            })
-        }
-
-        req.user = row.user_id
-        req.key = req.query.key
-
-        req.apiKey = {
-            canTrade: row.can_trade,
-            canDeposit: row.can_deposit,
-            canWithdraw: row.can_withdraw,
-            primary: row.primary,
-            admin: row.admin
-        }
-
-        return next()
+        checkRow(dres.rows[0])
     })
 }
 

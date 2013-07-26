@@ -26,6 +26,7 @@ app.ripple = require('./ripple')(app)
 app.tropo = require('./tropo')(app)
 app.verifyEmail = require('./verifyemail')
 app.use(express.bodyParser())
+app.apiKeys = {}
 
 if (module.parent) {
     app.ripple.drop = {}

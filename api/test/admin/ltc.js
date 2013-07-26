@@ -15,7 +15,7 @@ describe('admin', function() {
 
                 mock.once(app.conn.read, 'query', function(query, cb) {
                     cb(null, mock.rows({
-                        height: res.height
+                        litecoin_height: res.height
                     }))
                 })
 

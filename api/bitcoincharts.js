@@ -42,8 +42,6 @@ exports.orderbook = function(req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
 
-        console.log(dr.rows)
-
         res.send({
             bids: dr.rows.filter(function(r) {
                 return r.type == 'bid'

@@ -130,7 +130,6 @@ tee ~/snow-api/config.${environment}.json << EOL
     "intercom_secret": "",
     "intercom_app_id": "",
     "bde_api_key": "",
-    "tropo_voice_token": "",
      "smtp": {
             "service": "Mandrill",
             "options": {

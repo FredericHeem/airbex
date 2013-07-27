@@ -90,40 +90,14 @@ exports.resetPasswordContinue = function(req, res, next) {
         }
 
         var code = dr.rows[0].code
-        , phoneNumber = dr.rows[0].phone_number
 
         debug('correct code is %s', code)
-
-        var codeMsg = [
-            '<prosody rate=\'-5%\'>',
-            'Your code is:' ,
-            '</prosody>',
-            '<prosody rate=\'-40%\'>',
-            code.split('').join(', '),
-            '</prosody>'
-        ].join('')
-
-        var msg = [
-            '<speak>',
-            '<prosody rate=\'-5%\'>',
-            'Password reset.',
-            '</prosody>',
-            codeMsg,
-            codeMsg,
-            '</speak>'
-        ].join('')
-
-        debug('requesting call to %s', phoneNumber)
 
         res.send('Email confirmed. Next we will call you. ' +
             'Close this window and go back to the password reset window.')
 
         setTimeout(function() {
-            req.app.tropo.say(phoneNumber, msg, function(err) {
-                if (!err) return debug('call placed')
-                console.error('Failed to call user at %s', phoneNumber)
-                console.error(err)
-            })
+            // TODO: Implement calling
         }, exports.callDelay)
     })
 }

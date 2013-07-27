@@ -57,36 +57,4 @@ describe('resetPassword', function() {
             })
         })
     })
-
-    describe('continue', function() {
-        it('succeeds', function(done) {
-            resetPassword.callDelay = 0
-
-            var emailCode = dummy.hex(20)
-            , phoneCode = dummy.fromAlphabet('0123456789', 4)
-
-            mock.once(app.conn.write, 'query', function(query, cb) {
-                expect(query.text).to.match(/reset_password_continue/)
-                expect(query.values).to.eql([emailCode])
-                cb(null, mock.rows({
-                    code: phoneCode,
-                    phone_number: '123456789'
-                }))
-            })
-
-            mock.once(app.tropo, 'say', function(number, msg, cb) {
-                expect(number).to.be('123456789')
-                expect(msg).to.contain(phoneCode.split('').join(', '))
-                cb()
-                done()
-            })
-
-            request(app)
-            .get('/v1/resetPassword/continue/' + emailCode)
-            .expect(200)
-            .end(function(err) {
-                if (err) return done(err)
-            })
-        })
-    })
 })

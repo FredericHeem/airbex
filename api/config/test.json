@@ -16,6 +16,5 @@
     "ripple_account": "rnipVEZ2hi6qh7BedivFR13rXHYdpzhKfc",
     "intercom_secret": null,
     "intercom_app_id": null,
-    "bde_api_key": null,
-    "tropo_voice_token": null
+    "bde_api_key": null
 }

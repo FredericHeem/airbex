@@ -1,11 +1,7 @@
-/* global TropoWebAPI, TropoJSON */
 var _ = require('lodash')
 , async = require('async')
-, Tropo = require('tropo')
 , debug = require('debug')('snow:users')
 , crypto = require('crypto')
-
-require('tropo-webapi')
 
 module.exports = exports = function(app) {
     app.get('/v1/whoami', app.auth.any, exports.whoami)
@@ -13,7 +9,6 @@ module.exports = exports = function(app) {
     app.post('/v1/users/identity', app.auth.primary, exports.identity)
     app.post('/v1/users/verify/call', app.auth.primary, exports.startPhoneVerify)
     app.post('/v1/users/verify', app.auth.primary, exports.verifyPhone)
-    app.post('/tropo', exports.tropo)
     app.patch('/v1/users/current', app.auth.primary, exports.patch)
 }
 
@@ -254,73 +249,15 @@ exports.startPhoneVerify = function(req, res, next) {
 
         debug('correct code is %s', code)
 
-        var tropo = new Tropo({
-            voiceToken: req.app.config.tropo_voice_token,
-            messagingToken: req.app.config.tropo_messaging_token
-        })
-
-        debug('using tropo token %s', req.app.config.tropo_voice_token)
-
-        var codeMsg = [
-            '<prosody rate=\'-5%\'>',
-            'Your code is:' ,
-            '</prosody>',
-            '<prosody rate=\'-40%\'>',
-            code.split('').join(', '),
-            '.</prosody>'
-        ].join('')
-
-        var msg = [
-            '<speak>',
-            '<prosody rate=\'-5%\'>',
-            'Welcome to Just-coin.',
-            '</prosody>',
-            codeMsg,
-            codeMsg,
-            '</speak>'
-        ].join('')
-
-        debug('message %s', msg)
-
         debug('requesting call to %s', req.body.number)
 
         async.parallel([
-            function(next) {
-                // call
-                tropo.call(req.body.number, msg, function(err) {
-                    if (err) return next(err)
-                    next()
-                })
+            function() {
+                // TODO: Implement calling
             }
         ], function(err) {
             if (err) return next(err)
             res.send(204)
         })
     })
-}
-
-exports.tropo = function(req, res) {
-    var params = req.body.session.parameters
-
-    debug('processing tropo request with params %j', params)
-
-    if (params.token != req.app.config.tropo_voice_token) {
-        debug('specified tropo token %s does not match config token %s',
-            params.token, req.app.config.tropo_voice_token)
-        return res.send(404)
-    }
-
-    debug('configuring response')
-
-    var tropo = new TropoWebAPI()
-
-    tropo.call(params.numberToDial)
-    tropo.wait(2000);
-    tropo.say(params.msg)
-
-    var tropoJSON = TropoJSON(tropo)
-
-    debug('sending tropo response %j', tropoJSON)
-
-    res.send(tropoJSON)
 }

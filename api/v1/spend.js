@@ -21,9 +21,9 @@ exports.spend = function(req, res, next) {
     }, function(err, dr) {
         if (err) {
             if (err.message.match(/non_negative_available/)) {
-                return res.send(500, {
+                return res.send(400, {
                     name: 'NoFunds',
-                    message: 'Insufficient funds.'
+                    message: 'Insufficient funds'
                 })
             }
 

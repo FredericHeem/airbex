@@ -21,11 +21,6 @@ module.exports = function(userId) {
     // Header
     $el.find('.header-placeholder').replaceWith(header(userId, 'user').$el)
 
-    // Link to intercom.io
-    $el.find('.intercom-link')
-    .attr('href', format('https://www.intercom.io/apps/%s/users/show?user_id=%s',
-        '64463fba8faa8166444bfb3c00a5e40976bd622e', userId))
-
     function renderProfile(u) {
         // Straight forward strings
         var plains = {

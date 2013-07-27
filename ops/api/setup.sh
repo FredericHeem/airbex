@@ -127,8 +127,6 @@ tee ~/snow-api/config.${environment}.json << EOL
         ]
     },
     "raven": "",
-    "intercom_secret": "",
-    "intercom_app_id": "",
     "bde_api_key": "",
      "smtp": {
             "service": "Mandrill",

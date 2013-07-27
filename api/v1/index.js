@@ -1,5 +1,5 @@
 module.exports = function(app) {
-    var routes = ['balances', 'markets', 'orders', 'ripple', 'intercom',
+    var routes = ['balances', 'markets', 'orders', 'ripple',
     'currencies', 'activities', 'users', 'withdraws',
     'keys', 'email', 'resetPassword', 'spend', 'bankaccounts',
     'language', 'vouchers', 'send']

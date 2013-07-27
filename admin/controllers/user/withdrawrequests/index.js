@@ -1,8 +1,9 @@
 var header = require('../header')
+, template = require('./template.html')
 
 module.exports = function(userId) {
     var itemTemplate = require('./item.html')
-    , $el = $(require('./template.html')())
+    , $el = $('<div class="user-withdraw-requests">').html(template())
     , controller = {
         $el: $el
     }

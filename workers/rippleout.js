@@ -194,6 +194,9 @@ RippleOut.prototype.send = function(request, cb) {
             } else if (err.name == 'tooBusy') {
                 abort = true
                 reason = 'Ripple server too busy. Try again'
+            } else if (err.name == 'telINSUF_FEE_P') {
+                abort = true
+                reason = 'Ripple server too busy. Try again'
             } else {
                 report = true
             }

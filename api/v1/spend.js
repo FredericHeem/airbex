@@ -27,6 +27,13 @@ exports.spend = function(req, res, next) {
                 })
             }
 
+            if (err.message.match(/inserted with zero volume/)) {
+                return res.send(400, {
+                    name: 'AmountTooSmall',
+                    message: 'Spend amount is too small'
+                })
+            }
+
             return next(err)
         }
 

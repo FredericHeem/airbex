@@ -45,6 +45,13 @@ exports.resetPasswordBegin = function(req, res, next) {
                 })
             }
 
+            if (err.message.match(/User does not have a verified email/)) {
+                return res.send(400, {
+                    name: 'NoVerifiedEmail',
+                    message: 'User does not have a verified email and cannot reset'
+                })
+            }
+
             return next(err)
         }
 

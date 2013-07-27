@@ -3,7 +3,6 @@ var header = require('./header')
 , model = require('../../util/model')
 , _ = require('lodash')
 , moment = require('moment')
-, format = require('util').format
 
 module.exports = function(userId) {
     var $el = $('<div class="admin-user-profile">').html(template({

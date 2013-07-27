@@ -191,16 +191,19 @@ RippleOut.prototype.send = function(request, cb) {
             } else if (err.name == 'dstActMalformed') {
                 abort = true
                 reason = 'Account not found'
+            } else if (err.name == 'tooBusy') {
+                abort = true
+                reason = 'Ripple server too busy. Try again'
             } else {
                 report = true
             }
-
-            debug('will not report error %s: %s', err.name || '<null>', err.message)
 
             if (report) {
                 err = new Error(format('Failed to send transaction #%s: %s, %s',
                     request.request_id, err.name || 'Unnamed', err.message))
                 that.emit('error', err)
+            } else {
+                debug('will not report error %s: %s', err.name || '<null>', err.message)
             }
 
             if (!abort) {

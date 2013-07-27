@@ -38,7 +38,8 @@ exports.reportFromXhr = function(error) {
     var message = format('XHR Error: %s %s: %s',
         strippedUrl,
         error.xhr.statusText,
-        error.xhr.responseText.substr(0, 200))
+        error.xhr.responseTextr ? error.xhr.responseText.substr(0, 200) :
+            '<no response text>')
 
     var data = {
         tags: {

@@ -25,7 +25,7 @@ exports.process = function(row, cb) {
     if (row.type == 'FillOrder') {
         template = 'fill-order'
         locals.market = details.market
-        locals.type = details.type ? 'ask' : 'bid'
+        locals.type = details.type
         locals.base = details.market.substr(0, 3)
         locals.quote = details.market.substr(3)
         locals.price = locals.price ? stripZeroes(details.price) : null

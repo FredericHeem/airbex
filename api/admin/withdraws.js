@@ -1,22 +1,14 @@
+var withdraws = require('../withdraws')
+
 module.exports = exports = function(app) {
-    app.get('/admin/withdraws', app.auth.admin, exports.index)
-    app.patch('/admin/withdraws/:id', app.auth.admin, exports.patch)
-}
-
-exports.index = function(req, res, next) {
-    var query = [
-        'SELECT *',
-        'FROM bank_withdraw_request_view',
-        'WHERE state NOT IN (\'cancelled\', \'completed\')'
-    ].join('\n')
-
-    req.app.conn.read.query(query, function(err, dr) {
-        if (err) return next(err)
-        res.send(dr.rows.map(function(row) {
-            row.amount = req.app.cache.formatCurrency(row.amount, row.currency_id)
-            return row
-        }))
+    app.get('/admin/withdraws', app.auth.admin, function(req, res, next) {
+        withdraws.query(req.app, req.query, function(err, items) {
+            if (err) return next(err)
+            res.send(items)
+        })
     })
+
+    app.patch('/admin/withdraws/:id', app.auth.admin, exports.patch)
 }
 
 exports.cancel = function(req, res, next) {

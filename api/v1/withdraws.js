@@ -1,9 +1,18 @@
-var _ = require('lodash')
+var withdraws = require('../withdraws')
+, _ = require('lodash')
 
 module.exports = exports = function(app) {
     app.del('/v1/withdraws/:id', app.auth.withdraw, exports.cancel)
-    app.get('/v1/withdraws', app.auth.any, exports.index)
     app.post('/v1/withdraws/bank', app.auth.withdraw, exports.withdrawBank)
+
+    app.get('/v1/withdraws', app.auth.any, function(req, res, next) {
+        withdraws.query(req.app, { user_id: req.user }, function(err, items) {
+            if (err) return next(err)
+            res.send(items.map(function(item) {
+                return _.omit(item, 'user')
+            }))
+        })
+    })
 }
 
 exports.withdrawBank = function(req, res, next) {
@@ -47,40 +56,6 @@ exports.withdrawBank = function(req, res, next) {
         }
 
         return res.send(204)
-    })
-}
-
-exports.index = function(req, res, next) {
-    req.app.conn.read.query({
-        text: 'SELECT * FROM withdraw_request_view WHERE user_id = $1',
-        values: [req.user]
-    }, function(err, dr) {
-        if (err) return next(err)
-        res.send(dr.rows.map(function(row) {
-            var destination
-
-            if (row.method == 'BTC') {
-                destination = row.bitcoin_address
-            } else if (row.method == 'LTC') {
-                destination = row.litecoin_address
-            } else if (row.method == 'ripple') {
-                destination = row.ripple_address
-            } else if (row.method == 'bank'){
-                destination = row.bank_account_id
-            }
-
-            if (!destination) {
-                return next(new Error('Unknown destination for ' + JSON.stringify(row)))
-            }
-
-            return _.extend({
-                currency: row.currency_id,
-                amount: req.app.cache.formatCurrency(row.amount, row.currency_id),
-                id: row.request_id,
-                destination:  destination,
-                created: row.created_at
-            }, _.pick(row, 'completed', 'method', 'state', 'error'))
-        }))
     })
 }
 

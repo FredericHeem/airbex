@@ -1,0 +1,16 @@
+<tr class="withdraw">
+    <td><%= id %></td>
+    <td><%= moment(created).format('YYYY-MM-DD HH:mm') %></td>
+    <td><%= method %></td>
+    <td><%= state %></td>
+    <td class="hidden-single-user">
+        <a href="#users/<%= user %>" data-user-id="<%= user %>"><%= user %></a></td>
+    <td><%= amount %> <%= currency %>
+    </td>
+    <td><%= destination %></td>
+    <td>
+        <button class="process visible-requested btn">Process</button>
+        <button class="complete hidden-cancelled hidden-completed btn btn-success">Complete</button>
+        <button class="cancel hidden-cancelled hidden-completed btn btn-danger">Cancel</button>
+    </td>
+</tr>

@@ -45,6 +45,13 @@ exports.resetPasswordBegin = function(req, res, next) {
                 })
             }
 
+            if (err.message.match(/User does not have a phone number/)) {
+                return res.send(400, {
+                    name: 'NoVerifiedPhone',
+                    message: 'User does not have a verified phone and cannot reset'
+                })
+            }
+
             if (err.message.match(/User does not have a verified email/)) {
                 return res.send(400, {
                     name: 'NoVerifiedEmail',

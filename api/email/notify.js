@@ -28,7 +28,7 @@ exports.process = function(row, cb) {
         locals.type = details.type
         locals.base = details.market.substr(0, 3)
         locals.quote = details.market.substr(3)
-        locals.price = locals.price ? stripZeroes(details.price) : null
+        locals.price = details.price ? stripZeroes(details.price) : null
         locals.original = stripZeroes(details.original)
         locals.total = stripZeroes(details.total)
     } else if (row.type == 'WithdrawComplete') {

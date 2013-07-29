@@ -236,10 +236,8 @@ BEGIN
         RAISE 'User with email % not found', temail;
     END IF;
 
-    VALUES (user_currency_account(fuid, c), user_currency_account(tuid, c), amnt, 'Transfer'
-        INSERT INTO "transaction" (debit_account_id, credit_account_id, amount, type)
-
-    );
+    INSERT INTO "transaction" (debit_account_id, credit_account_id, amount, type)
+    VALUES (user_currency_account(fuid, c), user_currency_account(tuid, c), amnt, 'Transfer');
 
     RETURN currval('transaction_transaction_id_seq');
 END; $BODY$

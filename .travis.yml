@@ -48,5 +48,5 @@ script:
   - "npm install"
   - "npm test"
   - "popd"
-  - "npm install jshint"
+  - "npm install jshint@2.1.3"
   - "jshint `find | grep -P '\\.js$' | grep -vP '(/node_modules/|/vendor/|/admin/components/|/coverage/)' | sed ':a;N;$!ba;s/\\n/ /g'`"

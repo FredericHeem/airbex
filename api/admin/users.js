@@ -300,7 +300,20 @@ exports.buildQuery = function(params) {
         }).join(' OR '))
     }
 
-    query.push('ORDER BY user_id ASC')
+    var orders = []
+
+    // Prioritize direct matching of user id
+    if (params.user_id || params.all) {
+        values.push(params.user_id || params.all)
+        orders.push(format(
+            'CASE WHEN user_id::varchar = $%d THEN 0 ELSE 1 END',
+            values.length))
+    }
+
+    orders.push('user_id')
+
+    query.push('ORDER BY')
+    query.push(orders.join(','))
 
     return {
         text: query.join('\n'),

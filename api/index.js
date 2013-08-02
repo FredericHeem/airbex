@@ -31,7 +31,7 @@ if (module.parent) {
     app.ripple.drop = {}
 } else {
     app.notify = require('./email/notify')(app)
-    app.ripple.connect()
+    //app.ripple.connect()
 }
 
 var routes = ['bitcoincharts', 'v1', 'admin']

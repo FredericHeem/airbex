@@ -12,8 +12,7 @@
         },
         "currency": {
             "type": "string",
-            "required": true,
-            "pattern": "^NOK$"
+            "required": true
         }
     }
 }

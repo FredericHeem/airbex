@@ -10,7 +10,15 @@ var async = require('async')
     USD: 5,
     NOK: 5,
     LTC: 8,
-    XRP: 6
+    XRP: 6,
+    EUR: 5,
+    fiat: {
+        'NOK': true,
+        'EUR': true,
+        'XRP': false,
+        'LTC': false,
+        'BTC': false
+    }
 }
 
 module.exports = exports = function(conn, cb) {
@@ -23,7 +31,7 @@ module.exports = exports = function(conn, cb) {
     async.parallel({
         currencies: function(cb) {
             conn.read.query({
-                text: 'SELECT currency_id, scale FROM currency'
+                text: 'SELECT currency_id, scale, fiat FROM currency'
             }, function(err, res) {
                 if (err) return cb(err)
                 cb(null, res.rows)
@@ -45,8 +53,15 @@ module.exports = exports = function(conn, cb) {
             exports[x.pair] = x.scale
         })
 
+        res.markets.forEach(function(x) {
+            exports[x.pair] = x.scale
+        })
+
+        exports.fiat = {}
+
         res.currencies.forEach(function(x) {
             exports[x.currency_id] = x.scale
+            exports.fiat[x.currency_id] = x.fiat
         })
 
         cb && cb()

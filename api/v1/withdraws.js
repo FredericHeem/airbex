@@ -25,6 +25,13 @@ exports.withdrawBank = function(req, res, next) {
         })
     }
 
+    if (!req.app.cache.fiat[req.body.currency]) {
+        return res.send(400, {
+            name: 'CannotWithdrawNonFiatToBank',
+            message: 'Cannot withdraw non-fiat to a bank account'
+        })
+    }
+
     req.app.conn.write.query({
         text: [
             'SELECT withdraw_bank($2, $3, $4)',

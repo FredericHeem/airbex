@@ -72,7 +72,7 @@ describe('bankaccounts', function() {
     describe('add', function() {
         it('success', function(done) {
             var userId =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, userId, { primary: true })
+            , impersonate = mock.impersonate(app, userId, { primary: true, level: 4 })
             , req = {
                 displayName: null,
                 iban: null,
@@ -127,7 +127,7 @@ describe('bankaccounts', function() {
 
         it('validates', function(done) {
             var userId =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, userId, { primary: true })
+            , impersonate = mock.impersonate(app, userId, { primary: true, level: 4 })
 
             request(app)
             .post('/v1/bankaccounts')

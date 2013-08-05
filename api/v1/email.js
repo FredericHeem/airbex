@@ -57,10 +57,13 @@ exports.verify = function(req, res, next) {
     }
 
     req.app.conn.write.query({
-        text: 'SELECT verify_email($1)',
+        text: 'SELECT verify_email($1) uid',
         values: [req.params.code]
-    }, function(err) {
-        if (err) {
+    }, function(err, dr) {
+        if (err) return next(err)
+        var uid = dr.rows[0].uid
+
+        if (!uid) {
             if (err.message == 'Code not found or expired') {
                 return req.app.tarpit(function() {
                     res.send(404, 'Code not found or expired')
@@ -70,6 +73,7 @@ exports.verify = function(req, res, next) {
             return next(err)
         }
 
+        req.app.auth.invalidateUser(req.app, uid)
         res.redirect(req.app.config.website_url)
     })
 }

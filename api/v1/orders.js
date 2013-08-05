@@ -1,6 +1,6 @@
 module.exports = exports = function(app) {
     app.del('/v1/orders/:id', app.auth.trade, exports.cancel)
-    app.post('/v1/orders', app.auth.trade, exports.create)
+    app.post('/v1/orders', app.auth.trade(2), exports.create)
     app.get('/v1/orders', app.auth.any, exports.index)
     app.get('/v1/orders/history', app.auth.any, exports.history)
 }

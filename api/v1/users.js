@@ -6,9 +6,9 @@ var _ = require('lodash')
 module.exports = exports = function(app) {
     app.get('/v1/whoami', app.auth.any, exports.whoami)
     app.post('/v1/users', exports.create)
-    app.post('/v1/users/identity', app.auth.primary, exports.identity)
-    app.post('/v1/users/verify/call', app.auth.primary, exports.startPhoneVerify)
-    app.post('/v1/users/verify', app.auth.primary, exports.verifyPhone)
+    app.post('/v1/users/identity', app.auth.primary(2), exports.identity)
+    app.post('/v1/users/verify/call', app.auth.primary(1), exports.startPhoneVerify)
+    app.post('/v1/users/verify', app.auth.primary(1), exports.verifyPhone)
     app.patch('/v1/users/current', app.auth.primary, exports.patch)
 }
 
@@ -41,7 +41,10 @@ exports.patch = function(req, res, next) {
         values: values
     }, function(err, dr) {
         if (err) return next(err)
-        if (!dr.rowCount) return next(new Error('User ' + req.user + ' not found'))
+        if (!dr.rowCount) {
+            return next(new Error('User ' + req.user + ' not found'))
+        }
+        req.app.auth.invalidate(req.app, req.key)
         res.send(204)
     })
 }
@@ -206,6 +209,8 @@ exports.verifyPhone = function(req, res, next) {
                     'you may not verify at this time.'
             })
         }
+
+        req.app.auth.invalidate(req.app, req.key)
 
         res.send(204)
     })

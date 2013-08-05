@@ -1,7 +1,7 @@
 var util = require('util')
 
 module.exports = exports = function(app, currencyId) {
-    app.post('/v1/' + currencyId + '/out', app.auth.withdraw,
+    app.post('/v1/' + currencyId + '/out', app.auth.withdraw(2),
         exports.withdraw.bind(exports, currencyId))
     app.get('/v1/' + currencyId + '/address', app.auth.deposit,
         exports.address.bind(exports, currencyId))

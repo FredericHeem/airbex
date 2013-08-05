@@ -2,7 +2,7 @@ var crypto = require('crypto')
 , async = require('async')
 
 module.exports = exports = function(app) {
-    app.post('/v1/vouchers', app.auth.withdraw, function(req, res, next) {
+    app.post('/v1/vouchers', app.auth.withdraw(2), function(req, res, next) {
         if (!req.app.validate(req.body, 'v1/voucher_create', res)) return
 
         exports.create(
@@ -17,7 +17,7 @@ module.exports = exports = function(app) {
         )
     })
 
-    app.post('/v1/vouchers/:id/redeem', app.auth.deposit, function(req, res, next) {
+    app.post('/v1/vouchers/:id/redeem', app.auth.deposit(2), function(req, res, next) {
         exports.redeem(req.app, req.user, req.params.id, function(err, details) {
             if (!err) {
                 return res.send(details)

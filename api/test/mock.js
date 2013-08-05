@@ -1,4 +1,5 @@
 var _ = require('lodash')
+, debug = require('debug')('snow:test')
 
 module.exports = exports = function(target, name, fake) {
     var real = target[name]
@@ -29,10 +30,13 @@ exports.once = function(target, name, fake) {
 }
 
 exports.impersonate = function(app, uid, permissions, key) {
+    debug('impersonating as user %s with permissions %j', uid, permissions)
+
     return exports(app.auth, 'user', function(req, res, next) {
         req.user = uid
         req.key = key || null
         req.apiKey = permissions || {}
+        req.apiKey.level = req.apiKey.level || 0
         next()
     })
 }

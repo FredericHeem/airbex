@@ -57,7 +57,7 @@ describe('orders', function() {
     describe('create', function() {
         it('creates order', function(done) {
             var uid =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, uid, { canTrade: true })
+            , impersonate = mock.impersonate(app, uid, { canTrade: true, level: 2 })
             , activity = mock(app, 'activity', function() {})
             , write = mock(app.conn.write, 'query', function(query, cb) {
                 expect(query.text).to.match(/INTO "order"/)

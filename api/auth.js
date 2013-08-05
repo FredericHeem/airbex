@@ -1,4 +1,34 @@
 var debug = require('debug')('snow:auth')
+, assert = require('assert')
+, format = require('util').format
+
+exports.invalidate = function(app, key) {
+    delete app.apiKeys[key]
+}
+
+exports.demand = function(level, req, res) {
+    assert(typeof level == 'number')
+    assert.equal(typeof req.apiKey.level, 'number')
+
+    if (req.apiKey.level >= level) return true
+
+    res.send(401, {
+        name: 'SecurityLevelTooLow',
+        message: format(
+            'This action requires a security level of %d. The user has %d.',
+            level, req.apiKey.level)
+    })
+}
+
+exports.invalidateUser = function(app, userId) {
+    debug('invalidating api keys for user %d', userId)
+
+    Object.keys(app.apiKeys).forEach(function(key) {
+        if (app.apiKeys[key].userId == userId) {
+            exports.invalidate(app, key)
+        }
+    })
+}
 
 exports.user = function(req, res, next) {
     if (req.user) return next()
@@ -26,7 +56,8 @@ exports.user = function(req, res, next) {
             canDeposit: row.can_deposit,
             canWithdraw: row.can_withdraw,
             primary: row.primary,
-            admin: row.admin
+            admin: row.admin,
+            level: row.security_level
         }
 
         next()
@@ -59,9 +90,10 @@ exports.user = function(req, res, next) {
             '   a.can_trade,',
             '   a."primary",',
             '   u.admin,',
+            '   u.security_level,',
             '   u.suspended',
             'FROM api_key a',
-            'INNER JOIN "user" u ON u.user_id = a.user_id',
+            'INNER JOIN user_view u ON u.user_id = a.user_id',
             'WHERE a.api_key_id = $1'
         ].join('\n'),
         values: [req.query.key]
@@ -89,7 +121,9 @@ var mappings = {
     any: null
 }
 
-exports.permission = function(type, req, res, next) {
+exports.permission = function(type, level, req, res, next) {
+    debug('requiring permission %s of level %d', type, level)
+
     exports.user(req, res, function(err) {
         if (err) return next(err)
         if (type == 'any') return next()
@@ -111,12 +145,20 @@ exports.permission = function(type, req, res, next) {
             })
         }
 
+        if (level && !exports.demand(level, req, res)) {
+            return
+        }
+
         next()
     })
 }
 
 Object.keys(mappings).forEach(function(type) {
     exports[type] = function(req, res, next) {
-        exports.permission(type, req, res, next)
+        if (typeof req == 'number') {
+            return exports.permission.bind(exports, type, req || 0)
+        }
+
+        exports.permission(type, 0, req, res, next)
     }
 })

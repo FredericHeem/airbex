@@ -3,7 +3,7 @@ var withdraws = require('../withdraws')
 
 module.exports = exports = function(app) {
     app.del('/v1/withdraws/:id', app.auth.withdraw, exports.cancel)
-    app.post('/v1/withdraws/bank', app.auth.withdraw, exports.withdrawBank)
+    app.post('/v1/withdraws/bank', app.auth.withdraw(4), exports.withdrawBank)
 
     app.get('/v1/withdraws', app.auth.any, function(req, res, next) {
         withdraws.query(req.app, { user_id: req.user }, function(err, items) {

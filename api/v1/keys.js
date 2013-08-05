@@ -16,9 +16,9 @@ exports.replace = function(req, res, next) {
     }, function(err) {
         if (err) return next(err)
         req.app.activity(req.user, 'ChangePassword', {})
-        res.send(204);
-        delete req.app.apiKeys[req.body.key];
-        delete req.app.apiKeys[req.key]
+        res.send(204)
+        req.app.auth.invalidate(req.app, req.body.key)
+        req.app.auth.invalidate(req.app, req.key)
     })
 }
 
@@ -91,8 +91,8 @@ exports.create = function(req, res, next) {
             req.body.canWithdraw
         ]
     }, function(err) {
-        if (err) return next(err);
-        delete req.app.apiKeys[key]
+        if (err) return next(err)
+        req.app.auth.invalidate(req.app, key)
         res.send(201, { id: key })
     })
 }

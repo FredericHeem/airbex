@@ -10,7 +10,7 @@ describe('withdraws', function() {
         it('succeeds', function(done) {
             var uid =  dummy.number(1, 1e6)
             , baid = dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, uid, { canWithdraw: true })
+            , impersonate = mock.impersonate(app, uid, { canWithdraw: true, level: 4 })
 
             mock.once(app.conn.write, 'query', function(query, cb) {
                 expect(query.text).to.match(/withdraw_bank/)

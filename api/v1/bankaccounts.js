@@ -1,14 +1,8 @@
 var _ = require('lodash')
-, crypto = require('crypto')
 
 module.exports = exports = function(app) {
     app.get('/v1/bankAccounts', app.auth.primary, exports.index)
     app.post('/v1/bankAccounts', app.auth.primary(4), exports.add)
-    app.post('/v1/bankAccounts/:id/verify', app.auth.primary, exports.verify)
-}
-
-exports.createVerifyCode = function() {
-    return crypto.randomBytes(2).toString('hex').toUpperCase()
 }
 
 exports.index = function(req, res, next) {
@@ -25,9 +19,7 @@ exports.index = function(req, res, next) {
                 displayName: row.display_name,
                 accountNumber: row.account_number,
                 iban: row.iban,
-                routingNumber: row.routing_number,
-                verified: !!row.verified_at,
-                verifying: !!row.verify_started_at
+                routingNumber: row.routing_number
             })
         }))
     })
@@ -38,58 +30,18 @@ exports.add = function(req, res, next) {
 
     req.app.conn.write.query({
         text: [
-            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
-            'routing_number, verify_code)',
-            'VALUES ($1, $2, $3, $4, $5, $6)'
+            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic, routing_number)',
+            'VALUES ($1, $2, $3, $4, $5)'
         ].join('\n'),
         values: [
             req.user,
             req.body.accountNumber,
             req.body.iban,
             req.body.swiftbic,
-            req.body.routingNumber,
-            exports.createVerifyCode()
+            req.body.routingNumber
         ]
     }, function(err) {
         if (err) return next(err)
-        res.send(204)
-    })
-}
-
-exports.verify = function(req, res, next) {
-    req.app.conn.write.query({
-        text: [
-            'SELECT',
-            '   verify_bank_account($1, $2, $3) success,',
-            '   account_number, iban',
-            'FROM bank_account',
-            'WHERE bank_account_id = $2'
-        ].join('\n'),
-        values: [
-            req.user,
-            +req.params.id,
-            req.body.code
-        ]
-    }, function(err, dr) {
-        if (err) return next(err)
-        var row = dr.rows[0]
-        if (!row) {
-            return res.send(400, {
-                name: 'BankAccountNotFound'
-            })
-        }
-
-        if (!row.success) {
-            return res.send(400, {
-                name: 'WrongBankAccountVerifyCode'
-            })
-        }
-
-        req.app.activity(req.user, 'VerifyBankAccount', {
-            accountNumber: row.account_number,
-            iban: row.iban
-        })
-
         res.send(204)
     })
 }

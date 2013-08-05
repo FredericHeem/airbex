@@ -42,7 +42,11 @@ module.exports = function(userId) {
 
         $el.find('.created span').html(moment(u.created_at).format('Do MMMM YYYY'))
         $el.find('.suspended span').html(u.suspended ? 'Yes' : 'No')
+        $el.find('.poi span').html(u.poi_approved_at ? 'Yes' : 'No')
+        $el.find('.poa span').html(u.poa_approved_at ? 'Yes' : 'No')
         $el.find('.suspended .field').prop('checked', u.suspended)
+        $el.find('.poi .field').prop('checked', !!u.poi_approved_at)
+        $el.find('.poa .field').prop('checked', !!u.poa_approved_at)
 
         $el.find('.bitcoin-address a')
         .attr('href', 'https://blockchain.info/address/' + u.bitcoin_address)
@@ -52,9 +56,9 @@ module.exports = function(userId) {
         .attr('href', 'http://explorer.litecoin.net/address/' + u.litecoin_address)
         .html(u.litecoin_address)
 
-        if (u.suspended) {
-            $el.find('.suspended').addClass('warning')
-        }
+        $el.find('.suspended').toggleClass('warning', u.suspended)
+        $el.find('.poi').toggleClass('success', !!u.poi_approved_at)
+        $el.find('.poa').toggleClass('success', !!u.poa_approved_at)
 
         $el.toggleClass('has-verified-email', !!u.email_verified_at)
 
@@ -123,6 +127,19 @@ module.exports = function(userId) {
             phone_number: $el.find('.phone .field').valOrNull(),
             suspended: $el.find('.suspended .field').prop('checked')
         })
+
+        var wasPoiApproved = !!oldUser.poi_approved_at
+        , wasPoaApproved = !!oldUser.poa_approved_at
+        , isPoiApproved = $el.find('.poi .field').prop('checked')
+        , isPoaApproved = $el.find('.poa .field').prop('checked')
+
+        if (wasPoiApproved != isPoiApproved) {
+            patch.poi_approved = isPoiApproved
+        }
+
+        if (wasPoaApproved != isPoaApproved) {
+            patch.poa_approved = isPoaApproved
+        }
 
         if (!_.keys(patch).length) {
             cancelEdit()

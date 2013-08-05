@@ -7,16 +7,12 @@ module.exports = exports = function(app) {
     app.patch('/admin/users/:id', app.auth.admin, exports.patch)
     app.get('/admin/users/:user/bankAccounts',
         app.auth.admin, exports.bankAccounts)
-    app.post('/admin/users/:user/bankAccounts/:id/startVerify',
-        app.auth.admin, exports.startBankAccountVerify)
     app.get('/admin/users/:user/activity', app.auth.admin, exports.activity)
     app.post('/admin/users/:user/sendVerificationEmail', app.auth.admin,
         exports.sendVerificationEmail)
     app.post('/admin/users/:user/bankAccounts', app.auth.admin,
         exports.addBankAccount)
     app.get('/admin/users/:user/accounts', app.auth.admin, exports.accounts)
-    app.post('/admin/users/:user/bankAccounts/:id/setVerified', app.auth.admin,
-        exports.setBankAccountVerified)
     app.del('/admin/users/:user/bankAccounts/:id', app.auth.admin,
         exports.removeBankAccount)
 }
@@ -50,9 +46,8 @@ exports.sendVerificationEmail = function(req, res, next) {
 exports.addBankAccount = function(req, res, next) {
     var query = {
         text: [
-            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic,',
-            'routing_number, verified_at, verify_attempts, verify_started_at)',
-            'VALUES ($1, $2, $3, $4, $5, current_timestamp, NULL, current_timestamp)'
+            'INSERT INTO bank_account (user_id, account_number, iban, swiftbic, routing_number)',
+            'VALUES ($1, $2, $3, $4, $5)'
         ].join('\n'),
         values: [
             +req.params.user,
@@ -65,75 +60,6 @@ exports.addBankAccount = function(req, res, next) {
 
     req.app.conn.write.query(query, function(err) {
         if (err) return next(err)
-        res.send(204)
-    })
-}
-
-exports.startBankAccountVerify = function(req, res, next) {
-    req.app.conn.write.query({
-        text: [
-            'UPDATE bank_account',
-            'SET verify_started_at = current_timestamp',
-            'WHERE',
-            '   bank_account_id = $1 AND',
-            '   verify_started_at IS NULL'
-        ].join('\n'),
-        values: [
-            req.params.id
-        ]
-    }, function(err, dr) {
-        if (err) return next(err)
-
-        if (!dr.rowCount) {
-            return res.send(404, {
-                name: 'BankAccountNotFound',
-                message: 'Bank account not found or already started verifying'
-            })
-        }
-
-        res.send(204)
-    })
-}
-
-exports.setBankAccountVerified = function(req, res, next) {
-    req.app.conn.write.query({
-        text: [
-            'UPDATE bank_account',
-            'SET',
-            '   verify_started_at = current_timestamp,',
-            '   verified_at = current_timestamp,',
-            '   verify_code = null,',
-            '   verify_attempts = null',
-            'WHERE',
-            '   bank_account_id = $1 AND',
-            '   verified_at IS NULL',
-            'RETURNING user_id, account_number, iban'
-        ].join('\n'),
-        values: [
-            req.params.id
-        ]
-    }, function(err, dr) {
-        if (err) return next(err)
-
-        if (!dr.rowCount) {
-            return res.send(404, {
-                name: 'BankAccountNotFound',
-                message: 'Bank account not found or already verifying'
-            })
-        }
-
-        var row = dr.rows[0]
-
-        req.app.activity(req.user, 'AdminVerifyBankAccount', {
-            id: +req.params.id,
-            user_id: req.params.user
-        })
-
-        req.app.activity(row.user_id, 'VerifyBankAccount', {
-            accountNumber: row.account_number,
-            iban: row.iban
-        })
-
         res.send(204)
     })
 }
@@ -161,7 +87,7 @@ exports.user = function(req, res, next) {
 exports.patch = function(req, res, next) {
     var updates = {}
     , values = [req.params.id]
-    , allowed = ['email', 'first_name', 'last_name', 'phone_number', 'country',
+    , allowed = ['first_name', 'last_name', 'phone_number', 'country',
         'city', 'postal_area', 'address', 'suspended']
 
     _.each(allowed, function(k) {
@@ -169,12 +95,20 @@ exports.patch = function(req, res, next) {
         updates[k] = req.body[k]
     })
 
-    var updateText = _.map(updates, function(value, key) {
+    updates = _.map(updates, function(value, key) {
         values.push(value)
         return key + ' = $' + values.length
     })
 
-    if (values.length === 1) {
+    if (req.body.poi_approved !== undefined) {
+        updates.push('poi_approved_at = ' + (req.body.poi_approved ? 'now()' : 'null'))
+    }
+
+    if (req.body.poa_approved !== undefined) {
+        updates.push('poa_approved_at = ' + (req.body.poa_approved ? 'now()' : 'null'))
+    }
+
+    if (!updates.length) {
         return res.send(400, {
             name: 'NoUpdates',
             message: 'No updates were provided'
@@ -184,18 +118,23 @@ exports.patch = function(req, res, next) {
     req.app.conn.write.query({
         text: [
             'UPDATE "user"',
-            'SET ' + updateText,
+            'SET ' + updates.join(),
             'WHERE user_id = $1'
         ].join('\n'),
         values: values
     }, function(err, dr) {
         if (err) return next(err)
-        if (!dr.rowCount) return next(new Error('User ' + req.user + ' not found'))
+
+        if (!dr.rowCount) {
+            return next(new Error('User ' + req.user + ' not found'))
+        }
 
         req.app.activity(req.user, 'AdminEditUser', {
             user_id: req.params.id,
             edits: req.body
         })
+
+        req.app.auth.invalidateUser(req.app, req.params.id)
 
         res.send(204)
     })

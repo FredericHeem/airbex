@@ -3,6 +3,25 @@
 
     <div class="row">
         <div class="span12">
+            <form class="form-inline filters">
+                <label class="checkbox">
+                    <input type="checkbox" name="remaining"> Remaining
+                </label>
+                <label class="checkbox">
+                    <input type="checkbox" name="matched"> Matched
+                </label>
+                <label class="checkbox">
+                    Market
+                    <select class="input-small" name="market">
+                    </select>
+                </label>
+                <button class="btn" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="span12">
             <table class="orders table table-striped table-bordered">
                 <thead>
                     <tr>

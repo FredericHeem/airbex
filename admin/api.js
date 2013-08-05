@@ -98,6 +98,14 @@ api.currencies = function() {
     })
 }
 
+api.markets = function() {
+    return api.call('v1/markets')
+    .done(function(markets) {
+        api.markets.value = markets
+        api.trigger('markets', markets)
+    })
+}
+
 api.bootstrap = function() {
     return $.when(
         api.currencies()

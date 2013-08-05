@@ -10,12 +10,20 @@ module.exports = exports = function(app) {
 exports.query = function(app, query, cb) {
     var criteria = []
 
-    if (query.user) {
-        criteria.push(['u.user_id', query.user])
+    if (query.userId) {
+        criteria.push(['u.user_id', +query.userId])
     }
 
-    if (query.active) {
-        criteria.push('remaining > 0')
+    if (query.remaining) {
+        criteria.push('volume > 0')
+    }
+
+    if (query.matched) {
+        criteria.push('matched > 0')
+    }
+
+    if (query.market) {
+        criteria.push(['m.base_currency_id || m.quote_currency_id', query.market])
     }
 
     var text = [
@@ -30,12 +38,15 @@ exports.query = function(app, query, cb) {
 
     if (criteria.length) {
         text.push('WHERE')
-        criteria.forEach(function(x) {
-            if (typeof x == 'string') return text.push(x)
+        text.push(criteria.map(function(x) {
+            if (typeof x == 'string') return x
             values.push(x[1])
-            text.push(x[0] + ' = $' + values.length)
-        })
+            return x[0] + ' = $' + values.length
+        }).join(' AND\n'))
     }
+
+    values.push(query.offset || 0)
+    text.push('LIMIT 100 OFFSET $' + values.length)
 
     app.conn.read.query({
         text: text.join('\n'),
@@ -50,7 +61,7 @@ exports.query = function(app, query, cb) {
                 original: app.cache.formatOrderVolume(row.original, row.market),
                 matched: app.cache.formatOrderVolume(row.matched, row.market),
                 cancelled: app.cache.formatOrderVolume(row.cancelled, row.market),
-                remaining: app.cache.formatOrderVolume(row.remaining, row.market),
+                remaining: app.cache.formatOrderVolume(row.volume, row.market),
                 userEmail: row.email_lower,
                 created: row.created_at,
                 type: row.type

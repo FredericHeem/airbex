@@ -16,7 +16,9 @@ describe('balances', function() {
 					rows: [
 						{
 							currency_id: 'BTC',
-							available: 123000000
+							available: 123000000,
+							hold: 0,
+							balance: 123000000
 						},
 						{
 							currency_id: 'NOK',
@@ -33,10 +35,14 @@ describe('balances', function() {
 			.expect([
 				{
 					currency: 'BTC',
+					balance: '1.23000000',
+					hold: '0.00000000',
 					available: '1.23000000'
 				},
 				{
 					currency: 'NOK',
+					balance: '0.00000',
+					hold: '0.00000',
 					available: '0.12345'
 				}
 			])

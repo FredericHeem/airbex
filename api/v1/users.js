@@ -143,6 +143,8 @@ exports.create = function(req, res, next) {
                 })
             }
 
+            req.app.auth.invalidate(req.app, req.body.key)
+
             next(err)
         })
     })

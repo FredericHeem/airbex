@@ -1,21 +1,14 @@
 <tr data-id="<%= bank_account_id %>">
     <td>
-        <%= account_number || iban %>
+        <%- account_number %>
     </td>
     <td>
-        <%= verified_at ? 'Verified' : verify_started_at ? 'Verifying' : 'Not verified' %>
-    </td>
-    <td class="code">
-        <%=  verify_code || '' %>
+        <%- iban %>
     </td>
     <td>
-        <% if (!verified_at && !verify_started_at) { %>
-            <button class="start-verify btn">Start verify</button>
-        <% } %>
-        <% if (!verified_at) { %>
-            <button class="set-verified btn btn-warning">Set verified</button>
-        <% } %>
-
-        <button data-action="delete" class="btn btn-danger">Delete</button>
+        <%- swiftbic %>
+    </td>
+    <td>
+        <%- routing_number %>
     </td>
 </tr>

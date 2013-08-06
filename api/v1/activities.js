@@ -22,8 +22,7 @@ var detailWhitelist = {
     Withdraw: ['method', 'amount', 'currency', 'address'],
     Credit: ['currency', 'amount'],
     FillOrder: ['market', 'total', 'original', 'type', 'price'],
-    WithdrawComplete: ['amount', 'currency', 'method'],
-    VerifyBankAccount: ['accountNumber', 'iban']
+    WithdrawComplete: ['amount', 'currency', 'method']
 }
 
 exports.index = function(req, res, next) {

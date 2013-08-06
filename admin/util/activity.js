@@ -78,11 +78,6 @@ module.exports = function(activity) {
             numbers.format(details.amount, { currency: details.currency }))
     }
 
-    if (activity.type == 'VerifyBankAccount') {
-        return format('The bank account was %s verified',
-            details.accountNumber || details.iban)
-    }
-
     if (activity.type == 'Credit') {
         return format('Credited %s from a deposit',
             numbers.format(details.amount, { currency: details.currency }))

@@ -45,9 +45,6 @@ exports.process = function(row, cb) {
         template = 'credit'
         locals.amount = stripZeroes(details.amount)
         locals.currency = details.currency
-    } else if (row.type == 'VerifyBankAccount') {
-        template = 'verify-bank-account'
-        _.extend(locals, _.pick(details, 'accountNumber', 'iban'))
     } else if (row.type == 'ChangePassword') {
         template = 'change-password'
     }

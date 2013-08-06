@@ -25,32 +25,6 @@ module.exports = function(userId) {
         .done(itemsChanged)
     }
 
-    $items.on('click', '.start-verify', function(e) {
-        e.preventDefault()
-        var id = $(this).closest('tr').attr('data-id')
-        $(this).enabled(false).loading(true, 'Starting verify...')
-        var url = format('admin/users/%s/bankAccounts/%s/startVerify', userId, id)
-
-        api.call(url, {}, { type: 'POST' })
-        .fail(errors.alertFromXhr)
-        .done(function() {
-            refresh()
-        })
-    })
-
-    $items.on('click', '.set-verified', function(e) {
-        e.preventDefault()
-        var id = $(this).closest('tr').attr('data-id')
-        $(this).enabled(false).loading(true, 'Starting verify...')
-        var url = format('admin/users/%s/bankAccounts/%s/setVerified', userId, id)
-
-        api.call(url, null, { type: 'POST' })
-        .fail(errors.alertFromXhr)
-        .done(function() {
-            refresh()
-        })
-    })
-
     $items.on('click', '[data-action="delete"]', function(e) {
         e.preventDefault()
         var id = $(this).closest('tr').attr('data-id')

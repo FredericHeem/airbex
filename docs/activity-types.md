@@ -116,7 +116,3 @@ Fields: address, amount, currency, method
 
 Triggers: Trigger
 Fields: amount, currency, method
-
-### VerifyBankAccount
-Triggers: Trigger
-Fields: accountNumber, iban

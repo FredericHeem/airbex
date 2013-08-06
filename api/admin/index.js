@@ -1,6 +1,6 @@
 module.exports = function(app) {
     var routes = ['balances', 'withdraws', 'credit', 'users', 'btc', 'ltc',
-        'bankaccounts', 'panic', 'orders']
+        'panic', 'orders']
 
     routes.forEach(function(name) {
         require('./' + name)(app)

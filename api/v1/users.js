@@ -49,10 +49,6 @@ exports.patch = function(req, res, next) {
     })
 }
 
-exports.createBankVerifyCode = function() {
-    return crypto.randomBytes(2).toString('hex')
-}
-
 exports.whoami = function(req, res, next) {
     // TODO: extract to view
 	req.app.conn.read.query({

@@ -4,7 +4,6 @@ var expect = require('expect.js')
 , app = require('../..')
 , mock = require('../mock')
 , dummy = require('../dummy')
-, bankaccounts = require('../../v1/bankaccounts')
 
 describe('bankaccounts', function() {
     describe('index', function() {

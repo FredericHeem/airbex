@@ -2,7 +2,7 @@ var _ = require('lodash')
 
 module.exports = exports = function(app) {
     app.get('/v1/bankAccounts', app.auth.primary, exports.index)
-    app.post('/v1/bankAccounts', app.auth.primary(4), exports.add)
+    app.post('/v1/bankAccounts', app.auth.primary(3), exports.add)
 }
 
 exports.index = function(req, res, next) {

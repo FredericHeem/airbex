@@ -90,8 +90,6 @@ Requests and responses are provided as `application/json` (see [RFC4627][rfc4627
 
 # Authentication
 
-Methods that
-
 Private API calls require an API key to be provided as a query parameter.
 
 ```
@@ -112,6 +110,16 @@ curl http://localhost:5073/api/v1/whoami?key=6827193b5418f481f6c7a79633845330c9e
   "language": "nb-NO"
 }
 ```
+
+Each user has one *primary* API key which was assigned when the user was created. The primary API key is allowed to execute any action and should not be used for programmatic access.
+
+Non-primary API keys can be allowed any combination or none of: *Can trade*, *Can deposit*, *Can withdraw*
+
+The user has a security level from 0 to 4:
+- 1: Email has been verified
+- 2: Phone has been verified
+- 3: User has submitted full name and address
+- 4: User has passed the Customer Identification Program
 
 # Account
 
@@ -486,5 +494,33 @@ TODO
 
 Private: Yes
 Permissions: Trade
+
+# Bank accounts
+
+## Add bank account
+
+`POST /bankaccounts`
+
+### Authorization
+
+- Private: Yes
+- Primary: Yes
+- Security level: 3
+
+### Input for Norwegian bank account:
+
+#### accountNumber:
+
+*Required* **string** Norwegian bank account number
+
+### Input for other bank account:
+
+#### iban
+
+*Required* **string** International Bank Account Number
+
+#### swiftbic
+
+*Required* **string** SWIFT/BIC
 
 [rfc4627]: http://tools.ietf.org/html/rfc4627

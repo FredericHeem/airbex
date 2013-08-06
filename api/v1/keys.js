@@ -17,8 +17,7 @@ exports.replace = function(req, res, next) {
         if (err) return next(err)
         req.app.activity(req.user, 'ChangePassword', {})
         res.send(204)
-        req.app.auth.invalidate(req.app, req.body.key)
-        req.app.auth.invalidate(req.app, req.key)
+        req.app.auth.invalidate(req.app, req.user)
     })
 }
 
@@ -40,7 +39,7 @@ exports.remove = function(req, res, next) {
             })
         }
 
-        delete req.app.apiKeys[req.params.id]
+        req.app.auth.invalidate(req.app, req.params.id)
 
         res.send(204)
     })

@@ -73,7 +73,7 @@ exports.verify = function(req, res, next) {
             return next(err)
         }
 
-        req.app.auth.Invalidate(req.app, uid)
+        req.app.auth.invalidate(req.app, uid)
         res.redirect(req.app.config.website_url)
     })
 }

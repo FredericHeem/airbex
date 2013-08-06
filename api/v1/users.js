@@ -43,7 +43,7 @@ exports.patch = function(req, res, next) {
         if (!dr.rowCount) {
             return next(new Error('User ' + req.user + ' not found'))
         }
-        req.app.auth.invalidate(req.app, req.key)
+        req.app.auth.invalidate(req.app, req.user)
         res.send(204)
     })
 }
@@ -212,7 +212,7 @@ exports.verifyPhone = function(req, res, next) {
             })
         }
 
-        req.app.auth.invalidate(req.app, req.key)
+        req.app.auth.invalidate(req.app, req.user)
 
         res.send(204)
     })

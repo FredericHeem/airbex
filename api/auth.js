@@ -2,8 +2,31 @@ var debug = require('debug')('snow:auth')
 , assert = require('assert')
 , format = require('util').format
 
-exports.invalidate = function(app, key) {
-    delete app.apiKeys[key]
+exports.invalidate = function(app, userId) {
+    var item
+
+    if (typeof userId !== 'number') {
+        item = app.apiKeys[userId]
+
+        if (!item) {
+            debug('failed to invalidate key %s (not in cache)')
+            return
+        }
+
+        userId = item.user_id
+    }
+
+    debug('invalidating keys for user %s', userId)
+
+    Object.keys(app.apiKeys).forEach(function(key) {
+        item = app.apiKeys[key]
+
+        if (item.user_id == userId) {
+            debug('invalidating key %s for user %s', key.substr(0, 4), userId)
+        }
+
+        delete app.apiKeys[key]
+    })
 }
 
 exports.demand = function(level, req, res) {
@@ -17,16 +40,6 @@ exports.demand = function(level, req, res) {
         message: format(
             'This action requires a security level of %d. The user has %d.',
             level, req.apiKey.level)
-    })
-}
-
-exports.invalidateUser = function(app, userId) {
-    debug('invalidating api keys for user %d', userId)
-
-    Object.keys(app.apiKeys).forEach(function(key) {
-        if (app.apiKeys[key].userId == userId) {
-            exports.invalidate(app, key)
-        }
     })
 }
 

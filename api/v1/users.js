@@ -1,7 +1,6 @@
 var _ = require('lodash')
 , async = require('async')
 , debug = require('debug')('snow:users')
-, crypto = require('crypto')
 
 module.exports = exports = function(app) {
     app.get('/v1/whoami', app.auth.any, exports.whoami)
@@ -181,7 +180,10 @@ exports.identity = function(req, res, next) {
             })
         }
 
+        req.app.auth.invalidate(req.app, req.user)
+
         req.app.activity(req.user, 'IdentitySet', {})
+
         return res.send(204)
     })
 }

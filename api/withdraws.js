@@ -10,7 +10,8 @@ exports.format = function(app, row) {
     } else if (row.method == 'ripple') {
         destination = row.ripple_address
     } else if (row.method == 'bank'){
-        destination = row.bank_account_number || row.iban + ' (' + row.swiftbic + ')'
+        destination = row.bank_account_number ||
+            row.bank_iban + ' (' + row.bank_swiftbic + ')'
     }
 
     if (!destination) {

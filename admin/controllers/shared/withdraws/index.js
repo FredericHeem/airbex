@@ -1,5 +1,6 @@
 var template = require('./index.html')
 , itemTemplate = require('./item.html')
+, _ = require('lodash')
 
 module.exports = function(url) {
     var $el = $('<div class="withdraws">').html(template())
@@ -7,6 +8,7 @@ module.exports = function(url) {
         $el: $el
     }
     , $items = controller.$el.find('tbody')
+    , lastItems
 
     function itemsChanged(items) {
         $items.html($.map(items, function(item) {
@@ -16,6 +18,8 @@ module.exports = function(url) {
 
             return $item
         }))
+
+        lastItems = items
     }
 
     function refresh() {
@@ -69,23 +73,23 @@ module.exports = function(url) {
         })
     })
 
-    $el.on('click', '.complete', function() {
-        var id = $(this).closest('.withdraw').attr('data-id')
-        , $el = $(this)
+    $el.on('click', '.complete', function(e) {
+        e.preventDefault()
+        var id = +$(this).closest('.withdraw').attr('data-id')
 
-        $el.addClass('is-loading')
-        .enabled(false)
-        .siblings().enabled(false)
+        console.log('???', id)
 
-        var url = 'admin/withdraws/' + id
+        var item = _.find(lastItems, { id: id })
 
-        api.call(url, { state: 'completed' }, { type: 'PATCH' })
-        .done(function() {
-            $el.closest('.withdraw').fadeAway()
-        })
-        .fail(function(xhr) {
-            errors.alertFromXhr(xhr)
-            refresh()
+        console.log('???', lastItems)
+        console.log('???', item)
+
+        var modal = require('./confirm')(item)
+
+        $('body').append(modal.$el)
+
+        modal.$el.on('hidden', '.modal', function() {
+            router.reload()
         })
     })
 

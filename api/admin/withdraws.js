@@ -9,6 +9,7 @@ module.exports = exports = function(app) {
     })
 
     app.patch('/admin/withdraws/:id', app.auth.admin, exports.patch)
+    app.post('/admin/withdraws/:id/complete', app.auth.admin, exports.complete)
 }
 
 exports.cancel = function(req, res, next) {
@@ -59,26 +60,47 @@ exports.process = function(req, res, next) {
 }
 
 exports.complete = function(req, res, next) {
-    req.app.conn.write.query({
+    req.app.conn.read.query({
         text: [
-            'SELECT confirm_withdraw($1)',
-            'FROM withdraw_request',
-            'WHERE request_id = $1 AND state = \'processing\''
+            'SELECT a.currency_id',
+            'FROM withdraw_request wr',
+            'INNER JOIN account a ON a.account_id = wr.account_id',
+            'WHERE wr.request_id = $1 AND wr.state = \'processing\''
         ].join('\n'),
         values: [+req.params.id]
     }, function(err, dr) {
         if (err) return next(err)
 
-        if (dr.rowCount) {
-            req.app.activity(req.user, 'AdminWithdrawComplete',
-                { id: req.params.id })
-            return res.send(204)
+        if (!dr.rowCount) {
+            return res.send(404, {
+                name: 'WithdrawRequestNotFound',
+                message: 'The withdraw request was not found or ' +
+                    'is not in the processing state'
+            })
         }
 
-        res.send(404, {
-            name: 'WithdrawRequestNotFound',
-            message: 'The withdraw request was not found or ' +
-                'is not in the processing state'
+        var currency = dr.rows[0].currency_id
+
+        req.app.conn.write.query({
+            text: [
+                'SELECT confirm_withdraw($1, $2)',
+                'FROM withdraw_request',
+                'WHERE request_id = $1 AND state = \'processing\''
+            ].join('\n'),
+            values: [
+                +req.params.id,
+                req.app.cache.parseCurrency(req.body.fee || '0', currency)
+            ]
+        }, function(err, dr) {
+            if (err) return next(err)
+            if (!dr.rowCount) return next(new Error('Concurrency fail'))
+
+            req.app.activity(req.user, 'AdminWithdrawComplete', {
+                id: +req.params.id,
+                fee: req.body.fee || '0'
+            })
+
+            res.send(204)
         })
     })
 }

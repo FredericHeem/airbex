@@ -1,0 +1,35 @@
+<div class="modal">
+    <div class="modal-header">
+        <h3>Confirm withdraw</h3>
+    </div>
+    <div class="modal-body">
+        <form class="bank-account-form form-horizontal">
+            <div class="control-group net">
+                <label class="control-label">Net</label>
+                <div class="controls">
+                    <input type="text" name="net" value="<%= net %>" />
+                </div>
+            </div>
+
+            <div class="control-group fee">
+                <label class="control-label">+ Fee</label>
+                <div class="controls">
+                    <input type="text" name="fee" value="<%= fee %>" />
+                </div>
+            </div>
+
+            <div class="control-group total">
+                <label class="control-label">= Total</label>
+                <div class="controls">
+                    <input type="text" class="disabled" disabled="disabled" name="total" />
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="controls">
+                    <button type="submit" class="btn btn-primary">Confirm withdraw</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

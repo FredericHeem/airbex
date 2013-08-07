@@ -7,6 +7,11 @@ module.exports = function() {
 
     api.on('user', function(user) {
         $summary.find('.email').html(user.email)
+
+        api.call('admin/withdraws?activeOnly=1')
+        .done(function(withdraws) {
+            $el.find('.active-withdraw-count').html(withdraws.length)
+        })
     })
 
     controller.destroy = function() {

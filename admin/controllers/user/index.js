@@ -88,6 +88,8 @@ module.exports = function(userId) {
             recent.splice(recent.indexOf(duplicate), 1)
         }
 
+        duplicate = _.pick(user, 'user_id', 'first_name', 'last_name', 'email')
+
         recent.unshift(user)
 
         while (recent.length > 10) {

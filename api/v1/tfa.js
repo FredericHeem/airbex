@@ -28,7 +28,7 @@ exports.remove = function(req, res, next) {
 
     if (correct === null) {
         return res.send(403, {
-            name: 'BlockedTotp',
+            name: 'BlockedOtp',
             message: 'Time-based one-time password has been consumed. Try again in 30 seconds'
         })
     }
@@ -75,7 +75,7 @@ exports.enable = function(req, res, next) {
 
     if (correct === null) {
         return res.send(403, {
-            name: 'BlockedTotp',
+            name: 'BlockedOtp',
             message: 'Time-based one-time password has been consumed. Try again in 30 seconds'
         })
     }
@@ -168,7 +168,7 @@ exports.auth = function(req, res) {
 
     if (correct === null) {
         return res.send(403, {
-            name: 'BlockedTotp',
+            name: 'BlockedOtp',
             message: 'Time-based one-time password has been consumed. Try again in 30 seconds'
         })
     }

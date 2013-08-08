@@ -107,7 +107,11 @@ module.exports = function(after) {
 
         debug('logging in')
 
-        api.login($email.find('input').val(), $password.find('input').val())
+        api.login(
+            $email.find('input').val(),
+            $password.find('input').val(),
+            $form.field('otp').val()
+        )
         .always(function() {
             $submit.prop('disabled', false)
             .removeClass('is-loading')

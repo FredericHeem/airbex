@@ -85,9 +85,17 @@ api.loginWithKey = function(key) {
     })
 }
 
-api.login = function(email, password) {
+api.login = function(email, password, otp) {
     var key = keyFromCredentials(email, password)
-    return api.loginWithKey(key)
+    return api.call('v1/twoFactor/auth', {
+        otp: otp
+    }, {
+        qs: {
+            key: key
+        }
+    }).then(function() {
+        return api.loginWithKey(key)
+    })
 }
 
 api.currencies = function() {

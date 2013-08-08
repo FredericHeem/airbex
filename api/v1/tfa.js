@@ -35,7 +35,7 @@ exports.remove = function(req, res, next) {
 
     if (!correct) {
         return res.send(403, {
-            name: 'WrongTotp',
+            name: 'WrongOtp',
             message: 'Wrong one-time password'
         })
     }
@@ -82,7 +82,7 @@ exports.enable = function(req, res, next) {
 
     if (!correct) {
         return res.send(403, {
-            name: 'WrongTotp',
+            name: 'WrongOtp',
             message: 'Wrong one-time password'
         })
     }
@@ -175,7 +175,7 @@ exports.auth = function(req, res) {
 
     if (!correct) {
         return res.send(403, {
-            name: 'WrongTotp',
+            name: 'WrongOtp',
             message: 'Wrong one-time password'
         })
     }

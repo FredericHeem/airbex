@@ -1,0 +1,10 @@
+{
+    "type": "object",
+    "properties": {
+        "otp": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9]{6}$"
+        }
+    }
+}

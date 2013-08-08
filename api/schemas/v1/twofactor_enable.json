@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "properties": {
+        "key": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[A-Z0-9]{32}$"
+        },
+        "otp": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9]{6}$"
+        }
+    }
+}

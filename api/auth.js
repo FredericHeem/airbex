@@ -2,6 +2,8 @@ var debug = require('debug')('snow:auth')
 , assert = require('assert')
 , format = require('util').format
 
+exports.tfa = {}
+
 exports.invalidate = function(app, userId) {
     var item
 
@@ -43,6 +45,30 @@ exports.demand = function(level, req, res) {
     })
 }
 
+exports.fetchUserFromKey = function(app, key, cb) {
+    app.conn.read.query({
+        text: [
+            'SELECT',
+            '   a.user_id,',
+            '   a.can_withdraw,',
+            '   a.can_deposit,',
+            '   a.can_trade,',
+            '   a."primary",',
+            '   u.admin,',
+            '   u.security_level,',
+            '   u.two_factor,',
+            '   u.suspended',
+            'FROM api_key a',
+            'INNER JOIN user_view u ON u.user_id = a.user_id',
+            'WHERE a.api_key_id = $1'
+        ].join('\n'),
+        values: [key]
+    }, function(err, dr) {
+        if (err) return cb(err)
+        cb(null, dr.rows[0])
+    })
+}
+
 exports.user = function(req, res, next) {
     if (req.user) return next()
 
@@ -70,7 +96,8 @@ exports.user = function(req, res, next) {
             canWithdraw: row.can_withdraw,
             primary: row.primary,
             admin: row.admin,
-            level: row.security_level
+            level: row.security_level,
+            twoFactor: row.two_factor
         }
 
         next()
@@ -94,34 +121,16 @@ exports.user = function(req, res, next) {
 
     debug('cache miss for api key %s', req.query.key)
 
-    req.app.conn.read.query({
-        text: [
-            'SELECT',
-            '   a.user_id,',
-            '   a.can_withdraw,',
-            '   a.can_deposit,',
-            '   a.can_trade,',
-            '   a."primary",',
-            '   u.admin,',
-            '   u.security_level,',
-            '   u.suspended',
-            'FROM api_key a',
-            'INNER JOIN user_view u ON u.user_id = a.user_id',
-            'WHERE a.api_key_id = $1'
-        ].join('\n'),
-        values: [req.query.key]
-    }, function(err, dres) {
+    exports.fetchUserFromKey(req.app, req.query.key, function(err, row) {
         if (err) return next(err)
 
-        if (!dres.rowCount) {
+        if (!row) {
             req.app.apiKeys[req.query.key] = false
-
             return unknownKey()
         }
 
-        req.app.apiKeys[req.query.key] = dres.rows[0]
-
-        checkRow(dres.rows[0])
+        req.app.apiKeys[req.query.key] = row
+        checkRow(row)
     })
 }
 
@@ -139,6 +148,22 @@ exports.permission = function(type, level, req, res, next) {
 
     exports.user(req, res, function(err) {
         if (err) return next(err)
+
+        if (req.apiKey.primary && req.apiKey.twoFactor && req.path != '/v1/twoFactor/auth') {
+            var expires = exports.tfa[req.key]
+
+            if (!expires || expires < +new Date()) {
+                if (expires) {
+                    delete exports.tfa[req.key]
+                }
+
+                return res.send(401, {
+                    name: 'OtpRequired',
+                    message: 'The user has two factor enabled'
+                })
+            }
+        }
+
         if (type == 'any') return next()
 
         var mapping = mappings[type]

@@ -66,6 +66,7 @@ exports.whoami = function(req, res, next) {
             '   postal_area postalarea,',
             '   language,',
             '   security_level,',
+            '   two_factor,',
             '   city',
             'FROM user_view',
             'WHERE user_id = $1'
@@ -91,7 +92,8 @@ exports.whoami = function(req, res, next) {
             postalArea: row.postalarea,
             city: row.city,
             securityLevel: row.security_level,
-            language: row.language
+            language: row.language,
+            twoFactor: !!row.two_factor
         })
 	})
 }

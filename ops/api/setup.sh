@@ -9,6 +9,10 @@ export prefix=""
 sudo apt-get update
 sudo apt-get upgrade -y
 
+# Auto update time
+echo "ntpdate ntp.ubuntu.com" | sudo tee /etc/cron.daily/ntpdate
+sudo chmod 755 /etc/cron.daily/ntpdate
+
 # Node.js
 echo | sudo add-apt-repository ppa:chris-lea/node.js
 sudo apt-get update

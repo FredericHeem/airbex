@@ -1,6 +1,7 @@
 module.exports = exports = function(app) {
     app.get('/v1/markets', exports.index)
     app.get('/v1/markets/:id/depth', exports.depth)
+    app.get('/v1/markets/:id/vohlc', exports.vohlc)
 }
 
 exports.index = function(req, res, next) {
@@ -60,5 +61,29 @@ exports.depth = function(req, res, next) {
                 ]
             })
         })
+    })
+}
+
+exports.vohlc = function(req, res, next) {
+    req.app.conn.read.query({
+        text: [
+            'SELECT *',
+            'FROM vohlc',
+            'WHERE market = $1'
+        ].join('\n'),
+        values: [req.params.id]
+    }, function(err, dr) {
+        if (err) return next(err)
+
+        res.send(dr.rows.map(function(row) {
+            return {
+                date: row.date,
+                volume: req.app.cache.formatOrderVolume(row.volume, req.params.id),
+                open: req.app.cache.formatOrderPrice(row.open, req.params.id),
+                high: req.app.cache.formatOrderPrice(row.high, req.params.id),
+                low: req.app.cache.formatOrderPrice(row.low, req.params.id),
+                close: req.app.cache.formatOrderPrice(row.close, req.params.id)
+            }
+        }))
     })
 }

@@ -1,3 +1,6 @@
+DROP VIEW vohlc;
+
+CREATE VIEW vohlc AS
 WITH
     match_expanded AS (
         SELECT

@@ -157,6 +157,55 @@ RippleOut.prototype.executeRequest = function(request, cb) {
     ], cb)
 }
 
+function translateSendError(err) {
+    if (err.name == 'malformedTransaction') {
+        return {
+            abort: true,
+            report: true,
+            reason: 'Malformed transaction'
+        }
+    }
+
+    if (err.name == 'tecUNFUNDED_PAYMENT') {
+        return {
+            abort: true,
+            reason: 'unfunded payment'
+        }
+    }
+
+    if (err.name == 'dstActMalformed') {
+        return {
+            abort: true,
+            reason: 'Account not found'
+        }
+    }
+
+    if (err.name == 'tooBusy') {
+        return {
+            abort: true,
+            reason: 'Ripple server too busy. Try again'
+        }
+    }
+
+    if (err.name == 'telINSUF_FEE_P') {
+        return {
+            abort: true,
+            reason: 'Ripple server too busy. Try again'
+        }
+    }
+
+    if (err.name == 'tecNO_DST_INSUF_XRP') {
+        return {
+            abort: true,
+            reason: 'Must send at least 200 XRP to start Ripple account'
+        }
+    }
+
+    return {
+        report: true
+    }
+}
+
 RippleOut.prototype.send = function(request, cb) {
     var that = this
 
@@ -179,29 +228,9 @@ RippleOut.prototype.send = function(request, cb) {
         debug('execution completed')
 
         if (err) {
-            var abort, reason, report
+            var our = translateSendError(err)
 
-            if (err.name == 'malformedTransaction') {
-                abort = true
-                reason = 'malformed transaction'
-                report = true
-            } else if (err.name == 'tecUNFUNDED_PAYMENT') {
-                abort = true
-                reason = 'unfunded payment'
-            } else if (err.name == 'dstActMalformed') {
-                abort = true
-                reason = 'Account not found'
-            } else if (err.name == 'tooBusy') {
-                abort = true
-                reason = 'Ripple server too busy. Try again'
-            } else if (err.name == 'telINSUF_FEE_P') {
-                abort = true
-                reason = 'Ripple server too busy. Try again'
-            } else {
-                report = true
-            }
-
-            if (report) {
+            if (our.report) {
                 err = new Error(format('Failed to send transaction #%s: %s, %s',
                     request.request_id, err.name || 'Unnamed', err.message))
                 that.emit('error', err)
@@ -209,14 +238,16 @@ RippleOut.prototype.send = function(request, cb) {
                 debug('will not report error %s: %s', err.name || '<null>', err.message)
             }
 
-            if (!abort) {
+            if (!our.abort) {
                 console.error('transaction is in an uncertain state')
                 return cb()
             }
 
             console.error('%s will attempt to abort', prefix, err)
 
-            return out.cancelRequest(that.client, request, 'unknown', function(err) {
+            return out.cancelRequest(that.client, request, our.reason || 'unknown',
+                function(err)
+            {
                 if (err) {
                     err = new Error(format('Failed to cancel withdraw reqeust: %s',
                     err.message))

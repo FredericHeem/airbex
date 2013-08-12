@@ -124,6 +124,13 @@ exports.resetPasswordEnd = function(req, res, next) {
         values: [req.body.email, req.body.code, req.body.key]
     }, function(err) {
         if (err) {
+            if (err.message.match(/Wrong phone code/)) {
+                return res.send(400, {
+                    name: 'WrongPhoneCode',
+                    message: 'Wrong phone code supplied'
+                })
+            }
+
             return next(err)
         }
 

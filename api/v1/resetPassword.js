@@ -120,18 +120,18 @@ exports.callDelay = 10e3
 
 exports.resetPasswordEnd = function(req, res, next) {
     req.app.conn.write.query({
-        text: 'SELECT reset_password_end($1, $2, $3)',
+        text: 'SELECT reset_password_end($1, $2, $3) success',
         values: [req.body.email, req.body.code, req.body.key]
-    }, function(err) {
-        if (err) {
-            if (err.message.match(/Wrong phone code/)) {
-                return res.send(400, {
-                    name: 'WrongPhoneCode',
-                    message: 'Wrong phone code supplied'
-                })
-            }
+    }, function(err, dr) {
+        if (err) return next(err)
 
-            return next(err)
+        var success = dr.rows[0].success
+
+        if (!success) {
+            return res.send(400, {
+                name: 'WrongPhoneCode',
+                message: 'Wrong phone code supplied'
+            })
         }
 
         res.send(204)

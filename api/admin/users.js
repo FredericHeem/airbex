@@ -88,7 +88,7 @@ exports.patch = function(req, res, next) {
     var updates = {}
     , values = [req.params.id]
     , allowed = ['first_name', 'last_name', 'phone_number', 'country',
-        'city', 'postal_area', 'address', 'suspended']
+        'city', 'postal_area', 'address', 'suspended', 'email']
 
     _.each(allowed, function(k) {
         if (req.body[k] === undefined) return

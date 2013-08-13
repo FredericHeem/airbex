@@ -109,10 +109,14 @@ exports.redeem = function(app, user, voucher, cb) {
         },
 
         function(dr, cb) {
-            if (!dr.rowCount || !dr.rows[0].tid) {
+            if (!dr.rowCount) {
                 var err = new Error('Voucher not found')
                 err.name = 'VoucherNotFound'
                 return cb(err)
+            }
+
+            if (!dr.rows[0].tid) {
+                return cb(null, null)
             }
 
             app.conn.read.query({
@@ -127,6 +131,14 @@ exports.redeem = function(app, user, voucher, cb) {
         },
 
         function(dr, cb) {
+            console.log(dr)
+            if (!dr) {
+                // Voucher was cancelled
+                return cb(null, {
+                    cancelled: true
+                })
+            }
+
             var row = dr.rows[0]
 
             cb(null, {

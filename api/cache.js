@@ -70,7 +70,12 @@ module.exports = exports = function(conn, cb) {
     return exports
 }
 
+var numberRegex = /^[0-9\.]+$/
+
 exports.parseCurrency = function(value, currency) {
+    if (!value.match(numberRegex)) {
+        throw new Error('Invalid number format ' + value)
+    }
     var scale = exports[currency]
     , result = num(value).mul(Math.pow(10, scale))
     result.set_precision(0)
@@ -78,6 +83,9 @@ exports.parseCurrency = function(value, currency) {
 }
 
 exports.parseOrderVolume = function(value, marketId) {
+    if (!value.match(numberRegex)) {
+        throw new Error('Invalid number format ' + value)
+    }
     var market = exports[marketId]
     , currency = exports[marketId.substr(0, 3)]
     , result = num(value).mul(Math.pow(10, currency - market))
@@ -86,6 +94,9 @@ exports.parseOrderVolume = function(value, marketId) {
 }
 
 exports.parseOrderPrice = function(value, marketId) {
+    if (!value.match(numberRegex)) {
+        throw new Error('Invalid number format ' + value)
+    }
     var market = exports[marketId]
     , result = num(value).mul(Math.pow(10, market))
     result.set_precision(0)

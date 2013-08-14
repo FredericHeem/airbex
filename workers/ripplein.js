@@ -274,6 +274,11 @@ RippleIn.prototype.processTransaction = function(tran, cb) {
         return cb()
     }
 
+    if (tran.to != this.account) {
+        debug('ignoring transaction not to us (to %s)', tran.to)
+        return cb()
+    }
+
     if (tran.type !== 'payment') {
         debug('Ignoring %s', tran.type)
         return cb()
@@ -289,6 +294,11 @@ RippleIn.prototype.processTransaction = function(tran, cb) {
 
     if (!tran.dt) {
         debug('ignoring legacy transaction with no dt')
+        return cb()
+    }
+
+    if (tran.issuer && tran.issuer != this.account) {
+        debug('ignoring transaction with issuer %s (not us)', tran.issuer)
         return cb()
     }
 

@@ -20,6 +20,5 @@
     "nonew": true,
     "trailing": true,
     "maxdepth": 3,
-    "maxlen": 110,
-    "maxcomplexity": 10
+    "maxlen": 110
 }

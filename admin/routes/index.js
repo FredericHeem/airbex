@@ -2,6 +2,7 @@ var balances = require('../controllers/balances')
 , users = require('../controllers/users')
 , adminUser = require('../controllers/user')
 , withdraws = require('../controllers/withdraws')
+, transactions = require('../controllers/transactions')
 , userBankAccounts = require('../controllers/user/bankaccounts')
 , userWithdraws = require('../controllers/user/withdraws')
 , userAccounts = require('../controllers/user/accounts')
@@ -65,6 +66,10 @@ module.exports = function() {
     .add(/^balances$/, function() {
         if (!authorize.admin()) return
         master(balances(), 'admin')
+    })
+    .add(/^transactions(?:\?userId=(\d+))?$/, function(userId) {
+        if (!authorize.admin()) return
+        master(transactions(userId), 'admin')
     })
     .add(/^users$/, function() {
         if (!authorize.admin()) return

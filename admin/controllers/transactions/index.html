@@ -1,0 +1,34 @@
+<div class="container">
+    <div class="row">
+        <div class="span12">
+            <div class="nav-container"></div>
+
+            <h3>Search for transactions</h3>
+
+            <form class="search-form form-inline">
+                <div class="control-group">
+                    <label for="userId">User #</label>
+                    <input type="text" name="userId" />
+                </div>
+
+                <button type="submit" class="search btn btn-success">Search</button>
+            </form>
+
+            <table class="transactions table table-bordered table-striped">
+                <thead>
+                    <tr class="header">
+                        <th class="id-header">#</th>
+                        <th class="date-header">Date</th>
+                        <th class="type-header">Type</th>
+                        <th class="amount-header">Amount</th>
+                        <th class="debit-header">Debit</th>
+                        <th class="credit-header">Credit</th>
+                        <!--<th class="raw-header">Raw</th>-->
+                        <th class="actions-header"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>

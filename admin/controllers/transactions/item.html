@@ -4,7 +4,9 @@
     <td class="type"><%- type %></td>
     <td class="amount">
         <%- numbers.format(amount, { currency: currency }) %>
-        (<%- numbers.format(amountBtc, { currency: 'BTC' }) %>)
+        <% if (currency != 'BTC') { %>
+            (<%- numbers.format(amountBtc, { currency: 'BTC' }) %>)
+        <% } %>
     </td>
     <td>
         <% if (debitUserId) { %>

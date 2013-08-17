@@ -25,7 +25,5 @@ function publishTo(host) {
 
 task('pp', ['publish-production'])
 task('publish-production', function() {
-    var tag = new Date().toISOString().match(/^[^\.]+/)[0].replace(/:/g, '-')
     publishTo('10.0.1.213')
-    execOrDie('git tag ' + tag)
 })

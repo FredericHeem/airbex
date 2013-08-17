@@ -33,12 +33,7 @@ task('publish-prod', function() {
     jake.Task['clean'].invoke()
     jake.Task['default'].invoke()
 
-    publish('10.0.0.184', function(err) {
-        if (err) return complete(err)
-        var tag = new Date().toISOString().match(/^[^\.]+/)[0].replace(/:/g, '-')
-        common.exec('git tag ' + tag)
-        complete()
-    })
+    publish('10.0.0.184', complete)
 }, { async: true })
 
 task('ps', ['publish-staging'])

@@ -30,9 +30,7 @@ task('publish-staging', function() {
 
 task('pp', ['publish-production'])
 task('publish-production', function() {
-    var tag = new Date().toISOString().match(/^[^\.]+/)[0].replace(/:/g, '-')
     publishTo('10.0.0.184')
-    execOrDie('git tag ' + tag)
 })
 
 task('bitcoind', function() {

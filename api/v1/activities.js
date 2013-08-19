@@ -22,7 +22,9 @@ var detailWhitelist = {
     Withdraw: ['method', 'amount', 'currency', 'address'],
     Credit: ['currency', 'amount'],
     FillOrder: ['market', 'total', 'original', 'type', 'price'],
-    WithdrawComplete: ['amount', 'currency', 'method']
+    WithdrawComplete: ['amount', 'currency', 'method'],
+    EnableTwoFactor: [],
+    RemoveTwoFactor: []
 }
 
 exports.index = function(req, res, next) {

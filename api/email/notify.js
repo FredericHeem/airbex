@@ -47,6 +47,10 @@ exports.process = function(row, cb) {
         locals.currency = details.currency
     } else if (row.type == 'ChangePassword') {
         template = 'change-password'
+    } else if (row.type == 'EnableTwoFactor') {
+        template = 'enable-two-factor'
+    } else if (row.type == 'RemoveTwoFactor') {
+        template = 'remove-two-factor'
     }
 
     if (!template) {

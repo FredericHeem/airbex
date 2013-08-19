@@ -8,6 +8,12 @@ DECLARE
   bwr bank_withdraw_request%ROWTYPE;
   h hold%ROWTYPE;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('NOK', 5, true);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('NOK', 'edge');
+
     uid := create_user('a@a', fn.key);
 
     -- Credit the user 100 NOK

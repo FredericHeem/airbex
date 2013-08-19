@@ -4,16 +4,29 @@ SAVEPOINT before_tests;
 
 DO $$ <<fn>>
 DECLARE
-    ask_uid int := create_user('a@a', repeat('a', 64));
-    bid_uid int := create_user('b@b', repeat('b', 64));
+    ask_uid int;
+    bid_uid int;
     ask_oid int;
     bid_oid int;
-    mrid int := (SELECT market_id FROM market
-        WHERE base_currency_id = 'BTC' AND quote_currency_id = 'NOK');
+    mrid int;
     ask_fee_expected bigint := ceil(3750e5 * 0.005);
     bid_fee_expected bigint := ceil(5e8 * 0.005);
     ma "match"%ROWTYPE;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('NOK', 5, true), ('BTC', 8, false);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('NOK', 'edge'), ('BTC', 'edge'), ('NOK', 'fee'), ('BTC', 'fee');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'NOK', 3);
+
+    ask_uid := create_user('a@a', repeat('a', 64));
+    bid_uid := create_user('b@b', repeat('b', 64));
+    mrid := (SELECT market_id FROM market
+        WHERE base_currency_id = 'BTC' AND quote_currency_id = 'NOK');
+
     PERFORM edge_credit(ask_uid, 'BTC', 10e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 5000e5::bigint);
 
@@ -50,18 +63,32 @@ ROLLBACK TO before_tests;
 -- The bidder does not have to pay fees. The asker pays 0.25%
 DO $$ <<fn>>
 DECLARE
-    ask_uid int := create_user('a@a', repeat('a', 64));
-    bid_uid int := create_user('b@b', repeat('b', 64));
+    ask_uid int;
+    bid_uid int;
     ask_oid int;
     bid_oid int;
-    mrid int := (SELECT market_id FROM market
-        WHERE base_currency_id = 'BTC' AND quote_currency_id = 'NOK');
+    mrid int ;
     ask_fee_expected bigint := ceil(3750e5 * 0.0025);
     bid_fee_expected bigint := 0;
     ma "match"%ROWTYPE;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('NOK', 5, true), ('BTC', 8, false);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('NOK', 'edge'), ('BTC', 'edge'), ('NOK', 'fee'), ('BTC', 'fee');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'NOK', 3);
+
     UPDATE "user" SET fee_ratio = 0 WHERE user_id = bid_uid;
     UPDATE "user" SET fee_ratio = 0.0025 WHERE user_id = ask_uid;
+
+    ask_uid := create_user('a@a', repeat('a', 64));
+    bid_uid := create_user('b@b', repeat('b', 64));
+
+    mrid := (SELECT market_id FROM market
+        WHERE base_currency_id = 'BTC' AND quote_currency_id = 'NOK');
 
     PERFORM edge_credit(ask_uid, 'BTC', 10e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 5000e5::bigint);

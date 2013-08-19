@@ -12,6 +12,12 @@ DECLARE
     actual bigint;
     atid int;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('LTC', 8, false);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('LTC', 'edge');
+
     uid := create_user('a@a', repeat('a', 64));
 
     INSERT INTO ltc_deposit_address (address, account_id)

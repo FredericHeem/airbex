@@ -4,8 +4,8 @@ SAVEPOINT before_tests;
 
 DO $$
 DECLARE
-    bid_uid int := create_user('a@a', repeat('a', 64));
-    ask_uid int := create_user('b@b', repeat('b', 64));
+    bid_uid int;
+    ask_uid int;
     bid_oid int;
     ask_oid int;
     bid int;
@@ -14,8 +14,18 @@ DECLARE
     wrid int;
     qamnt bigint;
 BEGIN
-    mid := (SELECT market_id FROM market WHERE base_currency_id = 'BTC' AND
-        quote_currency_id = 'NOK');
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false), ('NOK', 5, true);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge'), ('NOK', 'edge'), ('BTC', 'fee'), ('NOK', 'fee');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'NOK', 3)
+    RETURNING market_id INTO mid;
+
+    ask_uid := create_user('a@a', repeat('a', 64));
+    bid_uid := create_user('b@b', repeat('b', 64));
 
     PERFORM edge_credit(bid_uid, 'NOK', 10000e5::bigint);
     PERFORM edge_credit(ask_uid, 'BTC', 5e8::bigint);

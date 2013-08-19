@@ -8,6 +8,15 @@ DECLARE
     match_id int;
     market_id int;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false), ('XRP', 6, false);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge'), ('XRP', 'edge');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'XRP', 3);
+
     fn.user_id := create_user('bob@gmail.com', fn.api_key);
     fn.market_id := (SELECT m.market_id FROM market m WHERE base_currency_id || quote_currency_id = 'BTCXRP');
 

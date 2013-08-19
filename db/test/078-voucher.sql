@@ -25,6 +25,12 @@ DECLARE
     favail bigint;
     tavail bigint;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge');
+
     vid := repeat('a', 12);
     fuid := create_user('a@a', repeat('a', 64));
     tuid := create_user('b@b', repeat('b', 64));
@@ -61,6 +67,12 @@ DECLARE
     uid int;
     avail bigint;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge');
+
     vid := repeat('a', 12);
     uid := create_user('a@a', repeat('a', 64));
     PERFORM edge_credit(uid, 'BTC', 10e8::bigint);
@@ -85,6 +97,12 @@ DECLARE
     uid int;
     avail bigint;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge');
+
     vid := repeat('a', 12);
     uid := create_user('a@a', repeat('a', 64));
     PERFORM edge_credit(uid, 'BTC', 10e8::bigint);

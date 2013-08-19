@@ -10,6 +10,16 @@ DECLARE
     bid int;
     mid int;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false), ('XRP', 6, false);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge'), ('XRP', 'edge'), ('BTC', 'fee'), ('XRP', 'fee');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'XRP', 3)
+    RETURNING market_id INTO mid;
+
     bob := create_user('bob@gmail.com', repeat('a', 64));
     alice := create_user('alice@hotmail.com', repeat('b', 64));
     bid := (SELECT market_id FROM market WHERE base_currency_id = 'BTC' AND quote_currency_id = 'XRP');

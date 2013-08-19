@@ -10,6 +10,15 @@ DECLARE
     u2_btc_actual bigint;
     u2_btc_expected bigint := (0.70877830 * 1e8)::bigint;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false), ('LTC', 8, false);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge'), ('LTC', 'edge'), ('BTC', 'fee'), ('LTC', 'fee');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'LTC', 3);
+
     -- create users
     uid1 := create_user('u1@g', REPEAT('x', 64));
     uid2 := create_user('u2@g', REPEAT('y', 64));

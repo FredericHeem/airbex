@@ -7,14 +7,26 @@ SAVEPOINT before_tests;
 
 DO $$ <<fn>>
 DECLARE
-    ask_uid int := create_user('a@a', repeat('a', 64));
-    bid_uid int := create_user('b@b', repeat('b', 64));
+    ask_uid int;
+    bid_uid int;
     ask_oid int;
     bid_oid int;
-    mrid int := (SELECT market_id FROM market
-        WHERE base_currency_id = 'BTC' AND quote_currency_id = 'NOK');
+    mrid int;
     ma "match"%ROWTYPE;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false), ('NOK', 5, true);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge'), ('NOK', 'edge'), ('BTC', 'fee'), ('NOK', 'fee');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'NOK', 3)
+    RETURNING market_id INTO mrid;
+
+    ask_uid := create_user('a@a', repeat('a', 64));
+    bid_uid := create_user('b@b', repeat('b', 64));
+
     PERFORM edge_credit(ask_uid, 'BTC', 10e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 5000e5::bigint);
 
@@ -51,14 +63,26 @@ END; $$; ROLLBACK TO before_tests;
 
 DO $$ <<fn>>
 DECLARE
-    ask_uid int := create_user('a@a', repeat('a', 64));
-    bid_uid int := create_user('b@b', repeat('b', 64));
+    ask_uid int;
+    bid_uid int;
     ask_oid int;
     bid_oid int;
-    mrid int := (SELECT market_id FROM market
-        WHERE base_currency_id = 'BTC' AND quote_currency_id = 'NOK');
+    mrid int;
     ma "match"%ROWTYPE;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false), ('NOK', 5, true);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge'), ('NOK', 'edge'), ('BTC', 'fee'), ('NOK', 'fee');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'NOK', 3)
+    RETURNING market_id INTO mrid;
+
+    ask_uid := create_user('a@a', repeat('a', 64));
+    bid_uid := create_user('b@b', repeat('b', 64));
+
     PERFORM edge_credit(ask_uid, 'BTC', 10e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 10000e5::bigint);
 
@@ -95,14 +119,27 @@ END; $$; ROLLBACK TO before_tests;
 
 DO $$ <<fn>>
 DECLARE
-    ask_uid int := create_user('a@a', repeat('a', 64));
-    bid_uid int := create_user('b@b', repeat('b', 64));
+    ask_uid int;
+    bid_uid int;
     ask_oid int;
     bid_oid int;
     mrid int := (SELECT market_id FROM market
         WHERE base_currency_id = 'BTC' AND quote_currency_id = 'NOK');
     ma "match"%ROWTYPE;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false), ('NOK', 5, true);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge'), ('NOK', 'edge'), ('BTC', 'fee'), ('NOK', 'fee');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'NOK', 3)
+    RETURNING market_id INTO mrid;
+
+    ask_uid := create_user('a@a', repeat('a', 64));
+    bid_uid := create_user('b@b', repeat('b', 64));
+
     PERFORM edge_credit(ask_uid, 'BTC', 10e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 10000e5::bigint);
 
@@ -130,13 +167,25 @@ END; $$; ROLLBACK TO before_tests;
 
 DO $$ <<fn>>
 DECLARE
-    ask_uid int := create_user('a@a', repeat('a', 64));
-    bid_uid int := create_user('b@b', repeat('b', 64));
+    ask_uid int;
+    bid_uid int;
     ask_oid int;
     bid_oid int;
-    mrid int := (SELECT market_id FROM market
-        WHERE base_currency_id = 'BTC' AND quote_currency_id = 'NOK');
+    mrid int;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false), ('NOK', 5, true);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge'), ('NOK', 'edge'), ('BTC', 'fee'), ('NOK', 'fee');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'NOK', 3)
+    RETURNING market_id INTO mrid;
+
+    ask_uid := create_user('a@a', repeat('a', 64));
+    bid_uid := create_user('b@b', repeat('b', 64));
+
     PERFORM edge_credit(ask_uid, 'BTC', 10e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 5000e5::bigint);
 
@@ -165,14 +214,26 @@ END; $$; ROLLBACK TO before_tests;
 
 DO $$ <<fn>>
 DECLARE
-    ask_uid int := create_user('a@a', repeat('a', 64));
-    bid_uid int := create_user('b@b', repeat('b', 64));
+    ask_uid int;
+    bid_uid int;
     ask_oid int;
     bid_oid int;
-    mrid int := (SELECT market_id FROM market
-        WHERE base_currency_id = 'BTC' AND quote_currency_id = 'NOK');
+    mrid int;
     ma "match"%ROWTYPE;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false), ('NOK', 5, true);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge'), ('NOK', 'edge'), ('BTC', 'fee'), ('NOK', 'fee');
+
+    INSERT INTO market (base_currency_id, quote_currency_id, scale)
+    VALUES ('BTC', 'NOK', 3)
+    RETURNING market_id INTO mrid;
+
+    ask_uid := create_user('a@a', repeat('a', 64));
+    bid_uid := create_user('b@b', repeat('b', 64));
+
     PERFORM edge_credit(ask_uid, 'BTC', 5e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 10000e5::bigint);
 

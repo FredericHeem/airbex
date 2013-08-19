@@ -12,6 +12,12 @@ DECLARE
     actual bigint;
     atid int;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('BTC', 8, false);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('BTC', 'edge');
+
     uid := create_user('a@a', repeat('a', 64));
 
     INSERT INTO btc_deposit_address (address, account_id)

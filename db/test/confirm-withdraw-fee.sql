@@ -15,6 +15,12 @@ DECLARE
     afb bigint;
     aeb bigint;
 BEGIN
+    INSERT INTO currency (currency_id, scale, fiat)
+    VALUES ('NOK', 8, true);
+
+    INSERT INTO account (currency_id, type)
+    VALUES ('NOK', 'edge'), ('NOK', 'fee');
+
     uid := create_user('a@a', repeat('a', 64));
     PERFORM edge_credit(uid, 'NOK', 1500e5::bigint);
 

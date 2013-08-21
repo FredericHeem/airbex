@@ -2,7 +2,7 @@ var template = require('./index.html')
 , itemTemplate = require('./item.html')
 , _ = require('lodash')
 
-module.exports = function(url) {
+module.exports = function(opts) {
     var $el = $('<div class="withdraws">').html(template())
     , controller = {
         $el: $el
@@ -23,7 +23,7 @@ module.exports = function(url) {
     }
 
     function refresh() {
-        api.call(url)
+        api.call('admin/withdraws', null, { qs: opts })
         .fail(errors.alertFromXhr)
         .done(itemsChanged)
     }

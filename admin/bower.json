@@ -1,10 +1,22 @@
 {
-  "name": "web",
-  "version": "0.0.0",
+  "name": "admin",
+  "main": "index.js",
+  "version": "1.0.9",
+  "homepage": "https://github.com/justcoin/justcoin",
+  "authors": [
+    "Andreas Brekken <a@abrkn.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
   "dependencies": {
-    "bootstrap": "http://twitter.github.com/bootstrap/assets/bootstrap.zip",
-    "alertify": "x",
-    "jquery": "x",
-    "bootstrap-notify": "x"
+    "bootstrap-notify": "~0.1.0",
+    "alertify": "~0.3.10",
+    "jquery": "~2.0.3"
   }
 }

@@ -1,0 +1,7 @@
+check process bitcoind
+    with pidfile /btc/bitcoind.pid
+    start program = "/sbin/start bitcoind"
+    stop program  = "/usr/bin/killall bitcoind"
+    if failed port 8332 type tcp
+        with timeout 600 seconds
+        then restart

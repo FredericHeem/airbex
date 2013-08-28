@@ -1,6 +1,0 @@
-#!upstart
-env name="litecoind"
-start on startup
-stop on shutdown
-respawn
-exec start-stop-daemon --start --name $name --make-pidfile --pidfile /var/run/$name --chuid ubuntu --exec /usr/bin/$name

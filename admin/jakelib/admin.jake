@@ -12,12 +12,12 @@ var head = [
 ]
 
 var vendor = [
-    'components/jquery/jquery.min.js',
+    'bower_components/jquery/jquery.min.js',
     'vendor/jquery.cookie.js',
     'vendor/sjcl.js',
-    'components/alertify/alertify.min.js',
+    'bower_components/alertify/alertify.min.js',
     'vendor/bootstrap/js/bootstrap.min.js',
-    'components/bootstrap-notify/js/bootstrap-notify.js'
+    'bower_components/bootstrap-notify/js/bootstrap-notify.js'
 ]
 
 task('dist', [
@@ -69,19 +69,19 @@ file(base + '/index.min.html', function() {
 })
 
 file(base + '/index.css', function() {
-    common.exec('stylus controllers/index.styl -o ' + base)
+    common.exec('node node_modules/stylus/bin/stylus controllers/index.styl -o ' + base)
 })
 
 file(base + '/styles.css', [
-    'components/alertify/themes/alertify.core.css',
-    'components/alertify/themes/alertify.bootstrap.css',
+    'bower_components/alertify/themes/alertify.core.css',
+    'bower_components/alertify/themes/alertify.bootstrap.css',
     'vendor/bootstrap/css/bootstrap.min.css',
     'vendor/bootstrap/css/bootstrap-responsive.min.css',
-    'components/bootstrap-notify/css/bootstrap-notify.css',
+    'bower_components/bootstrap-notify/css/bootstrap-notify.css',
     'build/index.css'
 ], common.concatFiles)
 
 file(base + '/index.js', ['build'].concat(vendor), function() {
-    var bundle = common.exec('browserify -d -t ./node_modules/browserify-ejs ./index.js')
+    var bundle = common.exec('node node_modules/browserify/bin/cmd.js -d -t ./node_modules/browserify-ejs ./index.js')
     bundle.to(this.name)
 })

@@ -1,0 +1,20 @@
+{
+  "name": "production",
+  "description": "",
+  "cookbook_versions": {
+  },
+  "json_class": "Chef::Environment",
+  "chef_type": "environment",
+  "default_attributes": {
+    "snow": {
+      "reverse": {
+        "server_name": "justcoin.com"
+      }
+    }
+  },
+  "override_attributes": {
+    "monit": {
+      "alert_email": "andreas@justcoin.com"
+    }
+  }
+}

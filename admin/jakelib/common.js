@@ -4,12 +4,12 @@ var fs = require('fs')
 
 exports.compressCss = function() {
     var inputFn = this.name.replace(/min\.css$/, 'css')
-    exports.exec('cleancss ' + inputFn).to(this.name)
+    exports.exec('node node_modules/clean-css/bin/cleancss ' + inputFn).to(this.name)
 }
 
 exports.compressJs = function() {
     var inputFn = this.name.replace(/min\.js$/, 'js')
-    exports.exec('uglifyjs ' + inputFn + ' --compress warnings=false --mangle')
+    exports.exec('node node_modules/uglifyjs ' + inputFn + ' --compress warnings=false --mangle')
     .to(this.name)
 }
 

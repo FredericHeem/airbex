@@ -1,3 +1,0 @@
-data_directory = '/data/main'
-listen_address = '*'
-password_encryption = on

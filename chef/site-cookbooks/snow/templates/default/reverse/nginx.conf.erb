@@ -1,0 +1,58 @@
+server {
+    listen <%= node[:snow][:reverse][:https_port] %>;
+    server_name <%= node[:snow][:reverse][:server_name] %>;
+    access_log /var/log/snow-reverse-access.log;
+    error_log /var/log/snow-reverse-error.log;
+
+    gzip on;
+    gzip_http_version 1.1;
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_proxied any;
+    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript text/x-js;
+    gzip_buffers 16 8k;
+    gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+
+    location /api {
+        rewrite ^/api(/?.*)$ $1 break;
+        proxy_pass http://<%= @api_ip %>:<%= node[:snow][:api][:port] %>;
+        proxy_set_header X-Real-IP $remote_addr;
+        break;
+    }
+
+    location /client {
+        rewrite ^/client(/?.*)$ $1 break;
+        proxy_pass http://<%= @frontend_ip %>:<%= node[:snow][:frontend][:port] %>;
+        proxy_set_header X-Real-IP $remote_addr;
+        break;
+    }
+
+    location /admin {
+        rewrite ^/admin(/?.*)$ $1 break;
+        proxy_pass http://<%= @admin_ip %>:<%= node[:snow][:admin][:port] %>;
+        proxy_set_header X-Real-IP $remote_addr;
+        break;
+    }
+
+    location / {
+        proxy_pass http://<%= @landing_ip %>:<%= node[:snow][:landing][:port] %>;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+server {
+    listen <%= node[:snow][:reverse][:http_port] %>;
+    server_name <%= node[:snow][:reverse][:server_name] %>;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen <%= node[:snow][:reverse][:https_port] %>;
+    server_name api.<%= node[:snow][:reverse][:server_name] %>;
+
+    location ~ ^(.*)$ {
+        proxy_pass http://127.0.0.1:<%= node[:snow][:reverse][:https_port] %>/api$1;
+        proxy_set_header Host <%= node[:snow][:reverse][:server_name] %>;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}

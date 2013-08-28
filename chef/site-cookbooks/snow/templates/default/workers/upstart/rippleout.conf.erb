@@ -1,0 +1,7 @@
+start on startup
+chdir <%= node[:snow][:workers][:app_directory] %>/current/workers
+console log
+env NODE_ENV=<%= node.chef_environment %>
+env DEBUG=snow*
+env HOME=/home/ubuntu
+exec sudo -Eu ubuntu node bin/rippleout

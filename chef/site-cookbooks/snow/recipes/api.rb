@@ -2,8 +2,10 @@ package 'git' do
 end
 
 include_recipe 'deploy_wrapper'
+
 bag = data_bag_item("snow", "main")
 env_bag = bag[node.chef_environment]
+node['monit']['alert_email'] = env_bag['monit']['alert_email']
 
 ssh_known_hosts_entry 'github.com'
 

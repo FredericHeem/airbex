@@ -7,14 +7,12 @@
   "chef_type": "environment",
   "default_attributes": {
     "snow": {
-      "reverse": {
-        "server_name": "justcoin.com"
+      "bitcoind": {
+        "aws_device": "xvdf",
+        "os_device": "sdf"
       }
     }
   },
   "override_attributes": {
-    "monit": {
-      "alert_email": "andreas@justcoin.com"
-    }
   }
 }

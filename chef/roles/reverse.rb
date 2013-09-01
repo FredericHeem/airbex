@@ -1,9 +1,8 @@
 name "reverse"
 description "Reverse proxy server"
 run_list(
-  # "recipe[snow::build]",
+  "recipe[snow::common]",
   "recipe[snow::aptupdate]",
-  # "recipe[elb]",
   "recipe[nginx]",
   "recipe[snow::reverse]"
 )

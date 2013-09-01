@@ -3,5 +3,5 @@ node_modules/
 phantomjs.exe
 build/
 config.dev.json
-components/
+bower_components/
 /*.ps1

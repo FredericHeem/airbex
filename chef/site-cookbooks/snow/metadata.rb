@@ -1,0 +1,15 @@
+name "snow"
+version "1.0.0"
+
+recipe "snow::pgm", "PostgreSQL Master"
+recipe "snow::pgs", "PostgreSQL Slave"
+recipe "snow::api", "API"
+recipe "snow::frontend", "Front-end"
+recipe "snow::reverse", "Reverse proxy"
+
+depends "postgresql"
+depends "nginx"
+depends "aws"
+depends "deploy_wrapper"
+depends "ssh_known_hosts"
+# depends "elb"

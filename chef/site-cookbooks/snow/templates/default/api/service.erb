@@ -1,0 +1,19 @@
+description "Run the Snow API"
+start on startup
+chdir <%= node[:snow][:api][:app_directory] %>/current/api
+console log
+env DEBUG=snow*
+env NODE_ENV=<%= node.chef_environment %>
+env HOME=/home/ubuntu
+setuid ubuntu
+respawn
+
+script
+    echo $$ | sudo tee /var/run/snow-api.pid
+    npm install
+    node index.js
+end script
+
+post-stop script
+    sudo rm -f /var/run/snow-api.pid
+end script

@@ -10,7 +10,7 @@ module.exports = function(userId) {
     , $form = $el.find('.search-form')
 
     function itemsChanged(query, items) {
-        $items.find('tbody').html($.map(items, function(item) {
+        $items.find('tbody').html($.map(items.transactions, function(item) {
             item.raw = JSON.stringify(item)
             item.query = query
             var $item = $(itemTemplate(item))

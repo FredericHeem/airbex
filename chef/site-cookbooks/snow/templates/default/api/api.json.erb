@@ -1,0 +1,23 @@
+{
+    "website_url": "<%= @website_url %>",
+    "pg_write_url": "<%= @pgm_conn %>",
+    "pg_read_url": "<%= @pgs_conn %>",
+    "port": <%= node[:snow][:api][:port] %>,
+    <% unless @ripple['federation'].nil? %>
+    "ripple_federation": <%= @ripple['federation'].to_json %>,
+    <% end %>
+    "ripple_account": "<%= @ripple['account'] %>",
+    <% unless @intercom.nil? %>
+    "intercom_app_id": "<%= @intercom['app_id'] %>",
+    "intercom_secret": "<%= @intercom['secret'] %>",
+    "intercom_key": "<%= @intercom['key'] %>",
+    <% end %>
+    <% unless @bde.nil? %>
+    "bde_api_key": "<%= @bde %>",
+    <% end %>
+    <% unless @tropo.nil? %>
+    "tropo_voice_token": "<%= @tropo['voice_token'] %>",
+    <% end %>
+    "smtp": <%= @smtp.to_json %>,
+    "email_from": "<%= @email_from %>"
+}

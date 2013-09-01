@@ -1,0 +1,18 @@
+{
+  "name": "production",
+  "description": "",
+  "cookbook_versions": {
+  },
+  "json_class": "Chef::Environment",
+  "chef_type": "environment",
+  "default_attributes": {
+    "snow": {
+      "bitcoind": {
+        "aws_device": "xvdf",
+        "os_device": "sdf"
+      }
+    }
+  },
+  "override_attributes": {
+  }
+}

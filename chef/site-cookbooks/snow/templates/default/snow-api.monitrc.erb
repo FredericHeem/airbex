@@ -1,0 +1,7 @@
+check process snow-api with pidfile /var/run/snow-api.pid
+    start program = "/sbin/start snow-api"
+    stop program = "/sbin/stop snow-api"
+    if failed port <%= node[:snow][:api][:port] %> protocol http
+        request /v1/currencies
+        with timeout 30 seconds
+        then restart

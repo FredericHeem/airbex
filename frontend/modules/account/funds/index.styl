@@ -1,0 +1,24 @@
+#area > .dashboard
+    .balances
+        a[href="#my/withdraw/XRP"],
+        a[href="#my/deposit/XRP"],
+        a[href^="#my/send"]
+            display: none
+
+        .balance
+            td
+                padding 15px 20px 10px 20px
+        .available
+            font-size 2em
+            color #555
+            text-align right
+
+    .activities
+        .activity
+            .when
+                width 120px
+            .what
+                word-wrap: break-word
+
+    .withdraws.is-empty
+        display none

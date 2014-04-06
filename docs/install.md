@@ -12,7 +12,19 @@ NAT
 * Stop instance
 * Change the _Name_ tag to _jc_prod_nat_
 * Change the _Instance Type_ to _t1.micro_
-* Security group: jc-prod-nat (`TCP 80, 443, 11371, 9418, 22`)
+* Security group ("nat"):
+  - **Inbound**
+  - TCP 22 (any)
+  - TCP 25 (any)
+  - TCP 80 (any)
+  - TCP 443 (any)
+  - TCP 587 (any)
+  - TCP 9418 (any)
+  - TCP 11371 (any)
+  - TCP 9333 (from litecoind)
+  - TCP 8333 (from bitcoind)
+  - TCP 51233 (from workers)
+
 * Start the instance
 
 VPN
@@ -24,7 +36,7 @@ This section is partially extracted from [Amazon EC2 Appliance (AMI) Quick Start
 * From _Community AMIs_ search for _OpenVPN Access Server_ (`ami-a94559dd`)
 * Options:
     - *Instance Type* *t1.micro*
-    - Subnet: Private subnet
+    - Subnet: Public subnet
     - User data:
 
 
@@ -46,11 +58,16 @@ Security groups
 ---
 
 Create the groups
-* jc-prod-pg
-* jc-prod-bitcoind
-* jc-prod-litecoind
-* jc-prod-api
-* jc-prod-web
+* pgm
+* pgs
+* bitcoind
+* litecoind
+* reverse
+* admin
+* workers
+* nat
+* vpn
+* chef
 
 Chef server
 ---

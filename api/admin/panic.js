@@ -1,12 +1,10 @@
 module.exports = exports = function(app) {
-    app.post('/admin/panic', app.auth.admin, exports.panic)
+    app.post('/admin/panic', app.security.demand.admin, exports.panic)
 }
 
 exports.panic = function(req, res, next) {
-    var dbName = req.app.conn.write.connectionParameters.database
-
     req.app.conn.write.query([
-        'ALTER DATABASE ' + dbName,
+        'ALTER DATABASE justcoin',
         'SET default_transaction_read_only = true;'
     ].join('\n'), function(err) {
         if (err) {

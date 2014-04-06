@@ -2,10 +2,16 @@ var template = require('./index.html')
 , num = require('num')
 
 module.exports = function(wr) {
-    var $el = $('<div class=confirm-withdraw>')
+    var fees = {
+        'NOK': '10',
+        'EUR': '5',
+        'USD': '14'
+    }
+    , fee = fees[wr.currency] || 0
+    , $el = $('<div class=confirm-withdraw>')
     .html(template({
-        net: num(wr.amount).sub(10).toString(),
-        fee: '10'
+        net: num(wr.amount).sub(fee).toString(),
+        fee: fee
     }))
     , controller = {
         $el: $el

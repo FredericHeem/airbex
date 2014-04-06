@@ -1,0 +1,43 @@
+<div class="container">
+
+    <h3><%= i18n('login.heading') %></h3>
+    <form class="login">
+        <div class="form-group email">
+            <label class="control-label"><%= i18n('login.email.label') %></label>
+            <input type="email" name="email" class="form-control">
+            <span class="help-block"></span>
+        </div>
+
+        <div class="form-group password">
+            <label class="control-label"><%= i18n('login.password.label') %></label>
+            <input type="password" name="password" class="form-control">
+            <span class="help-block"></span>
+        </div>
+
+        <div class="form-group otp" style="display:none">
+            <label class="control-label"><%= i18n('login.otp.label') %></label>
+            <input type="text" name="otp" class="form-control">
+            <span class="help-block visible-wrong">
+                <%- i18n('auth.login.otp.error.wrong') %>
+            </span>
+            <span class="help-block visible-invalid">
+                <%- i18n('auth.login.otp.error.invalid') %>
+            </span>
+            <span class="help-block visible-locked-out">
+                <%- i18n('auth.login.otp.error.locked out') %>
+            </span>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-success btn-large"><%= i18n('login.login button') %></button>
+        </div>
+
+        <p><a href="#auth/register" class="new-user"><%= i18n('login.new user register') %></a></p>
+        <p>
+            <a href="#auth/resetpassword">
+            <%= i18n('auth.login.forgot password') %>
+            </a>
+        </p>
+    </form>
+
+</div>

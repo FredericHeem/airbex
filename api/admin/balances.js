@@ -1,5 +1,19 @@
 module.exports = exports = function(app) {
-    app.get('/admin/balances', app.auth.admin, exports.index)
+    app.get('/admin/balances', app.security.demand.admin, exports.index)
+    app.get('/admin/balances/wallets', app.security.demand.admin, exports.wallets)
+}
+
+exports.wallets = function(req, res, next) {
+    req.app.conn.read.query([
+        'SELECT btc_balance, ltc_balance',
+        'FROM settings'
+    ].join('\n'), function(err, dr) {
+        if (err) return next(err)
+        res.send({
+            btc: dr.rows[0].btc_balance,
+            ltc: dr.rows[0].ltc_balance
+        })
+    })
 }
 
 exports.index = function(req, res, next) {

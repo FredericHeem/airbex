@@ -1,0 +1,101 @@
+<div class="navbar navbar-inverse navbar-fixed-top logged-in"
+	id="navbar-logged-in">
+	<div class="container">
+
+		<a href="#" class="navbar-brand">SBEX</a>
+
+		<button class="navbar-toggle" data-toggle="collapse"
+			data-target=".navHeaderCollapse">
+			<span class="icon-bar"></span> <span class="icon-bar"></span> <span
+				class="icon-bar"></span>
+		</button>
+
+		<div class="collapse navbar-collapse navHeaderCollapse">
+
+			<ul class="nav navbar-nav navbar-left">
+
+				<li class="account active "><a href="#account"><%=
+						i18n('top.account') %></a></li>
+				<li class="trade"><a href="#trade"><%= i18n('top.trade') %></a></li>
+				<li class="deposit"><a href="#deposit"><%=
+						i18n('top.deposit') %></a></li>
+				<li class="withdraw"><a href="#withdraw"><%=
+						i18n('top.withdraw') %></a></li>
+			</ul>
+			<div class="pull-right summary">
+				<ul class="nav navbar-nav">
+
+					<li class="dropdown fiat"><a href="#" class="dropdown-toggle"
+						data-toggle="dropdown"> <span class="fiat-balance"></span> <b
+							class="caret"></b>
+					</a>
+						<ul class="dropdown-menu">
+							<li class="fiat-currencies"></li>
+						</ul></li>
+					<li class="dropdown digital"><a href="#"
+						class="dropdown-toggle" data-toggle="dropdown"> <span
+							class="digital-balance"></span> <b class="caret"></b>
+					</a>
+						<ul class="dropdown-menu">
+							<li class="digital-currencies"></li>
+						</ul></li>
+
+					<li class="dropdown"><a href="#" class="dropdown-toggle"
+						data-toggle="dropdown"><span class="user-name"> </span><b class="caret"></b></i> </a>
+						<ul class="dropdown-menu pull-right">
+							<li><a href="#settings"><%= i18n('top.settings') %></a></li>
+							<li><a href="#signOut"><%= i18n('top.log out') %></a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="reminder-profile" class="alert alert-warning alert-dismissable">
+	<i class="fa fa-info-circle"></i>
+	<button type="button" class="close" data-dismiss="alert"
+		aria-hidden="true">&times;</button>
+	<a href="#settings/profile"><%= i18n('settings.profile.warning') %></a>
+</div>
+
+<div id="reminder-identity" class="alert alert-warning alert-dismissable">
+	<i class="fa fa-info-circle"></i>
+	<button type="button" class="close" data-dismiss="alert"
+		aria-hidden="true">&times;</button>
+	<a href="#settings/identity"><%= i18n('settings.identity.warning') %></a>
+</div>
+
+<div id="reminder-phone" class="alert alert-warning alert-dismissable">
+    <i class="fa fa-info-circle"></i>
+    <button type="button" class="close" data-dismiss="alert"
+        aria-hidden="true">&times;</button>
+    <a href="#settings/phone"><%= i18n('settings.phone.warning') %></a>
+</div>
+
+<div class="navbar navbar-inverse navbar-fixed-top not-logged-in"
+	id="navbar-logged-in">
+	<div class="container">
+
+		<a href="#" class="navbar-brand">SBEX</a>
+
+		<button class="navbar-toggle" data-toggle="collapse"
+			data-target=".navHeaderCollapse">
+			<span class="icon-bar"></span> <span class="icon-bar"></span> <span
+				class="icon-bar"></span>
+		</button>
+
+		<div class="collapse navbar-collapse navHeaderCollapse">
+			<div class="pull-right summary">
+				<ul class="nav navbar-nav">
+
+					<li class="active "><a href="#auth/login"><%= 'Login' %></a></li>
+					<li class="trade"><a href="#auth/register"><%= 'Register'
+							%></a></li>
+				</ul>
+			</div>
+		</div>
+
+	</div>
+</div>

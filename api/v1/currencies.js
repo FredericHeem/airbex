@@ -4,7 +4,7 @@ module.exports = exports = function(app) {
 
 exports.index = function(req, res, next) {
     var query = [
-        'SELECT currency_id, scale',
+        'SELECT currency_id, scale, fiat',
         'FROM currency',
         'ORDER BY currency_id'
     ].join('\n')
@@ -14,6 +14,7 @@ exports.index = function(req, res, next) {
         res.send(dr.rows.map(function(row) {
             return {
                 id: row.currency_id,
+                fiat: row.fiat,
                 scale: row.scale
             }
         }))

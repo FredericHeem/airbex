@@ -1,0 +1,78 @@
+<div class="container">
+    <div class="settings-nav"></div>
+
+    <div class="col-lg-9">
+        <h1 class="content-title"><%= i18n('settings.profile.heading') %></h1>
+
+        <div class="content-area">
+            <div class="row">
+                <div class="col-lg-8">
+                    <span class="hidden-security-level-3">
+                        <p class="lead visible-allowed-to-edit">
+                            <%= i18n('settings.profile.intro.below level 3') %>
+                        </p>
+                    </span>
+
+                    <p class="lead hidden-allowed-to-edit">
+                        <%= i18n('settings.profile.intro.level 4') %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <form>
+                        <div class="form-group first-name">
+                            <label class="control-label" for="firstName"><%= i18n('settings.profile.firstName') %></label>
+                            <input type="text" name="firstName" class="form-control" value="<%= [api.user.firstName].join('') %>">
+                            <span class="help-block visible-error"><%- i18n('required') %></span>
+                        </div>
+
+                        <div class="form-group last-name">
+                            <label class="control-label" for="lastName"><%= i18n('settings.profile.lastName') %></label>
+                            <input type="text" name="lastName" class="form-control" value="<%= [api.user.lastName].join('') %>">
+                            <span class="help-block visible-error"><%- i18n('required') %></span>
+                        </div>
+
+                        <div class="form-group address">
+                            <label class="control-label" for="address"><%= i18n('settings.profile.address') %></label>
+                            <textarea type="text" name="address" rows="2" class="form-control"><%= [api.user.address].join('') %></textarea>
+                            <span class="help-block visible-error"><%- i18n('required') %></span>
+                        </div>
+
+                        <div class="form-group city">
+                            <label class="control-label" for="city"><%= i18n('settings.profile.city') %></label>
+                            <input type="text" name="city" class="form-control" value="<%= [api.user.city].join('') %>">
+                            <span class="help-block visible-error"><%- i18n('required') %></span>
+                        </div>
+
+                        <div class="form-group postal-area">
+                            <label class="control-label" for="postalArea"><%= i18n('settings.profile.postalArea') %></label>
+                            <input type="text" name="postalArea" class="form-control" value="<%= [api.user.postalArea].join('') %>">
+                            <span class="help-block visible-error"><%- i18n('required') %></span>
+                        </div>
+
+                        <div class="form-group country">
+                            <label class="control-label" for="country"><%= i18n('settings.profile.country') %></label>
+                            <select name="country" class="form-control" />
+                        </div>
+
+                        <div class="form-group actions visible-allowed-to-edit">
+                            <button type="submit" class="hidden-security-level-4 btn btn-primary">
+                                <%= i18n('settings.profile.save') %>
+                            </button>
+
+                            <button class="visible-security-level-4 btn btn-primary" disabled="disabled">
+                                <%= i18n('settings.profile.save') %>
+                            </button>
+
+                            <span class="visible-saved" style="color:green;font-weight:bold">
+                                <%= i18n('settings.profile.saved') %>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

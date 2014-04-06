@@ -1,0 +1,8 @@
+#!/bin/sh
+/usr/bin/ec2-consistent-snapshot \
+--aws-access-key-id <%= @aws_bag['aws_access_key_id'] %> \
+--aws-secret-access-key <%= @aws_bag['aws_secret_access_key'] %> \
+--region <%= @aws_bag['aws_region'] %> \
+--freeze-filesystem $1 \
+--description "<%= node.chef_environment %> <%= node.name %> `date --iso-8601=minutes`" \
+$2

@@ -1,0 +1,9 @@
+.amount-input
+    states fixed-currency
+
+    .amount
+        states too-high invalid too-high-precision too-small
+
+    &.is-fixed-currency
+        .currency
+            pointer-events none

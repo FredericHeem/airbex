@@ -3,3 +3,23 @@
 
     .withdraw
         states requested, processing, completed, cancelled
+
+        .state
+            text-align center
+            vertical-align middle
+            font-size 1.3em
+
+        .destination
+            font-size 0.8em
+
+        .method
+            text-transform capitalize
+
+        &.is-completed .state
+            background-color #CBE2AC
+
+        &.is-cancelled .state
+            background-color #F17D80
+
+        &.is-processing .state
+            background-color #E5EBBF

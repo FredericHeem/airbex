@@ -1,0 +1,28 @@
+<div class="container">
+    <div class="trade-nav"></div>
+
+    <div class="col-lg-9">
+        <h1 class="content-title"><%- i18n('markets.market.heading', base, quote) %></h1>
+
+        <div class="row">
+            <div class="col-lg-6">                
+                <div class="order-modes clearfix row-right">
+                    <a class="instant" href="#trade/<%= id %>/instant/<%= type %>"><%- i18n('trade.nav.instant') %><div class="arrow"></div></a>
+                    <a class="advanced" href="#trade/<%= id %>/advanced/<%= type %>"><%- i18n('trade.nav.advanced') %><div class="arrow"></div></a>
+                </div>
+                <div class="visible-order-mode-market">
+                    <div class="market-order">
+                    </div>
+                </div>
+
+                <div class="visible-order-mode-limit">
+                    <div class="limit-order">
+                    </div>
+                </div>
+            </div>
+
+            <div class="depth-container col-lg-6">
+            </div>
+        </div>
+    </div>
+</div>

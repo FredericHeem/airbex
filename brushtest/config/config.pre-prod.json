@@ -1,0 +1,5 @@
+{
+  "url" : "http://localhost:8000/",
+  "url_admin" : "http://localhost:5071/",
+  "pg_write_url" : "postgres://postgres:postgres1234@localhost:5432/snow"
+}

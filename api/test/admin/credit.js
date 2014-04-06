@@ -10,7 +10,7 @@ describe('admin', function() {
         describe('bankCredit', function() {
             it('succeeds', function(done) {
                 var uid = dummy.id()
-                , impersonate = mock.impersonate(app, uid, { admin: true })
+                , impersonate = mock.impersonate(app, { id: uid, admin: true })
                 , req = {
                     user_id: dummy.id(),
                     currency_id: 'NOK',
@@ -71,7 +71,7 @@ describe('admin', function() {
             })
 
             it('fails if not admin', function(done) {
-                var impersonate = mock.impersonate(app, dummy.id(), { admin: false })
+                var impersonate = mock.impersonate(app, dummy.id())
 
                 request(app)
                 .post('/admin/bankCredit')

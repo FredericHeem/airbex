@@ -1,5 +1,5 @@
 var _ = require('lodash')
-, debug = require('../../util/debug')('login')
+, debug = require('../../helpers/debug')('login')
 
 module.exports = function(after) {
     var controller = {
@@ -112,6 +112,13 @@ module.exports = function(after) {
             $password.find('input').val(),
             $form.field('otp').val()
         )
+        .then(null, function(err) {
+            if (err.name == 'OtpRequired') {
+                return $.Deferred().resolve()
+            }
+
+            return err
+        })
         .always(function() {
             $submit.prop('disabled', false)
             .removeClass('is-loading')

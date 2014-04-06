@@ -27,7 +27,7 @@ BEGIN
     ask_uid := create_user('a@a', repeat('a', 64));
     bid_uid := create_user('b@b', repeat('b', 64));
 
-    PERFORM edge_credit(ask_uid, 'BTC', 10e8::bigint);
+    PERFORM edge_credit(ask_uid, 'BTC', 10.1e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 5000e5::bigint);
 
     -- ASK 10 BTC @ 750 NOK (7500 NOK)
@@ -58,6 +58,7 @@ BEGIN
     END IF;
 END; $$; ROLLBACK TO before_tests;
 
+
 -- Test: Market order ask (success)
 -------------------------------------------------------------------------------------
 
@@ -83,7 +84,7 @@ BEGIN
     ask_uid := create_user('a@a', repeat('a', 64));
     bid_uid := create_user('b@b', repeat('b', 64));
 
-    PERFORM edge_credit(ask_uid, 'BTC', 10e8::bigint);
+    PERFORM edge_credit(ask_uid, 'BTC', 10.5e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 10000e5::bigint);
 
     -- BID 10 BTC @ 800 NOK (8000 NOK)
@@ -140,7 +141,7 @@ BEGIN
     ask_uid := create_user('a@a', repeat('a', 64));
     bid_uid := create_user('b@b', repeat('b', 64));
 
-    PERFORM edge_credit(ask_uid, 'BTC', 10e8::bigint);
+    PERFORM edge_credit(ask_uid, 'BTC', 10.5e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 10000e5::bigint);
 
     -- BID 8 BTC @ 800 NOK (8000 NOK)
@@ -186,7 +187,7 @@ BEGIN
     ask_uid := create_user('a@a', repeat('a', 64));
     bid_uid := create_user('b@b', repeat('b', 64));
 
-    PERFORM edge_credit(ask_uid, 'BTC', 10e8::bigint);
+    PERFORM edge_credit(ask_uid, 'BTC', 10.5e8::bigint);
     PERFORM edge_credit(bid_uid, 'NOK', 5000e5::bigint);
 
     -- ASK 10 BTC @ 750 NOK (7500 NOK)
@@ -197,8 +198,8 @@ BEGIN
     -- BID 10 BTC @ ? NOK (? NOK)
     BEGIN
         INSERT INTO "order" (user_id, market_id, type, volume, price)
-        VALUES (bid_uid, mrid, 'bid', 10e5, NULL); -- = ? NOK
-        bid_oid := currval('order_order_id_seq');
+        VALUES (bid_uid, mrid, 'bid', 10e5, NULL) -- = ? NOK
+        RETURNING order_id INTO bid_oid;
 
         RAISE 'Test failed.';
     EXCEPTION WHEN others THEN

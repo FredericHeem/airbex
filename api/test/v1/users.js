@@ -14,17 +14,13 @@ describe('users', function() {
             }
             , userId = dummy.number(1, 1e6)
 
-            mock.once(app, 'verifyEmail', function(email, cb) {
-                expect(email).to.be(req.email)
-                cb(null, true)
-            })
-
             mock.once(app.conn.write, 'query', function(q, cb) {
-                expect(q.text).to.match(/create_user\(/)
-                expect(q.values).to.eql([
-                    req.email,
-                    req.key
-                ])
+                expect(q.text).to.match(/INSERT INTO user_pending/)
+                expect(q.values.length).to.be(3)
+                expect(q.values[0]).to.be(req.email)
+                expect(q.values[1]).to.be(req.key)
+                expect(q.values[2].length).to.be(20)
+
                 cb(null, {
                     rows: [
                         {
@@ -35,14 +31,44 @@ describe('users', function() {
             })
 
             mock.once(app, 'activity', function() {})
+            mock.once(app.smtp, 'sendMail', function() {
+                arguments[arguments.length - 1]()
+            })
 
             request(app)
             .post('/v1/users')
             .send(req)
-            .expect(201)
-            .expect('Content-Type', /json/)
+            .expect(204)
+            .end(done)
+        })
+    })
+
+    describe('identity', function() {
+        it('allows sample Polish address', function(done) {
+            mock.once(app.conn.write, 'query', function(query, cb) {
+                cb(null, mock.rows({}))
+            })
+
+            var impersonate = mock.impersonate(app, {
+                id: 123,
+                securityLevel: 2
+            })
+
+            request(app)
+            .post('/v1/users/identity')
+            .send({
+                firstName: 'Bartosz',
+                lastName: 'Bortnik',
+                address: 'Broniewskiego',
+                city: 'Rzeszow',
+                postalArea: '35-206',
+                country: 'PL'
+            })
+            .expect(204)
             .end(function(err) {
-                done(err)
+                if (err) return done(err)
+                impersonate.restore()
+                done()
             })
         })
     })

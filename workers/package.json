@@ -3,20 +3,27 @@
   "version": "0.0.12",
   "description": "workers for snow",
   "dependencies": {
-    "lodash": "~1.2.1",
-    "debug": "~0.7.2",
-    "request": "~2.12.0",
-    "num": "0.2.0",
-    "q": "~0.9.3",
-    "drop": "~0.2.5",
-    "bitcoin": "~1.6.2",
-    "raven": "~0.5.1",
-    "konfu": "~1.1.4",
-    "semaphore": "~1.0.1",
-    "async": "~0.2.8",
-    "pg": "~1.1.0"
+    "lodash": "1.2.1",
+    "debug": "0.7.2",
+    "request": "2.12.0",
+    "num": "git://github.com/abrkn/node-num.git#v0.2.9",
+    "drop": "0.2.5",
+    "bitcoin": "1.6.2",
+    "raven": "0.5.1",
+    "konfu": "1.1.4",
+    "async": "0.2.8",
+    "pg": "1.1.0",
+    "ripple-lib": "0.7.29",
+    "firebase": "0.6.17",
+    "open-exchange-rates": "0.2.0",
+    "analytics-node": "0.5.0",
+    "firebase-token-generator": "0.1.4",
+    "ws": "0.4.31",
+    "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master"
   },
   "scripts": {
+    "pack": "tar -zcf node_modules.tar.gz node_modules",
+    "unpack": "tar -zxf node_modules.tar.gz",
     "test": "mocha"
   },
   "devDependencies": {
@@ -26,7 +33,7 @@
     "shelljs": "x"
   },
   "engines": {
-    "node": "~0.8",
-    "npm": "~1.1"
+    "node": "~0.10",
+    "npm": ">=1.1"
   }
 }

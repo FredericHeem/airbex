@@ -1,0 +1,14 @@
+
+.navbar {
+	margin-bottom:0px;
+}
+[id^="reminder-"] {
+    display:none;
+    width: auto;
+    
+    max-width:800px;
+    margin: 0 auto;
+    margin-bottom:18px;
+}
+
+

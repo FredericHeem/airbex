@@ -1,15 +1,39 @@
 {
-    "pg_url": "<%= @pgm_conn %>",
+    "api_url": "http://<%= @api_ip %>:<%= node[:snow][:api][:port] %>/",
+    "pg_url": {
+		"user":"postgres",
+		"host": "<%= @pgm_ip %>",
+		"database" :"snow",
+		"ssl": false,
+		"password" : "<%= node[:pg_write_url][:password] %>"
+    },
+    "armory_user": "<%= @armory['username'] %>",
+    "armory_port": "<%= @armory['port'] %>",
+    "armory_pass": "<%= @armory['password'] %>",
     "btc_host": "<%= @bitcoind_ip %>",
-    "btc_user": "username",
-    "btc_port": 8332,
-    "btc_pass": "password",
+    "btc_user": "<%= @bitcoin['username'] %>",
+    "btc_port": "<%= @bitcoin['port'] %>",
+    "btc_pass": "<%= @bitcoin['password'] %>",
     "ltc_host": "<%= @litecoind_ip %>",
-    "ltc_user": "username",
-    "ltc_port": 9332,
-    "ltc_pass": "password",
-    "ltc_minconf": 6,
+    "ltc_user": "<%= @litecoin['username'] %>",
+    "ltc_port": "<%= @litecoin['port'] %>",
+    "ltc_pass": "<%= @litecoin['password'] %>",
+    "ltc_minconf": <%= node[:snow][:workers][:litecoinin][:min_conf] %>,
+    "btc_minconf": <%= node[:snow][:workers][:bitcoinin][:min_conf] %>,
+    <% unless node[:raven][:uri].nil? %>
+    "raven": "<%= node[:raven][:uri] %>",
+    <% end %>
     "ripple_account": "<%= @ripple['account'] %>",
     "ripple_secret": "<%= @ripple['secret'] %>",
-    "ripple_uri": "wss://s1.ripple.com:51233"
+    "local_ripple_uri": "ws://<%= @rippled_ip %>:5006",
+    "ripple_uri": "wss://s1.ripple.com:51233",
+    <% unless @env_bag["workers"].nil? %>
+    "metrics_firebase_secret": "<%= @env_bag["workers"]["metrics"]["firebase_secret"] %>",
+    "metrics_firebase_url": "<%= @env_bag["workers"]["metrics"]["firebase_url"] %>",
+    "oxr_app_id": "<%= @env_bag["workers"]["metrics"]["oxr_app_id"] %>",
+    <% end %>
+    <% unless @env_bag["segment"].nil? %>
+    "segment_secret": "<%= @env_bag["segment"]["api_secret"] %>",
+    <% end %>
+    "last":""
 }

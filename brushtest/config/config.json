@@ -1,0 +1,48 @@
+{
+  "url" : "http://localhost:5071/",
+  "url_admin" : "http://localhost:5071/",
+  "pg_write_url" : "postgres://postgres:postgres@localhost:5432/snow",
+  "userMax":"2", 
+  "market" : "BTCEUR",
+  "price" : "150",
+  "bid_price" : "1000",
+  "ask_price" : "500",
+  "volume" : "0.2",
+  "documentOk":"",
+  "documentTooBig":"",
+  
+  "users" :
+      [
+
+{
+    "email" : "admin@swissmybitcoin.com",
+    "password" : "password",
+    "admin": "true",
+    "country":"IT",
+    "number":"0607065268",
+    "btc_deposit_address":"1MfWN6iGMJgHPfp1phyX8DK9g5ucV4GaLZ"
+},
+{
+    "email" : "alice@nomail.com",
+    "password" : "password",
+    "country":"FR",
+    "number":"0607065268",
+    "btc_deposit_address":"12BzXgPgq3scersJWG7c5ku7BFDGfsDdYi"
+}
+,
+{
+    "email" : "bob@nomail.com",
+    "password" : "password",
+    "country":"UK",
+    "btc_deposit_address":"1eqghyo891XZXMog2kGHZ7GDfJrmyuPMR"
+}
+,
+{
+    "email" : "mamak@nomail.com",
+    "password" : "password",
+    "country":"DE",
+    "btc_deposit_address":"15zfKBxF1vjYRrjcLBkBsJtJ4HJatrB5it"
+}
+]
+ 
+}

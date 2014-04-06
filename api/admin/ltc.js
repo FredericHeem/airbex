@@ -1,5 +1,5 @@
 module.exports = exports = function(app) {
-    app.get('/admin/ltc/height', app.auth.admin, exports.height)
+    app.get('/admin/ltc/height', app.security.demand.admin, exports.height)
 }
 
 exports.height = function(req, res, next) {

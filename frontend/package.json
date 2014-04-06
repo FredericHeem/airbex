@@ -1,0 +1,44 @@
+{
+  "name": "snow-frontend",
+  "description": "web interface",
+  "version": "0.0.76",
+  "dependencies": {
+    "num": "git://github.com/abrkn/node-num.git#v0.2.9",
+    "lodash": "2.2.1",
+    "moment": "2.1.0",
+    "thirty-two": "0.0.1",
+    "debug": "0.7.2",
+    "grunt-cli": "0.1.9",
+    "grunt": "0.4.1",
+    "grunt-browserify": "1.2.9",
+    "grunt-concurrent": "0.4.1",
+    "grunt-contrib-clean": "0.5.0",
+    "grunt-contrib-concat": "0.3.0",
+    "grunt-contrib-copy": "0.4.1",
+    "grunt-contrib-htmlmin": "0.1.3",
+    "grunt-contrib-uglify": "0.2.4",
+    "grunt-contrib-watch": "0.5.3",
+    "grunt-contrib-cssmin": "0.6.2",
+    "grunt-contrib-connect": "0.5.0",
+    "grunt-contrib-stylus": "0.9.0",
+    "browserify-ejs": "0.0.2",
+    "grunt-ejs": "0.1.0",
+    "nib": "1.0.1"
+  },
+  "engines": {
+    "node": "~0.10",
+    "npm": ">=1.1"
+  },
+  "devDependencies": {
+    "brfs" : "0.0.8",
+    "http-proxy" : "0.10.x",
+    "grunt-bower": "~0.7.0",
+    "optimist": "0.6.0",
+    "http-proxy": "0.10.3"
+  },
+  "scripts": {
+    "start" : "grunt serve",
+    "pack": "tar -zcf node_modules.tar.gz node_modules",
+    "unpack": "tar -zxf node_modules.tar.gz"
+  }
+}

@@ -1,7 +1,7 @@
 var _ = require('lodash')
 
 module.exports = exports = function(app) {
-    app.get('/v1/activities', app.auth.primary, exports.index)
+    app.get('/v1/activities', app.security.demand.primary, exports.index)
 }
 
 var detailWhitelist = {
@@ -22,9 +22,15 @@ var detailWhitelist = {
     Withdraw: ['method', 'amount', 'currency', 'address'],
     Credit: ['currency', 'amount'],
     FillOrder: ['market', 'total', 'original', 'type', 'price'],
+    BTCWithdraw: ['amount', 'address'],
+    WithdrawRequest: ['amount', 'bankAccount', 'currency', 'method'],
+    CancelWithdrawRequest: ['bankAccount'],
     WithdrawComplete: ['amount', 'currency', 'method'],
     EnableTwoFactor: [],
-    RemoveTwoFactor: []
+    RemoveTwoFactor: [],
+    KycCompleted: [],
+    ApiKeyCreate:[],
+    Login:['ip']
 }
 
 exports.index = function(req, res, next) {
@@ -39,7 +45,7 @@ exports.index = function(req, res, next) {
                 'ORDER BY activity_id ASC',
                 'LIMIT 20'
             ].join('\n'),
-            values: [req.user, +req.query.since]
+            values: [req.user.id, +req.query.since]
         }
     } else {
         query = {
@@ -50,7 +56,7 @@ exports.index = function(req, res, next) {
                 'ORDER BY activity_id DESC',
                 'LIMIT 20'
             ].join('\n'),
-            values: [req.user]
+            values: [req.user.id]
         }
     }
 

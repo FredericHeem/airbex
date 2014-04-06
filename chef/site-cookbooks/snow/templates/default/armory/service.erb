@@ -1,0 +1,16 @@
+description "Run the armory deamon"
+start on startup
+chdir /usr/lib/armory/
+console log
+env PYTHONPATH=/usr/lib/armory/
+env HOME=/btc
+env WALLET=/btc/.armory/<%= @snow_env_bag['armory']['wallet_name'] %>
+
+script
+    echo $$ > /var/run/armoryd.pid
+    sudo -Eu ubuntu python /usr/lib/armory/armoryd.py $WALLET --debug --rpcport=<%= @snow_env_bag['armory']['port'] %> --offline
+end script
+
+post-stop script
+    rm -f /var/run/armoryd.pid
+end script

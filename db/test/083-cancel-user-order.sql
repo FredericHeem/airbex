@@ -18,7 +18,7 @@ BEGIN
     RETURNING market_id INTO mid;
 
     uid := create_user('a@a', repeat('x', 64));
-    PERFORM edge_credit(uid, 'BTC', 1e8::bigint);
+    PERFORM edge_credit(uid, 'BTC', 1.1e8::bigint);
 
     INSERT INTO "order" (user_id, market_id, type, price, volume)
     VALUES (uid, mid, 'ask', 700e3, 1e5)

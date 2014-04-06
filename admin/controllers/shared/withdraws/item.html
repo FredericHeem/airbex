@@ -1,16 +1,43 @@
 <tr class="withdraw">
     <td><%= id %></td>
-    <td><%= moment(created).format('YYYY-MM-DD HH:mm') %></td>
-    <td><%= method %></td>
-    <td><%= state %></td>
-    <td class="hidden-single-user">
-        <a href="#users/<%= user %>" data-user-id="<%= user %>"><%= user %></a></td>
-    <td><%= amount %> <%= currency %>
+    <td class="when" title="<%= moment(created).format('YYYY-MM-DD HH:mm') %>">
+        <%= moment(created).fromNow() %>
     </td>
-    <td><%= destination %></td>
+    <td class="method"><%= method %></td>
+    <td class="state">
+        <span style="font-size:1.2em">
+            <i class="fa fa-spinner visible-processing" title="Processing"></i>
+            <i class="fa fa-user visible-requested" title="Requested by user"></i>
+            <i class="fa fa-times visible-cancelled" title="Canceled/failed"></i>
+            <i class="fa fa-check visible-completed" title="Completed"></i>
+        </span>
+    </td>
+    <td class="destination">
+        <%= destination %>
+    </td>
+    <td class="hidden-single-user">
+        <% if (user) { %>
+            <a href="#users/<%= user.user_id %>" title="User #<%= user.user_id %>">
+                <%= user.first_name ? (user.first_name + ' ' + user.last_name) : user.email %>
+            </a>
+
+            <a href="https://www.intercom.io/apps/64463fba8faa8166444bfb3c00a5e40976bd622e/users/show?user_id=<%= user.user_id %>"
+                target="_blank" title="View user in Intercom">
+                <i class="fa fa-comments"></i>
+            </a>
+        <% } %>
     <td>
-        <button class="process visible-requested btn">Process</button>
-        <button class="complete hidden-cancelled hidden-completed btn btn-success">Complete</button>
-        <button class="cancel hidden-cancelled hidden-completed btn btn-danger">Cancel</button>
+        <%= numbers(amount, { currency: currency }) %>
+    </td>
+    <td>
+        <button class="process visible-requested btn">
+            <i class="fa fa-lock" title="Start processing"></i>
+        </button>
+        <button class="complete visible-processing btn btn-success">
+            <i class="fa fa-check" title="Mark completed/sent"></i>
+        </button>
+        <button class="cancel hidden-cancelled hidden-completed btn btn-danger">
+            <i class="fa fa-times" title="Cancel (release hold on funds)"></i>
+        </button>
     </td>
 </tr>

@@ -1,0 +1,35 @@
+{
+    "browser": true, // This option defines globals exposed by modern browsers: all the way from good ol' document and navigator to the HTML5 FileReader and other new developments in the browser world.
+    "devel": true, // This option defines globals that are usually used for logging poor-man's debugging: console, alert, etc.
+    "expr": true, // This option suppresses warnings about the use of expressions where normally you would expect to see assignments or function calls. Most of the time, such code is a typo. However, it is not forbidden by the spec and that's why this warning is optional.
+    "globals": {
+        "$app": false,
+        "i18n": false,
+        "formatters": false,
+        "api": false,
+        "router": false,
+        "errors": false,
+        "numbers": false,
+        "analytics": false,
+        "Modernizr": false,
+        "alertify": false,
+        "Intercom": false,
+        "notify": false
+    },
+    "es3": true,
+    "indent": 4, // This option enforces specific tab width for your code.
+    "jquery": true, // This option defines globals exposed by the jQuery JavaScript library.
+    "laxbreak": true, // This option suppresses most of the warnings about possibly unsafe line breakings in your code. It doesn't suppress warnings about comma-first coding style.
+    "laxcomma": true, // This option suppresses warnings about comma-first coding style:
+    "loopfunc": true, // This option suppresses warnings about functions inside of loops.
+    "node": true, // This option defines globals available when your code is running inside of the Node runtime environment. Node.js is a server-side JavaScript environment that uses an asynchronous event-driven model.
+    "quotmark": "single", // This option enforces the consistency of quotation marks used throughout your code. It accepts three values: true if you don't want to enforce one particular style but want some consistency, "single" if you want to allow only single quotes and "double" if you want to allow only double quotes.
+    "sub": true, // This option suppresses warnings about using [] notation when it can be expressed in dot notation: person['name'] vs. person.name.
+    "undef": true, // This option prohibits the use of explicitly undeclared variables. This option is very useful for spotting leaking and mistyped variables.
+    "unused": true, // This option warns when you define and never use your variables. It is very useful for general code cleanup, especially when used in addition to undef.,
+    "asi": true,
+    "noarg": true,
+    "nonew": true,
+    "trailing": true,
+    "maxdepth": 3
+}

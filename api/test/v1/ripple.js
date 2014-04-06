@@ -6,34 +6,6 @@ var expect = require('expect.js')
 , dummy = require('../dummy')
 
 describe('ripple', function() {
-    describe('trust', function() {
-        it('returns lines', function(done) {
-            var account = dummy.rippleAddress()
-            mock.once(app.ripple.drop, 'lines', function(a, cb) {
-                expect(a).to.be(account)
-                cb(null, [
-                    {
-                        account: app.config.ripple_account,
-                        currency: 'NOK',
-                        limit: 1,
-                        balance: 0
-                    }
-                ])
-            })
-
-            request(app)
-            .get('/v1/ripple/trust/' + account)
-            .expect(200)
-            .expect('Content-Type', /json/)
-            .expect({
-                NOK: { limit: 1, balance: 0 }
-            })
-            .end(function(err) {
-                done(err)
-            })
-        })
-    })
-
     describe('address', function() {
         it('returns address from config', function(done) {
             request(app)
@@ -60,7 +32,8 @@ describe('ripple', function() {
                 id: dummy.number(1, 1e6)
             }
             , userId = dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, userId, { canWithdraw: true, level: 2 })
+            , impersonate = mock.impersonate(app, { id: userId, securityLevel: 2}, null,
+                { canWithdraw: true })
 
             mock.once(app.conn.write, 'query', function(q, cb) {
                 expect(q.text).to.match(/ripple_withdraw\(/)

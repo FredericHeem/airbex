@@ -10,7 +10,7 @@ describe('withdraws', function() {
         it('succeeds', function(done) {
             var uid =  dummy.number(1, 1e6)
             , baid = dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, uid, { canWithdraw: true, level: 4 })
+            , impersonate = mock.impersonate(app, { id: uid, securityLevel: 4 }, null, { canWithdraw: true })
 
             mock.once(app.conn.write, 'query', function(query, cb) {
                 expect(query.text).to.match(/withdraw_bank/)
@@ -39,7 +39,7 @@ describe('withdraws', function() {
 
         it('requires canWithdraw', function(done) {
             var uid =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, uid, { canWithdraw: false })
+            , impersonate = mock.impersonate(app, uid, null, { canWithdraw: false })
 
             request(app)
             .post('/v1/withdraws/bank')
@@ -54,7 +54,7 @@ describe('withdraws', function() {
     describe('index', function() {
         it('returns withdraws', function(done) {
             var uid =  dummy.id()
-            , impersonate = mock.impersonate(app, uid, { canWithdraw: true })
+            , impersonate = mock.impersonate(app, uid, null, { canWithdraw: true })
             , res = [{
                 currency: 'BTC',
                 amount: '987.12311111',
@@ -78,7 +78,7 @@ describe('withdraws', function() {
                     created_at: res[0].created,
                     completed: res[0].completed,
                     state: res[0].state,
-                    amount: '987.12311111',
+                    amount: 987.12311111e8,
                     currency_id: res[0].currency,
                     error: res[0].error
                 }))
@@ -99,7 +99,7 @@ describe('withdraws', function() {
         it('succeeds', function(done) {
             var uid =  dummy.id()
             , id = dummy.id()
-            , impersonate = mock.impersonate(app, uid, { canWithdraw: true })
+            , impersonate = mock.impersonate(app, uid, null, { canWithdraw: true })
 
             mock.once(app.conn.write, 'query', function(query, cb) {
                 expect(query.text).to.match(/cancel_withdraw_request/)
@@ -118,7 +118,7 @@ describe('withdraws', function() {
 
         it('requires canWithdraw', function(done) {
             var uid =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, uid, { canWithdraw: false })
+            , impersonate = mock.impersonate(app, uid, null, { canWithdraw: false })
 
             request(app)
             .del('/v1/withdraws/123')

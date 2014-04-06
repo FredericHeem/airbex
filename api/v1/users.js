@@ -1,22 +1,33 @@
 var _ = require('lodash')
-, async = require('async')
 , debug = require('debug')('snow:users')
+, libphonenumber = require('libphonenumber')
+
 
 module.exports = exports = function(app) {
-    app.get('/v1/whoami', app.auth.any, exports.whoami)
-    app.post('/v1/users', exports.create)
-    app.post('/v1/users/identity', app.auth.primary(2), exports.identity)
-    app.post('/v1/users/verify/call', app.auth.primary(1), exports.startPhoneVerify)
-    app.post('/v1/users/verify', app.auth.primary(1), exports.verifyPhone)
-    app.patch('/v1/users/current', app.auth.primary, exports.patch)
+    app.get('/v1/whoami', app.security.demand.any, exports.whoami)
+    app.post('/v1/users/identity', app.security.demand.primary(1), exports.identity)
+    app.post('/v1/users/verify/text', app.security.demand.primary(1), exports.startPhoneVerify)
+    app.post('/v1/users/verify/call', app.security.demand.primary(1), exports.voiceFallback)
+    app.post('/v1/users/verify', app.security.demand.primary(1), exports.verifyPhone)
+    app.patch('/v1/users/current', app.security.demand.primary, exports.patch)
+    app.post('/v1/changePassword', app.security.demand.otp(app.security.demand.primary, true), exports.changePassword)
+
+    require('./users.create')(app)
+    require('./documents')(app)
 }
 
 exports.patch = function(req, res, next) {
+    if (!req.app.validate(req.body, 'v1/user_patch', res)) return
+
     var updates = {}
-    , values = [req.user]
+    , values = [req.user.id]
 
     if (req.body.language !== undefined) {
         updates['language'] = req.body.language
+    }
+
+    if  (req.body.username !== undefined) {
+        updates['username'] = req.body.username
     }
 
     var updateText = _.map(updates, function(value, key) {
@@ -24,7 +35,7 @@ exports.patch = function(req, res, next) {
         return key + ' = $' + values.length
     })
 
-    if (values.length === 1) {
+    if (values.length == 1) {
         return res.send(400, {
             name: 'NoUpdates',
             message: 'No updates were provided'
@@ -41,9 +52,8 @@ exports.patch = function(req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         if (!dr.rowCount) {
-            return next(new Error('User ' + req.user + ' not found'))
+            return next(new Error('User ' + req.user.id + ' not found'))
         }
-        req.app.auth.invalidate(req.app, req.user)
         res.send(204)
     })
 }
@@ -55,7 +65,6 @@ exports.whoami = function(req, res, next) {
             'SELECT',
             '   user_id id,',
             '   email,',
-            '   email_verified_at,',
             '   admin,',
             '   tag,',
             '   phone_number phone,',
@@ -67,11 +76,14 @@ exports.whoami = function(req, res, next) {
             '   language,',
             '   security_level,',
             '   two_factor,',
+            '   username,',
+            '   poi_approved_at,',
+            '   poa_approved_at,',
             '   city',
             'FROM user_view',
             'WHERE user_id = $1'
         ].join('\n'),
-		values: [req.user]
+		values: [req.user.id]
 	}, function(err, dres) {
 		if (err) return next(err)
 		if (!dres.rows.length) return res.send(404)
@@ -86,67 +98,18 @@ exports.whoami = function(req, res, next) {
             phone: row.phone,
             firstName: row.firstname,
             lastName: row.lastname,
+            username: row.username,
             address: row.address,
-            emailVerified: row.email_verified_at !== null,
             country: row.country,
             postalArea: row.postalarea,
             city: row.city,
             securityLevel: row.security_level,
             language: row.language,
-            twoFactor: !!row.two_factor
+            twoFactor: !!row.two_factor,
+            poi: !!row.poi_approved_at,
+            poa: !!row.poa_approved_at
         })
 	})
-}
-
-exports.create = function(req, res, next) {
-    if (!req.app.validate(req.body, 'v1/user_create', res)) return
-
-    req.app.verifyEmail(req.body.email, function(err, ok) {
-        if (err) {
-            debug('E-mail validation failed for %s:\n', req.body.email, err)
-        }
-
-        if (!ok) {
-            if (err) debug('email check failed', err)
-            debug('email check failed for %s', req.body.email)
-
-            return res.send(403, {
-                name: 'EmailFailedCheck',
-                message: 'E-mail did not pass validation'
-            })
-        }
-
-        req.app.conn.write.query({
-            text: 'SELECT create_user($1, $2) user_id',
-            values: [req.body.email, req.body.key]
-        }, function(err, dr) {
-            if (!err) {
-                var row = dr.rows[0]
-                req.app.activity(row.user_id, 'Created', {})
-                return res.send(201, { id: row.user_id })
-            }
-
-            if (err.message.match(/email_regex/)) {
-                return res.send(403, {
-                    name: 'InvalidEmail',
-                    message: 'e-mail is invalid'
-                })
-            }
-
-            if (err.message.match(/api_key_pkey/) ||
-                err.message.match(/email_lower_unique/))
-            {
-                return res.send(403, {
-                    name: 'EmailAlreadyInUse',
-                    message:'e-mail is already in use'
-                })
-            }
-
-            req.app.auth.invalidate(req.app, req.body.key)
-
-            next(err)
-        })
-    })
 }
 
 exports.identity = function(req, res, next) {
@@ -164,9 +127,9 @@ exports.identity = function(req, res, next) {
             '   postal_area = $7',
             'WHERE',
             '   user_id = $1 AND',
-            '   first_name IS NULL'
+            '   poi_approved_at IS NULL AND poa_approved_at IS NULL'
         ].join('\n'),
-        values: [req.user, req.body.firstName, req.body.lastName, req.body.address,
+        values: [req.user.id, req.body.firstName, req.body.lastName, req.body.address,
             req.body.country, req.body.city, req.body.postalArea]
     }
 
@@ -176,30 +139,47 @@ exports.identity = function(req, res, next) {
         }
 
         if (!dr.rowCount) {
+            // 404 or other ?
             return res.send(404, {
                 name: 'IdentityAlreadySet',
                 message: 'The identity for the user has already been set.'
             })
         }
 
-        req.app.auth.invalidate(req.app, req.user)
+        req.app.intercom.setIdentity(req.user.id, req.body)
 
-        req.app.activity(req.user, 'IdentitySet', {})
+        req.app.activity(req.user.id, 'IdentitySet', _.pick(req.body,
+            'firstName', 'lastName', 'address', 'country', 'city', 'postalArea'))
 
         return res.send(204)
     })
 }
 
 exports.verifyPhone = function(req, res, next) {
+    // As soon as he attempts to solve, the user may not fall back
+    // to a voice call
+    debug('verifyPhone %s, code %s', req.user.id, req.body.code);
+    //TODO
+    //if (!req.app.validate(req.body, 'v1/user_verify_phone_code', res)) return
+    delete exports.allowedVoiceFallback[req.user.id]
+
     req.app.conn.write.query({
         text: 'SELECT verify_phone($1, $2) success',
-        values: [req.user, req.body.code]
+        values: [req.user.id, req.body.code]
     }, function(err, dr) {
         if (err) {
+            debug("verifyPhone error %s", err.message)
             if (err.message == 'User already has a verified phone number.') {
                 return res.send(400, {
                     name: 'AlreadyVerified',
                     message: 'A phone number has already been verified for this user'
+                })
+            }
+
+            if (err.message == 'User has not started phone verification') {
+                return res.send(400, {
+                    name: 'NotInPhoneVerify',
+                    message: 'The user has not begun phone verification'
                 })
             }
 
@@ -209,13 +189,66 @@ exports.verifyPhone = function(req, res, next) {
         if (!dr.rows[0].success) {
             return res.send(403, {
                 name: 'VerificationFailed',
-                message: 'Verification failed. The code is wrong or ' +
-                    'you may not verify at this time.'
+                message: 'Verification failed. The code is wrong.'
             })
         }
 
-        req.app.auth.invalidate(req.app, req.user)
+        req.app.conn.read.query({
+            text: [
+                'SELECT phone_number',
+                'FROM "user"',
+                'WHERE user_id = $1'
+            ].join('\n'),
+            values: [req.user.id]
+        }, function(err, dr) {
+            if (err) {
+                debug("%s", err)
+                return console.error(err)
+            }
+            req.app.intercom.setUserPhoneVerified(req.user.id, dr.rows[0].phone_number)
+        })
 
+        res.send(204)
+    })
+}
+
+exports.allowedVoiceFallback = {}
+
+exports.voiceFallback = function(req, res, next) {
+    var item = exports.allowedVoiceFallback[req.user.id]
+
+    if (!item) {
+        return res.send(400, {
+            name: 'CallFallbackNotAllowed',
+            message: 'User is not in a situation where he can fallback to voice'
+        })
+    }
+
+    delete exports.allowedVoiceFallback[req.user.id]
+
+    debug('falling back to voice for user %s', req.user.id)
+
+    var codeMsg = [
+        '<prosody rate=\'-5%\'>',
+        'Your code is:' ,
+        '</prosody>',
+        '<prosody rate=\'-20%\'>',
+        item.code.split('').join(', '),
+        '.</prosody>'
+    ].join('')
+
+    var msg = [
+        '<speak>',
+        '<prosody rate=\'-5%\'>',
+        'Welcome to Just-coin.',
+        '</prosody>',
+        codeMsg,
+        codeMsg,
+        '</speak>'
+    ].join('')
+
+    req.app.phone.call(item.number, msg, function(err) {
+        if (err) return next(err)
         res.send(204)
     })
 }
@@ -223,13 +256,28 @@ exports.verifyPhone = function(req, res, next) {
 exports.startPhoneVerify = function(req, res, next) {
     if (!req.app.validate(req.body, 'v1/user_verify_call', res)) return
 
-    debug('processing request to start phone verification')
+    debug('processing request to start phone verification %j', req.body)
+
+    var number
+
+    try {
+        number = libphonenumber.e164(req.body.number, req.body.country)
+    } catch (e) {
+        debug('failed to parse %s (%s): %s', req.body.country, req.body.number,
+            e.message || e)
+
+        return res.send(400, {
+            name: 'InvalidPhoneNumber',
+            message: 'The number is not a valid phone number'
+        })
+    }
 
     req.app.conn.write.query({
         text: 'SELECT create_phone_number_verify_code($2, $1) code',
-        values: [req.user, req.body.number]
+        values: [req.user.id, number]
     }, function(err, dr) {
         if (err) {
+            debug("startPhoneVerify error: %s", err.message);
             if ((/^User is locked out/i).exec(err.message)) {
                 return res.send(403, {
                     name: 'LockedOut',
@@ -258,15 +306,37 @@ exports.startPhoneVerify = function(req, res, next) {
 
         debug('correct code is %s', code)
 
-        debug('requesting call to %s', req.body.number)
+        exports.allowedVoiceFallback[req.user.id] = {
+            code: code,
+            number: number
+        }
 
-        async.parallel([
-            function() {
-                // TODO: Implement calling
-            }
-        ], function(err) {
+        debug('requesting text to %s', number)
+        var company = req.app.config.company || 'SBEX';
+        var msg = code + ' is your ' + company + ' code'
+
+        req.app.phone.text(number, msg, function(err) {
             if (err) return next(err)
-            res.send(204)
+            res.send(200, {
+                number: number
+            })
         })
+    })
+}
+
+exports.changePassword = function(req, res, next) {
+    if (!req.app.validate(req.body, 'v1/users_changepassword', res)) return
+
+    req.app.conn.write.query({
+        text: [
+            'UPDATE api_key',
+            'SET api_key_id = $2',
+            'WHERE user_id = $1 AND "primary" = TRUE'
+        ].join('\n'),
+        values: [req.user.id, req.body.key]
+    }, function(err) {
+        if (err) return next(err)
+        req.app.activity(req.user.id, 'ChangePassword', {})
+        res.send(204)
     })
 }

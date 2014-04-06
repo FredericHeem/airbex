@@ -1,0 +1,81 @@
+<div class="container">
+    <div class="settings-nav"></div>
+
+    <div class="col-lg-9">
+        <h1 class="content-title"><%- i18n('settings.twofactor.heading') %></h1>
+
+        <div class="content-area">
+            <div class="hidden-two-factor">
+                <p class="lead"><%- i18n('settings.twofactor.disabled.lead') %></p>
+                <p class="two-factor-marketplace">
+                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank"><img src="img/two-factor/google.png"/></a>
+                    <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605" target="_blank"><img src="img/two-factor/apple.png"/></a>
+                    <a href="http://www.windowsphone.com/s?appid=e7994dbc-2336-4950-91ba-ca22d653759b" target="_blank"><img src="img/two-factor/microsoft.png"/></a>
+                </p>
+
+                <img class="two-factor-image" src="https://chart.googleapis.com/chart?chs=250x250&chld=L|0&cht=qr&chl=otpauth://totp/<%= location.hostname %>:<%- encodeURIComponent(api.user.id) %>%3Fsecret=<%= secret %>%26issuer=Sbex" />
+
+                <form name="enable">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="form-group">
+                                <label for="secret"><%- i18n('settings.twofactor.disabled.secret') %></label>
+                                <input type="text" class="form-control disabled" name="secret" value="<%= secret %>" disabled="disabled" />
+                            </div>
+
+                            <div class="form-group otp">
+                                <label for="otp" class="control-label">
+                                    <%- i18n('settings.twofactor.disabled.otp') %>
+                                </label>
+                                <input type="text" class="form-control" name="otp" />
+                                <span class="help-block visible-wrong">
+                                    <%- i18n('settings.twofactor.otp.error.wrong') %>
+                                </span>
+                                <span class="help-block visible-invalid">
+                                    <%- i18n('settings.twofactor.otp.error.invalid') %>
+                                </span>
+                                <span class="help-block visible-locked-out">
+                                    <%- i18n('settings.twofactor.otp.error.locked out') %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <%- i18n('settings.twofactor.disabled.enable') %>
+                    </button>
+                </form>
+            </div>
+
+            <div class="visible-two-factor">
+                <p class="lead"><%- i18n('settings.twofactor.enabled.lead') %></p>
+
+                <form name="disable">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group otp">
+                                <label for="otp" class="control-label">
+                                    <%- i18n('settings.twofactor.enabled.otp') %>
+                                </label>
+                                <input type="text" class="form-control" name="otp" />
+                                <span class="help-block visible-wrong">
+                                    <%- i18n('settings.twofactor.otp.error.wrong') %>
+                                </span>
+                                <span class="help-block visible-invalid">
+                                    <%- i18n('settings.twofactor.otp.error.invalid') %>
+                                </span>
+                                <span class="help-block visible-locked-out">
+                                    <%- i18n('settings.twofactor.otp.error.locked out') %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-danger">
+                        <%- i18n('settings.twofactor.enabled.disable') %>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

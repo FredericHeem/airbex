@@ -1,0 +1,8 @@
+<tr data-id="<%= id %>">
+    <td><%= id %></td>
+    <td><%= market %></td>
+    <td><%= type == 'bid' ? i18n('orders.buy') : i18n('orders.sell') %></td>
+    <td class="number"><%= price ? numbers.format(price, null, quote) : '' %></td>
+    <td class="matched number"><%= numbers.format(matched, null, base) %></td>
+    <td class="average-price number"><%= numbers.format(averagePrice, null, quote) %></td>
+</tr>

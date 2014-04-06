@@ -1,27 +1,22 @@
 <tr class="transaction" data-id="<%= id %>">
-    <td class="id"><%- id %></td>
-    <td class="date"><%- moment(timestamp * 1e3).format('YYYY-MM-DD HH:mm') %></td>
-    <td class="type"><%- type %></td>
+    <td class="id"><%= id %></td>
+    <td class="date"><%= moment(createdAt).format('YYYY-MM-DD HH:mm') %></td>
+    <td class="type"><%= type %></td>
     <td class="amount">
-        <%- numbers.format(amount, { currency: currency }) %>
-        <% if (currency != 'BTC') { %>
-            (<%- numbers.format(amountBtc, { currency: 'BTC' }) %>)
-        <% } %>
+        <%= numbers.format(amount, { currency: currency }) %>
     </td>
     <td>
         <% if (debitUserId) { %>
-            (<a href="#users/<%- debitUserId %>">#<%- debitUserId %></a>, <%- debitUserName || debitUserEmail %>)
+            (<a href="#users/<%= debitUserId %>">#<%= debitUserId %></a>, <%= debitUserName || debitUserEmail %>)
         <% } else { %>
-            <%- debitAccountType %>
+            <%= debitAccountType %>
         <% } %>
     </td>
     <td>
         <% if (creditUserId) { %>
-            (<a href="#users/<%- creditUserId %>">#<%- creditUserId %></a>, <%- creditUserName || creditUserEmail %>)
+            (<a href="#users/<%= creditUserId %>">#<%= creditUserId %></a>, <%= creditUserName || creditUserEmail %>)
         <% } else { %>
-            <%- creditAccountType %>
+            <%= creditAccountType %>
         <% } %>
     </td>
-    <!--<td class="raw"><%= raw %></td>-->
-    <td class="actions"></td>
 </tr>

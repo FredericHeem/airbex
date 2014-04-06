@@ -24,6 +24,17 @@ module.exports = function(opts) {
 
     function refresh() {
         api.call('admin/withdraws', null, { qs: opts })
+        .then(function(withdraws) {
+            return $.when.apply($, _.map(withdraws, function(withdraw) {
+                return api.call('admin/users/' + withdraw.user)
+                .then(function(user) {
+                    withdraw.user = user
+                })
+            }))
+            .then(function() {
+                return withdraws
+            })
+        })
         .fail(errors.alertFromXhr)
         .done(itemsChanged)
     }
@@ -77,12 +88,7 @@ module.exports = function(opts) {
         e.preventDefault()
         var id = +$(this).closest('.withdraw').attr('data-id')
 
-        console.log('???', id)
-
         var item = _.find(lastItems, { id: id })
-
-        console.log('???', lastItems)
-        console.log('???', item)
 
         var modal = require('./confirm')(item)
 

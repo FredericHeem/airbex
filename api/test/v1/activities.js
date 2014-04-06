@@ -7,7 +7,7 @@ var expect = require('expect.js')
 describe('activities', function() {
     describe('index', function() {
         it('returns activities', function(done) {
-            var impersonate = mock.impersonate(app, 234, { primary: true })
+            var impersonate = mock.impersonate(app, 234)
             , read = mock(app.conn.read, 'query', function(query, cb) {
                 expect(query.text).to.match(/FROM activity/)
                 expect(query.text).to.match(/user_id =/)

@@ -1,0 +1,10 @@
+Withdraw request
+<p>
+    Hi <%= firstName || 'there' %>,
+</p>
+
+<p>
+    You have requested to withdraw <%= amount %> <%= currency %> to the address <%= address %>
+</p>
+
+<% include signature.html %>

@@ -1,4 +1,8 @@
+include_recipe "snow::common"
 include_recipe "nginx"
+include_recipe "nodejs"
+include_recipe "nginx"
+include_recipe "solo-search"
 
 ['git', 'make', 'g++'].each do |pkg|
   package pkg do
@@ -19,7 +23,7 @@ template '/etc/nginx/sites-available/snow-admin' do
 end
 
 # include_recipe 'deploy_wrapper'
-bag = data_bag_item("snow", "main")
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
 env_bag = bag[node.chef_environment]
 
 ssh_known_hosts_entry 'github.com'
@@ -37,12 +41,23 @@ end
 deploy_revision node[:snow][:admin][:app_directory] do
     user "ubuntu"
     group "ubuntu"
-    repo node[:snow][:repo]
-    revision "feature/chef"
+    repo env_bag["repository"]["main"]
+    branch node[:snow][:branch]
     ssh_wrapper "/home/ubuntu/admin-ssh-wrapper/admin_deploy_wrapper.sh"
     action :deploy
-    restart "cd #{node[:snow][:admin][:app_directory]}/current/admin ; npm install ; node_modules/bower/bin/bower install ; node_modules/jake/bin/cli.js"
-    keep_releases 5
+    before_symlink do
+      bash "npm install" do
+        user "root"
+        group "root"
+        cwd "#{release_path}/admin"
+        code %{
+          npm install
+          PATH=$PATH:./node_modules/.bin
+          grunt production
+        }
+      end
+    end 
+    keep_releases 2
     symlinks({})
     symlink_before_migrate({})
     create_dirs_before_symlink([])

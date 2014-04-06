@@ -1,9 +1,22 @@
 var config = require('konfu')
-, RippleIn = require('../ripplein')
-, dbClient = require('../lib/db')(config.pg_url, config.pg_native)
-, rippleIn = new RippleIn(dbClient, config.ripple_uri, config.ripple_account, config.ripple_secret)
-, raven = require('../lib/raven')
+, RippleIn = require('../ripple.in')
+, secrets = {}
 
-rippleIn.on('log', function(msg) {
-    raven.captureMessage(msg)
+secrets[config.ripple_account] = config.ripple_secret
+
+var rippleIn = new RippleIn(config.ripple_account, {
+    postgresUri: config.pg_url,
+    secrets: secrets
 })
+
+if (config.raven) {
+    var raven = require('raven')
+
+    raven.patchGlobal(function(logged, err) {
+        console.error(err)
+        console.error(err.stack)
+
+        console.error('exiting process (after global patch)')
+        process.exit(1)
+    })
+}

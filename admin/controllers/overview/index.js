@@ -1,5 +1,4 @@
 var template = require('./template.html')
-, recentUserTemplate = require('./recent-user.html')
 
 module.exports = function() {
     var $el = $('<div class="overview">').html(template())
@@ -23,22 +22,18 @@ module.exports = function() {
         })
     }
 
-    function refreshRecentUsers() {
-        var recentCookie = $.cookie('recent-users')
-        , recent = recentCookie ? JSON.parse(recentCookie) : []
-        , $recent = $el.find('.recent-users')
-
-        $recent
-        .toggleClass('is-empty', !recent.length)
-        .find('tbody')
-        .html($.map(recent, function(user) {
-            return recentUserTemplate(user)
-        }))
+    function refreshWallets() {
+        api.call('admin/balances/wallets')
+        .fail(errors.alertFromXhr)
+        .done(function(res) {
+            $el.find('.btc-balance').html(res.btc)
+            $el.find('.ltc-balance').html(res.ltc)
+        })
     }
 
     refreshBtcHeight()
     refreshLtcHeight()
-    refreshRecentUsers()
+    refreshWallets()
 
     return controller
 }

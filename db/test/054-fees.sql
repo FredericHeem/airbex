@@ -6,9 +6,9 @@ DECLARE
     o2 int;
     mid int;
     u1_ltc_actual bigint;
-    u1_ltc_expected bigint := (24.80653172 * 1e8)::bigint;
+    u1_ltc_expected bigint := (24.93118766 * 1e8)::bigint;
     u2_btc_actual bigint;
-    u2_btc_expected bigint := (0.70877830 * 1e8)::bigint;
+    u2_btc_expected bigint := (0.71234 * 1e8)::bigint;
 BEGIN
     INSERT INTO currency (currency_id, scale, fiat)
     VALUES ('BTC', 8, false), ('LTC', 8, false);
@@ -27,9 +27,9 @@ BEGIN
     INSERT INTO "transaction" (debit_account_id, credit_account_id, amount)
     VALUES (special_account('edge', 'BTC'), user_currency_account(uid1, 'BTC'), 1e8);
 
-    -- credit user2 with 35 ltc
+    -- credit user2 with 36 ltc
     INSERT INTO "transaction" (debit_account_id, credit_account_id, amount)
-    VALUES (special_account('edge', 'LTC'), user_currency_account(uid2, 'LTC'), 35e8);
+    VALUES (special_account('edge', 'LTC'), user_currency_account(uid2, 'LTC'), 36e8);
 
     -- fee should default to 0.5%
     mid := (SELECT market_id FROM market WHERE base_currency_id = 'BTC' AND

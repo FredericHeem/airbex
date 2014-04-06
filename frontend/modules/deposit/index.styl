@@ -1,0 +1,58 @@
+#area > .deposit-btc
+    .address
+        font-size 1.6em
+        padding-top 20px
+        padding-bottom 20px
+        text-align center
+        border solid 1px #ccc
+
+    .disclaimer
+        font-size 0.85em
+
+#area > .deposit-ltc
+    .address
+        font-size 1.6em
+        padding-top 20px
+        padding-bottom 20px
+        text-align center
+        border solid 1px #ccc
+
+    .disclaimer
+        font-size 0.85em
+
+#area > .deposit-voucher
+    states redeeming redeemed cancelled
+
+    .form
+        max-width 28em
+
+        .control-label
+            width 5em
+
+        .controls
+            margin-left 6.5em
+
+            select, input, button
+                width 100%
+                max-width 11em
+
+            input
+                max-width 10em
+
+
+#area > .deposit-bank-EUR, .deposit-bank-USD, .deposit-bank-NOK
+    states allowed
+
+    .payment-details
+        font-size 1.2em
+
+        .row
+            margin-top 1em
+
+#area > .deposit-bank-NOK
+    states step-sender, step-payment, step-summary
+
+table.depth th,
+.level .price,
+.level .volume
+    white-space: nowrap

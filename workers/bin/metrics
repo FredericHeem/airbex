@@ -1,0 +1,37 @@
+var config = require('konfu')
+, Activities = require('../metrics.activities')
+, Fees = require('../metrics.fees')
+, Stats = require('../metrics.stats')
+, ExchangeRates = require('../metrics.exchangerates')
+, Firebase = require('firebase')
+, FirebaseTokenGenerator = require('firebase-token-generator')
+, firebaseTokenGenerator = new FirebaseTokenGenerator(config.metrics_firebase_secret)
+, firebaseToken = firebaseTokenGenerator.createToken({}, { admin: true })
+, firebaseRoot = new Firebase(config.metrics_firebase_url)
+
+firebaseRoot.auth(firebaseToken, function(err) {
+    if (err) throw err
+
+    new Activities({
+        firebaseRoot: firebaseRoot,
+        segmentSecret: config.segment_secret,
+        postgresUrl: config.pg_url
+    })
+
+    new Fees({
+        firebaseRoot: firebaseRoot,
+        segmentSecret: config.segment_secret,
+        postgresUrl: config.pg_url,
+        oxrAppId: config.oxr_app_id
+    })
+
+    new Stats({
+        firebaseRoot: firebaseRoot,
+        postgresUrl: config.pg_url
+    })
+
+    new ExchangeRates({
+        firebaseRoot: firebaseRoot,
+        ratesUrl: config.api_url + 'v1/markets'
+    })
+})

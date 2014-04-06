@@ -1,0 +1,4 @@
+#!/bin/sh
+export NODE_ENV=<%= node.chef_environment %>
+cd <%= node[:snow][:workers][:app_directory] %>/current/workers
+node bin/solvency.proof.app.js

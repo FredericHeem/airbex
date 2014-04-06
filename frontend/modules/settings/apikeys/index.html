@@ -1,0 +1,74 @@
+<div class="container">
+    <div class="account-nav"></div>
+
+    <div class="col-lg-9">
+        <h1 class="content-title"><%- i18n('account.apikeys.heading') %></h1>
+
+        <div class="content-area">
+            <div class="row">
+                <div class="col-lg-12">
+                    <button class="show-add btn btn-primary hidden-showing-add">
+                        <%- i18n('account.apikeys.new key') %>
+                    </button>
+
+                    <div class="add visible-showing-add well">
+                        <h4>
+                            <%- i18n('account.apikeys.add.add key') %>
+                        </h4>
+
+                        <form class="add-form">
+                            <label class="checkbox">
+                                <input type="checkbox" name="canTrade" />
+                                <%- i18n('account.apikeys.add.can trade') %>
+                            </label>
+
+                            <label class="checkbox">
+                                <input type="checkbox" name="canDeposit" />
+                                <%- i18n('account.apikeys.add.can deposit') %>
+                            </label>
+
+                            <label class="checkbox">
+                                <input type="checkbox" name="canWithdraw" />
+                                <%- i18n('account.apikeys.add.can withdraw') %>
+                            </label>
+
+                            <button type="submit" class="btn btn-primary add-button">
+                                <%- i18n('account.apikeys.add.add key') %>
+                            </button>
+
+                            <button class="btn hide-add">
+                                <%- i18n('account.apikeys.add.cancel') %>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <table class="keys-table table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="key-header">
+                                    <%- i18n('account.apikeys.keys.headers.key') %>
+                                </th>
+                                <th class="can-trade-header">
+                                    <%- i18n('account.apikeys.keys.headers.trade') %>
+                                </th>
+                                <th class="can-deposit-header">
+                                    <%- i18n('account.apikeys.keys.headers.deposit') %>
+                                </th>
+                                <th class="can-withdraw-header">
+                                    <%- i18n('account.apikeys.keys.headers.withdraw') %>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="keys">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,5 @@
+<tr class="transaction" data-id="<%= id %>">
+    <td class="date"><%= moment(date).format('LLL') %></td>
+    <td class="type"><%= i18n('account.transactions.types.' + (type || 'Unknown')) %></td>
+    <td class="amount"><%= amount %> <%= currency %></td>
+</tr>

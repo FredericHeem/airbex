@@ -1,5 +1,5 @@
 module.exports = exports = function(app) {
-    app.get('/admin/orders', app.auth.admin, function(req, res, next) {
+    app.get('/admin/orders', app.security.demand.admin, function(req, res, next) {
         exports.query(req.app, req.query, function(err, items) {
             if (err) return next(err)
             res.send(items)
@@ -57,7 +57,7 @@ exports.query = function(app, query, cb) {
             return {
                 id: row.order_id,
                 market: row.market,
-                price: app.cache.formatOrderPrice(row.price, row.market),
+                price: row.price ? app.cache.formatOrderPrice(row.price, row.market) : null,
                 original: app.cache.formatOrderVolume(row.original, row.market),
                 matched: app.cache.formatOrderVolume(row.matched, row.market),
                 cancelled: app.cache.formatOrderVolume(row.cancelled, row.market),

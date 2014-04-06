@@ -1,3 +1,12 @@
 start on startup
 console log
-exec sudo -u ubuntu litecoind -datadir=/btc --printtoconsole
+env NAME=litecoind
+
+script
+    echo $$ > /var/run/$NAME.pid
+    sudo -Eu ubuntu /usr/bin/litecoind -datadir=/ltc
+end script
+
+post-stop script
+   rm -f /var/run/$NAME.pid
+end script

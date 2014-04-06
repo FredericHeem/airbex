@@ -20,6 +20,8 @@ BEGIN
     fn.user_id := create_user('bob@gmail.com', fn.api_key);
     fn.market_id := (SELECT m.market_id FROM market m WHERE base_currency_id || quote_currency_id = 'BTCXRP');
 
+    UPDATE "user" SET fee_ratio = 0;
+
     -- Fund user with 10 BTC
     INSERT INTO "transaction" (debit_account_id, credit_account_id, amount)
     VALUES (special_account('edge', 'BTC'), user_currency_account(fn.user_id, 'BTC'), 10e8);

@@ -1,0 +1,13 @@
+<tr class="voucher" data-id="<%= code %>">
+    <td>
+        <%= code.substr(0, 4) + '-' + code.substr(4, 4) + '-' + code.substr(8, 4) %>
+    </td>
+    <td>
+        <%- numbers.format(amount, { currency: currency }) %>
+    </td>
+    <td>
+        <button class="cancel btn btn-danger">
+            <%- i18n('account.vouchers.cancel') %>
+        </button>
+    </td>
+</tr>

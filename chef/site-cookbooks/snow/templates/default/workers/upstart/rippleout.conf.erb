@@ -1,7 +1,15 @@
 start on startup
-chdir <%= node[:snow][:workers][:app_directory] %>/current/workers
-console log
+env NAME=snow-rippleout
 env NODE_ENV=<%= node.chef_environment %>
-env DEBUG=snow*
+env DEBUG=*
 env HOME=/home/ubuntu
-exec sudo -Eu ubuntu node bin/rippleout
+chdir <%= node[:snow][:workers][:app_directory] %>/current/workers
+
+script
+    echo $$ > /var/run/$NAME.pid
+    sudo -Eu ubuntu node bin/rippleout >> /var/log/$NAME.log 2>&1
+end script
+
+post-stop script
+   rm -f /var/run/$NAME.pid
+end script

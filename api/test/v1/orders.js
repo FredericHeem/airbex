@@ -21,7 +21,7 @@ describe('orders', function() {
                             type: 'ask',
                             market: 'BTCXRP',
                             price: 123.456e3,
-                            remaining: 0e5,
+                            volume: 0e5,
                             original: 10e5,
                             matched: 10e5,
                             cancelled: 0
@@ -57,7 +57,7 @@ describe('orders', function() {
     describe('create', function() {
         it('creates order', function(done) {
             var uid =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, uid, { canTrade: true, level: 2 })
+            , impersonate = mock.impersonate(app, { id: uid, securityLevel: 2 }, null, { canTrade: true })
             , activity = mock(app, 'activity', function() {})
             , write = mock(app.conn.write, 'query', function(query, cb) {
                 expect(query.text).to.match(/INTO "order"/)
@@ -97,7 +97,7 @@ describe('orders', function() {
         it('cancels order', function(done) {
             var uid =  dummy.number(1, 1e6)
             , oid =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, uid, { canTrade: true })
+            , impersonate = mock.impersonate(app, uid, null, { canTrade: true })
             , activity = mock(app, 'activity', function() {})
             , write = mock(app.conn.write, 'query', function(query, cb) {
                 expect(query.text).to.match(/UPDATE "order"/)
@@ -124,7 +124,7 @@ describe('orders', function() {
         it('returns 404 if order is not found', function(done) {
             var uid =  dummy.number(1, 1e6)
             , oid =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, uid, { canTrade: true })
+            , impersonate = mock.impersonate(app, uid, null, { canTrade: true })
 
             mock.once(app.conn.write, 'query', function(query, cb) {
                 cb(null, mock.rows([]))

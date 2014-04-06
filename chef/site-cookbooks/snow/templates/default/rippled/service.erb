@@ -1,0 +1,12 @@
+start on startup
+env NAME=rippled
+chdir /home/ubuntu/rippled/current/build
+
+script
+    echo $$ > /var/run/$NAME.pid
+    sudo -Eu ubuntu ./rippled --net --conf /home/ubuntu/rippled/shared/rippled.cfg >> /var/log/$NAME.log 2>&1
+end script
+
+post-stop script
+   rm -f /var/run/$NAME.pid
+end script

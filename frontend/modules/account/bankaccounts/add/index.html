@@ -1,0 +1,101 @@
+<div class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-action="close" aria-hidden="true">&times;</button>
+                <h4 class="modal-title"><%- i18n('account.bankaccounts.add.heading') %></h4>
+            </div>
+
+            <form>
+                <div class="modal-body">
+                    <div class="form-group type visible-advanced">
+                        <label name="type" class="control-label">
+                            <%- i18n('account.bankaccounts.add.type') %>
+                        </label>
+
+                        <select class="form-control" name="type">
+                            <option value="norway"><%- i18n('account.bankaccounts.add.domestic') %></option>
+                            <option value="iban">IBAN</option>
+                            <option value="international">International wire</option>
+                        </select>
+                    </div>
+
+                    <!-- <span class="visible-type-norway"><%- i18n('account.bankaccounts.add.domestic.description') %></span>
+                    <span class="visible-type-iban"><%- i18n('account.bankaccounts.add.domestic.iban') %></span>
+                    <span class="visible-type-international"><%- i18n('account.bankaccounts.add.domestic.international') %></span>
+ -->
+                    <div class="form-group name">
+                        <label for="name" class="control-label">
+                            <%- i18n('account.bankaccounts.add.display name') %>
+                        </label>
+                        <input type="text" class="form-control" name="name" />
+                    </div>
+
+                    <div class="form-group iban visible-type-iban">
+                        <label for="iban" class="control-label">
+                            <%- i18n('account.bankaccounts.add.iban') %>
+                        </label>
+                        <input type="text" class="form-control" name="iban" />
+                        <span class="help-block visible-invalid">
+                            <%- i18n('invalid') %>
+                        </span>
+                        <span class="help-block visible-empty">
+                            <%- i18n('required') %>
+                        </span>
+                    </div>
+
+                    <div class="form-group swift hidden-type-norway">
+                        <label for="swift" class="control-label">
+                            <%- i18n('account.bankaccounts.add.swiftbic') %>
+                        </label>
+                        <input type="text" class="form-control" name="swift" />
+                        <span class="help-block visible-invalid">
+                            <%- i18n('invalid') %>
+                        </span>
+                        <span class="help-block visible-empty">
+                            <%- i18n('required') %>
+                        </span>
+                    </div>
+
+                    <div class="form-group account-number hidden-type-iban">
+                        <label for="accountNumber" class="control-label">
+                            <%- i18n('account.bankaccounts.add.account number') %>
+                        </label>
+                        <input type="text" class="form-control" name="accountNumber" />
+                        <span class="help-block visible-invalid">
+                            <%- i18n('invalid') %>
+                        </span>
+                        <span class="help-block visible-empty">
+                            <%- i18n('required') %>
+                        </span>
+                    </div>
+
+                    <div class="form-group routing-number visible-type-international">
+                        <label for="routingNumber" class="control-label">
+                            <%- i18n('account.bankaccounts.add.routing number') %>
+                        </label>
+                        <input type="text" class="form-control" name="routingNumber" />
+                        <span class="help-block visible-invalid">
+                            <%- i18n('invalid') %>
+                        </span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="actions">
+                            <a href="javascript:" style="float:left" class="hidden-advanced" data-action="advanced">
+                                <%- i18n('account.bankaccounts.add.advanced') %>
+                            </a>
+
+                            <button type="button" class="btn btn-default" data-action="close">
+                                <%- i18n('account.bankaccounts.add.close') %>
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <%- i18n('account.bankaccounts.add.submit') %>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+*.rbc
+.bundle
+.config
+.yardoc
+_yardoc
+Berksfile.lock
+Gemfile.lock
+coverage/
+doc/
+tmp
+.kitchen/
+.kitchen.local.yml
+bin/
+.rspec

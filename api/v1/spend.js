@@ -1,10 +1,14 @@
+var debug = require('debug')('snow:spend')
+
 module.exports = exports = function(app) {
-    app.post('/v1/spend', app.auth.trade, exports.spend)
+    app.post('/v1/spend', app.security.demand.trade, exports.spend)
 }
 
 exports.spend = function(req, res, next) {
     if (!req.app.validate(req.body, 'v1/spend', res)) return
 
+    debug("spend: ", JSON.stringify(req.body));
+    
     var quote = req.body.market.substr(3, 3)
 
     req.app.conn.write.query({
@@ -14,12 +18,13 @@ exports.spend = function(req, res, next) {
             'WHERE base_currency_id || quote_currency_id = $3'
         ].join('\n'),
         values: [
-            req.user,
+            req.user.id,
             req.app.cache.parseCurrency(req.body.amount, quote),
             req.body.market
         ]
     }, function(err, dr) {
         if (err) {
+            debug("spend error: %s", err.message);
             if (err.message.match(/non_negative_available/)) {
                 return res.send(400, {
                     name: 'NoFunds',

@@ -19,6 +19,5 @@
     "noarg": true,
     "nonew": true,
     "trailing": true,
-    "maxdepth": 3,
-    "maxlen": 110
+    "maxdepth": 3
 }

@@ -5,7 +5,9 @@ var debug = require('debug')('snow:bitcoinout')
 , prefix = '[snow:bitcoinout]'
 , out = require('./out')
 
-var BitcoinOut = module.exports = function(currency, bitcoinEndpoint, dbClient) {
+var BitcoinOut = module.exports = exports = function(currency,
+    bitcoinEndpoint, dbClient)
+{
     var Bitcoin = require('bitcoin').Client
     this.bitcoin = new Bitcoin(bitcoinEndpoint)
     this.client = dbClient
@@ -47,7 +49,7 @@ BitcoinOut.prototype.validateAddresses = function(requests, cb) {
     async.each(requests, function(request, cb) {
         that.bitcoin.validateAddress(request.address, function(err, res) {
             if (!err && res.isvalid) {
-                debug('address %s validated', request.address)
+                console.log('address %s validated', request.address)
                 validRequests.push(request)
                 return cb()
             }
@@ -68,7 +70,7 @@ BitcoinOut.prototype.validateAddresses = function(requests, cb) {
                     return cb()
                 }
 
-                debug('the request %s was aborted', request.request_id)
+                console.log('the request %s was aborted', request.request_id)
 
                 cb()
             })
@@ -84,7 +86,7 @@ BitcoinOut.prototype.executeBatch = function(requests, cb) {
         this.validateAddresses.bind(this, requests),
         function(requests, next) {
             if (!requests.length) {
-                debug('no requests are valid, skipping this batch')
+                console.error('no requests are valid, skipping this batch')
                 return cb()
             }
             next(null, requests)
@@ -94,10 +96,10 @@ BitcoinOut.prototype.executeBatch = function(requests, cb) {
 }
 
 // converts requests into a command to sendMany
-BitcoinOut.prototype.formatRequestsToSendMany = function(requests) {
+exports.formatRequestsToSendMany = function(requests) {
     return requests.reduce(function(r, i) {
-        var amount = +num(i.amount, i.scale)
-        r[i.address] = +num(r[i.address] || 0).add(amount)
+        var amount = num(i.amount, i.scale).toString()
+        r[i.address] = +(num(+(r[i.address] || 0)).add(amount))
         return r
     }, {})
 }
@@ -105,40 +107,52 @@ BitcoinOut.prototype.formatRequestsToSendMany = function(requests) {
 BitcoinOut.prototype.sendBatch = function(requests, cb) {
     var that = this
 
-    debug('will send %d transactions', requests.length)
+    console.log('will send %d transactions', requests.length)
     debug(util.inspect(requests))
 
-    var cmd = this.formatRequestsToSendMany(requests)
+    var cmd = exports.formatRequestsToSendMany(requests)
 
     debug('formatted requests:')
     debug(util.inspect(cmd))
 
     this.bitcoin.sendMany('', cmd, function(err, res) {
         if (!err) {
-            debug('send requests successful')
+            console.log('send requests successful')
             debug(util.inspect(res))
 
-            return async.each(requests,
-                out.markRequestCompleted.bind(that, that.client), function(err)
-            {
-                if (!err) {
-                    debug('succeeded in marking requests as done')
-                    return cb()
-                }
+            return async.each(requests, function(request, cb) {
+                async.parallel([
+                    // Mark complete
+                    function(cb) {
+                        out.markRequestCompleted(that.client, request, cb)
+                    },
 
-                console.error('%s failed to mark item as done', prefix)
+                    // Store transaction id
+                    function(cb) {
+                        that.client.query({
+                            text: [
+                                'UPDATE btc_withdraw_request',
+                                'SET txid = $1',
+                                'WHERE request_id = $2'
+                            ].join('\n'),
+                            values: [res, request.request_id]
+                        }, cb)
+                    }
+                ], cb)
+            }, function(err) {
+                if (!err) return cb()
+                console.error('%s failed to mark items as done', prefix)
                 console.error('%s', prefix, err)
                 cb()
             })
         }
 
-        if (err.code == -6) {
-            debug('request failed because wallet is lacking funds')
-            debug('trying to re-queue requests')
+        if (err.message == 'Account has insufficient funds') {
+            console.error('request failed because wallet is lacking funds. trying to re-queue requests')
 
             return out.reQueue(that.client, requests, function(err) {
                 if (!err) {
-                    debug('succeeded in requeing the requests')
+                    console.log('succeeded in requeing the requests')
                     return cb()
                 }
 

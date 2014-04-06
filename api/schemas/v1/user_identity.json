@@ -3,24 +3,28 @@
     "properties": {
         "firstName": {
             "type": "string",
-            "required": true
+            "required": true,
+            "maxLength": 50
         },
         "lastName": {
             "type": "string",
-            "required": true
+            "required": true,
+            "maxLength": 50
         },
         "address": {
             "type": "string",
-            "required": true
+            "required": true,
+            "maxLength": 200
         },
         "city": {
             "type": "string",
-            "required": true
+            "required": true,
+            "maxLength": 50
         },
         "postalArea": {
             "type": "string",
             "required": true,
-            "pattern": "^[\\w\\s]+$"
+            "maxLength": 50
         },
         "country": {
             "type": "string",

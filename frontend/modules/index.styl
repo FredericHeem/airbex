@@ -1,0 +1,45 @@
+.form-group
+    states invalid empty
+
+@import "shared"
+@import "sidebar"
+@import "master"
+
+@import "about"
+@import "auth"
+@import "account"
+@import "deposit"
+@import "withdraw"
+@import "trade"
+@import "settings"
+
+.area-nav
+    .tabbable
+        @media (min-width: 768px)
+            margin-top 4em
+
+            ul
+                min-height 100%
+
+    li
+        min-width 10em
+
+        i
+            display inline-block
+            width 1.1em
+            margin-right: 5px
+            color: #aaa
+            font-size: 19px
+            vertical-align: bottom
+            padding-bottom: 2px
+
+.two-factor-marketplace
+    margin-bottom: 40px
+
+    a
+        margin-bottom: 10px
+        margin-right: 10px
+        display: inline-block
+
+.two-factor-image
+    margin-bottom: 20px

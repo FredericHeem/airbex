@@ -1,0 +1,15 @@
+<tr class="item" data-id="<%= id %>">
+    <td><%= id %></td>
+    <td><%= market %></td>
+    <td><%= type == 'bid' ? i18n('orders.buy') : i18n('orders.sell') %></td>
+    <td class="number"><%= price ? numbers.format(price) : '' %></td>
+    <td class="number"><%= numbers.format(amount) %></td>
+    <td class="number"><%= numbers.format(matched) %></td>
+    <td class="number"><%= numbers.format(remaining) %></td>
+    <td class="number"><%= numbers.format(cancelled) %></td>
+    <td>
+        <% if (+remaining > 0) { %>
+            <button class="cancel btn btn-danger btn-block"><%= i18n('orders.cancel.label') %></button>
+        <% } %>
+    </td>
+</tr>

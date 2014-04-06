@@ -1,0 +1,29 @@
+{
+  "name": "s3cmd",
+  "description": "Installs latest s3cmd from master branch at github (alpha)",
+  "long_description": "s3cmd Cookbook\n==============\n\nThis chef cookbook installs the latest s3cmd from the master branch at github.\nIt downloads the tarball of master: https://github.com/s3tools/s3cmd/archive/master.tar.gz\n\nThe latest version of S3CMD from github seems to work better than the older versions included in Ubuntu and CentOS.\n\nBe aware this is an alpha version and not bug free, don't rely on this version for production servers, altho I use it in production servers just fine.\n\nhttps://github.com/fred/chef-s3cmd\n\n\nRequirements\n------------\n  \n  This cookbook will install the following packages:\n\n  - python\n  - python-setuptools\n  - python-distutils-extra\n\n\nAttributes\n----------\nTODO: List you cookbook attributes here.\n\ne.g.\n#### s3cmd::default\n<table>\n  <tr>\n    <th>Key</th>\n    <th>Type</th>\n    <th>Description</th>\n    <th>Default</th>\n  </tr>\n  <tr>\n    <td><tt>['s3cmd']['url']</tt></td>\n    <td>String</td>\n    <td>Tarball URL to download s3cmd</td>\n    <td><tt>https://github.com/s3tools/s3cmd/archive/master.tar.gz</tt></td>\n  </tr>\n  <tr>\n    <td><tt>['s3cmd']['gpg_passphrase']</tt></td>\n    <td>String</td>\n    <td>GPG passphrase used to encrypt files before uploading</td>\n    <td><tt>some-top-secret-passphrase</tt></td>\n  </tr>\n  <tr>\n    <td><tt>['s3cmd']['encrypt']</tt></td>\n    <td>Boolean</td>\n    <td>Enable Encryption of files before uploading to S3 using gpg</td>\n    <td><tt>false</tt></td>\n  </tr>\n  <tr>\n    <td><tt>['s3cmd']['secret_key']</tt></td>\n    <td>String</td>\n    <td>AWS secret key</td>\n    <td><tt>--</tt></td>\n  </tr>\n  <tr>\n    <td><tt>['s3cmd']['access_key']</tt></td>\n    <td>String</td>\n    <td>AWS access key</td>\n    <td><tt>--</tt></td>\n  </tr>\n  <tr>\n    <td><tt>['s3cmd']['bucket_location']</tt></td>\n    <td>String</td>\n    <td>Datacentre to create bucket in. As of now the datacenters are: US (default), EU, ap-northeast-1, ap-southeast-1, sa-east-1, us-west-1 and us-west-2</td>\n    <td><tt>US</tt></td>\n  </tr>\n  <tr>\n    <td><tt>['s3cmd']['user']</tt></td>\n    <td>String</td>\n    <td>User to install .s3cfg config file</td>\n    <td><tt>ubuntu</tt></td>\n  </tr>\n</table>\n\nUsage\n-----\n\n#### s3cmd::default\nTODO: Write usage instructions for each cookbook.\n\ne.g.\nJust include `s3cmd` in your node's `run_list` and configure it\n\n```json\n{\n  \"s3cmd\": {\n    \"user\": \"fred\",\n    \"encrypt\": true,\n    \"gpg_passphrase\": \"some-top-secret-passphrase\",\n    \"secret_key\": \"your-secret-key\",\n    \"access_key\": \"your-access-key\",\n    \"bucket_location\": \"EU\"\n  },\n  \"run_list\": [\n    \"recipe[s3cmd]\"\n  ]\n}\n```\n\nContributing\n------------\n\n1. Fork the repository on Github\n2. Create a named feature branch (like `add_component_x`)\n3. Write you change\n4. Write tests for your change (if applicable)\n5. Run the tests, ensuring they all pass\n6. Submit a Pull Request using Github\n\n\nLicense and Authors\n-------------------\n\nAuthors: Frederico Araujo (github.com/fred)\nContributors: Steven Lehrburger (github.com/lehrblogger)\n",
+  "maintainer": "Frederico Araujo",
+  "maintainer_email": "fred.the.master@gmail.com",
+  "license": "All rights reserved",
+  "platforms": {
+  },
+  "dependencies": {
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "0.2.1"
+}

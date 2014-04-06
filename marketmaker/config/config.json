@@ -1,0 +1,18 @@
+{
+  "market":"BTCEUR",
+  "max_bc_on_offer" : "100",
+  "max_qc_on_offer" : "100000",
+  "feeBidRatio":"0.96",
+  "feeAskRatio":"1.04",
+  "source" : {
+      "name":"bitstamp",
+      "user_id":"123456",
+      "apikey":""
+  },
+  "target" : {
+
+    "url" : "http://swissmybitcoin.com/api/",
+    "email" : "frederic.heem@gmail.com",
+    "apikey": "280450d7cac7155de142b7bff3503e0614e27bd938d37edd5e15dde4044f7708"
+  }
+}

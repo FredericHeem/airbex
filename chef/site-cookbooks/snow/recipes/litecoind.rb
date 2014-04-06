@@ -1,17 +1,16 @@
+include_recipe "apt"
+include_recipe "snow::common"
+
 %w(build-essential libssl-dev libboost-all-dev git libdb5.1-dev libdb5.1++-dev libminiupnpc-dev).each do |pkg|
     package pkg do
         action :install
     end
 end
 
-if File.exists? "/usr/bin/litecoind"
-  swap do
-    size 0
-  end
-else
+unless File.exists? "/usr/bin/litecoind"
   git "/tmp/litecoin" do
     repository "git://github.com/litecoin-project/litecoin.git"
-    reference "4be9f4d40ea4bd40cf1c99649f1d613a28bb33e1"
+    reference "fe7b87a9761d9819bc2dcb6796b46b17fa775a5c"
     action :sync
   end
 
@@ -19,15 +18,17 @@ else
   memory_total_mb = node['memory']['total'][0..-3].to_i / 1024 +
     node['memory']['swap']['total'][0..-3].to_i / 1024
 
-  swap do
-    size 2048
-    only_if memory_total_mb < 2000
-  end
+  Chef::Log.warn "Memory total #{memory_total_mb}"
+
+  #swap do
+  #  mb 2048
+  #  only_if memory_total_mb < 1000
+  #end
 
   bash "install-litecoin" do
     cwd "/tmp/litecoin/src"
     code <<-EOH
-    sudo make -j4 -f makefile.unix
+    sudo make -f makefile.unix
     EOH
     timeout 360000
     not_if { File.exists? '/tmp/litecoin/src/litecoind' }
@@ -44,7 +45,9 @@ else
 end
 
 include_recipe "aws"
-aws = data_bag_item("aws", "main")
+aws = Chef::EncryptedDataBagItem.load("aws", 'main')
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
+env_bag = bag[node.chef_environment]
 
 directory "/ltc" do
   owner "ubuntu"
@@ -53,20 +56,35 @@ directory "/ltc" do
   recursive true
 end
 
-# Disk is attached to /dev/sdf but shows up
-# in ubuntu as /dev/xvdf
-aws_ebs_volume "/dev/sdf" do
-  aws_access_key aws['aws_access_key_id']
-  aws_secret_access_key aws['aws_secret_access_key']
-  volume_id node[:snow][:litecoind][:volume_id]
-  device "/dev/sdf"
-  action :attach
+if node[:cloud] && node[:cloud][:provider] == 'ec2'
+    
+    aws_device = "/dev/#{node[:snow][:litecoind][:aws_device]}"
+    os_device = "/dev/#{node[:snow][:litecoind][:os_device]}"
+    
+    aws_ebs_volume aws_device do
+        aws_access_key aws['aws_access_key_id']
+        aws_secret_access_key aws['aws_secret_access_key']
+        size node[:snow][:litecoind][:volume_size]
+        device aws_device
+        action [ :create, :attach ]
+    end
+    
+    execute "sudo mkfs.xfs #{os_device}" do
+      only_if "xfs_admin -l #{os_device} 2>&1 | grep -qx 'xfs_admin: #{os_device} is not a valid XFS filesystem (unexpected SB magic number 0x00000000)'"
+    end
+
+    mount "/ltc" do
+        fstype "xfs"
+        device os_device
+        action [:mount, :enable]
+    end
 end
 
-mount "/ltc" do
-  fstype "xfs"
-  device "/dev/xvdf"
-  action [:mount, :enable]
+# Ensure rights
+directory "/ltc" do
+  owner "ubuntu"
+  group "ubuntu"
+  mode 0775
 end
 
 template "/etc/init/litecoind.conf" do
@@ -79,6 +97,10 @@ end
 
 template "/ltc/litecoin.conf" do
   source "litecoind/litecoin.conf.erb"
+  variables({
+    :username => env_bag['litecoin']['username'],
+    :password => env_bag['litecoin']['password']
+  })
   owner "ubuntu"
   group "ubuntu"
   mode 0664
@@ -90,5 +112,19 @@ service "litecoind" do
   action [:enable, :start]
 end
 
-monit_monitrc "litecoind" do
+#monit_monitrc "litecoind" do
+#end
+
+# Automatic backups
+include_recipe "cron"
+include_recipe "snow::ebssnapshot"
+
+#cron_d "ebs-snapshot" do
+#  hour 14
+#  minute 0
+#  command "/usr/bin/ebs-snapshot.sh /ltc #{node[:snow][:litecoind][:volume_id]}"
+#end
+
+diskmonit "ltc" do
+    path "/ltc"
 end

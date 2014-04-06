@@ -15,7 +15,7 @@ describe('markets', function() {
                             base_currency_id: 'BTC',
                             quote_currency_id: 'NOK',
                             last: 550e3,
-                            high: 600.5e3,
+                            high: Math.floor(600.5e3),
                             low: 525.123e3,
                             bid: 540e3,
                             ask: 570.5e3,
@@ -57,12 +57,12 @@ describe('markets', function() {
                     rows: [
                         {
                             price: 550.5e3,
-                            volume: 12345.12345,
+                            volume: 12345.12345e5,
                             type: 'bid'
                         },
                         {
                             price: 560.5e3,
-                            volume: 32345.12345,
+                            volume: 32345.12345e5,
                             type: 'ask'
                         }
                     ]

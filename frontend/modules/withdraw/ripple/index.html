@@ -1,0 +1,132 @@
+<div class="container">
+    <div class="withdraw-nav"></div>
+    <div class="col-lg-9">
+        <h1 class="content-title"><%= i18n('withdrawripple.heading') %></h1>
+
+        <div class="content-area clearfix">
+            <p class="lead"><%= i18n('withdrawripple.intro') %></p>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <form class="entry visible-entering">
+                        <div class="row">
+                            <div class="col-lg-7">
+                                <div class="amount-placeholder"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group address">
+                                    <label for="address" class="control-label">
+                                        <%= i18n('withdrawripple.address.label') %>
+                                    </label>
+
+                                    <input class="field form-control" type="text" name="address" />
+
+                                    <p class="help-block visible-unfunded">
+                                        <%- i18n('withdraw.ripple.entry.unfunded') %>
+                                    </p>
+
+                                    <p class="help-block visible-too-low-trust too-low-trust">
+                                        <%- i18n('withdraw.ripple.entry.too low trust') %>
+
+                                        <a href="#" target="_blank" class="add-trust">
+                                            <%- i18n('withdraw.ripple.entry.set trust') %>
+                                            <i class="icon-external-link"></i>
+                                        </a>
+                                    </p>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-success btn-large submit">
+                                        <%- i18n('withdraw.ripple.entry.submit') %>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="review visible-reviewing">
+                        <h4><%- i18n('withdraw.ripple.review.heading') %></h4>
+                        <p><%- i18n('withdraw.ripple.review.intro') %></p>
+
+                        <table class="payment-details table table-compact">
+                            <tr>
+                                <td><%- i18n('withdraw.ripple.review.send to') %></td>
+                                <td><strong><span class="address"></span></strong></td>
+                            </tr>
+                            <tr>
+                                <td><%- i18n('withdraw.ripple.review.amount') %></td>
+                                <td><strong><span class="amount"></span></strong></td>
+                            </tr>
+                            <tr>
+                                <td><%- i18n('withdraw.ripple.review.fee') %></td>
+                                <td><%- i18n('withdraw.ripple.review.no fee') %></td>
+                            </tr>
+                        </table>
+
+                        <div class="actions">
+                            <button class="btn btn-success btn-large confirm" type="submit">
+                                <%- i18n('withdraw.ripple.review.confirm') %>
+                            </button>
+                            <button class="btn back">
+                                <%- i18n('withdraw.ripple.review.back') %>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="summary visible-sending">
+                        <h4><%- i18n('withdraw.ripple.summary.heading') %></h4>
+
+                        <p>
+                            <%- i18n('withdraw.ripple.summary.intro') %>
+                        </p>
+
+                        <table class="payment-details table table-compact">
+                            <tr>
+                                <td><%- i18n('withdraw.ripple.summary.send to') %></td>
+                                <td><strong><span class="address"></span></strong></td>
+                            </tr>
+                            <tr>
+                                <td><%- i18n('withdraw.ripple.summary.amount') %></td>
+                                <td><strong><span class="amount"></span></strong></td>
+                            </tr>
+                            <tr class="status">
+                                <td>
+                                    <%- i18n('withdraw.ripple.summary.status') %>
+                                </td>
+                                <td>
+                                    <div class="visible-requested progress progress-striped active">
+                                        <div class="progress-bar" style="width:25%"></div>
+                                        <%- i18n('withdraw.ripple.summary.status.requested') %>
+                                    </div>
+
+                                    <div class="visible-processing progress progress-striped active">
+                                        <div class="progress-bar" style="width:50%"></div>
+                                        <%- i18n('withdraw.ripple.summary.status.processing') %>
+                                    </div>
+
+                                    <div class="visible-completed">
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-success" style="width:100%"></div>
+                                        </div>
+                                        <%- i18n('withdraw.ripple.summary.status.success') %>
+                                    </div>
+
+                                    <div class="visible-cancelled">
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-danger" style="width:100%"></div>
+                                        </div>
+                                        <%- i18n('withdraw.ripple.summary.status.cancelled') %>
+                                        <span class="cancelled-reason"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

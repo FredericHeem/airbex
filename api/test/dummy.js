@@ -21,7 +21,7 @@ exports.phoneCode = function() {
     return exports.fromAlphabet('1234567890', 4)
 }
 
-exports.bool = exports.boolean = function() {
+exports.bool = exports['boolean'] = function() {
     return Math.random() < 0.5
 }
 

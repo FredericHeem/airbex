@@ -1,0 +1,29 @@
+<div class="container">
+    <div class="withdraw-nav"></div>
+
+    <div class="col-lg-9">
+        <h1 class="content-title"><%= i18n('withdraws.heading') %></h1>
+
+        <div class="content-area">
+            <div class="alert alert-info visible-loading lead">
+                <p class=""><%- i18n('loading') %>...</p>
+            </div>
+
+            <div class="alert alert-info lead visible-empty">
+                <%- i18n('withdraw.withdraws.empty') %>
+            </div>
+
+            <table class="withdraws table table-striped visible-loaded hidden-empty">
+                <thead>
+                    <th><%= i18n('withdraws.column headers.date') %></th>
+                    <th><%= i18n('withdraws.column headers.amount') %></th>
+                    <th><%= i18n('withdraws.column headers.destination') %></th>
+                    <th><%= i18n('withdraws.column headers.status') %></th>
+                    <th><!-- Actions --></th>
+                </thead>
+                <tbody class="items">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

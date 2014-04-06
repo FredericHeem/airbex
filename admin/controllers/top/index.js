@@ -5,17 +5,25 @@ module.exports = function() {
     }
     , $summary = controller.$el.find('.account-summary')
 
-    api.on('user', function(user) {
+    function userUpdated(user) {
         $summary.find('.email').html(user.email)
 
         api.call('admin/withdraws?activeOnly=1')
         .done(function(withdraws) {
             $el.find('.active-withdraw-count').html(withdraws.length)
         })
+    }
+
+    api.on('user', userUpdated)
+
+    $el.on('click', '[data-action="sign-out"]', function(e) {
+        e.preventDefault()
+        api.logout()
     })
 
-    controller.destroy = function() {
-    }
+    $el.on('remove', function() {
+        api.off('user', userUpdated)
+    })
 
     return controller
 }

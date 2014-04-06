@@ -1,0 +1,4 @@
+{
+    "run_list": [ "recipe[solo-search]", "role[redis]", "recipe[snow::pgm]", "recipe[snow::pg_dump_s3]", "recipe[snow::frontend]", "role[admin]", "role[api]", "role[bitcoind]", "recipe[snow::armory]", "role[reverse]", "role[workers]"]
+}
+

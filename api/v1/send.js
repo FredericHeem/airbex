@@ -3,7 +3,7 @@ var async = require('async')
 , util = require('util')
 
 module.exports = exports = function(app) {
-    app.post('/v1/send', app.auth.withdraw(2), exports.send)
+    app.post('/v1/send', app.security.demand.otp(app.security.demand.withdraw(2), true), exports.send)
 }
 
 exports.sendToEmail = function(app, from, to, currency, amount, allowNew, cb) {
@@ -151,7 +151,7 @@ exports.send = function(req, res, next) {
         })
     }
 
-    exports.sendToEmail(req.app, req.user, req.body.email,
+    exports.sendToEmail(req.app, req.user.id, req.body.email,
         req.body.currency, req.body.amount, req.body.allowNewUser,
         function(err) {
             if (!err) return res.send(204)

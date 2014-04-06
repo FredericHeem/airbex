@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+box      = 'precise64daily'
+url      = 'http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-vagrant-amd64-disk1.box'
+hostname = 'snow'
+domain   = 'example.com'
+ip       = '10.0.1.5'
+ram      = '2048'
+
+Vagrant.configure("2") do |config|
+  config.vm.box = box
+  config.vm.box_url = url
+  
+  config.vm.hostname = hostname + '.' + domain
+  config.vm.network :forwarded_port, guest: 8010, host: 8010
+  config.vm.network :forwarded_port, guest: 9001, host: 9001
+  config.vm.network :private_network, ip: ip
+  config.vm.synced_folder ".", "/vagrant"
+  
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = true
+    vb.customize [
+    'modifyvm', :id,
+    '--name', hostname,
+    '--memory', ram
+    ]
+  end
+
+$script = <<SCRIPT
+echo Provisioning snow
+date > /etc/vagrant_provisioned_at
+/vagrant/setup.sh
+SCRIPT
+
+  config.vm.provision :shell, :inline => $script
+  
+end

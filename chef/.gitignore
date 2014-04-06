@@ -2,6 +2,7 @@
 /.chef/*.pem
 /.chef/encrypted_data_bag_secret
 /.chef/knife_secrets.rb
-/cookbooks/
 /tmp/
 /scripts/secrets.sh
+*.clear.json
+*.pem

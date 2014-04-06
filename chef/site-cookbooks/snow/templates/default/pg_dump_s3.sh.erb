@@ -1,0 +1,16 @@
+#!/bin/bash
+PGDUMP=pg_dump
+EXPORTFILE=`date +%A`.sql
+COMPRESSEDFILE=/tmp/${EXPORTFILE}.tgz
+ENCRYPTEDFILE=${COMPRESSEDFILE}.gpg
+BUCKET=snow-pgdump-<%= @env %>
+S3CMD=/usr/local/bin/s3cmd
+RECIPIENT="Sbex Security"
+GPG_PUB_KEY="/home/ubuntu/SbexSecurity.pubkey.gpg"
+
+$PGDUMP snow | gzip > ${COMPRESSEDFILE}
+gpg --import ${GPG_PUB_KEY}
+rm -rf ${ENCRYPTEDFILE}
+gpg --encrypt -r "${RECIPIENT}" --trust-model always ${COMPRESSEDFILE}
+rm -rf ${COMPRESSEDFILE}
+$S3CMD put ${ENCRYPTEDFILE} s3://${BUCKET}

@@ -1,0 +1,28 @@
+server {
+    listen <%= node[:snow][:landing][:port] %>;
+    server_name <%= node[:snow][:landing][:domain] %>;
+    root /home/ubuntu/snow-landing/current/landing/public/;
+    access_log /var/log/snow-landing-access.log;
+    error_log /var/log/snow-landing-error.log;
+
+    gzip on;
+    gzip_http_version 1.1;
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_proxied any;
+    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript text/x-js;
+    gzip_buffers 16 8k;
+    gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+
+    location = /no/ {
+        try_files /index-no.html /;
+    }
+
+    location = /en/ {
+        try_files /index-en.html /;
+    }
+
+    location ~ "^/([a-z]{2})/([^\?]+)" {
+        try_files /$2-$1.html /;
+    }
+}

@@ -1,12 +1,13 @@
-var debug = require('./util/debug')('snow:entry')
+var debug = require('./helpers/debug')('snow:entry')
 
 debug('initializing shared components')
 
 window.$app = $('body')
-window.router = require('./util/router')
+window.router = require('./helpers/router')
 window.api = require('./api')
 window.errors = require('./errors')
-window.numbers = require('./util/numbers')
+window.numbers = require('./helpers/numbers')
+window.moment = require('moment')
 
 debug('shared components inited')
 
@@ -18,25 +19,25 @@ api.on('user', function(user) {
     $app.toggleClass('is-admin', user && user.admin)
 })
 
-api.bootstrap().done(function() {
-    var apiKey = $.cookie('apiKey')
-
+api.bootstrap()
+.done(function() {
     var master = require('./controllers/master')
     master.render()
 
-    if (apiKey) {
+    if ($.cookie('session')) {
         debug('using cached credentials')
-        api.loginWithKey(apiKey)
-        .done(router.now)
+        api.whoami().done(router.now)
     } else {
         debug('no cached credentials')
 
-        if ($.cookie('existingUser')) {
-            debug('routing to login (existing user cookie)')
-            require('./authorize').admin()
-        } else {
-            debug('routing')
-            router.now()
-        }
+        require('./authorize').admin()
     }
+})
+.fail(function(err) {
+    debug('reloading window after alert (bootstrap failed)')
+    errors.alertFromXhr(err)
+
+    setTimeout(function() {
+        location.reload()
+    }, 10e3)
 })

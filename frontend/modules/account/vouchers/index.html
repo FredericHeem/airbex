@@ -1,0 +1,29 @@
+<div class="container">
+    <div class="account-nav"></div>
+    <div class="col-lg-9">
+        <h1 class="content-title"><%- i18n('account.vouchers.heading') %></h1>
+
+        <div class="content-area">
+            <div class="alert alert-info visible-loaded visible-empty">
+                <p><%- i18n('account.vouchers.empty') %></p>
+            </div>
+
+            <div class="btn-group">
+                <a href="#withdraw/voucher" class="btn btn-primary"><%- i18n('account.vouchers.create') %></a>
+                <a href="#deposit/voucher" class="btn btn-primary"><%- i18n('account.vouchers.redeem') %></a>
+            </div>
+
+            <table class="vouchers-table table hidden-empty">
+                <thead>
+                    <tr>
+                        <th><%- i18n('account.vouchers.headers.code') %></th>
+                        <th><%- i18n('account.vouchers.headers.amount') %></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="vouchers">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

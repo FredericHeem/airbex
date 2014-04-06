@@ -1,47 +1,62 @@
+include_recipe "snow::common"
+include_recipe "apt"
 include_recipe "aws"
-aws = data_bag_item("aws", "main")
+include_recipe "awscli"
+include_recipe "snow::db_disk"
 
-service 'postgresql' do
-    action :stop
-end
+aws = Chef::EncryptedDataBagItem.load("aws", 'main')
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
+env_bag = bag[node.chef_environment]
+    
+include_recipe "postgresql::server"
+include_recipe "postgresql::contrib"
 
-directory "/pgmdata" do
-    action :create
-end
-
-# Disk is attached to /dev/sdf but shows up
-# in ubuntu as /dev/xvdf
-aws_ebs_volume "/dev/sdf" do
-    aws_access_key aws['aws_access_key_id']
-    aws_secret_access_key aws['aws_secret_access_key']
-    volume_id node[:snow][:pgm][:volume_id]
-    device "/dev/sdf"
-    action :attach
-end
-
-mount "/pgmdata" do
-    fstype "xfs"
-    device "/dev/xvdf"
-    action [:mount, :enable]
-end
-
-directory "/pgmdata" do
-    owner "postgres"
-    group "postgres"
-    mode 0700
-    recursive true
-end
-
-# Workaround
-directory "/pgmdata/main/9.2" do
-    action :create
+if env_bag['pgm_s3']
+    include_recipe "snow::pgm_s3"
+    include_recipe "snow::pg_dump_s3"
 end
 
 service 'postgresql' do
     action [:enable, :start]
 end
 
-# Workaround (end)
-directory "/pgmdata/main/9.2" do
-    action :delete
+pg_user "postgres" do
+    privileges :superuser => true
+    password env_bag['pg_password']
+end
+
+pg_user "snow" do
+    privileges :superuser => false, :createdb => false, :login => true
+    password env_bag["pg_write_url"]["password"]
+end
+
+pg_user "snowro" do
+    privileges :superuser => false, :createdb => false, :login => true
+    password env_bag["pg_read_url"]["password"]
+end
+
+pg_database "snow" do
+    owner "snow"
+    encoding "utf8"
+    template "template0"
+    locale "en_US.UTF8"
+end
+
+pg_database_extensions "snow" do
+    languages "plpgsql"             
+    extensions ["hstore"]
+end
+
+# Automatic backups
+include_recipe "cron"
+include_recipe "snow::ebssnapshot"
+
+cron_d "ebs-snapshot-db-snow" do
+  hour 15
+  minute 0
+  command "/usr/bin/ebs-snapshot.sh /pgmdata #{node[:snow][:pgm][:volume_id]}"
+end
+
+diskmonit "pgmdata" do
+    path "/pgmdata"
 end

@@ -1,15 +1,15 @@
 <tr data-id="<%= bank_account_id %>">
     <td>
-        <%- account_number %>
+        <%= account_number === null ? '' : account_number %>
     </td>
     <td>
-        <%- iban %>
+        <%= iban === null ? '' : iban %>
     </td>
     <td>
-        <%- swiftbic %>
+        <%= swiftbic === null ? '' : swiftbic %>
     </td>
     <td>
-        <%- routing_number %>
+        <%= routing_number === null ? '' : routing_number %>
     </td>
     <td>
         <button type="button" data-action="delete" class="btn btn-danger">Delete</button>

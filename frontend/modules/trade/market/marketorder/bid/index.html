@@ -1,0 +1,78 @@
+<div class="well row-right">
+    <p class="available-container">
+        <%- i18n('markets.market.marketorder.bid.you have') %>
+        <span class="available">...</span>
+        <%- i18n('markets.market.marketorder.bid.to spend') %>
+    </p>
+
+    <form>
+        <div class="form-group amount">
+            <label>
+                <%= quote %> <%- i18n('markets.market.marketorder.bid.spend.label') %>
+                (<a href="#" data-action="spend-all">
+                    <%- i18n('markets.market.marketorder.bid.spend all') %>
+                </a>)
+            </label>
+
+            <div class="input-group">
+                <input type="text" name="amount" class="form-control" value="" />
+                <span class="input-group-addon"><%= quote %></span>
+            </div>
+
+            <span class="help-block">
+                <span class="visible-insufficient-funds hidden-precision-too-high">
+                    <%- i18n('markets.market.marketorder.bid.spend.insufficient funds') %>
+                </span>
+                <span class="visible-precision-too-high">
+                    <%- i18n('markets.market.marketorder.bid.spend.too many decimals') %>
+                </span>
+                <span class="visible-too-deep hidden-insufficient-funds hidden-too-many-decimals">
+                    <%- i18n('markets.market.marketorder.bid.spend.more than for sale') %>
+                </span>
+                <span class="visible-too-small hidden-insufficient-funds hidden-too-many-decimals hidden-precision-too-high">
+                    <%- i18n('markets.market.marketorder.bid.spend.too small') %>
+                </span>
+            </span>
+        </div>
+
+        <table class="order-summary table">
+            <tr>
+                <th>
+                    <%- i18n('markets.market.marketorder.bid.summary.price per') %>
+                    <%= base %>
+                </th>
+                <td>
+                    <span>
+                        <span class="receive-price"></span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <%- i18n('markets.market.marketorder.bid.summary.fee') %>
+                </th>
+                <td>
+                    <span>
+                        <span class="fee"></span>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <%- i18n('markets.market.marketorder.bid.summary.you receive') %>
+                </th>
+                <td>
+                    <span>
+                        <span class="receive-quote"></span>
+                    </span>
+                </td>
+            </tr>
+        </table>
+
+        <div>
+            <button type="submit" class="btn btn-success btn-block">
+                <%- i18n('markets.market.marketorder.bid.buy button') %> <%= base %>
+            </button>
+        </div>
+    </form>
+</div>

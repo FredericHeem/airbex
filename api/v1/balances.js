@@ -1,5 +1,5 @@
 module.exports = exports = function(app) {
-    app.get('/v1/balances', app.auth.any, exports.index)
+    app.get('/v1/balances', app.security.demand.any, exports.index)
 }
 
 exports.index = function(req, res, next) {
@@ -10,7 +10,7 @@ exports.index = function(req, res, next) {
             'WHERE user_id = $1',
             'GROUP BY user_id, currency_id'
         ].join('\n'),
-        values: [req.user]
+        values: [req.user.id]
     }, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows.map(function(row) {

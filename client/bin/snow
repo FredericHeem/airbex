@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-var num = require('num')
-, fs = require('fs')
+var fs = require('fs')
 , Table = require('cli-table')
+, async = require('async')
 , optimist = require('optimist')
 , argv = optimist
 .usage([
@@ -9,10 +9,14 @@ var num = require('num')
     'Usage:',
     'snow APIKEY               Write API key to config',
     'snow url <url>            Write endpoint to config (debugging)',
+    'snow whoami               Show user information',
+    'snow showall              Show user information, balances, orders and transaction',
+    'snow balances             List balances',
     'snow markets              List markets',
     'snow orders               List my orders',
     'snow depth <market>       List order depth. Example: snow depth BTCXRP',
-    'snow cancel <order id>    Cancel exchange order'
+    'snow cancel <order id>    Cancel exchange order',
+    'snow cancelAll            Cancel all orders'
 ].join('\n'))
 .describe('u', 'API url to use')
 .describe('k', 'API key to use')
@@ -45,59 +49,70 @@ if (method == 'url') {
 }
 
 if (argv.url) config.url = argv.url
+if (argv.key) config.key = argv.key
 
 function demandApiKey() {
     console.error('API key not set\n')
     usage()
 }
 
-var client = new (require('../index'))(config.key, config.url)
+var client = new (require('../index'))(config)
+
+if (method == 'showall') {
+    return async.series([function (callback) {
+        client.whoami(function(err, user) {
+            if (err) throw err
+            console.log(client.createTableUser(user).toString())
+            callback()
+        })
+    }, function (callback) {
+        client.balances(function(err, balances) {
+            if (err) throw err
+            console.log(client.createTableBalances(balances).toString())
+            callback()
+        })
+    }, function (callback) {
+        client.orders(function(err, orders) {
+            if (err) throw err
+            console.log(client.createTableOrders(orders).toString())
+            callback()
+        })
+    }, function (callback) {
+        client.markets(function(err, markets) {
+            if (err) throw err
+            console.log(client.createTableMarkets(markets).toString())
+            callback()
+        })
+    }], function(err) {
+        if (err) throw err
+    });
+}
+
+if (method == 'whoami') {
+    return client.whoami(function(err, user) {
+        if (err) throw err
+        console.log(client.createTableUser(user).toString())
+    })
+}
+
+if (method == 'balances') {
+    return client.balances(function(err, balances) {
+        if (err) throw err
+        console.log(client.createTableBalances(balances).toString())
+    })
+}
 
 if (method == 'orders') {
     return client.orders(function(err, orders) {
         if (err) throw err
-        var table = new Table({
-            head: ['#', 'Market', 'Type', 'Volume', 'Price', 'Total'],
-            colWidths: [8, 10, 6, 20, 20, 20]
-        })
-
-        orders.forEach(function(order) {
-            var pair = [order.market.substr(0, 3), order.market.substr(3)]
-            table.push([
-                order.id,
-                order.market,
-                order.type.toUpperCase(),
-                order.remaining + ' ' + pair[0],
-                order.price + ' ' + pair[1],
-                num(order.remaining).mul(order.price) + ' ' + pair[1]
-            ])
-        })
-
-        console.log(table.toString())
+        console.log(client.createTableOrders(orders).toString())
     })
 }
 
 if (method == 'markets') {
     return client.markets(function(err, markets) {
         if (err) throw err
-        var table = new Table({
-            head: ['Market', 'Bid', 'Ask', 'Last', 'High', 'Low', 'Volume'],
-            colWidths: [8, 12, 12, 12, 12, 12, 12]
-        })
-
-        markets.forEach(function(market) {
-            table.push([
-                market.id,
-                market.bid || '',
-                market.ask || '',
-                market.last || '',
-                market.high || '',
-                market.low || '',
-                market.volume || '0'
-            ])
-        })
-
-        console.log(table.toString())
+        console.log(client.createTableMarkets(markets).toString())
     })
 }
 
@@ -136,6 +151,14 @@ if (method == 'cancel') {
     })
 }
 
+if (method == 'cancelAll') {
+    if (!config.key) return demandApiKey()
+    return client.cancelAll(function(err, orderCancelled) {
+        if (err) throw err
+        console.log('#order cancelled %d', orderCancelled)
+    })
+}
+
 if (method == 'bid' || method == 'ask') {
     if (argv._.length != 5) return usage()
     if (!config.key) return demandApiKey()
@@ -143,7 +166,7 @@ if (method == 'bid' || method == 'ask') {
         market: argv._[2].toUpperCase() + argv._[4].toUpperCase(),
         type: method,
         price: argv._[3] + '',
-        volume: argv._[1] + ''
+        amount: argv._[1] + ''
     }, function(err, id) {
         if (err) throw err
         console.log('Order #%s placed', id)

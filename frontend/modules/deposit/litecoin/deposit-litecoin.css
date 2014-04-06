@@ -1,0 +1,11 @@
+#area>.deposit-ltc .address {
+    font-size: 1.6em;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    text-align: center;
+    border: solid 1px #ccc
+}
+
+#area>.deposit-ltc .disclaimer {
+    font-size: .85em
+}

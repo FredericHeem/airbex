@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+    <% if (typeof optimizely != 'undefined') { %>
+    <script src="//cdn.optimizely.com/js/<%= optimizely %>.js"></script>
+    <% } %>
+    <meta charset="utf-8">
+    <title><%= title %></title>
+    <meta name="description" content="Buy, sell and trade Bitcoin at fair prices with Justcoin, the secure Bitcoin exchange from Norway. Create a Bitcoin wallet and exchange your usd/euro/nok to BTC.">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="google-site-verification" content="k-cpuaSupUp1f4IQ2iZPmhIHOBIcGYUVVHLuApat1y4" />
+
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href="/app.css" rel="stylesheet">
+
+    <link rel="apple-touch-icon" href="/touchicon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/touch-icon-ipad-retina.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/touch-icon-iphone-retina.png">
+    <link rel="apple-touch-icon-precomposed" href="/touch-icon-iphone.png">
+    <link rel="icon" href="/favicon.png">
+    <!--[if IE]><link rel="shortcut icon" href="/favicon.ico"><![endif]-->
+    <meta name="msapplication-TileImage" content="/tileicon.png">
+
+    <script type="text/javascript">
+        if ('-ms-user-select' in document.documentElement.style && navigator.userAgent.match(/IEMobile\/10\.0/)) {
+            var msViewportStyle = document.createElement('style');
+            msViewportStyle.appendChild(document.createTextNode('@-ms-viewport{width:auto!important}'));
+            document.getElementsByTagName('head')[0].appendChild(msViewportStyle);
+        }
+    </script>
+
+    <% if (segment !== undefined) { %>
+        <script type="text/javascript">
+          var analytics=analytics||[];(function(){var e=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group"],t=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var n=0;n<e.length;n++)analytics[e[n]]=t(e[n])})(),analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)};
+          analytics.load("<%- segment %>");
+        </script>
+    <% } %>
+</head>
+<body>
+<script>window.environment = '<%= environment %>'</script>
+<script type='text/javascript' src='https://cdn.firebase.com/v0/firebase.js'></script>
+<script src="/vendor.js"></script>
+<script src="/app.js"></script>
+<div class="wrapper">
+  <div class="header row">
+    <div class="col-md-12">
+        <a href="/<%= lang %>/">
+            <img src="/justcoin.svg" class="logo" alt="Justcoin logo">
+        </a>
+        <a href="/client/#auth/login" class="btn btn-success pull-right btn-login"><%= login %></a>
+        <div class="exchangerates">
+            <p class="rates">
+                <span id="BTCNOK" class="largerfont">7,000</span> NOK/BTC
+                <span id="BTCEUR" class="largerfont spacebetween">700</span> EUR/BTC
+                <span id="BTCUSD" class="largerfont spacebetween">1,000</span> USD/BTC
+            </p>
+        </div>
+    </div>
+  </div>

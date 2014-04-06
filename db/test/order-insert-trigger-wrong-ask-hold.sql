@@ -21,7 +21,7 @@ BEGIN
   RAISE NOTICE 'market id = %', bid;
 
   INSERT INTO "transaction" (debit_account_id, credit_account_id, amount)
-  VALUES (special_account('edge', 'BTC'), user_currency_account(uid, 'BTC'), 1e8);
+  VALUES (special_account('edge', 'BTC'), user_currency_account(uid, 'BTC'), 1.1e8);
 
   RAISE NOTICE 'balance %', (SELECT balance FROM "account" WHERE account_id = user_currency_account(uid, 'BTC'));
 

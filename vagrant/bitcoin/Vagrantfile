@@ -1,0 +1,37 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+box      = 'precise64daily'
+url      = 'http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-vagrant-amd64-disk1.box'
+hostname = 'bitcoind'
+domain   = 'example.com'
+ip       = '10.0.1.6'
+ram      = '1024'
+
+Vagrant.configure("2") do |config|
+  config.vm.box = box
+  config.vm.box_url = url
+  
+  config.vm.hostname = hostname + '.' + domain
+  config.vm.network :forwarded_port, guest: 8332, host: 8332
+  config.vm.network :private_network, ip: ip
+  config.vm.synced_folder ".", "/vagrant"
+  
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = true
+    vb.customize [
+    'modifyvm', :id,
+    '--name', hostname,
+    '--memory', ram
+    ]
+  end
+
+$script = <<SCRIPT
+echo Provisioning bitcoind
+date > /etc/vagrant_provisioned_at
+/vagrant/setup.sh
+SCRIPT
+
+  config.vm.provision :shell, :inline => $script
+  
+end

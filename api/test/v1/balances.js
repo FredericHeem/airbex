@@ -22,7 +22,9 @@ describe('balances', function() {
 						},
 						{
 							currency_id: 'NOK',
-							available: 12345
+							available: 12345,
+							hold: 0,
+							balance: 0
 						}
 					]
 				})

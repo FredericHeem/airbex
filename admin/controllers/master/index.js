@@ -1,4 +1,4 @@
-var debug = require('../../util/debug')('snow:master')
+var debug = require('../../helpers/debug')('snow:master')
 , page
 , template = require('./template.html')
 , section
@@ -9,13 +9,12 @@ var debug = require('../../util/debug')('snow:master')
 
 var master = module.exports = function(val, name) {
     if (!$section) {
-        throw new Error('master called before render')
+        debug('master called before render')
+        return
     }
 
     if (val !== undefined) {
-        if (page && page.destroy) {
-            page.destroy()
-        }
+        page && page.$el.triggerHandler('remove')
         page = val
         $section.html(page.$el)
         master.section(name || null)

@@ -3,20 +3,32 @@
 # Always specify a reference to avoid trouble in the future
 
 site 'http://community.opscode.com/api/v1'
+cookbook 'dpkg_autostart'
 
+cookbook 'solo-search',
+  :git => 'https://github.com/edelight/chef-solo-search.git',
+  :ref => '0.5.1'
+
+cookbook 'hostname',
+  :git => 'https://github.com/timurbatyrshin/chef-cookbook-hostname',
+  :ref => 'f7fc6fb81d637e18371060167a0b39c2ff2155af'
+
+cookbook 'cron',
+  :git => 'https://github.com/opscode-cookbooks/cron.git',
+  :ref => '6f669a60e203bf4cbec62bdcdb5e247dfe7c5e32'
 
 cookbook 'monit',
-  :git => 'https://github.com/phlipper/chef-monit.git',
-  :ref => 'd78262e52e75bd8254bdc33612d14b4e9dd34c8a'
+   :git => 'https://github.com/justcoin/chef-monit.git',
+   :ref => '314fb5a3a3870e5b63e9da650ee077868df30086'
 
 cookbook 'aws',
-    :git => 'https://github.com/opscode-cookbooks/aws.git',
-    :ref => 'v0.101.4'
+    :git => 'https://github.com/joelmoss/aws.git',
+    :ref => '995da5e38fdb23fa85a5dff0080ed5c61cca3c47'
 
-cookbook 'postgresql',
-    :path => '../../chef-postgresql'
-  # :git => 'https://github.com/phlipper/chef-postgresql.git',
-  # :ref => '0.11.2'
+#Use the one in site-cookbook
+#cookbook 'postgresql',
+#  :git => 'https://github.com/justcoin/chef-postgresql',
+#  :ref => '7b1f0d3e830ee7f61d0ec735b049dafabc097b5e'
 
 cookbook 'nodejs',
     :git => 'https://github.com/phlipper/chef-nodejs.git',
@@ -27,9 +39,8 @@ cookbook 'logrotate',
     :ref => '1.2.2'
 
 cookbook 'deploy_wrapper',
-    :path => '../../chef-deploy_wrapper'
-    # :git => 'https://github.com/cwjohnston/chef-deploy_wrapper.git',
-    # :ref => 'bf717075443626f1109ee4590dec23ef359fc4a3'
+    :git => 'https://github.com/justcoin/chef-deploy_wrapper.git',
+    :ref => 'c5cafbbaf91152690491118acfe89139e5f233e6'
 
 cookbook 'ssh_known_hosts',
     :git => 'https://github.com/opscode-cookbooks/ssh_known_hosts.git',
@@ -38,3 +49,27 @@ cookbook 'ssh_known_hosts',
 cookbook 'nginx',
   :git => 'https://github.com/opscode-cookbooks/nginx.git',
   :ref => 'd7a41ce15b30f91df95195b213d95bb9b3a6c4c3'
+
+cookbook 'postfix',
+  :git => 'https://github.com/opscode-cookbooks/postfix.git',
+  :ref => 'v3.0.4'
+
+cookbook 'hostsfile',
+  :git => 'https://github.com/customink-webops/hostsfile.git',
+  :ref => '63769c54580942551281db9c1dcf996b5ce95730'
+
+cookbook 'varnish',
+  :git => 'https://github.com/opscode-cookbooks/varnish.git',
+  :ref => '5881859574c00754da3cfd3fb50f2151b8af310f'
+
+cookbook 'awscli',
+  :git => 'https://github.com/ebensing/chef-awscli.git',
+  :ref => '10756bb38defe06aceaf5eb42f29ef6a42cfe359'
+
+cookbook 'redisio',
+  :git => 'https://github.com/brianbianco/redisio/',
+  :ref => '2b7fc068417fb95758b07bc4f6e3c4a450419812'
+
+cookbook 's3cmd',
+  :git => 'https://github.com/fred/chef-s3cmd',
+  :ref => 'v0.2.1'

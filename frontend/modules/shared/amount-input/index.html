@@ -1,0 +1,36 @@
+<div class="form-group amount">
+    <label for="amount" class="control-label">
+        <%= i18n('shared.amount-input.amount.label') %>
+    </label>
+
+    <div class="input-group">
+        <input class="form-control" type="text" name="amount" />
+
+        <div class="input-group-addon addon-btn">
+            <button type="button" class="btn btn-default dropdown-toggle currency" data-toggle="dropdown" name="button">
+                <span name="currency"></span>
+                <span class="caret hidden-fixed-currency"></span>
+            </button>
+
+            <ul class="dropdown-menu pull-right currencies hidden-fixed-currency">
+            </ul>
+        </div>
+    </div>
+
+    <p class="help-block">
+        <span class="visible-invalid">
+            <%= i18n('shared.amount-input.amount.invalid') %>
+        </span>
+
+        <span class="visible-too-high">
+            <%- tooHighError %>
+        </span>
+
+        <span class="visible-too-small">
+            <%- tooSmallError %>
+        </span>
+
+        <span class="too-high-precision visible-too-high-precision">
+        </span>
+    </p>
+</div>

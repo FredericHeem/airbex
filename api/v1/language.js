@@ -3,11 +3,11 @@ var debug = require('debug')('snow:language')
 , languageRe = /^([a-z]{1,8}(?:-[a-z]{1,8})?)(?:;q=([0-9](?:\.[0-9])?))?$/i
 
 module.exports = exports = function(app) {
-    app.get('/v1/language', exports.language)
+    app.get('/v1/language', exports.handler)
 }
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-exports.language = function(req, res) {
+exports.language = function(req) {
     var header = req.get('Accept-Language')
     , language = null
 
@@ -40,5 +40,12 @@ exports.language = function(req, res) {
         }
     }
 
-    res.send(200, { language: language })
+    return language
+}
+
+// http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+exports.handler = function(req, res) {
+    var language = exports.language(req)
+
+    res.send({ language: language })
 }

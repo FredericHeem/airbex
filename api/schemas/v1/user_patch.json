@@ -1,0 +1,9 @@
+{
+    "type": "object",
+    "properties": {
+        "username": {
+            "type": ["null", "string"],
+            "pattern": "^[a-zA-Z0-9](?:[\\._]?[a-zA-Z0-9]){2,25}$"
+        }
+    }
+}

@@ -1,0 +1,128 @@
+<div class="container">
+    <div class="account-nav"></div>
+    <div class="col-offset-3 col-lg-8">
+        <h1>
+            <%- i18n('auth.verifyphone.heading') %>
+        </h1>
+
+        <p class="visible-phone-verified">
+            <%- i18n('auth.verifyphone.alreadyverified') %>
+        </p>
+        
+        <p class="lead hidden-phone-verified">
+            <%- i18n('auth.verifyphone.lead') %>
+        </p>
+        
+        <form class="phone hidden-phone-verified">
+            <fieldset>
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div class="form-group country">
+                            <label class="control-label" for="country">
+                                <%- i18n('auth.verifyphone.phone.country.label') %>
+                            </label>
+
+                            <select name="country" class="form-control input-lg">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="form-group number">
+                            <label class="control-label" for="number">
+                                <%- i18n('auth.verifyphone.phone.number.label') %>
+                            </label>
+
+                            <input type="text" name="number" class="form-control input-lg">
+
+                            <p class="help-block visible-invalid">
+                                <%- i18n('auth.verifyphone.phone.number.invalid') %>
+                            </p>
+
+                            <p class="help-block visible-locked-out">
+                                <%- i18n('auth.verifyphone.phone.number.locked out') %>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="visible-lg" style="margin-top:24px"></div>
+
+                        <button type="submit" class="btn btn-primary" style="width:100%">
+                            <span class="visible-loading">
+                                <%- i18n('auth.verifyphone.phone.submit.sending') %>
+                            </span>
+
+                            <span class="hidden-loading hidden-texted">
+                                <%- i18n('auth.verifyphone.phone.submit.send') %>
+                            </span>
+
+                            <span class="hidden-voice">
+                                <span class="visible-texted">
+                                    <%- i18n('auth.verifyphone.phone.submit.sent') %>
+                                </span>
+                            </span>
+
+                            <span class="visible-voice">
+                                <%- i18n('auth.verifyphone.phone.submit.calling') %>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+        <form class="verify visible-texted" style="margin-top:3em">
+            <fieldset>
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div class="form-group code">
+                            <label for="code" class="control-label">
+                                <%- i18n('auth.verifyphone.verify.code.label') %>
+                            </label>
+
+                            <input type="text" name="code" class="form-control input-lg" />
+
+                            <p class="help-block visible-invalid">
+                                <%- i18n('auth.verifyphone.verify.code.invalid') %>
+                            </p>
+
+                            <p class="help-block visible-wrong">
+                                <%- i18n('auth.verifyphone.verify.code.wrong') %>
+                                <a href="javascript:router.reload()">
+                                    <%- i18n('auth.verifyphone.verify.code.wrong.restart') %>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="visible-lg" style="margin-top:24px"></div>
+
+                        <button type="submit" class="btn btn-success" style="width:100%">
+                            <%- i18n('auth.verifyphone.verify.submit') %>
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+        <div class="visible-slow">
+            <p><%- i18n('auth.verifyphone.slow.lead') %></p>
+
+            <ul>
+                <li>
+                    <a href="javascript:router.reload()">
+                        <%- i18n('auth.verifyphone.slow.restart') %>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#" data-action="voice">
+                        <%- i18n('auth.verifyphone.slow.voice') %>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,12 +1,6 @@
 name "pgm"
 
 run_list(
-  "recipe[snow::common]",
-  "recipe[snow::aptupdate]",
-  "recipe[snow::crontp]",
-  "recipe[postgresql::server]",
-  "recipe[postgresql::contrib]",
-  "recipe[aws]",
   "recipe[snow::pgm]"
 )
 
@@ -17,10 +11,15 @@ override_attributes(
     "initdb" => false,
     "data_directory" => "/pgmdata/main",
     "listen_addresses" => "0.0.0.0",
-    "wal_level" => "hot_standby",
-    "max_wal_senders" => 1,
+    "wal_level" => "archive",
+    
+    "archive_mode" => "on",
+    "archive_command" => "envdir /etc/wal-e.d/env /usr/local/bin/wal-e wal-push %p",
+    "archive_timeout" => 60,
+
+    "max_wal_senders" => 2,
     "wal_keep_segments" => 32,
-    "synchronous_standby_names" => "walreceiver",
+    #"synchronous_standby_names" => "walreceiver",
     "pg_hba_defaults" => true,
     "pg_hba" => [
       {
@@ -37,6 +36,12 @@ override_attributes(
         'addr' => '10.0.1.0/24',
         'method' => 'trust'
       }
-    ]
+    ],
+    "log_min_duration_statement" => 100,
+    "log_line_prefix" => "%t [%p]: [%l-1] db=%d,user=%u ",
+    "log_checkpoints" => "on",
+    "log_connections" => "on",
+    "log_disconnections" => "on",
+    "log_lock_waits" => "on"
   }
 )

@@ -1,0 +1,221 @@
+import std;
+
+backend default {
+    .host = "<%= @reverse_ip %>";
+    .port = "<%= node['snow']['reverse']['https_port'] %>";
+}
+
+acl purge {
+    "localhost";
+    "10.0.0.0"/16;
+}
+
+sub vcl_hash {
+    hash_data(req.url);
+
+    if (req.http.host) {
+        hash_data(req.http.host);
+    } else {
+        hash_data(server.ip);
+    }
+
+    if (req.http.cookie) {
+        hash_data(req.http.cookie);
+    }
+
+    return (hash);
+}
+
+sub vcl_recv {
+    # Redirect landing page
+    if (req.url ~ "^/(\?.*)?$") {
+        if (req.http.cookie ~ "language=nb-NO") {
+            error 750 regsub(req.url, "^(.*)$", "/no\1");
+        }
+
+        if (req.http.cookie ~ "language=en-US") {
+            error 750 regsub(req.url, "^(.*)$", "/en\1");
+        }
+
+        if (req.http.accept-language ~ "(?i)(nb|no)") {
+            set req.http.X-Language = "language=nb-NO;path=/;max-age=31536000";
+            error 750 regsub(req.url, "^(.*)$", "/no\1");
+        }
+
+        set req.http.X-Language = "language=en-US;path=/;max-age=31536000";
+        error 750 regsub(req.url, ".*", "/en\0");
+    }
+
+    # The only cookie is used is session
+    if (req.http.cookie && req.http.cookie ~ "(^|; *)session=[^;]+") {
+        set req.http.cookie =
+            regsub(req.http.cookie, "(?:^|.*; *)(session=[^;]+).*", "\1");
+    } else {
+        remove req.http.cookie;
+    }
+
+    # Normalize accept-encoding, from https://www.varnish-cache.org/trac/wiki/VCLExampleNormalizeAcceptEncoding
+    if (req.http.Accept-Encoding) {
+        if (req.http.Accept-Encoding ~ "gzip") {
+            set req.http.Accept-Encoding = "gzip";
+        } elsif (req.http.Accept-Encoding ~ "deflate") {
+            set req.http.Accept-Encoding = "deflate";
+        } else {
+            # unkown algorithm
+            remove req.http.Accept-Encoding;
+        }
+    }
+
+    # Normalize Accept-Encoding header
+    # straight from the manual: https://www.varnish-cache.org/docs/3.0/tutorial/vary.html
+    if (req.http.Accept-Encoding) {
+        if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+            # No point in compressing these
+            remove req.http.Accept-Encoding;
+        } elsif (req.http.Accept-Encoding ~ "gzip") {
+            set req.http.Accept-Encoding = "gzip";
+        } elsif (req.http.Accept-Encoding ~ "deflate") {
+            set req.http.Accept-Encoding = "deflate";
+        } else {
+            # unkown algorithm
+            remove req.http.Accept-Encoding;
+        }
+    }
+
+    if (req.request == "PURGE") {
+        if (!client.ip ~ purge) {
+            error 405 "Not allowed.";
+        }
+        return (lookup);
+    }
+
+    if (!req.request ~ "^(GET|HEAD|POST|DELETE|PATCH|PUT)$") {
+        error 405 "Not allowed.";
+    }
+
+    # Strip hash, server doesn't need it.
+    if (req.url ~ "\#") {
+        set req.url = regsub(req.url, "\#.*$", "");
+    }
+
+    # Strip a trailing ? if it exists
+    if (req.url ~ "\?$") {
+        set req.url = regsub(req.url, "\?$", "");
+    }
+
+    # Pass anything but GET and HEAD
+    if (req.request != "GET" && req.request != "HEAD") {
+        return (pass);
+    }
+
+    # Strip attempts to force caching, ?ts=123 or ?123
+    if (req.url ~ "\?(ts=)?\d+$") {
+        set req.url = regsub(req.url, "(.+)\?(ts=)?\d+$", "\1");
+    }
+
+    # Remove cookie if the user is asking for something public
+    if (req.http.cookie && (
+        # Static resources (html, css, etc)
+        req.url ~ "\.(png|jpg|txt|css|js|ico)$" ||
+        req.url ~ "^/(admin|client|no|en)/" ||
+
+        # Public information
+        req.url ~ "^/api/v1/currencies" ||
+        req.url ~ "^/api/v1/markets" ||
+        req.url ~ "^/api/v1/ripple/account" ||
+        req.url ~ "^/api/v1/ripple/address" ||
+        req.url ~ "^/api/v1/markets"))
+    {
+        remove req.http.cookie;
+    }
+
+    return (lookup);
+}
+
+sub vcl_fetch {
+    set beresp.ttl = 0s;
+    set beresp.http.cache-control = "max-age=0";
+
+    # The backend does not set any cookies
+    unset beresp.http.set-cookie;
+
+    # If a user creates or deletes an order, invalidate market stats
+    if ((req.url ~ "^/api/v1/orders" && req.request == "POST") ||
+        (req.url ~ "^/api/v1/spend" && req.request == "POST") ||
+        (req.url ~ "^/api/v1/orders/\d+" && req.request == "DELETE"))
+    {
+        ban("req.url ~ ^/api/v1/markets");
+        ban("req.url ~ ^/api/bitcoincharts");
+    }
+
+    # Deliver anything that can't be cached
+    if (req.request != "GET" && req.request != "HEAD") {
+        return (deliver);
+    }
+
+    # Deliver errors without caching
+    if (beresp.status >= 300) {
+        return (deliver);
+    }
+
+    # Cache statics for 10 min
+    if (req.url ~ "\.(png|jpg|txt|css|js|ico)$" ||
+        req.url ~ "^/(admin|client|no|en)/")
+    {
+        set beresp.ttl = 10m;
+    }
+
+    # Cache market stats
+    if (req.url ~ "^/api/v1/markets" ||
+        req.url ~ "^/api/bitcoincharts")
+    {
+        set beresp.ttl = 5m;
+    }
+
+    # Cache bootstrapping info that rarely changes,
+    # including user specific
+    if (req.url ~ "^/api/v1/currencies" ||
+        req.url ~ "^/api/v1/ripple/address" ||
+        req.url ~ "^/api/v1/intercom" ||
+        req.url ~ "^/api/v1/language" ||
+        req.url ~ "^/api/v1/BTC/address" ||
+        req.url ~ "^/api/v1/LTC/address" ||
+        req.url ~ "^/ripple/address")
+    {
+        set beresp.ttl = 10m;
+    }
+
+    if (beresp.ttl <= 0s) {
+        return (hit_for_pass);
+    }
+
+    return (deliver);
+}
+
+sub vcl_deliver {
+    # Strip unnecessary headers
+    remove resp.http.X-Varnish;
+    remove resp.http.Via;
+    remove resp.http.Vary;
+    remove resp.http.Server;
+    remove resp.http.X-Powered-By;
+    #remove resp.http.Age;
+
+    if (obj.hits > 0) {
+        set resp.http.X-Cache = "HIT";
+        set resp.http.X-Cache-Hits = obj.hits;
+    } else {
+        set resp.http.X-Cache = "MISS";
+    }
+
+    return (deliver);
+}
+
+sub vcl_error {
+    if (obj.status == 750) {
+        set obj.http.Location = obj.response;
+        set obj.status = 302;
+        set obj.http.Set-Cookie = req.http.X-Language;
+        return(deliver);
+    }
+}

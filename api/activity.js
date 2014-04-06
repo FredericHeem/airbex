@@ -1,9 +1,11 @@
+var debug = require('debug')('snow:activity')
+
 module.exports = exports = function(app) {
     return exports.log.bind(exports, app)
 }
 
 exports.log = function(app, userId, type, details, retry) {
-    console.log('user #%d activity: %s %j', userId, type, details)
+    debug('user #%d activity: %s %j', userId, type, details)
     app.conn.write.query({
         text: 'INSERT INTO activity (user_id, "type", details) VALUES ($1, $2, $3)',
         values: [userId, type, JSON.stringify(details)]

@@ -1,0 +1,12 @@
+{
+  "name": "baproof",
+  "homepage": "https://github.com/FredericHeem/bitcoin-asset-proof",
+  "_release": "2f766a876b",
+  "_resolution": {
+    "type": "commit",
+    "commit": "2f766a876b5179aeedb5c51d2b3666d8a48542c4"
+  },
+  "_source": "https://github.com/FredericHeem/bitcoin-asset-proof.git",
+  "_target": "2f766a876b5179aeedb5c51d2b3666d8a48542c4",
+  "_originalSource": "https://github.com/FredericHeem/bitcoin-asset-proof.git"
+}

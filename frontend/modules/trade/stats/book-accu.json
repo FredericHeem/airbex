@@ -1,0 +1,48 @@
+{
+    "chart": {
+        "type": "area",
+    },
+    "credits": {
+        "enabled": false
+    },
+    "title": {
+        "text": "[base currency]/[quote currency] Order book (accumulative)"
+    },
+    "xAxis": {
+        "categories": null,
+        "title": {
+            "text": null
+        }
+    },
+    "yAxis": {
+        "title": {
+            "text": "[base currency]"
+        },
+        "allowDecimals": true
+    },
+    "plotOptions": {
+        "area": {
+            "marker": {
+                "enabled": false,
+                "symbol": "circle",
+                "radius": 2,
+                "states": {
+                    "hover": {
+                        "enabled": true
+                    }
+                }
+            }
+        }
+    },
+    "colors": [
+        "#7EB3B5",
+        "#F13A2F"
+    ],
+    "series": [{
+        "name": "Buyers ([base currency])",
+        "data": null
+    }, {
+        "name": "Sellers ([base currency])",
+        "data": null
+    }]
+}

@@ -1,0 +1,160 @@
+.btn
+    border-radius: 0
+    background-image: none
+    border: 0
+    padding: 10px 15px
+    &:focus
+        outline: 0
+
+.btn-success
+    background-color: #7fba00
+
+.btn-success:hover, 
+.btn-success:focus, 
+.btn-success:active, 
+.btn-success.active, 
+.open .dropdown-toggle.btn-success
+    background-color: #72a700
+
+.btn-group
+    margin-bottom: 15px
+    .btn + .btn
+        margin-left: 15px
+
+.btn-group > .btn:last-child:not(:first-child), 
+.btn-group > .dropdown-toggle:not(:first-child),
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle)
+    border-bottom-left-radius: 0
+    border-top-left-radius: 0
+    border-bottom-right-radius: 0
+    border-top-right-radius: 0
+
+.dropdown-toggle
+    padding: 6px
+
+.input-group-addon.addon-btn
+    padding: 0
+
+.input-group-addon
+    border-radius: 0
+
+.input-lg
+    margin-top: -1px
+    height: 43px
+    border-radius: 0;
+
+select.input-lg
+    height: 43px
+    line-height: 43px
+
+.form-control
+    border-radius: 0
+
+form > .form-group:last-child
+    margin-bottom: 0;
+
+.table thead>tr>th, 
+.table tbody>tr>th, 
+.table tfoot>tr>th, 
+.table thead>tr>td, 
+.table tbody>tr>td, 
+.table tfoot>tr>td
+    padding: 6px 8px
+
+.alert
+    border-radius: 0
+    font-size: 17px
+    font-weight: bold
+    border-width: 0
+    margin-bottom: 15px
+
+.lead
+    margin-bottom: 40px
+
+.progress
+    margin-bottom: 0
+
+.table.depth > tbody > tr > td
+    vertical-align: top
+    padding: 0
+    font-size: 1
+
+    table
+        font-size: 12px
+        border: 0
+
+        th:first-child,
+        td:first-child
+            border-left: 0
+
+        th:last-child,
+        td:last-child
+            border-right: 0
+
+
+.table
+    font-size: 14px
+        
+    @media(max-width: 768px)
+        font-size: 12px
+
+    thead > tr > th, 
+    tbody > tr > th, 
+    tfoot > tr > th, 
+    thead > tr > td, 
+    tbody > tr > td, 
+    tfoot > tr > td
+        vertical-align: middle
+
+        @media(max-width: 1200px)
+            padding: 4px 6px
+
+        @media(max-width: 768px)
+            padding: 2px 4px
+
+
+.navbar-nav > li > .dropdown-menu
+    border: 0
+    border-radius: 0
+
+body
+    font-family: 'Open Sans', sans-serif;
+    font-size: 17px
+    line-height: 150%
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6
+    font-weight: normal
+    line-height: 150%
+
+h1, .h1
+    font-size: 25px
+
+.content-title
+    margin: 0 15px
+    margin-bottom: 7px
+    @media(max-width: 768px)
+        margin-left: 0        
+        margin-right: 0
+
+.content-area
+    background-color: #fff
+    padding: 15px
+    margin: 0
+    margin-bottom: 40px
+    @media(max-width: 768px)
+        border-left: 0
+        border-right: 0
+        margin-left: -15px
+        margin-right: -15px
+        
+        .row
+            margin-right: -15px
+            margin-left: -15px
+
+
+@media(min-width: 988px)
+    .row-left
+        margin-left: -15px
+
+    .row-right
+        margin-right: -15px

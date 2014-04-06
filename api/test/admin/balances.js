@@ -8,7 +8,7 @@ describe('admin', function() {
     describe('balances', function() {
         describe('index', function() {
             it('succeeds', function(done) {
-                var impersonate = mock.impersonate(app, dummy.id(), { admin: true })
+                var impersonate = mock.impersonate(app, { id: dummy.id(), admin: true })
 
                 mock.once(app.conn.read, 'query', function(query, cb) {
                     cb(null, mock.rows({
@@ -38,7 +38,7 @@ describe('admin', function() {
             })
 
             it('fails if not admin', function(done) {
-                var impersonate = mock.impersonate(app, dummy.id(), { admin: false })
+                var impersonate = mock.impersonate(app, dummy.id())
 
                 request(app)
                 .get('/admin/balances')

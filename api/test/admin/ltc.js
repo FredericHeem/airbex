@@ -8,7 +8,7 @@ describe('admin', function() {
     describe('ltc', function() {
         describe('height', function() {
             it('succeeds', function(done) {
-                var impersonate = mock.impersonate(app, dummy.id(), { admin: true })
+                var impersonate = mock.impersonate(app, { id: dummy.id(), admin: true })
                 , res = {
                     height: dummy.number(1, 1e6)
                 }
@@ -31,7 +31,7 @@ describe('admin', function() {
             })
 
             it('fails if not admin', function(done) {
-                var impersonate = mock.impersonate(app, dummy.id(), { admin: false })
+                var impersonate = mock.impersonate(app, dummy.id())
 
                 request(app)
                 .get('/admin/ltc/height')

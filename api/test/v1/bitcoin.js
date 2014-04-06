@@ -10,7 +10,7 @@ describe('bitcoin', function() {
         it('returns address', function(done) {
             var uid = dummy.number(1, 1e6)
             , addr = dummy.bitcoinAddress()
-            , impersonate = mock.impersonate(app, uid, { canDeposit: true })
+            , impersonate = mock.impersonate(app, uid, null, { canDeposit: true })
             , read = mock(app.conn.read, 'query', function(query, cb) {
                 expect(query.text).to.match(/FROM BTC_deposit_address/)
                 expect(query.text).to.match(/= user_currency_acc/)
@@ -42,7 +42,7 @@ describe('bitcoin', function() {
     it('allows withdraw', function(done) {
         var uid = dummy.number(1, 1e6)
         , addr = dummy.bitcoinAddress()
-        , impersonate = mock.impersonate(app, uid, { canWithdraw: true, level: 4 })
+        , impersonate = mock.impersonate(app, { id: uid, securityLevel: 4 }, null, { canWithdraw: true })
         , rid = dummy.number(1, 1e6)
         , write = mock(app.conn.write, 'query', function(query, cb) {
             expect(query.text).to.match(/BTC_withdraw\(\$1, \$2, \$3/)

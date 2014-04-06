@@ -2,12 +2,14 @@ var crypto = require('crypto')
 , async = require('async')
 
 module.exports = exports = function(app) {
-    app.post('/v1/vouchers', app.auth.withdraw(2), function(req, res, next) {
+    app.post('/v1/vouchers', app.security.demand.otp(app.security.demand.withdraw(2), true),
+        function(req, res, next)
+    {
         if (!req.app.validate(req.body, 'v1/voucher_create', res)) return
 
         exports.create(
             req.app,
-            req.user,
+            req.user.id,
             req.body.currency,
             req.body.amount,
             function(err, code) {
@@ -17,8 +19,8 @@ module.exports = exports = function(app) {
         )
     })
 
-    app.post('/v1/vouchers/:id/redeem', app.auth.deposit(2), function(req, res, next) {
-        exports.redeem(req.app, req.user, req.params.id, function(err, details) {
+    app.post('/v1/vouchers/:id/redeem', app.security.demand.deposit(3), function(req, res, next) {
+        exports.redeem(req.app, req.user.id, req.params.id, function(err, details) {
             if (!err) {
                 return res.send(details)
             }
@@ -34,7 +36,7 @@ module.exports = exports = function(app) {
         })
     })
 
-    app.get('/v1/vouchers', app.auth.any, exports.index)
+    app.get('/v1/vouchers', app.security.demand.any, exports.index)
 }
 
 exports.create = function(app, userId, currency, amount, cb) {
@@ -81,7 +83,7 @@ exports.index = function(req, res, next) {
             'INNER JOIN account a ON a.account_id = h.account_id',
             'WHERE a.user_id = $1'
         ].join('\n'),
-        values: [req.user]
+        values: [req.user.id]
     }, function(err, dr) {
         if (err) return next(err)
         res.send(201, dr.rows.map(function(row) {
@@ -109,12 +111,6 @@ exports.redeem = function(app, user, voucher, cb) {
         },
 
         function(dr, cb) {
-            if (!dr.rowCount) {
-                var err = new Error('Voucher not found')
-                err.name = 'VoucherNotFound'
-                return cb(err)
-            }
-
             if (!dr.rows[0].tid) {
                 return cb(null, null)
             }
@@ -131,7 +127,6 @@ exports.redeem = function(app, user, voucher, cb) {
         },
 
         function(dr, cb) {
-            console.log(dr)
             if (!dr) {
                 // Voucher was cancelled
                 return cb(null, {
@@ -146,5 +141,15 @@ exports.redeem = function(app, user, voucher, cb) {
                 amount: app.cache.formatCurrency(row.amount, row.currency_id)
             })
         }
-    ], cb)
+    ], function(err, res) {
+        if (err) {
+            if (err.message.match(/not found/)) {
+                err = new Error('Voucher not found')
+                err.name = 'VoucherNotFound'
+                return cb(err)
+            }
+        }
+
+        cb(err, res)
+    })
 }

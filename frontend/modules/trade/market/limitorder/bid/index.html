@@ -1,0 +1,74 @@
+<div class="well row-right">
+    <p class="available-container">
+        <%- i18n('markets.market.limitorder.bid.available.you have') %>
+        <span class="available">...</span>
+    </p>
+
+    <form>
+        <div class="form-group amount">
+            <label class="control-label">
+                <%- i18n('markets.market.limitorder.bid.amount.label') %>
+            </label>
+
+            <div class="input-group">
+                <input type="text" name="amount" class="form-control" />
+                <span class="input-group-addon"><%= base %></span>
+            </div>
+
+            <span class="help-block">
+                <span class="visible-precision-too-high">
+                    <%- i18n('markets.market.limitorder.bid.amount.too many decimals') %>
+                </span>
+                <span class="visible-too-small  hidden-too-many-decimals hidden-precision-too-high">
+                    <%- i18n('markets.market.marketorder.bid.spend.too small') %>
+                </span>
+            </span>
+        </div>
+
+        <div class="form-group price">
+            <label class="control-label">
+                <%- i18n('markets.market.limitorder.bid.price.label') %>
+                <%= base %>
+            </label>
+
+            <div class="input-group">
+                <input type="text" name="price" class="form-control" />
+                <span class="input-group-addon"><%= quote %></span>
+            </div>
+
+            <span class="help-block">
+                <span class="visible-precision-too-high">
+                    <%- i18n('markets.market.limitorder.bid.price.too many decimals') %>
+                </span>
+            </span>
+        </div>
+
+        <table class="order-summary table">
+            <tr>
+                <th>
+                    <%- i18n('markets.market.limitorder.bid.summary.subtotal') %>
+                </th>
+                <td class="subtotal">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <%- i18n('markets.market.limitorder.bid.summary.fee') %>
+                </th>
+                <td class="fee">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <%- i18n('markets.market.limitorder.bid.summary.total') %>
+                </th>
+                <td class="total">
+                </td>
+            </tr>
+        </table>
+
+        <button type="submit" class="btn btn-success btn-block">
+            <%- i18n('markets.market.limitorder.bid.submit') %>
+        </button>
+    </form>
+</div>

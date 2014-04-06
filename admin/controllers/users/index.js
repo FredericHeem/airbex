@@ -1,47 +1,69 @@
-module.exports = function() {
+var format = require('util').format
+
+module.exports = function(query, skip) {
+    // Assign defaults
+    query || (query = '')
+    skip || (skip = 0)
+
     var itemTemplate = require('./item.html')
-    , $el = $(require('./template.html')())
-    , controller = {
+    , $el = $(require('./template.html')({
+        query: query
+    }))
+    , ctrl = {
         $el: $el
     }
-    , $items = controller.$el.find('.users')
-    , $form = $el.find('.search-form')
 
-    function itemsChanged(items) {
-        $items.html($.map(items, function(item) {
+    // Navigation
+    $el.find('.nav a[href="#users"]').parent().addClass('active')
+
+    // Submit search
+    $el.on('submit', 'form', function(e) {
+        e.preventDefault()
+        var val = $el.field('query').val()
+        if (!val.length) return
+        router.go('users?query=' + val)
+    })
+
+    $el.find('.query').focus().focusSoon()
+
+    if (!query) return ctrl
+
+    // Search
+    api.call('admin/users', null, {
+        qs: {
+            all: query,
+            skip: skip
+        }
+    })
+    .fail(errors.alertFromXhr)
+    .done(function(res) {
+        // Add items
+        $el.find('.users').html($.map(res.users, function(item) {
             var $item = $(itemTemplate(item))
             $item.attr('data-id', item.user_id)
             return $item
         }))
-    }
 
-    function refresh(query) {
-        $form.addClass('is-loading')
+        // Toggle pagers
+        $el
+        .toggleClass('has-page-after', skip + res.users.length < res.count)
+        .toggleClass('has-page-before', !!skip)
 
-        api.call('admin/users', null, { qs: query })
-        .fail(errors.alertFromXhr)
-        .always(function() {
-            $form.removeClass('is-loading')
+        // Pager next
+        $el.on('click', '.pager .next a', function(e) {
+            e.preventDefault()
+            skip = skip + res.users.length
+            router.go(format('users?query=%s&skip=%d', query, skip))
         })
-        .done(itemsChanged)
-    }
 
-    $form.on('submit', function(e) {
-        function parseField(val) {
-            val = val.replace(/^\s+|\s+$/g, '')
-            return val.length ? val : null
-        }
-
-        e.preventDefault()
-
-        refresh({
-            all: parseField($form.find('.query').val())
+        // Pager previous
+        $el.on('click', '.pager .previous a', function(e) {
+            e.preventDefault()
+            var prev = Math.max(0, skip - res.limit)
+            skip = prev > 0 ? prev : 0
+            router.go(format('users?query=%s&skip=%d', query, skip))
         })
     })
 
-    $el.find('.nav a[href="#users"]').parent().addClass('active')
-
-    $el.find('.query').focusSoon()
-
-    return controller
+    return ctrl
 }

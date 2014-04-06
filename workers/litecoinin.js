@@ -2,6 +2,7 @@ var num = require('num')
 , async = require('async')
 , debug = require('debug')('snow:litecoinin')
 , _ = require('lodash')
+, util = require('util')
 
 module.exports = exports = function(o) {
     _.extend(exports, { minConf: 6 }, o)
@@ -25,6 +26,13 @@ exports.getDbHeight = function(cb) {
         debug('db height found at %s', exports.dbHeight)
         cb(null, exports.dbHeight)
     })
+}
+
+exports.setDbBalance = function(val, cb) {
+    exports.db.query({
+        text: 'UPDATE settings SET ltc_balance = $1',
+        values: [val]
+    }, cb)
 }
 
 exports.setDbHeight = function(height, cb) {
@@ -51,7 +59,11 @@ exports.check = function(cb) {
                 exports.daemon.getBlockHash.bind(exports.daemon, n),
                 exports.daemon.getBlock.bind(exports.daemon),
                 exports.processBlock,
-                exports.setDbHeight.bind(null, n)
+                exports.setDbHeight.bind(null, n),
+                function(dr, cb) {
+                    exports.daemon.getBalance(cb)
+                },
+                exports.setDbBalance
             ], function(err) {
                 if (err) return cb(err)
                 debug('finished with block #%d', n)
@@ -81,6 +93,7 @@ exports.credit = function(txid, address, satoshis, cb) {
                 return cb()
             }
             if (err) return cb(err)
+            console.log('credited %s satoshis to %s (%s)', satoshis, address, txid)
             cb(null, dr.rows[0].tid)
         })
     })
@@ -96,11 +109,13 @@ exports.processTx = function(txid, cb) {
         if (err && err.message.match(/^Invalid or non-wallet/)) return cb()
         if (err) return cb(err)
         if (!tx.details) return cb()
-        if (tx.details.length != 1) return cb(new Error('more than one detail'))
-        var detail = tx.details[0]
-        if (detail.category !== 'receive') return cb()
-        var address = detail.address
-        , satoshis = +num(detail.amount).mul(1e8)
-        exports.credit(txid, address, satoshis, cb)
+
+        async.eachSeries(tx.details, function(detail, cb) {
+            debug('proecssing detail %s', util.inspect(detail))
+            if (detail.category != 'receive') return cb()
+            var address = detail.address
+            , satoshis = +num(detail.amount.toFixed(8)).mul(1e8)
+            exports.credit(txid, address, satoshis, cb)
+        }, cb)
     })
 }

@@ -1,7 +1,7 @@
 server {
     listen <%= node[:snow][:admin][:port] %>;
     server_name <%= node[:snow][:admin][:domain] %>;
-    root /home/ubuntu/snow-admin/current/admin/build/;
+    root /home/ubuntu/snow-admin/current/admin/dist/;
     access_log /var/log/snow-admin-access.log;
     error_log /var/log/snow-admin-error.log;
 

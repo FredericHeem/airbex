@@ -1,0 +1,10 @@
+	<td class="name"><a
+		href="/api/admin/users/documents/<%= document_id %>"><%=
+			name %></a></td>
+
+	<td class="status">
+		<button class="btn btn-success approve" data-id="<%= document_id %>" data-action="approve">Approve</button>
+		<button class="btn btn-danger reject" data-id="<%= document_id %>" data-action="reject">Reject</button>
+	</td>
+	<td class="status"><span id="status" class="label"><%= status %></span></td>
+	<td class="lastupdate"><%= moment(last_modified_date).format('YYYY-MM-DD HH:mm') %></td>

@@ -3,7 +3,7 @@ var crypto = require('crypto')
 
 module.exports = exports = function(app) {
     app.post('/v1/resetPassword', exports.resetPasswordBegin)
-    app.get('/v1/resetPassword/continue/:code',
+    app.get('/v1/resetPassword/continue/:code([a-f0-9]{20})',
         exports.resetPasswordContinue)
     app.post('/v1/resetPassword/end', exports.resetPasswordEnd)
 }
@@ -19,6 +19,13 @@ exports.createPhoneCode = function() {
 }
 
 exports.resetPasswordBegin = function(req, res, next) {
+    if (!req.app.validate(req.body, 'v1/password_reset_begin', res)) {
+        debug("resetPasswordBegin invalid request")
+        return;
+    }
+    
+    debug("resetPasswordBegin email: %s", req.body.email);
+    
     var emailCode = exports.createEmailCode()
     , phoneCode = exports.createPhoneCode()
 
@@ -81,6 +88,9 @@ exports.resetPasswordBegin = function(req, res, next) {
 }
 
 exports.resetPasswordContinue = function(req, res, next) {
+    
+    debug("resetPasswordContinue code: %s", req.params.code); 
+    
     req.app.conn.write.query({
         text: [
             'SELECT code, phone_number',
@@ -104,14 +114,23 @@ exports.resetPasswordContinue = function(req, res, next) {
         }
 
         var code = dr.rows[0].code
+        , phoneNumber = dr.rows[0].phone_number
 
         debug('correct code is %s', code)
+        var company = req.app.config.company || 'SBEX'
+        var msg = code + ' is your ' + company + ' reset code'
 
-        res.send('Email confirmed. Next we will call you. ' +
+        debug('requesting call to %s', phoneNumber)
+
+        res.send('Email confirmed. Next we will text you a 4 digit code. ' +
             'Close this window and go back to the password reset window.')
 
         setTimeout(function() {
-            // TODO: Implement calling
+            req.app.phone.text(phoneNumber, msg, function(err) {
+                if (!err) return debug('call placed')
+                console.error('Failed to call user at %s', phoneNumber)
+                console.error(err)
+            })
         }, exports.callDelay)
     })
 }
@@ -119,6 +138,8 @@ exports.resetPasswordContinue = function(req, res, next) {
 exports.callDelay = 10e3
 
 exports.resetPasswordEnd = function(req, res, next) {
+    debug("resetPasswordEnd email: %s, code %s", req.body.email, req.body.code); 
+    
     req.app.conn.write.query({
         text: 'SELECT reset_password_end($1, $2, $3) success',
         values: [req.body.email, req.body.code, req.body.key]

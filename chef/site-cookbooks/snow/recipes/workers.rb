@@ -1,8 +1,13 @@
+include_recipe "snow::common"
+include_recipe "apt"
+include_recipe "nodejs"
+include_recipe "postgresql::client"
+
 package 'git' do
 end
 
 include_recipe 'deploy_wrapper'
-bag = data_bag_item("snow", "main")
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
 env_bag = bag[node.chef_environment]
 
 ssh_known_hosts_entry 'github.com'
@@ -16,100 +21,52 @@ deploy_wrapper 'workers' do
     sloppy true
 end
 
-template "/etc/init/snow-bitcoinin.conf" do
-  source "workers/upstart/bitcoinin.conf.erb"
-  owner "root"
-  group "root"
-  mode 00644
+#services = %w(bitcoinin bitcoinbridge bitcoinout bitcoinaddress litecoinin litecoinout litecoinaddress ripplein rippleout metrics)
+services = %w(bitcoinin bitcoinout bitcoinaddress litecoinin litecoinout litecoinaddress)
+services.each do |service|
+  template "/etc/init/snow-#{service}.conf" do
+    source "workers/upstart/#{service}.conf.erb"
+    owner "root"
+    group "root"
+    mode 00644
+    notifies :restart, "service[snow-#{service}]"
+  end
 end
-
-template "/etc/init/snow-bitcoinout.conf" do
-  source "workers/upstart/bitcoinout.conf.erb"
-  owner "root"
-  group "root"
-  mode 00644
-end
-
-template "/etc/init/snow-bitcoinaddress.conf" do
-  source "workers/upstart/bitcoinaddress.conf.erb"
-  owner "root"
-  group "root"
-  mode 00644
-end
-
-template "/etc/init/snow-litecoinin.conf" do
-  source "workers/upstart/litecoinin.conf.erb"
-  owner "root"
-  group "root"
-  mode 00644
-end
-
-template "/etc/init/snow-litecoinout.conf" do
-  source "workers/upstart/litecoinout.conf.erb"
-  owner "root"
-  group "root"
-  mode 00644
-end
-
-template "/etc/init/snow-litecoinaddress.conf" do
-  source "workers/upstart/litecoinaddress.conf.erb"
-  owner "root"
-  group "root"
-  mode 00644
-end
-
-template "/etc/init/snow-ripplein.conf" do
-  source "workers/upstart/ripplein.conf.erb"
-  owner "root"
-  group "root"
-  mode 00644
-end
-
-template "/etc/init/snow-rippleout.conf" do
-  source "workers/upstart/rippleout.conf.erb"
-  owner "root"
-  group "root"
-  mode 00644
-end
-
-services = %w(snow-bitcoinin snow-bitcoinout snow-bitcoinaddress snow-litecoinin snow-litecoinout snow-litecoinaddress snow-ripplein snow-rippleout)
 
 # Create services
 services.each do |service|
-  service service do
+  service "snow-#{service}" do
     provider Chef::Provider::Service::Upstart
     supports :start => true, :stop => true, :restart => true
     action :enable
   end
 end
 
-execute "npm_install" do
-  command "npm install"
-  user "ubuntu"
-  group "ubuntu"
-  cwd "#{node[:snow][:workers][:app_directory]}/current/workers"
-  action :nothing
-end
-
 # Deployment config
 deploy_revision node[:snow][:workers][:app_directory] do
     user "ubuntu"
     group "ubuntu"
-    repo node[:snow][:repo]
+    repo env_bag["repository"]["main"]
     ssh_wrapper "/home/ubuntu/workers-ssh-wrapper/workers_deploy_wrapper.sh"
     action :deploy
-    branch 'master'
-    #restart 'sudo initctl restart snow-bitcoinin || sudo initctl start snow-bitcoinin'
-    notifies :run, "execute[npm_install]"
+    branch node[:snow][:branch]
+    before_symlink do
+      bash "npm install" do
+        user "root"
+        group "root"
+        cwd "#{release_path}/workers"
+        code %{
+          npm install
+        }
+      end
+    end
     notifies :restart, "service[snow-bitcoinin]"
     notifies :restart, "service[snow-bitcoinout]"
     notifies :restart, "service[snow-bitcoinaddress]"
     notifies :restart, "service[snow-litecoinin]"
     notifies :restart, "service[snow-litecoinout]"
     notifies :restart, "service[snow-litecoinaddress]"
-    notifies :restart, "service[snow-ripplein]"
-    notifies :restart, "service[snow-rippleout]"
-    keep_releases 10
+    keep_releases 2
     symlinks({
          "config/workers.json" => "workers/config/#{node.chef_environment}.json"
     })
@@ -133,22 +90,40 @@ pgm_ip = search(:node, 'role:pgm').first ? search(:node, 'role:pgm').first[:ipad
 pgs_ip = search(:node, 'role:pgs').first ? search(:node, 'role:pgs').first[:ipaddress] : nil
 bitcoind_ip = search(:node, 'role:bitcoind').first ? search(:node, 'role:bitcoind').first[:ipaddress] : nil
 litecoind_ip = search(:node, 'role:litecoind').first ? search(:node, 'role:litecoind').first[:ipaddress] : nil
+rippled_ip = search(:node, 'role:rippled').first ? search(:node, 'role:rippled').first[:ipaddress] : nil
 
 template "#{node[:snow][:workers][:app_directory]}/shared/config/workers.json" do
     source 'workers/config.json.erb'
     variables({
+        :website_url => env_bag['api']['website_url'],
         :pgm_conn => "postgres://postgres@#{pgm_ip || '127.0.0.1'}/snow",
         :pgs_conn => "postgres://postgres@#{pgs_ip || '127.0.0.1'}/snow",
         :ripple => env_bag['ripple'],
         :litecoind_ip => litecoind_ip || '127.0.0.1',
-        :bitcoind_ip => bitcoind_ip || '127.0.0.1'
+        :rippled_ip => rippled_ip || '127.0.0.1',
+        :bitcoind_ip => bitcoind_ip || '127.0.0.1',
+        :bitcoin => env_bag['bitcoin'],
+        :litecoin => env_bag['litecoin'],
+        :armory => env_bag['armory'],
+        :env_bag => env_bag
     })
     notifies :restart, resources(:service => "snow-bitcoinin")
+    notifies :restart, resources(:service => "snow-litecoinin")
 end
 
-# Start services
-services.each do |service|
-  service service do
-    action :start
-  end
+monit_monitrc "snow-workers" do
 end
+
+template "/usr/bin/liability-proof.sh" do
+    source "liability-proof.sh.erb"
+    owner "root"
+    group "root"
+    mode 0755
+end
+
+cron_d "liability-proof" do
+  hour 14
+  minute 30
+  command "/usr/bin/liability-proof.sh"
+end
+

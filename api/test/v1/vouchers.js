@@ -16,7 +16,8 @@ describe('vouchers', function() {
             , res = {
             }
             , userId = dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, userId, { canWithdraw: true, level: 2 })
+            , impersonate = mock.impersonate(app, { id: userId, securityLevel: 2 }, null,
+                { canWithdraw: true })
 
             mock.once(vouchers, 'createId', function() {
                 res.voucher = vouchers.createId.real()
@@ -53,7 +54,8 @@ describe('vouchers', function() {
         it('redeems', function(done) {
             var userId = dummy.number(1, 1e6)
             , tid = dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, userId, { canDeposit: true, level: 2 })
+            , impersonate = mock.impersonate(app, { id: userId, securityLevel: 2 }, null,
+                { canDeposit: true })
             , voucher = dummy.hex(8).toUpperCase()
             , res = {
                 currency: 'BTC',

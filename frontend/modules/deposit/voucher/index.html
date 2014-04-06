@@ -1,0 +1,46 @@
+<div class="container">
+    <div class="deposit-nav"></div>
+    <div class="col-lg-9">
+        <h1 class="content-title"><%- i18n('deposit.voucher.heading') %></h1>
+
+        <div class="content-area">
+            <div class="redeem hidden-cancelled hidden-redeemed">
+                <form class="form">
+                    <div class="code form-group">
+                        <label class="control-label">
+                            <%- i18n('deposit.voucher.code') %>
+                        </label>
+
+                        <input type="text" name="code" placeholder="XXXX-XXXX-XXXX" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="submit btn btn-success">
+                            <%- i18n('deposit.voucher.submit') %>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="redeemed visible-redeemed">
+                <h3>
+                    <%- i18n('deposit.voucher.redeemed.intro') %>
+                </h3>
+
+                <p class="credit"></p>
+
+                <p>
+                    <a href="#reload">
+                        <%- i18n('deposit.voucher.redeemed.reload') %>
+                    </a>
+                </p>
+            </div>
+
+            <div class="cancelled visible-cancelled">
+                <h3><%- i18n('deposit.voucher.cancelled.heading') %></h3>
+
+                <p><%-i18n('deposit.voucher.cancelled.intro') %></p>
+            </div>
+        </div>
+    </div>
+</div>

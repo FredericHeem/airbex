@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+export REGION=eu-west-1
+export AZ=${REGION}a
+export PRIVATE_SUBNET=subnet-9bc6baf0
+export PUBLIC_SUBNET=subnet-9fc6baf4
+export AMI="ami-89b1a3fd"
+export SSH_KEY=/P/Justcoin/Keys/AWS/jc.pem
+export SSH_KEY_NAME=justcoin
+export VPC=vpc-81c6baea
+
+export PGM_INSTANCE_TYPE=m1.small
+export PGM_SECURITY_GROUP=sg-3cce2753
+
+export PGS_INSTANCE_TYPE=m1.small
+export PGS_SECURITY_GROUP=sg-bdd43dd2
+
+export API_INSTANCE_TYPE=t1.micro
+export API_SECURITY_GROUP=sg-5dce2732
+
+export WORKERS_INSTANCE_TYPE=t1.micro
+export WORKERS_SECURITY_GROUP=sg-08a24a67
+
+export FRONTEND_INSTANCE_TYPE=t1.micro
+export FRONTEND_SECURITY_GROUP=sg-e01df48f
+
+export REVERSE_INSTANCE_TYPE=t1.micro
+export REVERSE_SECURITY_GROUP=sg-2815fc47
+
+export ADMIN_INSTANCE_TYPE=t1.micro
+export ADMIN_SECURITY_GROUP=sg-e717fe88
+
+export LANDING_INSTANCE_TYPE=t1.micro
+export LANDING_SECURITY_GROUP=sg-ab7a93c4
+
+export APP_INSTANCE_TYPE=m1.small
+export APP_SECURITY_GROUPS=$API_SECURITY_GROUP,$ADMIN_SECURITY_GROUP,$FRONTEND_SECURITY_GROUP,$LANDING_SECURITY_GROUP,$REVERSE_SECURITY_GROUP
+
+export BITCOIND_INSTANCE_TYPE=m1.small
+export BITCOIND_SECURITY_GROUP=sg-4d4ea722
+
+export LITECOIND_INSTANCE_TYPE=t1.micro
+export LITECOIND_SECURITY_GROUP=sg-294ea746
+
+export RIPPLED_INSTANCE_TYPE=t1.micro
+export RIPPLED_SECURITY_GROUP=sg-90aa41ff
+
+export CHEF_SERVER_URL=https://chef.internal.justcoin.com

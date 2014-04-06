@@ -1,0 +1,4 @@
+{
+    "pg_url" : "postgres://postgres:postgres1234@localhost:5432/snow"
+    
+}

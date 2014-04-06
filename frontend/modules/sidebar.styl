@@ -1,0 +1,537 @@
+freiablue = darken(#94B1D1, 40%)
+
+
+/*
+ * Bootstrap Documentation
+ * Special styles for presenting Bootstrap's documentation and code examples.
+ */
+
+
+
+/* Key scaffolding
+-------------------------------------------------- */
+
+body {
+  position: relative; /* For scrollyspy */
+  padding-top: 60px; /* Account for fixed navbar */
+  background-color: #f9f9f9;
+}
+
+/* Temp CSS until RC2 */
+.jc-customize-placeholder {
+  margin-bottom: -100px;
+  padding: 80px 30px;
+  text-align: center;
+  background-color: #f5f5f5;
+}
+
+
+/* Top nav and header
+-------------------------------------------------- */
+
+topbarbg = #07415B
+topbarbgactive = #C0ECFF
+
+.jc-nav
+  background-color topbarbg
+
+
+.jc-nav .navbar-nav > li > a
+  color #fff
+  padding-bottom: 30px
+  margin-bottom: -15px
+
+.jc-nav .navbar-nav > li > a:hover {
+  color: #fff;
+}
+
+.jc-nav .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav>.open>a,
+.navbar-inverse .navbar-nav>.open>a:hover,
+.navbar-inverse .navbar-nav>.open>a:focus,
+.jc-nav .navbar-nav > .active > a:hover {
+  color: #b2d6fd
+  background-color: transparent
+  background-position: center bottom
+  background-repeat: no-repeat
+}
+/*
+.navbar-inverse .navbar-nav > .active > a, 
+.navbar-inverse .navbar-nav > .active > a:hover, 
+.navbar-inverse .navbar-nav > .active > a:focus
+  background-color: transparent
+
+.jc-nav .navbar-toggle {
+  border-color: #f7f5fa
+}
+.jc-nav .navbar-toggle:hover {
+  background-color topbarbgactive
+  border-color: #463265;
+}
+*/
+/* Docs pages and sections
+-------------------------------------------------- */
+
+/* Page headers */
+.jc-header {
+  padding: 30px 30px 40px;
+  font-size: 16px;
+  color: #5a5a5a;
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.jc-header h1 {
+  color: #563d7c;
+}
+.jc-header p {
+  font-weight: 300;
+  line-height: 1.5;
+}
+.jc-header .container {
+  position: relative;
+}
+
+.jc-section + .jc-section {
+  margin-top: 80px;
+}
+
+/* Ads in page headers */
+.carbonad {
+  width: auto !important;
+  margin: 50px -30px -40px !important;
+  padding: 20px !important;
+  overflow: hidden; /* clearfix */
+  height: auto !important;
+  font-size: 13px !important;
+  line-height: 16px !important;
+  text-align: left;
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid #e5e5e5 !important;
+}
+.carbonad-img {
+  margin: 0 !important;
+}
+.carbonad-text,
+.carbonad-tag {
+  float: none !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  margin-left: 145px !important;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+.carbonad-text {
+  padding-top: 0 !important;
+}
+.carbonad-tag {
+  text-align: left !important;
+}
+.carbonad #azcarbon > img {
+  display: none; /* hide what I assume are tracking images */
+}
+
+/* Docs sidebar
+-------------------------------------------------- */
+
+/* By default it's not affixed in mobile views, so undo that */
+.jc-sidebar.affix {
+  position: static;
+}
+
+/* First level of nav */
+.jc-sidenav {
+  @media (min-width: 768px) {
+    margin-top: 10px;
+  }
+
+  margin-bottom: 30px;
+  padding-top:    10px;
+  padding-bottom: 10px;
+}
+
+/* All levels of nav */
+.jc-sidebar .nav > li > a {
+  text-decoration: none;
+  display: block;
+  color: #716b7a;
+  padding: 5px;
+  margin: 0 -5px;
+}
+.jc-sidebar .nav > li > a:hover,
+.jc-sidebar .nav > li > a:focus {
+  color: #563d7c;
+  background-color: #e5e3e9;
+}
+.jc-sidebar .nav > .active > a,
+.jc-sidebar .nav > .active:hover > a,
+.jc-sidebar .nav > .active:focus > a {
+  font-weight: bold;
+  color: #563d7c;
+  background-color: transparent;
+}
+
+/* Nav: second level (shown on .active) */
+.jc-sidebar .nav .nav {
+  display: none; /* Hide by default, but at >768px, show it */
+  margin-bottom: 8px;
+}
+.jc-sidebar .nav .nav > li > a {
+  padding-top:    3px;
+  padding-bottom: 3px;
+  padding-left: 30px;
+  font-size: 90%;
+}
+
+
+
+/* Side notes for calling out things
+-------------------------------------------------- */
+
+/* Base styles (regardless of theme) */
+.jc-callout {
+  margin: 20px 0;
+  padding: 15px 30px 15px 15px;
+  border-left: 5px solid #eee;
+}
+.jc-callout h4 {
+  margin-top: 0;
+}
+.jc-callout p:last-child {
+  margin-bottom: 0;
+}
+.jc-callout code,
+.jc-callout .highlight {
+  background-color: #fff;
+}
+
+/* Themes for different contexts */
+.jc-callout-danger {
+  background-color: #fcf2f2;
+  border-color: #dFb5b4;
+}
+.jc-callout-warning {
+  background-color: #fefbed;
+  border-color: #f1e7bc;
+}
+.jc-callout-info {
+  background-color: #f0f7fd;
+  border-color: #d0e3f0;
+}
+
+
+
+/* Special grid styles
+-------------------------------------------------- */
+
+.show-grid {
+  margin-bottom: 15px;
+}
+.show-grid [class^="col-"] {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #eee;
+  border: 1px solid #ddd;
+  background-color: rgba(86,61,124,.15);
+  border: 1px solid rgba(86,61,124,.2);
+}
+
+
+
+/* Responsive docs
+-------------------------------------------------- */
+
+/* Responsive (scrollable) doc tables */
+@media (max-width: 768px) {
+  .jc-table-scrollable {
+    width: 100%;
+    margin-bottom: 15px;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    border: 1px solid #ddd;
+  }
+  .jc-table-scrollable .table {
+    margin-bottom: 0;
+    border: 0;
+  }
+  .jc-table-scrollable .table th,
+  .jc-table-scrollable .table td {
+    white-space: nowrap;
+  }
+  .jc-table-scrollable .table th:first-child,
+  .jc-table-scrollable .table td:first-child {
+    border-left: 0;
+  }
+  .jc-table-scrollable .table th:last-child,
+  .jc-table-scrollable .table td:last-child {
+    border-right: 0;
+  }
+  .jc-table-scrollable .table tr:last-child th,
+  .jc-table-scrollable .table tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+/* Related: responsive utilities tables */
+.table code {
+  font-size: 13px;
+  font-weight: normal;
+}
+
+/* Utility classes table
+------------------------- */
+.jc-table th small,
+.responsive-utilities th small {
+  display: block;
+  font-weight: normal;
+  color: #999;
+}
+.responsive-utilities tbody th {
+  font-weight: normal;
+}
+.responsive-utilities td {
+  text-align: center;
+}
+.responsive-utilities td.is-visible {
+  color: #468847;
+  background-color: #dff0d8 !important;
+}
+.responsive-utilities td.is-hidden {
+  color: #ccc;
+  background-color: #f9f9f9 !important;
+}
+
+
+/* Footer
+-------------------------------------------------- */
+
+.jc-footer
+  padding: 40px 0 30px;
+  text-align: center;
+  @media(min-width: 768px)
+    margin-top: 100px
+
+  .logo
+    margin-top: 40px
+    margin-bottom: 20px
+    opacity: 0.2
+    
+  p  
+    margin-bottom: 0;
+    color: #777;
+
+.footer-links
+  margin: 0 100px
+  padding-left: 0
+  @media(max-width: 768px)
+    margin: 0
+
+
+.footer-links li {
+  display: inline-block;
+  padding: 0 2px;
+  margin-bottom: 10px;
+}
+.footer-links li:first-child {
+  padding-left: 0;
+}
+
+/* Social proof buttons from GitHub & Twitter */
+.jc-social {
+  margin-bottom: 20px;
+}
+.jc-social-buttons {
+  display: inline-block;
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+}
+.jc-social-buttons li {
+  display: inline-block;
+  line-height: 1;
+}
+.jc-social-buttons li + li {
+  margin-left: 15px;
+}
+.jc-social-buttons .twitter-follow-button {
+  width: 225px !important;
+}
+.jc-social-buttons .twitter-share-button {
+  width: 98px !important;
+}
+
+
+
+/* Misc docs stuff
+-------------------------------------------------- */
+
+/* Pseudo :focus state for showing how it looks in the docs */
+input.focused {
+  border-color: rgba(82,168,236,.8);
+  outline: 0;
+  outline: thin dotted \9; /* IE6-9 */
+  -moz-box-shadow: 0 0 8px rgba(82,168,236,.6);
+       box-shadow: 0 0 8px rgba(82,168,236,.6);
+}
+
+/* Scrollspy demo on fixed height div */
+.scrollspy-example {
+  position: relative;
+  height: 200px;
+  margin-top: 10px;
+  overflow: auto;
+}
+
+.highlight {
+  padding: 9px 14px;
+  margin-bottom: 14px;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+  border-radius: 4px;
+}
+.highlight pre {
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  background-color: transparent;
+  border: 0;
+  white-space: nowrap;
+}
+.highlight pre code {
+  font-size: inherit;
+  color: #333; /* Effectively the base text color */
+}
+.highlight pre .lineno {
+  display: inline-block;
+  width: 22px;
+  padding-right: 5px;
+  margin-right: 10px;
+  text-align: right;
+  color: #bebec5;
+}
+
+/* Better spacing on download options in getting started */
+.jc-dl-options h4 {
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+
+/* Responsive variations
+-------------------------------------------------- */
+
+/* Hide code snippets on mobile devices */
+@media screen and (max-width: 480px) {
+  .highlight {
+    display: none;
+  }
+}
+
+/* Tablets and up */
+@media screen and (min-width: 768px) {
+
+  .jc-header {
+    font-size: 21px;
+    text-align: left;
+  }
+  .jc-header h1 {
+    font-size: 60px;
+    line-height: 1;
+  }
+
+  .jc-example {
+    margin-left: 0;
+    margin-right: 0;
+    background-color: #fff;
+    border-width: 1px;
+    border-color: #ddd;
+    border-radius: 4px 4px 0 0;
+    box-shadow: none;
+  }
+
+  .carbonad {
+    margin: 0 !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 4px;
+  }
+
+  /* Show the docs nav */
+  .jc-sidebar {
+    display: block;
+  }
+
+  /* Show the hidden subnavs when space allows it */
+
+  /* Tweak display of docs jumbotrons */
+  .jc-masthead {
+    padding-top:    100px;
+    padding-bottom: 100px;
+  }
+  .jc-masthead h1 {
+    font-size: 100px;
+  }
+  .jc-masthead p {
+    margin-left: 15%;
+    margin-right: 15%;
+    font-size: 30px;
+  }
+
+  .jc-navbar-top-example .navbar-fixed-top,
+  .jc-navbar-bottom-example .navbar-fixed-bottom {
+    position: absolute;
+  }
+
+}
+
+.jc-sidebar .nav > .active > ul {
+  display: block;
+}
+
+/* Tablets/desktops and up */
+@media screen and (min-width: 992px) {
+
+  /* Widen the fixed sidebar */
+  .jc-sidebar.affix,
+  .jc-sidebar.affix-bottom {
+    width: 213px;
+  }
+  .jc-sidebar.affix {
+    position: fixed; /* Undo the static from mobile-first approach */
+    top: 80px;
+  }
+  .jc-sidebar.affix-bottom {
+    position: absolute; /* Undo the static from mobile-first approach */
+  }
+  .jc-sidebar.affix-bottom .jc-sidenav,
+  .jc-sidebar.affix .jc-sidenav {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  .jc-header h1,
+  .jc-header p {
+    margin-right: 380px;
+  }
+  .carbonad {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    padding: 15px !important;
+    width: 330px !important;
+    min-height: 132px;
+  }
+
+}
+
+/* Large desktops and up */
+@media screen and (min-width: 1200px) {
+
+  /* Widen the fixed sidebar again */
+  .jc-sidebar.affix-bottom,
+  .jc-sidebar.affix {
+    width: 270px;
+  }
+
+}
+
+.btn-primary
+  background-color freiablue

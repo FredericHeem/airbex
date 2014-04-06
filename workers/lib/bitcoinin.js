@@ -11,12 +11,13 @@ var BitcoinIn = module.exports = function(ep, db, minConf) {
     , Bitcoin = require('bitcoin').Client
     this.bitcoin = new Bitcoin(ep)
     this.minConf = minConf || 3
-    console.log('bitcoinin minConf %d', this.minConf)
     this.db = db
     async.forever(function(cb) {
         that.check(function(err) {
-            if (err) console.error(err)
-            if (err) that.emit(err)
+            if (err) {
+                console.error(err)
+                that.emit(err)
+            }
             setTimeout(cb, 5e3)
         })
     })
@@ -33,6 +34,13 @@ BitcoinIn.prototype.getDbHeight = function(cb) {
         that.dbHeight = dr.rows[0].bitcoin_height
         cb(null, that.dbHeight)
     })
+}
+
+BitcoinIn.prototype.setDbBalance = function(val, cb) {
+    this.db.query({
+        text: 'UPDATE settings SET btc_balance = $1',
+        values: [val]
+    }, cb)
 }
 
 BitcoinIn.prototype.setDbHeight = function(val, cb) {
@@ -58,7 +66,11 @@ BitcoinIn.prototype.check = function(cb) {
                 that.bitcoin.getBlockHash.bind(that.bitcoin, n),
                 that.bitcoin.getBlock.bind(that.bitcoin),
                 that.processBlock,
-                that.setDbHeight.bind(that, n)
+                that.setDbHeight.bind(that, n),
+                function(dr, cb) {
+                    that.bitcoin.getBalance(cb)
+                },
+                that.setDbBalance
             ], function(err) {
                 if (err) return cb(err)
                 debug('Finished with block #%d', n)
@@ -74,7 +86,7 @@ BitcoinIn.prototype.processOutput = function(txid, o, cb) {
     if (!o.scriptPubKey.addresses) return cb()
     if (o.scriptPubKey.addresses.length !== 1) return cb()
     var address = o.scriptPubKey.addresses[0]
-    , satoshi = +num(o.value).mul(1e8)
+    , satoshi = +num(o.value.toFixed(8)).mul(1e8)
     this.db.query({
         text: [
             'SELECT btc_credit($1, $2, $3) tid',

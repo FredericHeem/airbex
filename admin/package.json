@@ -3,23 +3,39 @@
   "description": "snow admin web interface",
   "version": "0.0.1",
   "dependencies": {
-    "jake": "~0.6.11",
-    "bower": "~1.2.4",
-    "browserify": "~2.29.0",
-    "uglifyjs": "~2.3.6",
-    "clean-css": "~1.0.12",
-    "stylus": "~0.37.0",
-    "shelljs": "~0.2.1",
-    "browserify-ejs": "0.0.2",
-    "lodash": "~1.3.1",
-    "num": "~0.2.1",
-    "moment": "~2.1.0",
-    "nib": "~1.0.1",
-    "ejs": "~0.8.4"
+    "lodash": "2.2.1",
+    "num": "git://github.com/abrkn/node-num.git#v0.2.9",
+    "moment": "2.1.0",
+    "nib": "1.0.1",
+    "alertify": "https://github.com/fabien-d/alertify.js/archive/0.3.11.tar.gz"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "grunt-bower": "0.7.0",
+    "grunt-cli": "0.1.9",
+    "grunt": "0.4.1",
+    "grunt-browserify": "1.2.9",
+    "grunt-concurrent": "0.4.1",
+    "grunt-contrib-clean": "0.5.0",
+    "grunt-contrib-concat": "0.3.0",
+    "grunt-contrib-copy": "0.4.1",
+    "grunt-contrib-htmlmin": "0.1.3",
+    "grunt-contrib-uglify": "0.2.4",
+    "grunt-legacy": "0.0.1",
+    "grunt-contrib-watch": "0.5.3",
+    "grunt-contrib-cssmin": "0.6.2",
+    "grunt-contrib-connect": "0.5.0",
+    "grunt-contrib-stylus": "0.9.0",
+    "browserify-ejs": "0.0.2",
+    "grunt-ejs": "0.1.0",
+    "grunt-bower-task": "0.3.2",
+    "http-proxy": "0.10.3"
+  },
+  "scripts": {
+    "pack": "tar -zcf node_modules.tar.gz node_modules",
+    "unpack": "tar -zxf node_modules.tar.gz"
+  },
   "engines": {
-    "node": ">=0.10",
+    "node": "~0.10",
     "npm": ">=1.1"
   }
 }

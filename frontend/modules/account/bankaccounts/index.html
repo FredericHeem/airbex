@@ -1,0 +1,58 @@
+<div class="container">
+    <div class="account-nav"></div>
+
+    <div class="col-lg-9">
+        <h1 class="content-title"><%- i18n('account.bankaccounts.heading') %></h1>
+
+        <div class="content-area">
+            <p class="lead alert alert-info visible-loading"><%- i18n('loading') %>...</p>
+
+            <div class="visible-blocked">
+                <p class="alert alert-danger"><%- i18n('account.bankaccounts.blocked.title') %></p>
+                <p><%- i18n('account.bankaccounts.blocked') %></p>
+            </div>
+
+            <div class="hidden-blocked">
+                <div class="visible-empty">
+                    <div class="alert alert-info visible-loaded">
+                        <p><%- i18n('account.bankaccounts.empty') %></p>
+                    </div>
+                </div>
+
+                <div class="row visible-loaded">
+                    <div class="col-lg-6">
+                        <a class="add btn btn-primary" href="#account/bankaccounts/add">
+                            <i class="icon-plus"></i>
+                            <%- i18n('account.bankaccounts.add button') %>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row visible-loaded">
+                    <div class="col-lg-12">
+                        <table class="accounts-table table table-striped hidden-empty">
+                            <thead>
+                                <tr>
+                                    <th class="display-name-header">
+                                        <%- i18n('account.bankaccounts.headers.display-name') %>
+                                    </th>
+                                    <th class="account-number-header">
+                                        <%- i18n('account.bankaccounts.headers.account-number') %> / IBAN
+                                    </th>
+                                    <th class="swiftbic-header">
+                                        SWIFT/BIC
+                                    </th>
+                                    <th class="routing-number-header">
+                                        Rtn.
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="accounts">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

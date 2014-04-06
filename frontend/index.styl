@@ -1,0 +1,55 @@
+.btn-xl
+    padding: 18px 28px
+    font-size: 26px
+    line-height: normal
+    -webkit-border-radius: 8px
+       -moz-border-radius: 8px
+            border-radius: 8px
+
+-animation()
+    animation arguments
+    -webkit-animation arguments
+    -moz-animation arguments
+    -o-animation arguments
+
+-transform()
+    transform arguments
+    -webkit-transform arguments
+    -moz-transform arguments
+    -o-transform arguments
+
+@import "./node_modules/nib/lib/nib/vendor.styl"
+@import "states.styl"
+@import "loading.styl"
+@import "square.styl"
+@import "bootstrap-overwrites.styl"
+
+.form-group
+    states error empty
+
+body
+    states user-country-NO
+
+@import "./modules"
+
+// Always show scroll bars
+html
+    overflow -moz-scrollbars-vertical
+    overflow scroll
+
+// Don't show the direct support link when logged in (use Intercom)
+body.is-logged-in
+    footer
+        .support
+            display none
+
+
+html
+    font-size: 100%
+    -webkit-text-size-adjust: 100%
+    -ms-text-size-adjust: 100%
+    
+@import "modules/common.css"
+@import "modules/master/top"
+@import "modules/master/top/top.css"
+@import "modules/master/footer/footer.css"    

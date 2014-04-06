@@ -1,0 +1,31 @@
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <h1><%- i18n('auth.cip.heading') %></h1>
+
+            <p class="lead"><%- i18n('auth.cip.intro') %></p>
+
+            <div class="well">
+                <p class="lead">
+                    <strong>To:</strong> <a href="mailto:kyc@sbex.com">kyc@sbex.com</a>
+                </p>
+
+                <p><strong>Subject:</strong> Verification <%= api.user.tag %></p>
+            </div>
+
+            <ul><%- i18n('auth.cip.requirements') %></ul>
+
+            <p><%- i18n('auth.cip.no retain') %></p>
+
+            <p class="hidden-finished">
+                <a href="#" data-action="continue" class="btn btn-default btn-lg"><%- i18n('auth.cip.continue') %></a>
+            </p>
+
+            <div class="visible-finished">
+                <p class="lead"><%- i18n('auth.cip.outro') %></p>
+                    <a href="#" class="btn btn-default btn-lg"><%- i18n('auth.cip.return') %></a>
+                <p>
+            </div>
+        </div>
+    </div>
+</div>

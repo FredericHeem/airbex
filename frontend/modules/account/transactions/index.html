@@ -1,0 +1,21 @@
+<div class="container">
+    <div class="account-nav"></div>
+
+    <div class="col-lg-9">
+        <h1 class="content-title"><%- i18n('account.transactions.heading') %></h1>
+
+        <div class="content-area">
+            <p>
+                <a href="/api/v1/transactions/csv"><%- i18n('account.transactions.download csv') %></a>
+            </p>
+            <div class="is-loading-indicator"/>
+            <ul class="pager hidden-loading">
+                <li class="previous"><a href="#">&larr; <%- i18n('paging.newer') %></a></li>
+                <li class="next"><a href="#"><%- i18n('paging.older') %> &rarr;</a></li>
+            </ul>
+
+            <table class="transactions table hidden-loading">
+            </table>
+        </div>
+    </div>
+</div>

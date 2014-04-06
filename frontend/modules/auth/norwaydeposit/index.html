@@ -1,0 +1,60 @@
+<div class="container">
+    <div class="col-lg-6">
+        <h1><%- i18n('auth.norwaydeposit.heading') %></h1>
+
+        <p class="lead"><%- i18n('auth.norwaydeposit.intro') %></p>
+
+        <div class="well payment-details">
+            <div class="row">
+                <div class="col-lg-6">
+                    <strong><%= i18n('auth.norwaydeposit.sender') %></strong>
+                </div>
+                <div class="col-lg-6">
+                    <%= firstName %> <%= lastName %><br>
+                    <%- address %><br>
+                    <%- postalArea %> <%- city %>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <strong><%= i18n('deposit.bank.NOK.payment.recipient name') %></strong>
+                </div>
+
+                <div class="col-lg-6">
+                    Justcoin AS<br />
+                    Tordenskioldsgate 3<br />
+                    0160 Oslo
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <strong><%= i18n('deposit.bank.NOK.payment.account') %></strong>
+                </div>
+                <div class="col-lg-6">
+                    1503.36.59595
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <strong><%= i18n('deposit.bank.NOK.payment.message') %></strong>
+                </div>
+                <div class="col-lg-6">
+                    <%= messageToRecipient %>
+                </div>
+            </div>
+        </div>
+
+        <p class="hidden-finished">
+            <a href="#" data-action="continue" class="btn btn-success btn-lg"><%- i18n('auth.norwaydeposit.continue') %></a>
+        </p>
+
+        <div class="visible-finished">
+            <p class="lead"><%- i18n('auth.norwaydeposit.outro') %></p>
+                <a href="#" class="btn btn-success btn-lg"><%- i18n('auth.norwaydeposit.return') %></a>
+            <p>
+        </div>
+    </div>
+</div>

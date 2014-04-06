@@ -1,0 +1,48 @@
+
+<div class="container">
+	<div class="settings-nav"></div>
+
+	<div class="col-lg-9">
+		<h1 class="content-title"><%= i18n('settings.identity.heading') %></h1>
+
+		<div class="content-area">
+			<div class="row">
+				<div class="col-lg-8">
+					<span class="hidden-security-level-4">
+						<p class="lead"><%= i18n("settings.identity.intro.below level 3") %></p>
+					</span>
+
+					<p class="lead visible-security-level-4"><%= i18n("settings.identity.intro.level 4") %></p>
+				</div>
+			</div>
+
+			<div class="row hidden-security-level-4">
+				<div class="col-lg-6">
+					<form>
+						<span class="btn btn-success fileinput-button"> <i
+							class="fa fa-plus"></i> <span>Add files...</span> <!-- The file input field used as target for the file upload widget -->
+							<input name="document" id="fileupload" type="file" name="files[]" multiple>
+						</span> <br> <br>
+						<!-- The global progress bar -->
+						<div id="progress" class="progress">
+							<div class="progress-bar progress-bar-success"></div>
+						</div>
+						<!-- The container for the uploaded files -->
+						<div id="files" class="files"></div>
+						<table class="documents table table-striped">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>State</th>
+									<th>Last Update</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+						<br>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -6,9 +6,16 @@
             <h3>Search for users</h3>
 
             <form class="search-form form-inline">
-                <input type="text" name="query" class="query" placeholder="User id, name, phone, ..." />
+                <input type="text" name="query" class="query" placeholder="User id, name, phone, ..." value="<%- query %>" />
                 <button type="submit" class="search btn btn-success">Search</button>
             </form>
+
+            <ul class="pager hidden-loading">
+                <li class="previous visible-page-before"><a href="#">&larr; Previous</a></li>
+                <li class="previous hidden-page-before disabled"><a href="#">&larr; Previous</a></li>
+                <li class="next visible-page-after"><a href="#">Next &rarr;</a></li>
+                <li class="next hidden-page-after disabled"><a href="#">Next &rarr;</a></li>
+            </ul>
 
             <table class="users-table table table-bordered table-striped">
                 <thead>

@@ -1,14 +1,19 @@
+var debug = require('debug')('snow:orders')
+
 module.exports = exports = function(app) {
-    app.del('/v1/orders/:id', app.auth.trade, exports.cancel)
-    app.post('/v1/orders', app.auth.trade(2), exports.create)
-    app.get('/v1/orders', app.auth.any, exports.index)
-    app.get('/v1/orders/history', app.auth.any, exports.history)
+    app.del('/v1/orders/:id', app.security.demand.trade, exports.cancel)
+    app.post('/v1/orders', app.security.demand.trade(2), exports.create)
+    app.get('/v1/orders', app.security.demand.any, exports.index)
+    app.get('/v1/orders/history', app.security.demand.any, exports.history)
 }
 
 exports.create = function(req, res, next) {
+
     if (!req.app.validate(req.body, 'v1/order_create', res)) return
 
-    if (req.body.price && !req.body.price.match(/^\d+(\.\d+)?$/)) {
+    debug("create order: ", JSON.stringify(req.body));
+    
+    if (req.body.price !== null && !req.body.price.match(/^\d+(\.\d+)?$/)) {
         res.send({
             name: 'BadRequest',
             message: 'Price is invalid'
@@ -19,8 +24,22 @@ exports.create = function(req, res, next) {
     , amount = req.app.cache.parseOrderVolume(req.body.amount, req.body.market)
     , query
 
-    if (req.body.price) {
+    if (amount <= 0) {
+        return res.send({
+            name: 'BadRequest',
+            message: 'Amount is <= 0'
+        })
+    }
+
+    if (req.body.price !== null) {
         price = req.app.cache.parseOrderPrice(req.body.price, req.body.market)
+
+        if (price <= 0) {
+            return res.send({
+                name: 'BadRequest',
+                message: 'Price is <= 0'
+            })
+        }
     }
 
     if (req.body.aon) {
@@ -31,7 +50,7 @@ exports.create = function(req, res, next) {
                 'WHERE base_currency_id || quote_currency_id = $2'
             ].join('\n'),
             values: [
-                req.user,
+                req.user.id,
                 req.body.market,
                 req.body.type == 'bid' ? 0 : 1,
                 price,
@@ -48,7 +67,7 @@ exports.create = function(req, res, next) {
                 'RETURNING order_id oid'
             ].join('\n'),
             values: [
-                req.user,
+                req.user.id,
                 req.body.market,
                 req.body.type,
                 price,
@@ -59,6 +78,8 @@ exports.create = function(req, res, next) {
 
     req.app.conn.write.query(query, function(err, dr) {
         if (err) {
+            debug("create order error: %s", err.message);
+            
             if (err.message.match(/transaction_amount_check/)) {
                 return res.send(400, {
                     name: 'InvalidAmount',
@@ -106,7 +127,7 @@ exports.create = function(req, res, next) {
             })
         }
 
-        req.app.activity(req.user, 'CreateOrder', {
+        req.app.activity(req.user.id, 'CreateOrder', {
             market: req.body.market,
             type: req.body.type,
             price: req.body.price,
@@ -124,7 +145,7 @@ function formatOrderRow(cache, row) {
         id: row.order_id,
         market: row.market,
         type: row.type,
-        price: cache.formatOrderPrice(row.price, row.market),
+        price: row.price ? cache.formatOrderPrice(row.price, row.market) : null,
         amount: cache.formatOrderVolume(row.original, row.market),
         remaining: cache.formatOrderVolume(row.volume, row.market),
         matched: cache.formatOrderVolume(row.matched, row.market),
@@ -143,7 +164,7 @@ exports.index = function(req, res, next) {
             'WHERE user_id = $1 AND volume > 0',
             'ORDER BY order_id DESC'
         ].join('\n'),
-        values: [req.user]
+        values: [req.user.id]
     }, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows.map(formatOrderRow.bind(this, req.app.cache)))
@@ -161,7 +182,7 @@ exports.history = function(req, res, next) {
             'ORDER BY order_id DESC',
             'LIMIT 100'
         ].join('\n'),
-        values: [req.user]
+        values: [req.user.id]
     }, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows.map(function(row) {
@@ -186,11 +207,16 @@ exports.cancel = function(req, res, next) {
             '   order_id = $1 AND',
             '   user_id = $2 AND volume > 0'
         ].join('\n'),
-        values: [+req.params.id, req.user]
+        values: [+req.params.id, req.user.id]
     }, function(err, dr) {
         if (err) return next(err)
-        if (!dr.rowCount) return res.send(404)
+        if (!dr.rowCount) {
+            return res.send(404, {
+                name: 'OrderNotFound',
+                message: 'The specified order does not exist or has been canceled'
+            })
+        }
         res.send(204)
-        req.app.activity(req.user, 'CancelOrder', { id: +req.params.id })
+        req.app.activity(req.user.id, 'CancelOrder', { id: +req.params.id })
     })
 }

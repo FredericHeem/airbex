@@ -9,7 +9,7 @@ describe('bankaccounts', function() {
     describe('index', function() {
         it('returns bankaccounts', function(done) {
             var userId =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, userId, { primary: true })
+            , impersonate = mock.impersonate(app, userId)
             , res = [
                 {
                     id: dummy.number(1, 1e6),
@@ -51,7 +51,7 @@ describe('bankaccounts', function() {
 
         it('requires primary', function(done) {
             var userId =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, userId, { primary: false })
+            , impersonate = mock.impersonate(app, userId, null, {})
 
             request(app)
             .get('/v1/bankaccounts')
@@ -67,7 +67,7 @@ describe('bankaccounts', function() {
     describe('add', function() {
         it('success', function(done) {
             var userId =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, userId, { primary: true, level: 4 })
+            , impersonate = mock.impersonate(app, { id: userId, securityLevel: 4 })
             , req = {
                 displayName: null,
                 iban: null,
@@ -83,7 +83,8 @@ describe('bankaccounts', function() {
                     req.accountNumber,
                     req.iban,
                     req.swiftbic,
-                    req.routingNumber
+                    req.routingNumber,
+                    req.displayName
                 ])
                 cb()
             })
@@ -102,7 +103,7 @@ describe('bankaccounts', function() {
 
         it('requires primary', function(done) {
             var userId =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, userId, { primary: false })
+            , impersonate = mock.impersonate(app, userId, null, {})
 
             request(app)
             .post('/v1/bankaccounts')
@@ -115,7 +116,7 @@ describe('bankaccounts', function() {
 
         it('validates', function(done) {
             var userId =  dummy.number(1, 1e6)
-            , impersonate = mock.impersonate(app, userId, { primary: true, level: 4 })
+            , impersonate = mock.impersonate(app, { id: userId, securityLevel: 4 })
 
             request(app)
             .post('/v1/bankaccounts')

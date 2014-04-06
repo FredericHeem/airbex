@@ -4,7 +4,12 @@
         "number": {
             "type": "string",
             "required": true,
-            "pattern": "^\\+\\d{2,13}$"
+            "pattern": "^[0-9-\\.,\\(\\) ]{1,13}$"
+        },
+        "country": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[A-Z]{2}$"
         }
     }
 }

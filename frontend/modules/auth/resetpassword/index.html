@@ -1,0 +1,43 @@
+<div class="container">
+    <div class="col-lg-6">
+        <h3><%= i18n('resetPassword.heading') %></h3>
+
+        <p><%- i18n('resetPassword.intro') %></p>
+
+        <div class="begin">
+            <form class="begin-form form-horizontal">
+                <div class="form-group email">
+                    <label class="control-label">Email</label>
+                    <input type="email" name="email" class="form-control">
+                    <button type="submit" class="submit btn btn-primary">Email me</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="phone">
+            <p>We are calling you to read you a 4 digit code</p>
+
+            <form class="phone-form form-horizontal">
+                <div class="form-group code">
+                    <label class="control-label">4 digit code</label>
+                    <input type="text" class="input-small form-control" name="code" />
+                    <button type="submit" class="submit btn btn-primary">Continue</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="end">
+            <form class="end-form form-horizontal">
+                <div class="form-group password">
+                    <label class="control-label">New password</label>
+                    <input type="password" class="input-small form-control" name="password" />
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label"></label>
+                    <button type="submit" class="submit btn btn-success">Reset password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

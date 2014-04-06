@@ -1,0 +1,9 @@
+<tr class="key" data-id="<%= id %>">
+    <td class="id"><%= id %></td>
+    <td class="can-trade"><%- canTrade ? '&#x2713;' : '' %></td>
+    <td class="can-deposit"><%- canDeposit ? '&#x2713;' : '' %></td>
+    <td class="can-withdraw"><%- canWithdraw ? '&#x2713;' : '' %></td>
+    <td class="actions">
+        <button class="remove btn btn-danger btn-block">Delete</button>
+    </td>
+</tr>

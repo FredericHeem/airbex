@@ -7,6 +7,7 @@ var balances = require('../controllers/balances')
 , userWithdraws = require('../controllers/user/withdraws')
 , userAccounts = require('../controllers/user/accounts')
 , userActivity = require('../controllers/user/activity')
+, userDocument = require('../controllers/user/document')
 , userOrders = require('../controllers/user/orders')
 , userBankCredit = require('../controllers/user/bankcredit')
 , overview = require('../controllers/overview')
@@ -71,13 +72,21 @@ module.exports = function() {
         if (!authorize.admin()) return
         master(transactions(userId), 'admin')
     })
-    .add(/^users$/, function() {
+    .add(/^users\/(\d+)\/documents$/, function(userId) {
         if (!authorize.admin()) return
-        master(users(), 'admin')
+        master(userDocument(userId), 'admin')
+    })
+    .add(/users(?:\?query=([^&]+)(?:&skip=(\d+))?)?/, function(query, skip) {
+        if (!authorize.admin()) return
+        master(users(query, +skip), 'admin')
     })
     .add(/^withdraws$/, function() {
         if (!authorize.admin()) return
         master(withdraws(), 'admin')
+    })
+    .add(/^credits$/, function() {
+        if (!authorize.admin()) return
+        master(require('../controllers/credits')(), 'admin')
     })
     .add(/^(.+)$/, function(hash) {
         master(notfound(hash))

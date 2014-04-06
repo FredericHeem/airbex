@@ -1,0 +1,35 @@
+<td>
+    <%= id %>
+</td>
+
+<td>
+    <%= userName %>
+
+    (
+    <a href="https://www.intercom.io/apps/64463fba8faa8166444bfb3c00a5e40976bd622e/users/show?user_id=<%= userId %>" target="_blank">
+        Intercom
+    </a>
+    |
+    <a href="#users/<%= userId %>">
+        User #<%= userId %>
+    </a>
+    )
+</td>
+
+<td>
+    <%= userTag %>
+</td>
+
+<td>
+    <%= numbers.format(amount, { currency: currency }) %>
+</td>
+
+<td>
+    <button class="btn btn-success" data-action="approve">
+        Approve
+    </button>
+
+    <button class="btn btn-danger" data-action="cancel">
+        Cancel
+    </button>
+</td>

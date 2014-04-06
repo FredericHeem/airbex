@@ -1,0 +1,69 @@
+{
+    "title": {
+        "text": null
+    },
+    "rangeSelector": {
+        "selected": 1,
+        "inputEnabled": false,
+        "labelStyle": {
+            "display": "none"
+        },
+        "buttonTheme": {
+            "fill": "none",
+            "stroke": "none",
+            "states": {
+                "hover": {
+                    "fill": "#07415B",
+                    "style": {
+                        "color": "#FFFFFF"
+                    }
+                },
+                "select": {
+                    "fill": "#07415B",
+                    "style": {
+                        "color": "#FFFFFF"
+                    }
+                }
+            }
+        }
+    },
+    "navigator": {
+        "enabled": false
+    },
+    "scrollbar": {
+        "enabled": false
+    },
+    "credits": {
+        "enabled": false
+    },
+    "yAxis": {
+        "lineWidth": 2,
+        "title": {
+            "text": null
+        }
+    },
+    "xAxis": {
+        "title": {
+            "text": null
+        }
+    },
+    "chart": {
+        "height": 300
+    },
+    "colors": ["#7EB3B5"],
+    "series": [
+        {
+            "type": "area",
+            "name": "Price (BTC)",
+            "data": "prices",
+            "shadow": true,
+            "dataGrouping": {
+                "units": [["week", [1]], ["month", [1, 2, 3, 4, 6]]]
+            },
+            "marker": {
+                "enabled": true,
+                "radius": 3
+            }
+        }
+    ]
+}

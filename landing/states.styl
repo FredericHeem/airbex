@@ -1,0 +1,26 @@
+states(states...)
+    for state in states
+        .visible-{state}
+            display none
+
+        .is-{state},
+        .has-{state},
+        &.is-{state},
+        &.has-{state}
+            .visible-{state}
+                display block
+
+            tr.visible-{state}
+                display table-row
+
+            .help-block.visible-{state}
+                visibility visible
+
+            table.visible-{state}
+                display table
+
+            .btn.visible-{state}
+                display inline-block
+
+            .hidden-{state}
+                display none

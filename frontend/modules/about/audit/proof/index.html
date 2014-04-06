@@ -1,0 +1,56 @@
+<div class="container">
+	<div class="row">
+		<div class="about-nav"></div>
+		<div class="col-lg-6">
+			<h1>Audit</h1>
+			<div id="audit-warning" class="alert alert-warning hidden">
+				<i class="fa fa-info-circle"></i>
+				<span class="audit-message"></span>
+			</div>
+			<div id="audit-error" class="alert alert-danger hidden">
+				<i class="fa fa-bug"></i>
+				<span class="audit-message"></span>
+			</div>
+			<div id="auditing">
+				<h4>Verifying liabilities and assets</h4>
+				<img src="img/ajax-loader.gif">
+			</div>
+			<div id="audited" class="hidden">
+				<div>
+					<div id="solvency">
+						<h1 class="error hidden" id="insolvent">
+							Site insolvent! <span class="amount"></span> BTC missing.
+						</h1>
+						<h1 class="success hidden" id="solvent">
+							Site solvent! <span class="amount"></span> BTC surplus.
+						</h1>
+					</div>
+					<div id="lproof-verified">
+						<h4 class="success">Liability proof successful</h4>
+						<p>
+							<strong>Total Liabilities:</strong> <span id="root_value"></span>
+							<span> BTC</span> <br> <strong>User:</strong> <span
+								id="user"></span><br> <strong>User Balance:</strong> <span
+								id="value"></span> <span> BTC</span><br> <strong>Total
+								Liabilities hash:</strong> <span id="root_hash"></span><br>
+						</p>
+					</div>
+
+					<div id="aproof-verified">
+						<h4 class="success">Solvency proof successful</h4>
+						<p>
+							<strong>Site:</strong> <span id="site"></span><br> <strong>Balance:</strong>
+							<span id="balance"></span><span> BTC</span><br>
+						</p>
+					</div>
+					<div id="aproof-ko" class="error hidden">
+						<h4>
+							Assert proof cannot be determined: <span id="aproof-error"></span>
+						</h4>
+						<p></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

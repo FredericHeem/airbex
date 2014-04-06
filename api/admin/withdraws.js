@@ -1,15 +1,49 @@
 var withdraws = require('../withdraws')
 
 module.exports = exports = function(app) {
-    app.get('/admin/withdraws', app.auth.admin, function(req, res, next) {
+    app.get('/admin/withdraws', app.security.demand.admin, function(req, res, next) {
         withdraws.query(req.app, req.query, function(err, items) {
             if (err) return next(err)
             res.send(items)
         })
     })
 
-    app.patch('/admin/withdraws/:id', app.auth.admin, exports.patch)
-    app.post('/admin/withdraws/:id/complete', app.auth.admin, exports.complete)
+    app.get('/admin/withdraws/:id', app.security.demand.admin, exports.withdraw)
+
+    app.patch('/admin/withdraws/:id', app.security.demand.admin, exports.patch)
+    app.post('/admin/withdraws/:id/complete', app.security.demand.admin, exports.complete)
+}
+
+exports.withdraw = function(req, res, next) {
+    req.app.conn.read.query({
+        text: [
+            'SELECT *',
+            'FROM withdraw_request_view',
+            'WHERE request_id = $1'
+        ].join('\n'),
+        values: [+req.params.id]
+    }, function(err, dr) {
+        if (err) return next(err)
+        if (!dr.rowCount) return res.send(404)
+        res.send(dr.rows.map(function(row) {
+            return {
+                amount: req.app.cache.formatCurrency(row.amount, row.currency_id),
+                currency: row.currency_id,
+                userId: row.user_id,
+                bankAccountNumber: row.bank_account_number,
+                bankIban: row.bank_iban,
+                bankSwiftbic: row.bank_swiftbic,
+                bitcoinAddress: row.bitcoin_address,
+                litecoinAddress: row.litecoin_address,
+                method: row.method,
+                id: row.request_id,
+                rippleAddress: row.ripple_address,
+                state: row.state,
+                createdAt: row.created_at,
+                bankForceSwift: row.bank_force_swift
+            }
+        })[0])
+    })
 }
 
 exports.cancel = function(req, res, next) {
@@ -19,7 +53,7 @@ exports.cancel = function(req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         if (dr.rowCount) {
-            req.app.activity(req.user, 'AdminWithdrawCancel', {
+            req.app.activity(req.user.id, 'AdminWithdrawCancel', {
                 id: req.params.id,
                 error: req.body.error || null
             })
@@ -47,7 +81,7 @@ exports.process = function(req, res, next) {
         if (err) return next(err)
 
         if (dr.rowCount) {
-            req.app.activity(req.user, 'AdminWithdrawProcess',
+            req.app.activity(req.user.id, 'AdminWithdrawProcess',
                 { id: req.params.id })
             return res.send(204)
         }
@@ -95,7 +129,7 @@ exports.complete = function(req, res, next) {
             if (err) return next(err)
             if (!dr.rowCount) return next(new Error('Concurrency fail'))
 
-            req.app.activity(req.user, 'AdminWithdrawComplete', {
+            req.app.activity(req.user.id, 'AdminWithdrawComplete', {
                 id: +req.params.id,
                 fee: req.body.fee || '0'
             })

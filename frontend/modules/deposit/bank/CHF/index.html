@@ -1,0 +1,99 @@
+<div class="container">
+    <div class="deposit-nav"></div>
+
+    <div class="col-lg-9">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="content-title"><%= i18n('deposit.bank.CHF.heading') %></h1>
+
+                <div class="content-area">
+                    <p class="lead visible-allowed">
+                        <%= i18n('deposit.bank.CHF.intro') %>
+                    </p>
+
+                    <div class="payment-details visible-allowed">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong><%= i18n('deposit.bank.EUR.recipient') %></strong>
+                            </div>
+                            <div class="col-lg-6">
+                                SBEX AS<br />
+                                <small>
+                                rue des flamands 3 <br />
+                                Le Landeron, Neufchatel<br>
+                                Suisse</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong>IBAN</strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                CH05 1250 6115 084
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong>SWIFT/BIC</strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                CHNOKKXXX
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong><%= i18n('deposit.bank.EUR.messageToRecipient') %></strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <%= messageToRecipient %>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong><%= i18n('deposit.bank.EUR.minimumAmount') %></strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                25 CHF
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong><%= i18n('deposit.bank.EUR.our bank') %></strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <small>
+                                    CIC<br />
+                                    <br />
+                                    <br />
+                                    Neufchatel
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong><%= i18n('deposit.bank.EUR.fee') %></strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <abbr title="Single Euro Payments Area">SEPA</abbr>: ~2.50 CHF<br />
+                                International: ~7.50 CHF<br />
+                                <small>See <a href="/en/terms" target="_blank">Terms</a></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

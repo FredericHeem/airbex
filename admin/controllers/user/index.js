@@ -1,8 +1,9 @@
 var header = require('./header')
 , template = require('./template.html')
-, model = require('../../util/model')
+, model = require('../../helpers/model')
 , _ = require('lodash')
 , moment = require('moment')
+, format = require('util').format
 
 module.exports = function(userId) {
     var $el = $('<div class="admin-user-profile">').html(template({
@@ -16,6 +17,11 @@ module.exports = function(userId) {
 
     // User id is always known
     $el.find('.userId td span').html(userId)
+
+    // Link to intercom.io
+    $el.find('.intercom-link')
+    .attr('href', format('https://www.intercom.io/apps/%s/users/show?user_id=%s',
+        '64463fba8faa8166444bfb3c00a5e40976bd622e', userId))
 
     // Header
     $el.find('.header-placeholder').replaceWith(header(userId, 'user').$el)
@@ -36,12 +42,13 @@ module.exports = function(userId) {
 
         _.each(plains, function(v, k) {
             var $row = $el.find('.' + k)
-            $row.find('span').html((u[v] || '').toString().replace(/\n/g, '<br />')),
+            $row.find('span').text((u[v] || '').toString().replace(/\n/g, '<br />')),
             $row.find('.field').val(u[v] || '')
         })
 
         $el.find('.created span').html(moment(u.created_at).format('Do MMMM YYYY'))
         $el.find('.suspended span').html(u.suspended ? 'Yes' : 'No')
+        $el.find('.two-factor span').html(u.two_factor ? 'Yes' : 'No')
         $el.find('.poi span').html(u.poi_approved_at ? 'Yes' : 'No')
         $el.find('.poa span').html(u.poa_approved_at ? 'Yes' : 'No')
         $el.find('.suspended .field').prop('checked', u.suspended)
@@ -59,8 +66,14 @@ module.exports = function(userId) {
         $el.find('.suspended').toggleClass('warning', u.suspended)
         $el.find('.poi').toggleClass('success', !!u.poi_approved_at)
         $el.find('.poa').toggleClass('success', !!u.poa_approved_at)
+        $el.find('.two-factor').toggleClass('success', !!u.two_factor)
 
-        $el.toggleClass('has-verified-email', !!u.email_verified_at)
+        if (u.reset_started_at) {
+            $el.find('.password-reset span')
+            .html(moment(u.reset_started_at).format('Do MMMM YYYY, HH:mm'))
+        }
+
+        $el.toggleClass('has-started-password-reset', !!u.reset_started_at)
 
         oldUser = u
     }
@@ -164,14 +177,14 @@ module.exports = function(userId) {
         })
     })
 
-    $el.on('click', '*[data-action="send-email-verification"]', function(e) {
+    $el.on('click', '[data-action="forgive-password-reset"]', function(e) {
         e.preventDefault()
 
-        var url = 'admin/users/' + userId + '/sendVerificationEmail'
+        var url = 'admin/users/' + userId + '/forgivePasswordReset'
         api.call(url, null, { type: 'POST' })
         .fail(errors.alertFromXhr)
         .done(function() {
-            fetchProfile()
+            window.location.reload()
         })
     })
 

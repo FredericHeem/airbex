@@ -1,0 +1,32 @@
+body > .top
+    .logged-in
+        display none
+
+    .balances-wrap
+        position relative
+
+        .balances
+            position absolute
+            top 50px
+            left -23px
+            font-size 11px
+
+            td
+                border solid 1px #eee
+
+            .currency
+                width 40px
+
+            .available
+                text-align right
+                width 95px
+
+body.is-logged-in > .top
+    .not-logged-in
+        display none
+
+    .logged-in
+        display block
+
+    .balances, .orders, .activities, .dashboard
+        display block

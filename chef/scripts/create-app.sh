@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export KNIFE_ENV=$1
 source $DIR/settings.sh
 
 source $DIR/delete-server.sh $REGION app
@@ -23,5 +24,3 @@ knife ec2 server create \
     --node-name app \
     --tags VPC=$VPC
 set +x
-
-#source $DIR/update.sh admin

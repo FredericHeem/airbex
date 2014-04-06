@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export KNIFE_ENV=$1
 source $DIR/settings.sh
 
 source $DIR/delete-server.sh $REGION bitcoind
@@ -9,6 +10,7 @@ cat ~/.ssh/known_hosts | grep -vE '^10.0.' | tee ~/.ssh/known_hosts
 
 knife ec2 server create \
     -V \
+    --run-list 'role[bitcoind]' \
     --image $AMI \
     --environment $1 \
     --region $REGION \
@@ -18,8 +20,9 @@ knife ec2 server create \
     --subnet $PRIVATE_SUBNET \
     --ssh-user ubuntu \
     --server-connect-attribute private_ip_address \
+    --ssh-gateway ubuntu@$SSH_GATEWAY \
     --availability-zone $AZ \
     --node-name bitcoind \
     --tags VPC=$VPC
 
-source $DIR/update.sh bitcoind
+#source $DIR/update.sh bitcoind

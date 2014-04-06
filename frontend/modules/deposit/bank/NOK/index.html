@@ -1,0 +1,144 @@
+<div class="container">
+    <div class="deposit-nav"></div>
+
+    <div class="col-lg-9">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="content-title"><%= i18n('deposit.bank.NOK.heading') %></h1>
+
+                <div class="content-area">
+                    <div class="hidden-allowed">
+                        <div class="alert lead">
+                            <%- i18n('not allowed', api.user.countryFriendly()) %>
+                        </div>
+                    </div>
+
+                    <div class="visible-allowed">
+                        <div class="step-sender visible-step-sender">
+                            <p class="lead">
+                                <%= i18n('deposit.bank.NOK.sender.intro') %>
+                            </p>
+
+                            <table class="table">
+                                <tr>
+                                    <td>
+                                        <%= i18n('deposit.bank.NOK.sender.name') %>
+                                    </td>
+
+                                    <td>
+                                        <%- formatters.escape(api.user.firstName + ' ' + api.user.lastName) %>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <%= i18n('deposit.bank.NOK.sender.address') %>
+                                    </td>
+
+                                    <td>
+                                        <%- formatters.escape(api.user.address).replace('\n', '<br>') %><br>
+                                        <%= api.user.postalArea %> <%= api.user.city %>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p>
+                                <%- i18n('deposit.bank.NOK.sender.disclaimer') %>
+                            </p>
+
+                            <div>
+                                <button data-action="next-step" class="btn btn-primary">
+                                    <%= i18n('deposit.bank.NOK.sender.next button') %>
+                                </button>
+
+                                <a href="#settings/profile" class="btn btn-default">
+                                    <%= i18n('deposit.bank.NOK.sender.change address') %>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="step-payment visible-step-payment">
+                            <p class="lead">
+                                <%= i18n('deposit.bank.NOK.payment.intro') %>
+                            </p>
+
+                            <table class="table">
+                                <tr>
+                                    <td>
+                                        <%= i18n('deposit.bank.NOK.payment.account') %>
+                                    </td>
+
+                                    <td>
+                                        1503.36.59595
+                                     </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <%= i18n('deposit.bank.NOK.payment.message') %>
+                                    </td>
+                                    <td>
+                                        <strong><%= api.user.tag %></strong>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <%= i18n('deposit.bank.NOK.payment.recipient name') %>
+                                    </td>
+                                    <td>
+                                        Justcoin AS
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <%= i18n('deposit.bank.NOK.payment.recipient address') %>
+                                    </td>
+                                    <td>
+                                        Tordenskioldsgate 3
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <%= i18n('deposit.bank.NOK.payment.recipient postal area') %>
+                                    </td>
+                                    <td>
+                                        0160 Oslo
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p>
+                                <%- i18n('deposit.bank.NOK.payment.disclaimer', api.user.tag) %>
+                            </p>
+
+                            <div>
+                                <button data-action="next-step" class="btn btn-primary">
+                                    <%- i18n('deposit.bank.NOK.payment.next button') %>
+                                </button>
+
+                                <a data-action="prev-step" class="btn btn-default">
+                                    <%- i18n('deposit.bank.NOK.payment.back') %>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="step-summary visible-step-summary">
+                            <p class="lead">
+                                <%- i18n('deposit.bank.NOK.summary.intro') %>
+                            </p>
+
+                            <div>
+                                <a href="#" class="btn btn-primary">
+                                    <%- i18n('deposit.bank.NOK.summary.back to home') %>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

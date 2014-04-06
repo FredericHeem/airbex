@@ -1,0 +1,31 @@
+{
+  "name": "market-maker",
+  "description": "snow exchange market maker",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "bitstamp":"x",  
+    "bigdecimal": "0.6.x",
+    "request": "~2.12.0",
+    "async": "~0.1.22",
+    "lodash": "~1.2.1",
+    "underscore": "x",
+    "num": "x",
+    "debug": "0.7.2",
+    "optimist": "~0.4.0",
+    "cli-table": "~0.2.0",
+    "konphyg": "1.2.x",
+    "should": "x",
+    "supertest": "0.7.x",
+	"methods":"x",
+    "async": "0.1.x",
+    "blanket": "x",
+    "mocha": "x",
+    "mocha-html-cov-reporter": "x",
+    "grunt": "~0.4.x"
+  },
+  
+  "scripts": {
+    "test": "DEBUG=* NODE_ENV=local mocha"
+  }
+}

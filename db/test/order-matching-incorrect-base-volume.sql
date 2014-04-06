@@ -36,16 +36,16 @@ BEGIN
 
     -- Create Bob's order
     INSERT INTO "order" (market_id, user_id, type, price, volume)
-    VALUES (bid, bob, 'ask', 150000e3, 1*10^(8-3));
+    VALUES (bid, bob, 'ask', 150000e3, 1e5);
 
     -- Bob, should now have a hold of 1 BTC
     IF (SELECT hold FROM "account" WHERE account_id = user_currency_account(bob, 'BTC')) <> 1e8 THEN
-        RAISE 'Mismatch held for Bob';
+        RAISE 'Mismatch held for Bob %', (SELECT hold FROM "account" WHERE account_id = user_currency_account(bob, 'BTC')) / 1e8;
     END IF;
 
     -- Create Alice's order
     INSERT INTO "order" (market_id, user_id, type, price, volume)
-    VALUES (bid, alice, 'bid', 175000e3, 0.05*10^(8-3));
+    VALUES (bid, alice, 'bid', 175000e3, 0.05e5);
 
     mid := currval('match_match_id_seq');
 

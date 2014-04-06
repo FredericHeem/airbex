@@ -1,7 +1,9 @@
 var _ = require('lodash')
+, assert = require('assert')
 , debug = require('debug')('snow:test')
 
 module.exports = exports = function(target, name, fake) {
+    assert(target, 'target is null')
     var real = target[name]
     , wrapper = function() {
         wrapper.invokes++
@@ -29,16 +31,54 @@ exports.once = function(target, name, fake) {
     return wrapper
 }
 
-exports.impersonate = function(app, uid, permissions, key) {
-    debug('impersonating as user %s with permissions %j', uid, permissions)
+exports.impersonate = function(app, user, session, apikey) {
+    if (typeof user == 'number') {
+        user = { id: user }
+    }
 
-    return exports(app.auth, 'user', function(req, res, next) {
-        req.user = uid
-        req.key = key || null
-        req.apiKey = permissions || {}
-        req.apiKey.level = req.apiKey.level || 0
-        next()
+    if (session) {
+        _.each(['primary', 'level', 'canWithdraw', 'canDeposit', 'admin', 'canTrade'], function(n) {
+            assert(session[n] === undefined, 'legacy ' + n + ' not removed')
+        })
+    }
+
+    _.defaults(user, {
+        securityLevel: 0
     })
+
+    if (!session && !apikey) {
+        session = {
+            id: 'sessionid',
+            expires: +new Date() + 15 * 60e3,
+            userId: user.id
+        }
+    }
+
+    var extendSessionMock
+    , mock = exports(app.security.demand, 'demand', function(type, level, req) {
+        req.user = user
+        req.session = session
+        req.apikey = apikey
+
+        debug('impersonating as user %j with %s', req.user, req.session ?
+            'session' : req.apikey ? 'api key' : 'nothing')
+
+        if (session) {
+            extendSessionMock = exports(app.security.session, 'extend', function(id, cb) {
+                cb()
+            })
+        }
+
+        return mock.real.apply(this, arguments)
+    })
+    , restore = mock.restore
+
+    mock.restore = function() {
+        extendSessionMock && extendSessionMock.restore()
+        restore()
+    }
+
+    return mock
 }
 
 exports.rows = function(rows) {

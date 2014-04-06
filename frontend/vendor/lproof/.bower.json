@@ -1,0 +1,10 @@
+{
+  "name": "lproof",
+  "_cacheHeaders": {
+    "Content-Type": "application/x-gzip",
+    "Content-Disposition": "attachment; filename=olalonde-proof-of-liabilities-1af3f64.tar.gz"
+  },
+  "_source": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
+  "_target": "*",
+  "_originalSource": "https://github.com/olalonde/proof-of-liabilities/tarball/master"
+}

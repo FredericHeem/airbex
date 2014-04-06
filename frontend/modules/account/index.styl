@@ -1,0 +1,52 @@
+#area > .account-apikeys
+    states showing-add
+
+    .show-add
+        margin-top 10px
+        margin-bottom 15px
+
+#area > .vouchers
+    states empty
+
+#area > .account-activity
+    .activity .when
+        min-width 13em
+
+#area > .account-funds
+    states two-factor-enabled
+
+    .balances
+        //width: auto
+        a[href="#my/withdraw/XRP"],
+        a[href="#my/deposit/XRP"],
+        a[href^="#my/send"]
+            display: none
+
+         tr .amount, th.amount
+            text-align right
+
+        .balance
+            td
+                padding 15px 20px 10px 20px
+
+        .available
+            font-size 2em
+            color #555
+            text-align right
+
+    .withdraws.is-empty
+        display none
+
+#area > .account-bankaccounts
+    states empty loading loaded blocked
+
+    .accounts-table
+        .actions
+            max-width 5em
+
+#area > .account-bankaccounts-add
+    form
+        states type-norway type-iban type-international advanced
+
+#area > .account-transactions
+    states loading

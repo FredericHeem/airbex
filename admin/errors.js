@@ -1,5 +1,5 @@
 /* global Raven, alertify */
-var debug = require('./util/debug')('errors')
+var debug = require('./helpers/debug')('errors')
 , format = require('util').format
 
 exports.bodyFromXhr = function(xhr) {
@@ -59,7 +59,7 @@ exports.reportFromXhr = function(error) {
     debug(message)
     debug(JSON.stringify(data, null, 4))
 
-    if (typeof Raven !== undefined) {
+    if (typeof Raven !== 'undefined') {
         Raven.captureMessage(message, data)
     }
 }

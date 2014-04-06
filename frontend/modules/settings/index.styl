@@ -1,0 +1,8 @@
+#area > .settings-twofactor
+    states two-factor
+
+    form[name="enable"], form[name="disable"]
+        states wrong locked-out
+
+#area > .settings-profile
+    states saved allowed-to-edit

@@ -1,0 +1,11 @@
+<tr class="item<%= good ? ' success' : '' %><%= bad ? ' warning' : '' %>">
+    <td><%= ago %></td>
+    <td><%= amount %> <%= currency %></td>
+    <td><%= destination %></td>
+    <td><%= status %></td>
+    <td>
+        <% if (state == 'requested') { %>
+            <button class="cancel btn btn-danger btn-block"><%= i18n('withdraws.cancel') %></button>
+        <% } %>
+    </td>
+</tr>

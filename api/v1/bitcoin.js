@@ -1,10 +1,12 @@
 var util = require('util')
+, num = require('num')
 
 module.exports = exports = function(app, currencyId) {
-    app.post('/v1/' + currencyId + '/out', app.auth.withdraw(2),
+    var prefix = '/v1/' + currencyId
+
+    app.post(prefix + '/out', app.security.demand.otp(app.security.demand.withdraw(2), true),
         exports.withdraw.bind(exports, currencyId))
-    app.get('/v1/' + currencyId + '/address', app.auth.deposit,
-        exports.address.bind(exports, currencyId))
+    app.get(prefix + '/address', app.security.demand.deposit(3), exports.address.bind(exports, currencyId))
 }
 
 exports.withdraw = function(currencyId, req, res, next) {
@@ -12,8 +14,15 @@ exports.withdraw = function(currencyId, req, res, next) {
         return
     }
 
+    if (num(req.body.amount).lt('0.0001')) {
+        return res.send(400, {
+            name: 'AmountTooSmall',
+            message: 'Minimum amount 0.0001'
+        })
+    }
+
     console.log('processing withdraw request of %d %s from user #%s to %s',
-        req.body.amount, currencyId, req.user, req.body.address)
+        req.body.amount, currencyId, req.user.id, req.body.address)
 
     var queryText = util.format(
         'SELECT %s_withdraw($1, $2, $3) rid',
@@ -22,7 +31,7 @@ exports.withdraw = function(currencyId, req, res, next) {
     req.app.conn.write.query({
         text: queryText,
         values: [
-            req.user,
+            req.user.id,
             req.body.address,
             req.app.cache.parseCurrency(req.body.amount, currencyId)
         ]
@@ -38,7 +47,7 @@ exports.withdraw = function(currencyId, req, res, next) {
             return next(err)
         }
 
-        req.app.activity(req.user, currencyId + 'Withdraw', {
+        req.app.activity(req.user.id, currencyId + 'Withdraw', {
             address: req.body.address,
             amount: req.body.amount
         })
@@ -56,7 +65,7 @@ exports.address = function(currencyId, req, res, next) {
 
     req.app.conn.read.query({
         text: queryText,
-        values: [req.user, currencyId]
+        values: [req.user.id, currencyId]
     }, function(err, dr) {
         if (err) return next(err)
         var address = dr.rows.length ? dr.rows[0].address : null

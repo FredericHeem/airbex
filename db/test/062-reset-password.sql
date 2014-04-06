@@ -26,10 +26,6 @@ BEGIN
     EXCEPTION WHEN OTHERS THEN
     END;
 
-    UPDATE "user"
-    SET email_verified_at = current_timestamp
-    WHERE user_id = uid;
-
     PERFORM reset_password_begin('a@a', repeat('a', 20), '1234');
 
     IF (SELECT reset_email_code FROM "user" WHERE user_id = uid) <> repeat('a', 20) THEN

@@ -1,7 +1,8 @@
 check process litecoind
-    with pidfile /btc/litecoind.pid
+    with pidfile /var/run/litecoind.pid
     start program = "/sbin/start litecoind"
-    stop program  = "/usr/bin/killall litecoind"
+    stop program  = "/sbin/stop litecoind"
     if failed port 9332 type tcp
-        with timeout 600 seconds
+        with timeout 10 seconds
+        20 times within 20 cycles
         then restart

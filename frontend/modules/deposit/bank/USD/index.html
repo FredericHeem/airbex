@@ -1,0 +1,104 @@
+<div class="container">
+    <div class="deposit-nav"></div>
+
+    <div class="col-lg-9">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="content-title"><%= i18n('deposit.bank.USD.heading') %></h1>
+
+                <div class="content-area">
+                    <p class="lead visible-allowed">
+                        <%= i18n('deposit.bank.USD.intro') %>
+                    </p>
+
+                    <div class="hidden-allowed">
+                        <div class="alert lead">
+                            Sorry, but at this time we do not accept bank deposits from your country,
+                            <strong><%= api.user.countryFriendly() %></strong>.
+                        </div>
+                    </div>
+
+                    <div class="payment-details visible-allowed">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong><%= i18n('deposit.bank.USD.recipient') %></strong>
+                            </div>
+                            <div class="col-lg-6">
+                                SBEX AS<br />
+                                <small>
+                                rue des flamands 3 <br />
+                                Le Landeron, Neufchatel<br>
+                                Suisse</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong>IBAN</strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                NO56 1250 0506 111
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong>SWIFT/BIC</strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                DNBANOKKXXX
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong><%= i18n('deposit.bank.USD.messageToRecipient') %></strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <%= messageToRecipient %>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong><%= i18n('deposit.bank.USD.minimumAmount') %></strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                35 USD
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong><%= i18n('deposit.bank.EUR.our bank') %></strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <small>
+                                    CIC<br />
+                                    1 rue du lac<br />
+                                    <br />
+                                    Neufchatel
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <strong><%= i18n('deposit.bank.USD.fee') %></strong>
+                            </div>
+
+                            <div class="col-lg-6">
+                                ~10.00 USD<br />
+                                <small>See <a href="/en/terms" target="_blank">Terms</a></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

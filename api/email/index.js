@@ -75,6 +75,10 @@ exports.send = function(user, language, templateName, locals, cb) {
 
     locals || (locals = {})
     locals.websiteUrl = config.website_url
+    locals.company = config.company || 'SBEX';
+    locals.email_support = config.email_support || 'support@sbex.ch';
+    locals.signature = config.signature || 'SBEX, the Swiss Bitcoin EXchange';
+    
     locals.filename = path.relative(path.join(__dirname, '..'), templateFn)
 
     var html = ejs.render(template, locals)
@@ -90,6 +94,13 @@ exports.send = function(user, language, templateName, locals, cb) {
     }
 
     debug('sending email %s', JSON.stringify(mail, null, 4))
-
-    exports.app.smtp.sendMail(mail, cb)
+    
+    if(exports.app.smtp.sendMail){
+        exports.app.smtp.sendMail(mail, cb)
+    } else {
+        debug("no smtp configured")
+        var error = {};
+        error.message = "no smtp configured";
+        cb(error)
+    }
 }

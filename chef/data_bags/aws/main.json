@@ -1,21 +1,3 @@
 {
-  "id": "main",
-  "aws_access_key_id": {
-    "encrypted_data": "/5AMVktyONCE0pJiXz5clvoK9WW/cGpWPZSns30+iqq4MM43OyJULbWHjdt7\nxyAn\n",
-    "iv": "Af/P5r2MirwWdEiVECt5QQ==\n",
-    "version": 1,
-    "cipher": "aes-256-cbc"
-  },
-  "aws_secret_access_key": {
-    "encrypted_data": "RFffE47apENErcfghow2sD9/qDMNCrPZqJOoQnkSPhL2sV1yoI0M6pDlYIZj\n58lTGzAMzEzUaWOqzbKOEH71vA==\n",
-    "iv": "KZnyGLh495l8V7dUjzrTdw==\n",
-    "version": 1,
-    "cipher": "aes-256-cbc"
-  },
-  "public_ip": {
-    "encrypted_data": "XyZI00ynAXC+5vdjsKqArX4nhlxka8GmEs88srQFuXk=\n",
-    "iv": "3WwjlP2gzki2fw0Rbl160g==\n",
-    "version": 1,
-    "cipher": "aes-256-cbc"
-  }
+  "id": "main"
 }

@@ -23,10 +23,10 @@
     }
   },
   "override_attributes": {
-    "set_fqdn": "dev-sbex",
+    "set_fqdn": "dev-logosxchange",
     "monit": {
       "mail": {
-        "from": "monit@dev.sbex.ch"
+        "from": "monit-dev@logosxchange.com"
       }
     }
   }

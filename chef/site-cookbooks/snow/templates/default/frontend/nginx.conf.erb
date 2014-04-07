@@ -1,7 +1,7 @@
 server {
     listen <%= node[:snow][:frontend][:port] %>;
     server_name <%= node[:snow][:frontend][:domain] %>;
-    root /home/ubuntu/snow-frontend/current/dist/;
+    root /home/ubuntu/snow-frontend/current/frontend/dist/;
     access_log /var/log/snow-frontend-access.log;
     error_log /var/log/snow-frontend-error.log;
 

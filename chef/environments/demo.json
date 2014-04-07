@@ -15,7 +15,7 @@
           "aws_device": "sdl",
           "os_device": "xvdl"
       },
-      "branch": "develop",
+      "branch": "master",
       "workers": {
         "bitcoinin": {
           "min_conf": 1
@@ -27,10 +27,10 @@
     }
   },
   "override_attributes": {
-    "set_fqdn": "swissmybitcoin.com",
+    "set_fqdn": "logosxchange.com",
     "monit": {
       "mail": {
-        "from": "monit-demo@sbex.ch"
+        "from": "monit-demo@logosxchange.com"
       }
     }
   }

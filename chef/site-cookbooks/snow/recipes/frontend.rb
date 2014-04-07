@@ -44,7 +44,7 @@ end
 deploy_revision node[:snow][:frontend][:app_directory] do
     user "ubuntu"
     group "ubuntu"
-    repo env_bag["repository"]["frontend"]
+    repo env_bag["repository"]["main"]
     branch node[:snow]['frontend'][:branch]
     ssh_wrapper "/home/ubuntu/frontend-ssh-wrapper/frontend_deploy_wrapper.sh"
     action :deploy
@@ -52,7 +52,7 @@ deploy_revision node[:snow][:frontend][:app_directory] do
       bash "npm install" do
         user "root"
         group "root"
-        cwd "#{release_path}"
+        cwd "#{release_path}/frontend"
         code %{
           npm install
           PATH=$PATH:./node_modules/.bin

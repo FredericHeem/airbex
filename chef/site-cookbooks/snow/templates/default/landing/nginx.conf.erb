@@ -14,6 +14,10 @@ server {
     gzip_buffers 16 8k;
     gzip_disable "MSIE [1-6]\.(?!.*SV1)";
 
+    location = / {
+        try_files /index-en.html /;
+    }
+    
     location = /no/ {
         try_files /index-no.html /;
     }

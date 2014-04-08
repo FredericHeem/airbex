@@ -1,7 +1,6 @@
 include_recipe "snow::common"
 include_recipe "nginx"
 include_recipe "nodejs"
-include_recipe "nginx"
 include_recipe "solo-search"
 
 ['git', 'make', 'g++'].each do |pkg|

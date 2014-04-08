@@ -45,7 +45,7 @@ deploy_revision node[:snow][:frontend][:app_directory] do
     user "ubuntu"
     group "ubuntu"
     repo env_bag["repository"]["main"]
-    branch node[:snow]['frontend'][:branch]
+    branch node[:snow][:branch]
     ssh_wrapper "/home/ubuntu/frontend-ssh-wrapper/frontend_deploy_wrapper.sh"
     action :deploy
     before_symlink do

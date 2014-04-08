@@ -1,5 +1,5 @@
 include_recipe "snow::common"
-include_recipe "nodejs"
+include_recipe "apt"
 include_recipe "nginx"
 
 ['git', 'make', 'g++', 'optipng', 'libjpeg-progs'].each do |pkg|
@@ -34,20 +34,18 @@ end
 deploy_revision node[:snow][:landing][:app_directory] do
     user "ubuntu"
     group "ubuntu"
-    repo node[:snow][:repo]
+    repo env_bag["repository"]["main"]
     branch node[:snow][:branch]
     ssh_wrapper "/home/ubuntu/landing-ssh-wrapper/landing_deploy_wrapper.sh"
     action :deploy
     before_symlink do
       bash "npm install" do
-        user "ubuntu"
-        group "ubuntu"
+        user "root"
+        group "root"
         cwd "#{release_path}/landing"
         code %{
-          sudo npm install
+          npm install
           PATH=$PATH:./node_modules/.bin
-          export SEGMENT=#{env_bag['segment']['api_key']}
-          export OPTIMIZELY=#{env_bag['optimizely']['app_id']}
           export NODE_ENV=#{node.chef_environment}
           grunt
         }

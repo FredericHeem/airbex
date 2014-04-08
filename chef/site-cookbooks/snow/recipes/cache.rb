@@ -1,3 +1,4 @@
+include_recipe "apt"
 include_recipe "snow::common"
 include_recipe "varnish"
 

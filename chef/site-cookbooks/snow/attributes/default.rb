@@ -30,13 +30,9 @@ default['snow']['branch'] = 'master'
 # Append to the existing (ssh and load)
 default["monit"]["default_monitrc_configs"] = []
 
-default['snow']['frontend']['port'] = 8010
-default['snow']['frontend']['app_directory'] = "/home/ubuntu/snow-frontend"
 default['snow']['frontend']['branch'] = 'master'
 
 node.set['varnish']['listen_port'] = 8030
-
-default['snow']['landing']['port'] = default['snow']['frontend']['port']
 
 default['postgresql']['initdb'] = false
 default['postgresql']['version'] = "9.2"

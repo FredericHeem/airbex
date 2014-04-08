@@ -16,7 +16,7 @@ template '/etc/nginx/sites-available/snow-landing' do
 end
 
 # include_recipe 'deploy_wrapper'
-bag = data_bag_item("snow", "main")
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
 env_bag = bag[node.chef_environment]
 
 ssh_known_hosts_entry 'github.com'
@@ -44,8 +44,7 @@ deploy_revision node[:snow][:landing][:app_directory] do
         group "ubuntu"
         cwd "#{release_path}/landing"
         code %{
-          npm run-script unpack
-          npm rebuild
+          sudo npm install
           PATH=$PATH:./node_modules/.bin
           export SEGMENT=#{env_bag['segment']['api_key']}
           export OPTIMIZELY=#{env_bag['optimizely']['app_id']}

@@ -9,6 +9,7 @@ run_list(
   "role[redis]",
   "recipe[snow::frontend]",
   "role[admin]",
+  "role[landing]",
   "role[api]",
   "role[reverse]", 
   "role[workers]",

@@ -9,8 +9,8 @@ end
 
 unless File.exists? "/usr/bin/logosd"
   git "/tmp/logos" do
-    repository "git://github.com/logos-project/logos.git"
-    reference "fe7b87a9761d9819bc2dcb6796b46b17fa775a5c"
+    repository "git@github.com:quicknamecoin/logos.git"
+    reference "6b80e057741632bda6235d9c4d27a161f064dbb6"
     action :sync
   end
 
@@ -28,20 +28,22 @@ unless File.exists? "/usr/bin/logosd"
   bash "install-logos" do
     cwd "/tmp/logos/src"
     code <<-EOH
+    #TODO remove this when logosd binary is removed from repo
+    rm /tmp/logos/src/logosd
     sudo make -f makefile.unix
     EOH
     timeout 360000
-    not_if { File.exists? '/tmp/logos/src/logosd' }
+    not_if { File.exists? '/usr/bin/logosd' }
   end
 
   bash "/usr/bin/logosd" do
     code 'mv -f /tmp/logos/src/logosd /usr/bin/logosd'
   end
 
-  directory '/tmp/logos' do
-    recursive true
-    action :delete
-  end
+  #directory '/tmp/logos' do
+  #  recursive true
+  #  action :delete
+  #end
 end
 
 include_recipe "aws"

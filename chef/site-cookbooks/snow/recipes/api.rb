@@ -85,7 +85,8 @@ execute "pg-migrate-install" do
     user "root"
     cwd node[:snow][:api][:app_directory] + '/current/db'
     command "npm install -g pg-test pg-migrate"
-    action :run end
+    action :run
+end
 
 execute "pg-migrate" do
     user "ubuntu"
@@ -94,6 +95,14 @@ execute "pg-migrate" do
     action :run
 end
 
+db_migration = node[:snow][:api][:app_directory] + '/current/db/' + bag['db_migration']
+execute "pg-migrate-custom" do
+    user "ubuntu"
+    cwd db_migration
+    command "pg-migrate -u postgres://postgres:" + env_bag['pg_password'] + "@localhost/snow"
+    action :run
+    only_if { ::File.directory?(db_migration) }
+end
 
 template "#{node[:snow][:api][:app_directory]}/shared/config/api.json" do
     source 'api/api.json.erb'

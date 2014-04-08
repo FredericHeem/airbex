@@ -43,5 +43,8 @@
     "raven": "<%= node[:raven][:uri] %>",
     <% end %>
     "smtp": <%= @smtp.to_json %>,
-    "email_from": "<%= @email_from %>"
+    "email_from": "<%= @email_from %>",
+    "company" : "<%= @company %>",
+    "email_support" : "<%= @email_support %>",
+    "signature" : "<%= @signature %>"
 }

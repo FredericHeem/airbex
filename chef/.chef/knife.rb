@@ -6,7 +6,7 @@ log_level                :info
 log_location             STDOUT
 node_name                ENV['KNIFE_USER']
 client_key               "#{current_dir}/#{ENV['KNIFE_USER']}.#{ENV['KNIFE_ENV']}.pem"
-validation_client_name   "sbex-validator"
+validation_client_name   "logosx-validator"
 validation_key           "#{current_dir}/validator.#{ENV['KNIFE_ENV']}.pem"
 chef_server_url          ENV['CHEF_SERVER_URL']
 cookbook_path            "#{current_dir}/../cookbooks" , "#{current_dir}/../site-cookbooks"

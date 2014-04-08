@@ -21,6 +21,10 @@ default['snow']['workers']['app_directory'] = "/home/ubuntu/snow-workers"
 default['snow']['workers']['bitcoinin']['min_conf'] = 6
 default['snow']['workers']['litecoinin']['min_conf'] = 6
 
+
+default['snow']['workers_lgs']['app_directory'] = "/home/ubuntu/snow-workers-lgs"
+default['snow']['workers']['logosin']['min_conf'] = 6
+
 default['snow']['branch'] = 'master'
 
 # Append to the existing (ssh and load)

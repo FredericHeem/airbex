@@ -1,0 +1,12 @@
+start on startup
+console log
+env NAME=logosd
+
+script
+    echo $$ > /var/run/$NAME.pid
+    sudo -Eu ubuntu /usr/bin/logosd -datadir=/lgs
+end script
+
+post-stop script
+   rm -f /var/run/$NAME.pid
+end script

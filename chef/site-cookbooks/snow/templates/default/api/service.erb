@@ -2,6 +2,7 @@ description "Run the Snow API"
 start on startup
 chdir <%= node[:snow][:api][:app_directory] %>/current/api
 console log
+env DEBUG='* -express:* -connect:*'
 env NODE_ENV=<%= node.chef_environment %>
 env HOME=/home/ubuntu
 

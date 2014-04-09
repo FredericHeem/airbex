@@ -13,9 +13,12 @@ default['snow']['admin']['app_directory'] = "/home/ubuntu/snow-admin"
 
 default['snow']['frontend']['app_directory'] = "/home/ubuntu/snow-frontend"
 default['snow']['frontend']['port'] = 8010
+default['snow']['frontend']['domain'] = "logosxchange.com"
 
 default['snow']['landing']['app_directory'] = "/home/ubuntu/snow-landing"
 default['snow']['landing']['port'] = 8050
+default['snow']['landing']['domain'] = "logosxchange.com"
+
 
 default['snow']['workers']['app_directory'] = "/home/ubuntu/snow-workers"
 default['snow']['workers']['bitcoinin']['min_conf'] = 6

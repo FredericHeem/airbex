@@ -24,7 +24,8 @@
   "scripts": {
     "pack": "tar -zcf node_modules.tar.gz node_modules",
     "unpack": "tar -zxf node_modules.tar.gz",
-    "test": "mocha"
+    "test": "mocha",
+    "run-cryptoin": "DEBUG=* NODE_ENV=brush node bin/cryptoin.js"
   },
   "devDependencies": {
     "mocha": "1.7.0",

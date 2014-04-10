@@ -1,8 +1,7 @@
 server {
-    listen <%= node[:snow][:reverse][:https_port] %>;
+    listen <%= node[:snow][:reverse][:https_port] %> ssl;
     server_name <%= node[:snow][:reverse][:server_name] %>;
 
-    listen 443 ssl;
     ssl_certificate conf/certificate.crt;
     ssl_certificate_key conf/private-key.pem;
 

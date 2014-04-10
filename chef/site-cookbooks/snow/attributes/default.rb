@@ -2,8 +2,8 @@ default['snow']['api']['app_directory'] = "/home/ubuntu/snow-api"
 default['snow']['api']['port'] = 8000
 default['snow']['api']['smtp'] = nil
 
-default['snow']['reverse']['https_port'] = 80
-default['snow']['reverse']['http_port'] = 8031
+default['snow']['reverse']['https_port'] = 443
+default['snow']['reverse']['http_port'] = 80
 default['snow']['reverse']['elb_name'] = "#{node.chef_environment}-reverse"
 default['snow']['reverse']['access_log'] = "/var/log/snow-reverse-access.log"
 default['snow']['reverse']['error_log'] = "/var/log/snow-reverse-error.log"

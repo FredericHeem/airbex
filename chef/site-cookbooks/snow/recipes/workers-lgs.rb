@@ -90,8 +90,8 @@ template "#{node[:snow][:workers_lgs][:app_directory]}/shared/config/workers.jso
     source 'workers/config-lgs.json.erb'
     variables({
         :website_url => env_bag['api']['website_url'],
-        :pgm_conn => "postgres://postgres@#{pgm_ip || '127.0.0.1'}/snow",
-        :pgs_conn => "postgres://postgres@#{pgs_ip || '127.0.0.1'}/snow",
+        :pgm_ip => pgm_ip || '127.0.0.1',
+        :pgs_ip => pgs_ip || '127.0.0.1',
         :logosd_ip => logosd_ip || '127.0.0.1',
         :logos => env_bag['logos'],
         :env_bag => env_bag

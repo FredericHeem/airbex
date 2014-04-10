@@ -2,11 +2,33 @@ include_recipe "apt"
 include_recipe "snow::common"
 include_recipe "nginx"
 
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
+env_bag = bag[node.chef_environment]
+
 frontend_ip = search(:node, 'role:frontend').first ? search(:node, 'role:frontend').first[:ipaddress] : nil
 admin_ip = search(:node, 'role:admin').first ? search(:node, 'role:admin').first[:ipaddress] : nil
 api_ip = search(:node, 'role:api').first ? search(:node, 'role:api').first[:ipaddress] : nil
 frontend_ip = search(:node, 'role:frontend').first ? search(:node, 'role:frontend').first[:ipaddress] : nil
 landing_ip = frontend_ip
+  
+directory "/etc/nginx/conf/" do
+  owner "www-data"
+  group "root"
+  mode 00600
+  action :create
+end
+
+cookbook_file "/etc/nginx/conf/certificate.crt" do
+  source "#{env_bag['https']['certificate']}"
+  owner "www-data"
+end
+
+file "/etc/nginx/conf/private-key.pem" do
+  content env_bag['https']['private_key']
+  owner "www-data"
+  group "root"
+  mode 00640
+end
 
 # Nginx configuration
 template '/etc/nginx/sites-available/snow-reverse' do

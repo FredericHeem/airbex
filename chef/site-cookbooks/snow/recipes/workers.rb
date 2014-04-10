@@ -95,9 +95,9 @@ rippled_ip = search(:node, 'role:rippled').first ? search(:node, 'role:rippled')
 template "#{node[:snow][:workers][:app_directory]}/shared/config/workers.json" do
     source 'workers/config.json.erb'
     variables({
+        :pgm_ip => pgm_ip || '127.0.0.1',
+        :pgs_ip => pgs_ip || '127.0.0.1',
         :website_url => env_bag['api']['website_url'],
-        :pgm_conn => "postgres://postgres@#{pgm_ip || '127.0.0.1'}/snow",
-        :pgs_conn => "postgres://postgres@#{pgs_ip || '127.0.0.1'}/snow",
         :ripple => env_bag['ripple'],
         :litecoind_ip => litecoind_ip || '127.0.0.1',
         :rippled_ip => rippled_ip || '127.0.0.1',

@@ -3,10 +3,10 @@ PGDUMP=pg_dump
 EXPORTFILE=`date +%A`.sql
 COMPRESSEDFILE=/tmp/${EXPORTFILE}.tgz
 ENCRYPTEDFILE=${COMPRESSEDFILE}.gpg
-BUCKET=snow-pgdump-<%= @env %>
+BUCKET=<%= @env_bag['pgm_s3']['pgdump_bucket'] %>
 S3CMD=/usr/local/bin/s3cmd
-RECIPIENT="Sbex Security"
-GPG_PUB_KEY="/home/ubuntu/SbexSecurity.pubkey.gpg"
+RECIPIENT="<%= @env_bag['pgp']['recipient'] %>"
+GPG_PUB_KEY="/home/ubuntu/<%= @env_bag['pgp']['public_key'] %>"
 
 $PGDUMP snow | gzip > ${COMPRESSEDFILE}
 gpg --import ${GPG_PUB_KEY}

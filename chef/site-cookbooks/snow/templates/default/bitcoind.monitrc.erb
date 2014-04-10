@@ -3,6 +3,6 @@ check process bitcoind
     start program = "/sbin/start bitcoind"
     stop program  = "/sbin/stop bitcoind"
     if failed port 8332 type tcp
-        with timeout 10 seconds
+        with timeout 60 seconds
         20 times within 20 cycles
         then restart

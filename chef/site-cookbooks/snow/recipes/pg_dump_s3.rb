@@ -1,4 +1,6 @@
 aws = Chef::EncryptedDataBagItem.load("aws", 'main')
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
+env_bag = bag[node.chef_environment]
 
 if aws['aws_access_key_id']
   include_recipe "s3cmd"
@@ -9,14 +11,14 @@ if aws['aws_access_key_id']
     group "postgres"
     mode 0755
     variables({
-        :snow_bag => Chef::EncryptedDataBagItem.load("snow", 'main'),
-	:env => node.chef_environment
+        :env_bag => env_bag,
+        :env => node.chef_environment
     })
     variables 
   end
 
-  cookbook_file "/home/ubuntu/SbexSecurity.pubkey.gpg" do
-    source "SbexSecurity.pubkey.gpg"
+  cookbook_file "/home/ubuntu/#{env_bag['pgp']['public_key']}" do
+    source "#{env_bag['pgp']['public_key']}"
   end
 
   cron_d "pg_dump_s3" do

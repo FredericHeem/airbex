@@ -8,7 +8,7 @@ chdir <%= node[:snow][:workers_lgs][:app_directory] %>/current/workers
 
 script
     echo $$ > /var/run/$NAME.pid
-    sudo -Eu ubuntu node bin/logosin
+    sudo -Eu ubuntu node bin/cryptoin.js
 end script
 
 post-stop script

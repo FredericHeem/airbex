@@ -94,7 +94,8 @@ template "#{node[:snow][:workers_lgs][:app_directory]}/shared/config/workers.jso
         :pgs_ip => pgs_ip || '127.0.0.1',
         :logosd_ip => logosd_ip || '127.0.0.1',
         :logos => env_bag['logos'],
-        :env_bag => env_bag
+        :env_bag => env_bag,
+        :currency => "LGS"
     })
     notifies :restart, resources(:service => "snow-logosin")
 end

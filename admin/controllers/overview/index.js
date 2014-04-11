@@ -13,44 +13,17 @@ module.exports = function() {
             return itemTemplate(item)
         }))
     }
-    
-    function refreshBtcHeight() {
-        api.call('admin/btc/height')
-        .fail(errors.alertFromXhr)
-        .done(function(res) {
-            $el.find('.btc-height').html(res.height)
-        })
-    }
 
-    function refreshLtcHeight() {
-        api.call('admin/ltc/height')
-        .fail(errors.alertFromXhr)
-        .done(function(res) {
-            $el.find('.ltc-height').html(res.height)
-        })
-    }
-
-    function refreshLgsHeight() {
-        api.call('admin/lgs/height')
-        .fail(errors.alertFromXhr)
-        .done(function(res) {
-            $el.find('.lgs-height').html(res.height)
-        })
-    }
     
     function refreshWallets() {
         api.call('admin/balances/wallets')
         .fail(errors.alertFromXhr)
         .done(function(res) {
-            $el.find('.btc-balance').html(res.btc)
-            $el.find('.ltc-balance').html(res.ltc)
-            $el.find('.lgs-balance').html(res.lgs)
+            itemsChanged(res);
         })
     }
 
-    refreshBtcHeight()
-    refreshLtcHeight()
-    refreshLgsHeight()
+
     refreshWallets()
 
     return controller

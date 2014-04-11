@@ -21,7 +21,10 @@ exports.getDbHeight = function(cb) {
     debug('looking up db height...')
     var q = 'SELECT logos_height FROM settings'
     exports.db.query(q, function(err, dr) {
-        if (err) return cb(err)
+        if (err) {
+            debug('getDbHeight error: ', err)
+            return cb(err)
+        }
         exports.dbHeight = dr.rows[0].logos_height
         debug('db height found at %s', exports.dbHeight)
         cb(null, exports.dbHeight)

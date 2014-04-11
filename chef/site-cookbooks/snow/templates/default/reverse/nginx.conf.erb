@@ -1,6 +1,9 @@
 server {
-    listen <%= node[:snow][:reverse][:https_port] %>;
+    listen <%= node[:snow][:reverse][:https_port] %> ssl;
     server_name <%= node[:snow][:reverse][:server_name] %>;
+
+    ssl_certificate conf/certificate.crt;
+    ssl_certificate_key conf/private-key.pem;
 
     client_max_body_size 5M;
     

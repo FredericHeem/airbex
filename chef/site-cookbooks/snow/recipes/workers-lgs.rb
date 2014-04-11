@@ -3,6 +3,9 @@ include_recipe "apt"
 include_recipe "nodejs"
 include_recipe "postgresql::client"
 
+cryptoName = "logos"
+cryptoCode = "LGS"
+
 package 'git' do
 end
 
@@ -21,20 +24,23 @@ deploy_wrapper 'workers' do
     sloppy true
 end
 
-services = %w(logosin logosout logosaddress)
+services = %w(in out address)
 services.each do |service|
-  template "/etc/init/snow-#{service}.conf" do
-    source "workers/upstart/#{service}.conf.erb"
+  template "/etc/init/snow-#{cryptoName}#{service}.conf" do
+    source "workers/upstart/crypto#{service}.conf.erb"
     owner "root"
     group "root"
     mode 00644
-    notifies :restart, "service[snow-#{service}]"
+    variables({
+        :service => "snow-#{cryptoName}#{service}"
+    })
+    notifies :restart, "service[snow-#{cryptoName}#{service}]"
   end
 end
 
 # Create services
 services.each do |service|
-  service "snow-#{service}" do
+  service "snow-#{cryptoName}#{service}" do
     provider Chef::Provider::Service::Upstart
     supports :start => true, :stop => true, :restart => true
     action :enable
@@ -59,9 +65,9 @@ deploy_revision node[:snow][:workers_lgs][:app_directory] do
         }
       end
     end
-    notifies :restart, "service[snow-logosin]"
-    notifies :restart, "service[snow-logosout]"
-    notifies :restart, "service[snow-logosaddress]"
+    notifies :restart, "service[snow-#{cryptoName}in]"
+    notifies :restart, "service[snow-#{cryptoName}out]"
+    notifies :restart, "service[snow-#{cryptoName}address]"
     keep_releases 2
     symlinks({
          "config/workers.json" => "workers/config/#{node.chef_environment}.json"
@@ -82,21 +88,24 @@ directory "#{node[:snow][:workers_lgs][:app_directory]}/shared/config" do
   group "ubuntu"
 end
 
+role = "role:#{cryptoName}d"
+
 pgm_ip = search(:node, 'role:pgm').first ? search(:node, 'role:pgm').first[:ipaddress] : nil
 pgs_ip = search(:node, 'role:pgs').first ? search(:node, 'role:pgs').first[:ipaddress] : nil
-logosd_ip = search(:node, 'role:logosd').first ? search(:node, 'role:logosd').first[:ipaddress] : nil
+cryptod_ip = search(:node, role).first ? search(:node, role).first[:ipaddress] : nil
 
 template "#{node[:snow][:workers_lgs][:app_directory]}/shared/config/workers.json" do
     source 'workers/config-lgs.json.erb'
     variables({
         :website_url => env_bag['api']['website_url'],
-        :pgm_conn => "postgres://postgres@#{pgm_ip || '127.0.0.1'}/snow",
-        :pgs_conn => "postgres://postgres@#{pgs_ip || '127.0.0.1'}/snow",
-        :logosd_ip => logosd_ip || '127.0.0.1',
-        :logos => env_bag['logos'],
-        :env_bag => env_bag
+        :pgm_ip => pgm_ip || '127.0.0.1',
+        :pgs_ip => pgs_ip || '127.0.0.1',
+        :cryptod_ip => cryptod_ip || '127.0.0.1',
+        :crypto => env_bag[cryptoName],
+        :env_bag => env_bag,
+        :currency => cryptoCode
     })
-    notifies :restart, resources(:service => "snow-logosin")
+    notifies :restart, resources(:service => "snow-#{cryptoName}in")
 end
 
 #monit_monitrc "snow-workers" do

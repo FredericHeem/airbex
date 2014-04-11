@@ -1,5 +1,5 @@
 {
-    "api_url": "http://<%= @api_ip %>:<%= node[:snow][:api][:port] %>/",
+    currency: <%= @currency %>,
     "pg_url": {
 		"user":"postgres",
 		"host": "<%= @pgm_ip %>",
@@ -7,9 +7,9 @@
 		"ssl": false,
 		"password" : "<%= node[:pg_write_url][:password] %>"
     },
-    "lgs_host": "<%= @logosd_ip %>",
-    "lgs_user": "<%= @logos['username'] %>",
-    "lgs_port": "<%= @logos['port'] %>",
-    "lgs_pass": "<%= @logos['password'] %>",
-    "lgs_minconf": <%= node[:snow][:workers][:logosin][:min_conf] %>
+    "host": "<%= @cryptod_ip %>",
+    "user": "<%= @crypto['username'] %>",
+    "port": "<%= @crypto['port'] %>",
+    "pass": "<%= @crypto['password'] %>",
+    "minconf": <%= node[:snow][:workers][:logosin][:min_conf] %>
 }

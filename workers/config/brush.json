@@ -1,4 +1,15 @@
 {
-    "pg_url" : "postgres://postgres:postgres1234@localhost:5432/snow"
-    
+    "currency":"BTC",
+    "pg_url": {
+                "user":"postgres",
+                "host": "127.0.0.1",
+                "database" :"snow",
+                "ssl": false,
+                "password" : "postgres1234"
+    },
+    "host": "127.0.0.1",
+    "user": "username",
+    "port": "8332",
+    "pass": "password",
+    "minconf": 6
 }

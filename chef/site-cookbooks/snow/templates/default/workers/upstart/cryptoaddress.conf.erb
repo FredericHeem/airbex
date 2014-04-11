@@ -1,6 +1,6 @@
 start on startup
 console log
-env NAME=snow-logosout
+env NAME=<%= @service %>
 env NODE_ENV=<%= node.chef_environment %>
 env DEBUG=*
 env HOME=/home/ubuntu
@@ -8,7 +8,7 @@ chdir <%= node[:snow][:workers_lgs][:app_directory] %>/current/workers
 
 script
     echo $$ > /var/run/$NAME.pid
-    sudo -Eu ubuntu node bin/cryptoout
+    sudo -Eu ubuntu node bin/cryptoaddress.js
 end script
 
 post-stop script

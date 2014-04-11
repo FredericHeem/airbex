@@ -2,9 +2,9 @@ var config = require('konfu')
 , async = require('async')
 , debug = require('debug')('snow:cryptoin')
 , Bitcoin = require('bitcoin').Client
-, BitcoinIn = require('../lib/cryptoin')
+, CryptoIn = require('../lib/cryptoin')
 , cryptoEndPoint = {
-    currencyCode : config.currencyCode,
+    currency : config.currency,
     host: config.host,
     port: config.port,
     user: config.user,
@@ -18,7 +18,7 @@ var dbClient = new Client(config.pg_url)
 
 var daemon = new Bitcoin(cryptoEndPoint);
 
-debug("Listen incoming transaction for currency ", config.currencyCode);
+debug("Listen incoming transaction for currency ", config.currency);
 
 async.series(
         [
@@ -36,9 +36,9 @@ async.series(
              daemon.getInfo(function(err){
                  debug("daemon.getInfo")
                  if(err){
-                     debug("daemon.getInfo error: ", err)
+                     debug("daemon.getinfo error: ", err)
                  }
-                 callback(err)
+                 callback()
              })
          }
          ],

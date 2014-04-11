@@ -13,7 +13,7 @@ var CryptoIn = module.exports = function(ep, db, minConf) {
     this.minConf = minConf || 3
     this.db = db
     this.currency = ep.currency
-    this.currencyLC = currency.toLowerCase();
+    this.currencyLC = this.currency.toLowerCase();
     
     async.forever(function(cb) {
         that.check(function(err) {
@@ -37,7 +37,11 @@ CryptoIn.prototype.getDbHeight = function(cb) {
     }
     this.db.query(query, function(err, dr) {
         if (err) return cb(err)
-        that.dbHeight = dr.rows[0].height
+        if(dr.rows.length){
+            that.dbHeight = dr.rows[0].height
+        } else {
+            that.dbHeight = 0;
+        }
         cb(null, that.dbHeight)
     })
 }

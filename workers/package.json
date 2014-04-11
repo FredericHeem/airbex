@@ -25,9 +25,9 @@
     "pack": "tar -zcf node_modules.tar.gz node_modules",
     "unpack": "tar -zxf node_modules.tar.gz",
     "test": "mocha",
-    "run-cryptoin": "DEBUG=* NODE_ENV=brush node bin/cryptoin.js",
-    "run-cryptoout": "DEBUG=* NODE_ENV=brush node bin/cryptoout.js",
-    "run-cryptoaddress": "DEBUG=* NODE_ENV=brush node bin/cryptoaddress.js"
+    "cryptoin": "DEBUG=* NODE_ENV=brush node bin/cryptoin.js",
+    "cryptoout": "DEBUG=* NODE_ENV=brush node bin/cryptoout.js",
+    "cryptoaddress": "DEBUG=* NODE_ENV=brush node bin/cryptoaddress.js"
   },
   "devDependencies": {
     "mocha": "1.7.0",

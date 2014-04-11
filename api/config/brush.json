@@ -5,14 +5,14 @@
     "email_support": "support@logosxchange.com",
     "signature":"Logosxchange, the Logos and Bitcoin Exchange",
     "pg_read_url": {
-        "user": "sylvain",
+        "user": "postgres",
         "host": "localhost",
         "database": "snow",
         "ssl": false,
         "password": "postgres1234"
     },
     "pg_write_url": {
-        "user": "sylvain",
+        "user": "postgres",
         "host": "localhost",
         "database": "snow",
         "ssl": false,

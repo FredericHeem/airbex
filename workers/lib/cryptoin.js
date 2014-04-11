@@ -32,7 +32,7 @@ CryptoIn.prototype.getDbHeight = function(cb) {
     if (this.dbHeight) return cb(null, this.dbHeight)
     var that = this
     , query = {
-            text: 'SELECT height FROM deamon where currency=$1', 
+            text: 'SELECT height FROM wallet where currency_id=$1', 
             values:[this.currency]
     }
     this.db.query(query, function(err, dr) {
@@ -42,21 +42,24 @@ CryptoIn.prototype.getDbHeight = function(cb) {
         } else {
             that.dbHeight = 0;
         }
+        debug("getDbHeight: ", that.dbHeight)
         cb(null, that.dbHeight)
     })
 }
 
 CryptoIn.prototype.setDbBalance = function(val, cb) {
+    debug("setDbBalance: %s, currency: %s", val, this.currency)
     this.db.query({
-        text: 'UPDATE deamon SET balance = $1 where currency=$2',
+        text: 'UPDATE wallet SET balance = $1 where currency_id=$2',
         values: [val, this.currency]
     }, cb)
 }
 
 CryptoIn.prototype.setDbHeight = function(val, cb) {
+    debug("dbHeight %s", val);
     this.dbHeight = val
     this.db.query({
-        text: 'UPDATE deamon SET height = $1 where currency=$2',
+        text: 'UPDATE wallet SET height = $1 where currency_id=$2',
         values: [val, this.currency]
     }, cb)
 }

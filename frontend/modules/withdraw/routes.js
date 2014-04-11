@@ -8,11 +8,11 @@ module.exports = function(router, master, authorize) {
         router.go('withdraw/withdraws', true)
     })
     .add(/^withdraw\/bitcoin$/, function() {
-        if (!authorize.user(2)) return
+        if (!authorize.user()) return
         master(require('./bitcoin')(), 'withdraw')
     })
     .add(/^withdraw\/litecoin$/, function() {
-        if (!authorize.user(2)) return
+        if (!authorize.user()) return
         master(require('./litecoin')(), 'withdraw')
     })
     .add(/^withdraw\/bank$/, function() {

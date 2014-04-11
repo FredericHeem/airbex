@@ -4,11 +4,11 @@ module.exports = function(router, master, authorize) {
         router.go('deposit/bank', true)
     })
     .add(/^deposit\/bitcoin$/, function() {
-        if (!authorize.user(4)) return
+        if (!authorize.user()) return
         master(require('./bitcoin')(), 'deposit')
     })
     .add(/^deposit\/litecoin$/, function() {
-        if (!authorize.user(4)) return
+        if (!authorize.user()) return
         master(require('./litecoin')(), 'deposit')
     })  
     .add(/^deposit\/bank$/, function() {

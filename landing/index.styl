@@ -6,8 +6,14 @@
   width: device-width
 
 .header
-  background white
+  background transparent;
   padding 10px
+  height: 300px
+  width: 100%
+  
+a.btn-login
+  position: fixed
+  right: 10px
 
 .flags
   margin-top: 5px
@@ -45,14 +51,15 @@
 
 .cover
     background-color: #70d0fa
-    background-image url("/norway.jpg")
+    background-image url("/cover.jpg")
     background-size cover
     background-position center
     height 601px
+    min-height 530px
     margin: 0 -15px
 
     .cover-content
-      margin-top 200px
+      margin-top 10px
 
     .tagline, .sub-tagline
       color: white;

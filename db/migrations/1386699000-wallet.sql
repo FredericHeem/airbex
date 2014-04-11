@@ -5,4 +5,4 @@ CREATE TABLE wallet (
    balance decimal(16, 8)
 );
 
-INSERT INTO wallet(currency_id, height) values('BTC', 0);
+INSERT INTO wallet(currency_id, height, balance) values('BTC', 0, 0);

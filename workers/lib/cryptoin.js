@@ -8,8 +8,8 @@ var num = require('num')
 var CryptoIn = module.exports = function(ep, db, minConf) {
     _.bindAll(this)
     var that = this
-    , CryptoIn = require('bitcoin').Client
-    this.bitcoin = new CryptoIn(ep)
+    , Bitcoin = require('bitcoin').Client
+    this.bitcoin = new Bitcoin(ep)
     this.minConf = minConf || 3
     this.db = db
     this.currency = ep.currency

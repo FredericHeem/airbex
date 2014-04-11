@@ -7,9 +7,9 @@
 		"ssl": false,
 		"password" : "<%= node[:pg_write_url][:password] %>"
     },
-    "host": "<%= @logosd_ip %>",
-    "user": "<%= @logos['username'] %>",
-    "port": "<%= @logos['port'] %>",
-    "pass": "<%= @logos['password'] %>",
+    "host": "<%= @cryptod_ip %>",
+    "user": "<%= @crypto['username'] %>",
+    "port": "<%= @crypto['port'] %>",
+    "pass": "<%= @crypto['password'] %>",
     "minconf": <%= node[:snow][:workers][:logosin][:min_conf] %>
 }

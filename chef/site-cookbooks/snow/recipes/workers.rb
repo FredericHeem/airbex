@@ -21,27 +21,6 @@ deploy_wrapper 'workers' do
     sloppy true
 end
 
-#services = %w(bitcoinin bitcoinbridge bitcoinout bitcoinaddress litecoinin litecoinout litecoinaddress ripplein rippleout metrics)
-services = %w(bitcoinin bitcoinout bitcoinaddress litecoinin litecoinout litecoinaddress)
-services.each do |service|
-  template "/etc/init/snow-#{service}.conf" do
-    source "workers/upstart/#{service}.conf.erb"
-    owner "root"
-    group "root"
-    mode 00644
-    notifies :restart, "service[snow-#{service}]"
-  end
-end
-
-# Create services
-services.each do |service|
-  service "snow-#{service}" do
-    provider Chef::Provider::Service::Upstart
-    supports :start => true, :stop => true, :restart => true
-    action :enable
-  end
-end
-
 # Deployment config
 deploy_revision node[:snow][:workers][:app_directory] do
     user "ubuntu"
@@ -60,12 +39,6 @@ deploy_revision node[:snow][:workers][:app_directory] do
         }
       end
     end
-    notifies :restart, "service[snow-bitcoinin]"
-    notifies :restart, "service[snow-bitcoinout]"
-    notifies :restart, "service[snow-bitcoinaddress]"
-    notifies :restart, "service[snow-litecoinin]"
-    notifies :restart, "service[snow-litecoinout]"
-    notifies :restart, "service[snow-litecoinaddress]"
     keep_releases 2
     symlinks({
          "config/workers.json" => "workers/config/#{node.chef_environment}.json"
@@ -88,8 +61,6 @@ end
 
 pgm_ip = search(:node, 'role:pgm').first ? search(:node, 'role:pgm').first[:ipaddress] : nil
 pgs_ip = search(:node, 'role:pgs').first ? search(:node, 'role:pgs').first[:ipaddress] : nil
-bitcoind_ip = search(:node, 'role:bitcoind').first ? search(:node, 'role:bitcoind').first[:ipaddress] : nil
-litecoind_ip = search(:node, 'role:litecoind').first ? search(:node, 'role:litecoind').first[:ipaddress] : nil
 rippled_ip = search(:node, 'role:rippled').first ? search(:node, 'role:rippled').first[:ipaddress] : nil
 
 template "#{node[:snow][:workers][:app_directory]}/shared/config/workers.json" do
@@ -99,16 +70,9 @@ template "#{node[:snow][:workers][:app_directory]}/shared/config/workers.json" d
         :pgs_ip => pgs_ip || '127.0.0.1',
         :website_url => env_bag['api']['website_url'],
         :ripple => env_bag['ripple'],
-        :litecoind_ip => litecoind_ip || '127.0.0.1',
-        :rippled_ip => rippled_ip || '127.0.0.1',
-        :bitcoind_ip => bitcoind_ip || '127.0.0.1',
-        :bitcoin => env_bag['bitcoin'],
-        :litecoin => env_bag['litecoin'],
         :armory => env_bag['armory'],
         :env_bag => env_bag
     })
-    notifies :restart, resources(:service => "snow-bitcoinin")
-    notifies :restart, resources(:service => "snow-litecoinin")
 end
 
 monit_monitrc "snow-workers" do

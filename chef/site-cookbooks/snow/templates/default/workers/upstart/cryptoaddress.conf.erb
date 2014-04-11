@@ -4,7 +4,7 @@ env NAME=<%= @service %>
 env NODE_ENV=<%= node.chef_environment %>
 env DEBUG=*
 env HOME=/home/ubuntu
-chdir <%= node[:snow][:workers_lgs][:app_directory] %>/current/workers
+chdir <%= @workerDir %>/current/workers
 
 script
     echo $$ > /var/run/$NAME.pid

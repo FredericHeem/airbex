@@ -10,16 +10,6 @@
     "armory_user": "<%= @armory['username'] %>",
     "armory_port": "<%= @armory['port'] %>",
     "armory_pass": "<%= @armory['password'] %>",
-    "btc_host": "<%= @bitcoind_ip %>",
-    "btc_user": "<%= @bitcoin['username'] %>",
-    "btc_port": "<%= @bitcoin['port'] %>",
-    "btc_pass": "<%= @bitcoin['password'] %>",
-    "ltc_host": "<%= @litecoind_ip %>",
-    "ltc_user": "<%= @litecoin['username'] %>",
-    "ltc_port": "<%= @litecoin['port'] %>",
-    "ltc_pass": "<%= @litecoin['password'] %>",
-    "ltc_minconf": <%= node[:snow][:workers][:litecoinin][:min_conf] %>,
-    "btc_minconf": <%= node[:snow][:workers][:bitcoinin][:min_conf] %>,
     <% unless node[:raven][:uri].nil? %>
     "raven": "<%= node[:raven][:uri] %>",
     <% end %>

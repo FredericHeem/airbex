@@ -33,10 +33,12 @@ async.series(
              });
          },
          function(callback) {
-             daemon.getInfo(function(err){
+             daemon.getInfo(function(err, info){
                  debug("daemon.getInfo")
                  if(err){
                      debug("daemon.getinfo error: ", err)
+                 } else {
+                     debug("info: ", JSON.stringify(info, null, 4))
                  }
                  callback()
              })

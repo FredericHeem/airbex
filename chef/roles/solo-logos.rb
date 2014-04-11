@@ -1,0 +1,19 @@
+name "solo-logos"
+run_list(
+  "recipe[snow::aptupdate]",
+  "recipe[apt]",
+  "recipe[solo-search]",
+  "role[bitcoind]",
+  "role[logosd]",
+  "recipe[snow::armory]",
+  "role[pgm]",
+  "role[redis]",
+  "recipe[snow::frontend]",
+  "role[admin]",
+  "role[landing]",
+  "role[api]",
+  "role[reverse]", 
+  "role[workers]",
+  "recipe[snow::workers-btc]",
+  "recipe[snow::workers-lgs]",
+)

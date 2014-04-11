@@ -22,8 +22,10 @@ default['snow']['workers']['app_directory'] = "/home/ubuntu/snow-workers"
 default['snow']['workers']['bitcoinin']['min_conf'] = 6
 default['snow']['workers']['litecoinin']['min_conf'] = 6
 
-
+default['snow']['workers_btc']['app_directory'] = "/home/ubuntu/snow-workers-btc"
+default['snow']['workers_ltc']['app_directory'] = "/home/ubuntu/snow-workers-ltc"
 default['snow']['workers_lgs']['app_directory'] = "/home/ubuntu/snow-workers-lgs"
+
 default['snow']['workers']['logosin']['min_conf'] = 6
 
 default['snow']['branch'] = 'master'

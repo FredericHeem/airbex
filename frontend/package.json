@@ -37,8 +37,6 @@
     "http-proxy": "0.10.3"
   },
   "scripts": {
-    "start" : "grunt serve",
-    "pack": "tar -zcf node_modules.tar.gz node_modules",
-    "unpack": "tar -zxf node_modules.tar.gz"
+    "start" : "grunt serve"
   }
 }

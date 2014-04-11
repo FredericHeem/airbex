@@ -1,18 +1,18 @@
 {
-    "company": "SBEX",
+    "company": "Logosxchange",
     "website_url": "http://localhost:5073",
-    "email_from": "email-verification@sbex.ch",
-    "email_support": "support@sbex.ch",
-    "signature":"SBEX, the Swiss Bitcoin EXchange",
+    "email_from": "support@logosxchange.com",
+    "email_support": "support@logosxchange.com",
+    "signature":"Logosxchange, the Logos and Bitcoin Exchange",
     "pg_read_url": {
-        "user": "postgres",
+        "user": "sylvain",
         "host": "localhost",
         "database": "snow",
         "ssl": false,
         "password": "postgres1234"
     },
     "pg_write_url": {
-        "user": "postgres",
+        "user": "sylvain",
         "host": "localhost",
         "database": "snow",
         "ssl": false,

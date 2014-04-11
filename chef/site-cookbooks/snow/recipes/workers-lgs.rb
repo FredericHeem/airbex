@@ -5,6 +5,7 @@ include_recipe "postgresql::client"
 
 cryptoName = "logos"
 cryptoCode = "LGS"
+worker_dir = node[:snow][:workers_lgs][:app_directory]
 
 package 'git' do
 end
@@ -48,7 +49,7 @@ services.each do |service|
 end
 
 # Deployment config
-deploy_revision node[:snow][:workers_lgs][:app_directory] do
+deploy_revision worker_dir do
     user "ubuntu"
     group "ubuntu"
     repo env_bag["repository"]["main"]
@@ -78,12 +79,12 @@ deploy_revision node[:snow][:workers_lgs][:app_directory] do
 end
 
 # Application config
-directory "#{node[:snow][:workers_lgs][:app_directory]}/shared" do
+directory "#{worker_dir}/shared" do
   owner "ubuntu"
   group "ubuntu"
 end
 
-directory "#{node[:snow][:workers_lgs][:app_directory]}/shared/config" do
+directory "#{worker_dir}/shared/config" do
   owner "ubuntu"
   group "ubuntu"
 end
@@ -94,7 +95,7 @@ pgm_ip = search(:node, 'role:pgm').first ? search(:node, 'role:pgm').first[:ipad
 pgs_ip = search(:node, 'role:pgs').first ? search(:node, 'role:pgs').first[:ipaddress] : nil
 cryptod_ip = search(:node, role).first ? search(:node, role).first[:ipaddress] : nil
 
-template "#{node[:snow][:workers_lgs][:app_directory]}/shared/config/workers.json" do
+template "#{worker_dir}/shared/config/workers.json" do
     source 'workers/config-lgs.json.erb'
     variables({
         :website_url => env_bag['api']['website_url'],
@@ -106,6 +107,8 @@ template "#{node[:snow][:workers_lgs][:app_directory]}/shared/config/workers.jso
         :currency => cryptoCode
     })
     notifies :restart, resources(:service => "snow-#{cryptoName}in")
+    notifies :restart, resources(:service => "snow-#{cryptoName}out")
+    notifies :restart, resources(:service => "snow-#{cryptoName}address")
 end
 
 #monit_monitrc "snow-workers" do

@@ -10,7 +10,8 @@ exports.wallets = function(req, res, next) {
     ].join('\n'), function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows.map(function(row) {
-            row.balance = req.app.cache.formatCurrency(row.balance, row.currency)
+            console.log("bal %s, curr %s", row.balance, row.currency_id)
+            //row.balance = req.app.cache.formatCurrency(row.balance, row.currency_id)
             return row
         }))
     })

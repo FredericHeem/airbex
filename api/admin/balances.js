@@ -5,14 +5,14 @@ module.exports = exports = function(app) {
 
 exports.wallets = function(req, res, next) {
     req.app.conn.read.query([
-        'SELECT btc_balance, ltc_balance',
-        'FROM settings'
+        'SELECT *',
+        'FROM wallet'
     ].join('\n'), function(err, dr) {
         if (err) return next(err)
-        res.send({
-            btc: dr.rows[0].btc_balance,
-            ltc: dr.rows[0].ltc_balance
-        })
+        res.send(dr.rows.map(function(row) {
+            row.balance = req.app.cache.formatCurrency(row.balance, row.currency)
+            return row
+        }))
     })
 }
 

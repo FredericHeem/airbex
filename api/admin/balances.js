@@ -9,9 +9,10 @@ exports.wallets = function(req, res, next) {
         'FROM wallet'
     ].join('\n'), function(err, dr) {
         if (err) return next(err)
-        res.send({
-            dr.rows
-        })
+        res.send(dr.rows.map(function(row) {
+            row.balance = req.app.cache.formatCurrency(row.balance, row.currency)
+            return row
+        }))
     })
 }
 

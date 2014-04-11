@@ -74,10 +74,12 @@ template "/etc/init/bitcoind.conf" do
 end
 
 template "/btc/bitcoin.conf" do
-  source "bitcoind/bitcoin.conf.erb"
+  source "crypto.conf.erb"
   variables({
     :username => env_bag['bitcoin']['username'],
-    :password => env_bag['bitcoin']['password']
+    :password => env_bag['bitcoin']['password'],
+    :rpcallowip => env_bag['bitcoin']['rpcallowip'] || '127.0.0.1' ,
+    :testnet => env_bag['bitcoin']['testnet'] || 0
   })  
   owner "ubuntu"
   group "ubuntu"

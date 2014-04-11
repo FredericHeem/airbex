@@ -10,8 +10,22 @@ margin-bottom:20px;
 margin-top:-10px;
 }
 
+
+.navbar-header{
+	margin-left 250px
+}
+
+
 div#area {
 	padding-top : 30px;
+}
+
+div.alert {
+	margin-top:70px;
+}
+
+div.reminder{
+margin-top 70px;
 }
 
 .cover-content {

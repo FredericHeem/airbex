@@ -39,17 +39,17 @@ define :compilecrypto do
         #{params[:compileCommand]}
         EOH
         timeout 360000
-        not_if { File.exists? "/tmp/#{cryptoName}/src/#{deamonName}" }
+        not_if { File.exists? "/usr/bin/#{deamonName}" }
       end
     
       bash "/usr/bin/#{deamonName}" do
         code "mv -f /tmp/#{cryptoName}/src/#{deamonName} /usr/bin/#{deamonName}"
       end
     
-      directory '/tmp/litecoin' do
-        recursive true
-        action :delete
-      end
+      #directory '/tmp/litecoin' do
+      #  recursive true
+      #  action :delete
+      #end
     end
     
     include_recipe "aws"

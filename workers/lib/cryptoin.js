@@ -107,7 +107,7 @@ CryptoIn.prototype.processOutput = function(txid, o, cb) {
              "FROM crypto_deposit_address",
              "WHERE address = $2 AND currency_id = '%s'"
          ].join('\n'),
-        currencyId);
+        this.currency);
     
     this.db.query({
         text: queryText,

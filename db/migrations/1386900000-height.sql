@@ -1,0 +1,1 @@
+update wallet set height = 221406 where currency_id = 'BTC';

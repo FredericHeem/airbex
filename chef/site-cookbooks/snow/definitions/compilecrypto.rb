@@ -122,7 +122,7 @@ define :compilecrypto do
       variables({
         :username => cryptoConfig['username'],
         :password => cryptoConfig['password'],
-        :rpcallowip => cryptoConfig['rpcallowip'] || '127.0.0.1' ,
+        :rpcallowip => cryptoConfig['rpcallowip'] || 'localhost' ,
         :testnet => cryptoConfig['testnet'] || 0
       })
       owner "ubuntu"
@@ -136,8 +136,16 @@ define :compilecrypto do
       action [:enable, :start]
     end
     
-    #monit_monitrc "#{deamonName}" do
-    #end
+    template "/etc/monit/conf.d/#{deamonName}.monitrc" do
+      source "cryptomonitrc.erb"
+      variables({
+        :deamonName => deamonName,
+        :port => cryptoConfig['port']
+      })
+      owner "ubuntu"
+      group "ubuntu"
+      mode 0664
+    end
     
     # Automatic backups
     include_recipe "cron"

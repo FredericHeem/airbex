@@ -75,8 +75,8 @@ template "#{node[:snow][:workers][:app_directory]}/shared/config/workers.json" d
     })
 end
 
-monit_monitrc "snow-workers" do
-end
+#monit_monitrc "snow-workers" do
+#end
 
 template "/usr/bin/liability-proof.sh" do
     source "liability-proof.sh.erb"

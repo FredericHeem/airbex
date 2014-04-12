@@ -1,14 +1,14 @@
 start on startup
 console log
 env NAME=<%= @service %>
-env NODE_ENV=<%= node.chef_environment %>
-env DEBUG=*
+#env NODE_ENV=<%= node.chef_environment %>
+#env DEBUG=*
 env HOME=/home/ubuntu
 chdir <%= @workerDir %>/current/workers
 
 script
     echo $$ > /var/run/$NAME.pid
-    sudo -Eu ubuntu node bin/cryptoaddress.js
+    sudo -Eu ubuntu /usr/bin/snow-<%= @cryptoName %><%= @service %>.sh
 end script
 
 post-stop script

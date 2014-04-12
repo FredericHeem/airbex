@@ -1,0 +1,8 @@
+check process <%= @deamonName %>
+    with pidfile /var/run/<%= @deamonName %>.pid
+    start program = "/sbin/start <%= @deamonName %>"
+    stop program  = "/sbin/stop <%= @deamonName %>"
+    if failed port <%= @port %> type tcp
+        with timeout 120 seconds
+        20 times within 20 cycles
+        then restart

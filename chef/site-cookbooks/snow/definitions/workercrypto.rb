@@ -31,18 +31,33 @@ define :workercrypto do
     services = %w(in out address)
     services.each do |service|
       template "/etc/init/snow-#{cryptoName}#{service}.conf" do
-        source "workers/upstart/crypto#{service}.conf.erb"
+        source "workers/upstart/cryptoservice.conf.erb"
         owner "root"
         group "root"
         mode 00644
         variables({
+            :serviceSuffix => service,
             :service => "snow-#{cryptoName}#{service}",
             :workerDir => workerDir
         })
         notifies :restart, "service[snow-#{cryptoName}#{service}]"
       end
     end
-    
+   
+    services.each do |service|
+      template "/usr/bin/snow-#{cryptoName}#{service}.sh" do
+        source "workers/cryptoservice.sh.erb"
+        owner "root"
+        group "root"
+        mode 0755
+        variables({
+            :cryptoName => cryptoName,
+            :service => "snow-#{cryptoName}#{service}",
+            :serviceSuffix => service,
+            :workerDir => workerDir
+        })
+      end
+    end    
     # Create services
     services.each do |service|
       service "snow-#{cryptoName}#{service}" do

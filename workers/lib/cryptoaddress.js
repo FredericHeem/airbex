@@ -30,16 +30,15 @@ CryptoAddress.prototype.loop = function() {
 }
 
 CryptoAddress.prototype.saveAddress = function(accountId, address, cb) {
-    var queryText = util.format(
-            [
-             "INSERT INTO crypto_deposit_address('%s', account_id, address)",
-             'VALUES ($1, $2)'
-         ].join('\n'),
-         this.currency);
+    var queryText = 
+         [
+             "INSERT INTO crypto_deposit_address(currency_id, account_id, address)",
+             'VALUES ($1, $2, $3)'
+         ].join('\n');
     
     this.client.query({
         text: queryText,
-        values: [accountId, address]
+        values: [this.currency, accountId, address]
     }, function(err) {
         if (err) return cb(err)
         console.log('Assigned Bitcoin address %s to account %s', address, accountId)
@@ -67,8 +66,8 @@ CryptoAddress.prototype.getAccounts = function(cb) {
             [
              'SELECT a.account_id',
              'FROM account a',
-             'LEFT JOIN crypto_deposit_address cda ON bda.account_id = a.account_id',
-             'WHERE a.currency_id = \'%s\' AND cda.address IS NULL AND cda.currency_id =  \'%s\''
+             'LEFT JOIN crypto_deposit_address cda ON cda.account_id = a.account_id',
+             'WHERE a.currency_id = \'%s\' AND cda.address IS NULL'
          ].join('\n'),
          this.currency);
     

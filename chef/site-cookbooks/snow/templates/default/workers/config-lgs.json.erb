@@ -8,8 +8,8 @@
 		"password" : "<%= node[:pg_write_url][:password] %>"
     },
     "host": "<%= @cryptod_ip %>",
-    "user": "<%= @crypto['username'] %>",
+    "rpcuser": "<%= @crypto['username'] %>",
     "port": "<%= @crypto['port'] %>",
-    "pass": "<%= @crypto['password'] %>",
+    "rpcpass": "<%= @crypto['password'] %>",
     "minconf": <%= @minConf %>
 }

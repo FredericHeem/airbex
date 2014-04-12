@@ -8,8 +8,8 @@
                 "password" : "postgres1234"
     },
     "host": "127.0.0.1",
-    "user": "frederic",
+    "rpcuser": "frederic",
     "port": "18332",
-    "pass": "password",
+    "rpcpass": "password",
     "minconf": 6
 }

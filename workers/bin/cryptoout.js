@@ -7,8 +7,8 @@ var config = require('konfu')
     currency : config.currency,
     host: config.host,
     port: config.port,
-    user: config.user,
-    pass: config.pass,
+    user: config.rpcuser,
+    pass: config.rpcpass,
     ssl: config.ssl || false
 }
 

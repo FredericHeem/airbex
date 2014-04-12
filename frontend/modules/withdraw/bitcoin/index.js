@@ -28,7 +28,7 @@ module.exports = function() {
             return
         }
 
-        if (!val.match(/^(1|3)[a-z0-9]{26,33}$/i)){
+        if (!val.match(/^(1|3|m)[a-z0-9]{26,33}$/i)){
             $address.addClass('has-error is-invalid')
             return
         }

@@ -90,7 +90,7 @@ define :workercrypto do
         notifies :restart, "service[snow-#{cryptoName}address]"
         keep_releases 2
         symlinks({
-             "config/workers.json" => "workers/config/#{node.chef_environment}.json"
+             "config/workers.json" => "workers/config/config.#{node.chef_environment}.json"
         })
         symlink_before_migrate({})
         create_dirs_before_symlink(['workers', 'workers/config'])

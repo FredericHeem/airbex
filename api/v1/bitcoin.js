@@ -25,8 +25,8 @@ exports.withdraw = function(currencyId, req, res, next) {
         req.body.amount, currencyId, req.user.id, req.body.address)
 
     var queryText = util.format(
-        'SELECT %s_withdraw($1, $2, $3) rid',
-        currencyId)
+        'SELECT crypto_withdraw(\'%s\', $1, $2, $3) rid',
+        currencyId.toUpperCase())
 
     req.app.conn.write.query({
         text: queryText,
@@ -37,6 +37,7 @@ exports.withdraw = function(currencyId, req, res, next) {
         ]
     }, function(err, dr) {
         if (err) {
+            console.log("withdraw error ", err.message);
             if (err.message.match(/non_negative_available/)) {
                 return res.send(500, {
                     name: 'NoFunds',

@@ -1,7 +1,3 @@
-ALTER TABLE settings
-    ADD COLUMN lgs_balance decimal(16, 8),
-    ADD COLUMN logos_height int;
-
 DROP TABLE IF EXISTS lgs_deposit_address CASCADE;
 CREATE TABLE lgs_deposit_address (
     address character varying(34) NOT NULL,
@@ -53,7 +49,7 @@ BEGIN
     INNER JOIN account ac ON ac.account_id = lda.account_id
     WHERE lda.address = a;
 
-    tid := edge_credit(uid, 'LTC', amnt);
+    tid := edge_credit(uid, 'LGS', amnt);
 
     INSERT INTO lgs_credited (txid, address, transaction_id)
     VALUES (t, a, tid);
@@ -61,6 +57,9 @@ BEGIN
     RETURN tid;
 END; $BODY$
   LANGUAGE plpgsql VOLATILE;
+  
+
+  
   
 CREATE OR REPLACE FUNCTION lgs_withdraw(uid integer, a character, amount bigint)
   RETURNS integer AS

@@ -3,13 +3,7 @@ var _ = require('lodash')
 , builder = require('pg-builder')
 
 exports.formatDestination = function(row) {
-    if (row.method == 'BTC') {
-        return row.bitcoin_address
-    } else if (row.method == 'LTC') {
-        return row.litecoin_address
-    } else if (row.method == 'ripple') {
-        return row.ripple_address
-    } else if (row.method == 'bank') {
+    if (row.method == 'bank') {
         if (row.bank_iban && row.bank_swiftbic) {
             // IBAN + SWIFT/BIC
             return format('IBAN: %s, SWIFT: %s%s', row.bank_iban, row.bank_swiftbic,
@@ -27,6 +21,8 @@ exports.formatDestination = function(row) {
             // Domestic
             return format('Domestic: %s', row.bank_account_number)
         }
+    } else {
+        return row.address;
     }
 }
 
@@ -34,7 +30,7 @@ exports.format = function(app, row) {
     var destination = exports.formatDestination(row)
 
     if (!destination) {
-        throw new Error('Unknown destination for ' + JSON.stringify(row))
+        //throw new Error('Unknown destination for ' + JSON.stringify(row))
     }
 
     return _.extend({

@@ -100,12 +100,17 @@ CryptoIn.prototype.processOutput = function(txid, o, cb) {
     if (o.scriptPubKey.addresses.length !== 1) return cb()
     var address = o.scriptPubKey.addresses[0]
     , satoshi = +num(o.value.toFixed(8)).mul(1e8)
+    
+    var queryText = util.format(
+            [
+             "SELECT crypto_credit('%s',$1, $2, $3) tid",
+             "FROM crypto_deposit_address",
+             "WHERE address = $2 AND currency_id = '%s'"
+         ].join('\n'),
+        currencyId);
+    
     this.db.query({
-        text: [
-            'SELECT ' + this.currencyLC + '_credit($1, $2, $3) tid',
-            'FROM ' + this.currencyLC + '_deposit_address',
-            'WHERE address = $2'
-        ].join('\n'),
+        text: queryText,
         values: [txid, address, satoshi]
     }, function(err, dr) {
         if (err) {

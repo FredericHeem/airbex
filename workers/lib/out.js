@@ -1,6 +1,7 @@
 var Out = module.exports = {}
 , debug = require('debug')('snow:out')
 , _= require('lodash')
+, util = require('util')
 
 Out.cancelRequest = function(client, request, error, cb) {
     debug('cancelling request %s', request.request_id)
@@ -18,8 +19,10 @@ Out.cancelRequest = function(client, request, error, cb) {
 Out.popBatch = function(client, currency, cb) {
     debug('retrieving batch')
 
-    var query = 'SELECT * FROM pop_' + currency + '_withdraw_requests()'
-
+    var query = util.format(
+        "SELECT * FROM pop_crypto_withdraw_requests('%s')",
+        currency.toUpperCase())
+        
     client.query(query, function(err, dr) {
         if (err) return cb(err)
 

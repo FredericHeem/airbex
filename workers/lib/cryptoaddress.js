@@ -30,11 +30,15 @@ CryptoAddress.prototype.loop = function() {
 }
 
 CryptoAddress.prototype.saveAddress = function(accountId, address, cb) {
+    var queryText = util.format(
+            [
+             "INSERT INTO crypto_deposit_address('%s', account_id, address)",
+             'VALUES ($1, $2)'
+         ].join('\n'),
+         this.currency);
+    
     this.client.query({
-        text: [
-            'INSERT INTO ' + this.currencyLC + '_deposit_address (account_id, address)',
-            'VALUES ($1, $2)'
-        ].join('\n'),
+        text: queryText,
         values: [accountId, address]
     }, function(err) {
         if (err) return cb(err)
@@ -59,14 +63,17 @@ CryptoAddress.prototype.processAccount = function(row, cb) {
 
 CryptoAddress.prototype.getAccounts = function(cb) {
     debug('looking for work')
-
+    var queryText = util.format(
+            [
+             'SELECT a.account_id',
+             'FROM account a',
+             'LEFT JOIN crypto_deposit_address cda ON bda.account_id = a.account_id',
+             'WHERE a.currency_id = \'%s\' AND cda.address IS NULL AND cda.currency_id =  \'%s\''
+         ].join('\n'),
+         this.currency);
+    
     this.client.query({
-        text: [
-            'SELECT a.account_id',
-            'FROM account a',
-            'LEFT JOIN ' + this.currencyLC + '_deposit_address bda ON bda.account_id = a.account_id',
-            'WHERE a.currency_id = \'BTC\' AND bda.address IS NULL'
-        ].join('\n')
+        text: queryText
     }, function(err, dr) {
         cb(err, err ? null : dr.rows)
     })

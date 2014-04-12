@@ -133,7 +133,7 @@ CryptoOut.prototype.sendBatch = function(requests, cb) {
                     function(cb) {
                         that.client.query({
                             text: [
-                                'UPDATE ' + this.currencyLC + '_withdraw_request',
+                                'UPDATE crypto_withdraw_request',
                                 'SET txid = $1',
                                 'WHERE request_id = $2'
                             ].join('\n'),

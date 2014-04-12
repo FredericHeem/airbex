@@ -11,5 +11,5 @@
     "rpcuser": "<%= @crypto['username'] %>",
     "port": "<%= @crypto['port'] %>",
     "rpcpass": "<%= @crypto['password'] %>",
-    "minconf": <%= @minConf %>
+    "minconf": <%= @crypto['minconf'] || 3 %>
 }

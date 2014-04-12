@@ -67,7 +67,6 @@ END; $BODY$
   LANGUAGE plpgsql VOLATILE;
   
 -- crypto_withdraw
-DROP FUNCTION crypto_withdraw(currency text, uid integer, a character, amount bigint);
 CREATE OR REPLACE FUNCTION crypto_withdraw(currency text, uid integer, a character, amount bigint)
   RETURNS integer AS
 $BODY$

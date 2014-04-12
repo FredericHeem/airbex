@@ -120,8 +120,8 @@ CryptoIn.prototype.processOutput = function(txid, o, cb) {
             return cb(err)
         }
         if (!dr.rowCount) return cb()
-        console.log('Credited %s with %s ' + this.currencyCode + ' from %s (internal %s)',
-            address, o.value, txid, dr.rows[0].tid)
+        console.log('Credited %s with %s %s from %s (internal %s)',
+            address, o.value, this.currency, txid, dr.rows[0].tid)
         cb(null, dr.rows[0].tid)
     })
 }

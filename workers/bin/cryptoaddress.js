@@ -1,9 +1,11 @@
-var config = require('konfu')
-, async = require('async')
+var async = require('async')
 , debug = require('debug')('snow:cryptoaddress')
 , Bitcoin = require('bitcoin').Client
 , CryptoAddress = require('../lib/cryptoaddress')
-, cryptoEndPoint = {
+
+var config = require('../lib/config.js')();
+
+var cryptoEndPoint = {
     currency : config.currency,
     host: config.host,
     port: config.port,

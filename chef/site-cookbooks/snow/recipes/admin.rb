@@ -1,4 +1,5 @@
 include_recipe "snow::common"
+include_recipe "apt"
 include_recipe "nginx"
 include_recipe "nodejs"
 include_recipe "solo-search"

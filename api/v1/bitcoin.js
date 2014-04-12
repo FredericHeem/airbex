@@ -24,13 +24,12 @@ exports.withdraw = function(currencyId, req, res, next) {
     console.log('processing withdraw request of %d %s from user #%s to %s',
         req.body.amount, currencyId, req.user.id, req.body.address)
 
-    var queryText = util.format(
-        'SELECT crypto_withdraw(\'%s\', $1, $2, $3) rid',
-        currencyId.toUpperCase())
+    var queryText = 'SELECT crypto_withdraw($1, $2, $3, $4) rid';
 
     req.app.conn.write.query({
         text: queryText,
         values: [
+            currencyId.toUpperCase(),
             req.user.id,
             req.body.address,
             req.app.cache.parseCurrency(req.body.amount, currencyId)
@@ -58,11 +57,11 @@ exports.withdraw = function(currencyId, req, res, next) {
 }
 
 exports.address = function(currencyId, req, res, next) {
-    var queryText = util.format([
+    var queryText = [
         'SELECT address',
-        'FROM %s_deposit_address',
-        'WHERE account_id = user_currency_account($1, $2)'
-    ].join('\n'), currencyId)
+        'FROM crypto_deposit_address',
+        'WHERE account_id = user_currency_account($1, $2) AND currency_id = $2'
+    ].join('\n');
 
     req.app.conn.read.query({
         text: queryText,

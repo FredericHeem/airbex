@@ -59,8 +59,8 @@ BEGIN
 
     tid := edge_credit(uid, currency, amnt);
 
-    INSERT INTO crypto_credited (currency, txid, address, transaction_id)
-    VALUES (t, a, tid);
+    INSERT INTO crypto_credited (currency_id, txid, address, transaction_id)
+    VALUES (currency, t, a, tid);
 
     RETURN tid;
 END; $BODY$

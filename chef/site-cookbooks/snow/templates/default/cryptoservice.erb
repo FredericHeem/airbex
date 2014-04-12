@@ -1,0 +1,12 @@
+start on startup
+console log
+env NAME=<%= @deamonName %>
+
+script
+    echo $$ > /var/run/$NAME.pid
+    sudo -Eu ubuntu /usr/bin/<%= @deamonName %> -datadir=/<%= @cryptoCode %>
+end script
+
+post-stop script
+   rm -f /var/run/$NAME.pid
+end script

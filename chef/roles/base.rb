@@ -22,7 +22,7 @@ override_attributes({
   "authorization" => {
     "sudo" => {
       "groups" => ["admin", "wheel", "sysadmin"],
-      "users" => ["ubuntu", "ops"],
+      "users" => ["ubuntu", "ops", "vagrant"],
       "passwordless" => true
     }
   }  

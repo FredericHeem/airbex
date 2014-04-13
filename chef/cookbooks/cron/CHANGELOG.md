@@ -2,6 +2,46 @@ cron Cookbook CHANGELOG
 =======================
 This file is used to list changes made in each version of the cron cookbook.
 
+v1.3.10 (2014-04-10)
+--------------------
+- [COOK-4507] - restore ability to use @ fields
+
+
+v1.3.8 (2014-04-10)
+-------------------
+- [COOK-4544] fixing NameError exception on :delete action
+
+
+v1.3.6 (2014-04-09)
+-------------------
+- [COOK-4337] fixing validations
+
+
+v1.3.4 (2014-04-09)
+-------------------
+- Reverting [COOK-4337] - cron cookbook does no input validation
+
+
+v1.3.2 (2014-03-27)
+-------------------
+- [COOK-4337] - cron cookbook does no input validation
+- [COOK-4229] - Support the Gentoo package
+
+
+v1.3.0 (2014-02-25)
+-------------------
+### New Feature
+- **[COOK-4112](https://tickets.opscode.com/browse/COOK-4112)** - Solaris 11 support for cron
+
+### Bug
+- **[COOK-3813](https://tickets.opscode.com/browse/COOK-3813)** - Add metadata for recipes in the cron cookbook
+
+
+v1.2.8
+------
+### Bug
+- **[COOK-3452](https://tickets.opscode.com/browse/COOK-3452)** - Add support for raspbian platform
+
 v1.2.6
 ------
 ### Improvement

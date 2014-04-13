@@ -1,6 +1,7 @@
 name "base"
 description "Essential recipes for securing every server"
 run_list(
+    "recipe[snow::users]",
     "recipe[openssh]",
     "recipe[chef-client::delete_validation]"
 )
@@ -18,5 +19,12 @@ override_attributes({
       "rsa_authentication" =>  "no"
      }
   }
+  "authorization" => {
+    "sudo" => {
+      "groups" => ["admin", "wheel", "sysadmin"],
+      "users" => ["ubuntu", "ops"],
+      "passwordless" => true
+    }
+  }  
 })
 

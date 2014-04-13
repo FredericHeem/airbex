@@ -11,7 +11,7 @@
         "aws_device": "sdf",
         "os_device": "xvdf"
       },
-      "branch": "develop",
+      "branch": "master",
       "workers": {
         "bitcoinin": {
           "min_conf": 1

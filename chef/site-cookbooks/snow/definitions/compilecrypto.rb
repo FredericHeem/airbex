@@ -2,24 +2,49 @@ define :compilecrypto do
 
     include_recipe "apt"
     include_recipe "snow::common"
-    
+    include_recipe 'deploy_wrapper'
+
+    bag = Chef::EncryptedDataBagItem.load("snow", 'main')
+    env_bag = bag[node.chef_environment]
+
     cryptoName = params[:cryptoName]
     deamonName = params[:deamonName]
     cryptoCode = params[:cryptoCode]
     gitRepo = params[:gitRepo]
     gitRef = params[:gitRef]
 
+    apt_repository "bitcoin" do
+      uri "http://ppa.launchpad.net/bitcoin/bitcoin/ubuntu"
+      distribution node[:lsb][:codename]
+      components ["main"]
+      keyserver "pgp.mit.edu"
+      key "C300EE8C"
+    end
+    
     %w(build-essential libssl-dev libboost-all-dev git libdb4.8-dev libdb4.8++-dev pkg-config libminiupnpc-dev).each do |pkg|
         package pkg do
             action :install
+            options "--force-yes"
         end
     end
     
+    ssh_known_hosts_entry 'github.com'
+
+    deploy_wrapper 'compilecrypto' do
+        ssh_wrapper_dir '/home/ubuntu/compilecrypto-ssh-wrapper'
+        ssh_key_dir '/home/ubuntu/.ssh'
+        ssh_key_data bag["github_private_key"]
+        owner "ubuntu"
+        group "ubuntu"
+        sloppy true
+    end
+
     unless File.exists? "/usr/bin/#{deamonName}"
       git "/tmp/#{cryptoName}" do
         repository gitRepo
         reference gitRef
         action :sync
+        ssh_wrapper "/home/ubuntu/compilecrypto-ssh-wrapper/compilecrypto_deploy_wrapper.sh"
       end
     
       # Compiling  takes more memory than an AWS t1.micro has (600)

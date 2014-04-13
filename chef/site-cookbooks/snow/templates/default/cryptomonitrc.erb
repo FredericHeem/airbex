@@ -4,5 +4,9 @@ check process <%= @deamonName %>
     stop program  = "/sbin/stop <%= @deamonName %>"
     if failed port <%= @port %> type tcp
         with timeout 120 seconds
+        2 times within 2 cycles
+        then alert
+    if failed port <%= @port %> type tcp
+        with timeout 120 seconds
         20 times within 20 cycles
         then restart

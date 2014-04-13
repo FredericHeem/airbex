@@ -130,7 +130,18 @@ define :workercrypto do
         notifies :restart, resources(:service => "snow-#{cryptoName}out")
         notifies :restart, resources(:service => "snow-#{cryptoName}address")
     end
+ 
+    services.each do |service|
+        template "/etc/monit/conf.d/snow-#{cryptoName}#{service}.monitrc" do
+          source "crypto-workers.monitrc.erb"
+          variables({
+            :service => "snow-#{cryptoName}#{service}"
+          })
+          owner "ubuntu"
+          group "ubuntu"
+          mode 0664
+        end
+    end
     
-    #monit_monitrc "snow-workers" do
-    #end
+
 end

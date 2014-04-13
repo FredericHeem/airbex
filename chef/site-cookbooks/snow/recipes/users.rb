@@ -1,3 +1,5 @@
+include_recipe "sudo"
+
 user = Chef::EncryptedDataBagItem.load("users", 'ops')
 user_name = user['id']
 password  = user['password']

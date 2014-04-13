@@ -18,7 +18,7 @@ override_attributes({
       "permit_root_login" =>  "yes",
       "rsa_authentication" =>  "no"
      }
-  }
+  },
   "authorization" => {
     "sudo" => {
       "groups" => ["admin", "wheel", "sysadmin"],

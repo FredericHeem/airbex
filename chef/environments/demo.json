@@ -7,6 +7,7 @@
   "chef_type": "environment",
   "default_attributes": {
     "snow": {
+      "branch": "develop",
       "bitcoind": {
         "aws_device": "sdf",
         "os_device": "xvdf"

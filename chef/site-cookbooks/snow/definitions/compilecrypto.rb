@@ -21,7 +21,7 @@ define :compilecrypto do
       key "C300EE8C"
     end
     
-    %w(build-essential libssl-dev libboost-all-dev git libdb4.8-dev libdb4.8++-dev pkg-config libminiupnpc-dev).each do |pkg|
+    %w(build-essential libtool automake libssl-dev libboost-all-dev git libdb4.8-dev libdb4.8++-dev pkg-config libminiupnpc-dev).each do |pkg|
         package pkg do
             action :install
             options "--force-yes"
@@ -68,7 +68,7 @@ define :compilecrypto do
       end
     
       bash "/usr/bin/#{deamonName}" do
-        code "mv -f /tmp/#{cryptoName}/src/#{deamonName} /usr/bin/#{deamonName}"
+        code "cp /tmp/#{cryptoName}/src/#{deamonName} /usr/bin/#{deamonName}"
       end
     
       #directory '/tmp/litecoin' do

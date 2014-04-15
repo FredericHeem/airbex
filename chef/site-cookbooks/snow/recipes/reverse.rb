@@ -18,17 +18,19 @@ directory "/etc/nginx/conf/" do
   action :create
 end
 
-cookbook_file "/etc/nginx/conf/certificate.crt" do
-  source "#{env_bag['https']['certificate']}"
-  owner "www-data"
-end
-
-file "/etc/nginx/conf/private-key.pem" do
-  content env_bag['https']['private_key']
-  owner "www-data"
-  group "root"
-  mode 00640
-end
+if env_bag['https']
+    cookbook_file "/etc/nginx/conf/certificate.crt" do
+      source "#{env_bag['https']['certificate']}"
+      owner "www-data"
+    end
+    
+    file "/etc/nginx/conf/private-key.pem" do
+      content env_bag['https']['private_key']
+      owner "www-data"
+      group "root"
+      mode 00640
+    end
+end 
 
 # Nginx configuration
 template '/etc/nginx/sites-available/snow-reverse' do

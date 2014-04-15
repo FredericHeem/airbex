@@ -1,20 +1,25 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+environment = "dev"
+orgname = ENV['ORGNAME']
+role = "solo-#{orgname}"
+chef_server_url = ENV['CHEF_SERVER_URL']
+chef_path = "../../chef/"
+
 box      = 'precise64daily'
 url      = 'http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-vagrant-amd64-disk1.box'
-hostname = 'snow-dev'
+hostname = "snow-#{orgname}-#{environment}"
+
 domain   = 'example.com'
 ip       = '192.168.0.2'
 ram      = '2048'
 
-chef_server_url = "https://backend.logosxchange.com"
-role = "solo-logos"
-chef_path = "../../chef/"
-validation_client_name = "validator-dev"
-validation_key_path = chef_path + ".chef/validator.dev.pem"
-encrypted_data_bag_secret_key_path = chef_path + '.chef/encrypted_data_bag_secret'
-environment = "dev"
+
+validation_client_name = "validator-#{environment}"
+validation_key_path = chef_path + ".chef/#{orgname}/validator-#{environment}.pem"
+encrypted_data_bag_secret_key_path = chef_path + '.chef/' + orgname + '/encrypted_data_bag_secret'
+
 node_name = hostname
 
 Vagrant.configure("2") do |config|

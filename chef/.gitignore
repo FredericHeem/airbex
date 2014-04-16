@@ -1,6 +1,6 @@
 /.rake_test_cache
 /.chef/*.pem
-/.chef/encrypted_data_bag_secret
+/.chef/*/encrypted_data_bag_secret
 /.chef/knife_secrets.rb
 /tmp/
 /scripts/secrets.sh

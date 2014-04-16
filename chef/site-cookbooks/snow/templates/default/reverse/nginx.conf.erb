@@ -1,9 +1,12 @@
 server {
-    listen <%= node[:snow][:reverse][:https_port] %> ssl;
     server_name <%= node[:snow][:reverse][:server_name] %>;
-
+    <% if @https -%>
+    listen <%= node[:snow][:reverse][:https_port] %> ssl;
     ssl_certificate conf/certificate.crt;
-    ssl_certificate_key conf/private-key.pem;
+    ssl_certificate_key conf/private-key.pem; 
+    <% else -%>
+    listen <%= node[:snow][:reverse][:http_port] %> ;
+    <% end -%>
 
     client_max_body_size 5M;
     
@@ -67,11 +70,13 @@ server {
 }
 
 # Redirect non-https to https (also www.)
+<% if @https -%>
 server {
     listen <%= node[:snow][:reverse][:http_port] %>;
     server_name ~^(www\.)?<%= node[:snow][:reverse][:server_name] %>$;
     return 301 https://<%= node[:snow][:reverse][:server_name] %>$request_uri;
 }
+
 
 # Redirect www. prefixed https
 server {
@@ -79,6 +84,13 @@ server {
     server_name www.<%= node[:snow][:reverse][:server_name] %>;
     return 301 https://<%= node[:snow][:reverse][:server_name] %>$request_uri;
 }
+<% else -%>
+server {
+    listen <%= node[:snow][:reverse][:http_port] %>;
+    server_name www.<%= node[:snow][:reverse][:server_name] %>;
+    return 301 http://<%= node[:snow][:reverse][:server_name] %>$request_uri;
+}
+<% end %>
 
 # Proxy api. (legacy)
 server {

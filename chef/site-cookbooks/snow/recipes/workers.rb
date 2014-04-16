@@ -25,7 +25,8 @@ end
 deploy_revision node[:snow][:workers][:app_directory] do
     user "ubuntu"
     group "ubuntu"
-    repo env_bag["repository"]["main"]
+    repo env_bag["repository"]["main"]["url"]
+    branch env_bag["repository"]["main"]["branch"]
     ssh_wrapper "/home/ubuntu/workers-ssh-wrapper/workers_deploy_wrapper.sh"
     action :deploy
     branch node[:snow][:branch]

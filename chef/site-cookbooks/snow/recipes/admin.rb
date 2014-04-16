@@ -41,8 +41,8 @@ end
 deploy_revision node[:snow][:admin][:app_directory] do
     user "ubuntu"
     group "ubuntu"
-    repo env_bag["repository"]["main"]
-    branch node[:snow][:branch]
+    repo env_bag["repository"]["main"]["url"]
+    branch env_bag["repository"]["main"]["branch"]
     ssh_wrapper "/home/ubuntu/admin-ssh-wrapper/admin_deploy_wrapper.sh"
     action :deploy
     before_symlink do

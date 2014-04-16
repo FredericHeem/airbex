@@ -6,4 +6,4 @@ source $DIR/settings.sh
 knife bootstrap localhost -p 2222 -x vagrant -P vagrant --sudo \
     --run-list "role[solo-$ORGNAME]" \
     --environment dev \
-    --node-name "snow-$ORGNAME-dev"
+    --node-name "snow-$ORGNAME-dev-$USER"

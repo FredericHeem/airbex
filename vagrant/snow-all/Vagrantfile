@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-
-environment = "dev"
+username = ENV['USER']
+environment = ENV['KNIFE_ENV']
 orgname = ENV['ORGNAME']
 role = "solo-#{orgname}"
 #role = "frontend"
@@ -10,7 +10,7 @@ chef_path = "../../chef/"
 
 box      = 'precise64daily'
 url      = 'http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-vagrant-amd64-disk1.box'
-hostname = "snow-#{orgname}-#{environment}"
+hostname = "snow-#{orgname}-#{environment}-#{username}"
 
 domain   = 'example.com'
 ip       = '192.168.0.2'
@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 8020, host: 8020
   config.vm.network :forwarded_port, guest: 8050, host: 8050
   config.vm.network :forwarded_port, guest: 9001, host: 9001
-  config.vm.network :forwarded_port, guest: 80, host: 8888
+  config.vm.network :forwarded_port, guest: 80, host: 8008
   config.vm.network :forwarded_port, guest: 443, host: 443
   config.vm.network :private_network, ip: ip
   config.vm.synced_folder ".", "/vagrant"

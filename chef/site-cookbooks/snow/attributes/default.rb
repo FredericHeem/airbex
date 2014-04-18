@@ -1,3 +1,11 @@
+aws = Chef::EncryptedDataBagItem.load("aws", 'main')
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
+env_bag = bag[node.chef_environment]
+
+Chef::Application.fatal!("env_bag for #{node.chef_environment} is null") if env_bag.nil?
+
+default['set_fqdn'] = env_bag['fqdn'] || "snow-#{node.chef_environment}"
+
 default['snow']['api']['app_directory'] = "/home/ubuntu/snow-api"
 default['snow']['api']['port'] = 8000
 default['snow']['api']['smtp'] = nil
@@ -49,7 +57,7 @@ default[:app][:ebs] = {
   :size => 10 # size is in GB
 }
 
-aws = Chef::EncryptedDataBagItem.load("aws", 'main')
+
 
 if aws['aws_access_key_id']
     default['s3cmd']['secret_key'] = aws['aws_secret_access_key']

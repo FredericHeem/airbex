@@ -14,13 +14,5 @@
     }
   },
   "override_attributes": {
-    "hostname": {
-      "set_fqdn": "*.internal.justcoin.com"
-    },
-    "monit": {
-      "mail": {
-        "from": "monit@justcoin.com"
-      }
-    }
   }
 }

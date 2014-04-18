@@ -28,11 +28,5 @@
     }
   },
   "override_attributes": {
-    "set_fqdn": "logosxchange.com",
-    "monit": {
-      "mail": {
-        "from": "monit-demo@logosxchange.com"
-      }
-    }
   }
 }

@@ -24,11 +24,5 @@
     }
   },
   "override_attributes": {
-    "set_fqdn": "snow-logos-dev",
-    "monit": {
-      "mail": {
-        "from": "monit-dev@logosxchange.com"
-      }
-    }
   }
 }

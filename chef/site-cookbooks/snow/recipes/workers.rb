@@ -60,9 +60,8 @@ directory "#{node[:snow][:workers][:app_directory]}/shared/config" do
   group "ubuntu"
 end
 
-pgm_ip = search(:node, 'role:pgm').first ? search(:node, 'role:pgm').first[:ipaddress] : nil
-pgs_ip = search(:node, 'role:pgs').first ? search(:node, 'role:pgs').first[:ipaddress] : nil
-rippled_ip = search(:node, 'role:rippled').first ? search(:node, 'role:rippled').first[:ipaddress] : nil
+pgm_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgm').first)
+pgs_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgs').first)
 
 template "#{node[:snow][:workers][:app_directory]}/shared/config/workers.json" do
     source 'workers/config.json.erb'

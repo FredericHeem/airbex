@@ -111,9 +111,17 @@ define :workercrypto do
     
     role = "role:#{cryptoName}d"
     
-    pgm_ip = search(:node, 'role:pgm').first ? search(:node, 'role:pgm').first[:ipaddress] : nil
-    pgs_ip = search(:node, 'role:pgs').first ? search(:node, 'role:pgs').first[:ipaddress] : nil
-    cryptod_ip = search(:node, role).first ? search(:node, role).first[:ipaddress] : nil
+    cryptod_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, role).first)
+    pgm_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgm').first)
+    pgs_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgs').first)
+
+    if pgm_ip == cryptod_ip
+      pgm_ip = "127.0.0.1"
+    end
+    
+    if pgs_ip == cryptod_ip
+      pgs_ip = "127.0.0.1"
+    end    
     
     template "#{workerDir}/shared/config/workers.json" do
         source 'workers/config-lgs.json.erb'
@@ -121,7 +129,7 @@ define :workercrypto do
             :website_url => env_bag['api']['website_url'],
             :pgm_ip => pgm_ip || '127.0.0.1',
             :pgs_ip => pgs_ip || '127.0.0.1',
-            :cryptod_ip => cryptod_ip || '127.0.0.1',
+            :cryptod_ip => '127.0.0.1',
             :crypto => env_bag[cryptoName],
             :env_bag => env_bag,
             :currency => cryptoCode,

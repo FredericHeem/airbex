@@ -4,7 +4,7 @@ env_bag = bag[node.chef_environment]
 
 Chef::Application.fatal!("env_bag for #{node.chef_environment} is null") if env_bag.nil?
 
-default['set_fqdn'] = env_bag['fqdn'] || "snow-#{node.chef_environment}"
+default['set_fqdn'] = "*.#{env_bag['fqdn']}" || "snow-#{node.chef_environment}"
 
 default['snow']['api']['app_directory'] = "/home/ubuntu/snow-api"
 default['snow']['api']['port'] = 8000

@@ -2,7 +2,7 @@ include_recipe "apt"
 include_recipe "snow::common"
 include_recipe "varnish"
 
-reverse_ip = search(:node, 'role:reverse').first ? search(:node, 'role:reverse').first[:ipaddress] : nil
+reverse_ip  = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:reverse').first)
 
 template '/etc/varnish/snow-cache.vcl' do
   source "cache/snow-cache.vcl.erb"

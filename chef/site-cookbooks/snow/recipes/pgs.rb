@@ -6,7 +6,7 @@ include_recipe "aws"
 include_recipe "solo-search"
 include_recipe "snow::db_disk"
 
-master_ip = search(:node, 'role:pgm').first ? search(:node, 'role:pgm').first[:ipaddress] : "127.0.0.1"
+master_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgm').first)
 
 pg_data_path = node[:postgresql][:data_directory]
 Chef::Log.info "postgres data path #{pg_data_path}"

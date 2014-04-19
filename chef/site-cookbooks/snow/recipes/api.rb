@@ -79,9 +79,14 @@ directory "#{node[:snow][:api][:app_directory]}/shared/config" do
   group "ubuntu"
 end
 
-pgm_ip = search(:node, 'role:pgm').first ? search(:node, 'role:pgm').first[:ipaddress] : nil
-pgs_ip = search(:node, 'role:pgs').first ? search(:node, 'role:pgs').first[:ipaddress] : nil
+api_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:api').first)
+pgm_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgm').first)
+pgs_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgs').first)
 
+if pgm_ip == api_ip
+  pgm_ip = "127.0.0.1"
+end
+    
 execute "pg-migrate-install" do
     user "root"
     cwd node[:snow][:api][:app_directory] + '/current/db'

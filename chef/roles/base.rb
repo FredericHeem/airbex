@@ -1,6 +1,9 @@
 name "base"
 description "Essential recipes for securing every server"
 run_list(
+    "recipe[snow::aptupdate]",
+    "recipe[apt]",
+    "recipe[solo-search]",
     "recipe[snow::users]",
     "recipe[openssh]",
     "recipe[chef-client::delete_validation]"

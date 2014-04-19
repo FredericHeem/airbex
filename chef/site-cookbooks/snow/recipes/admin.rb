@@ -10,7 +10,7 @@ include_recipe "solo-search"
 end
 
 # Nginx configuration
-api_ip = search(:node, 'role:api').first ? search(:node, 'role:api').first[:ipaddress] : nil
+api_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:api').first)
 
 template '/etc/nginx/sites-available/snow-admin' do
   source "admin/nginx.conf.erb"

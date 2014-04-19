@@ -82,6 +82,7 @@ end
 api_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:api').first)
 pgm_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgm').first)
 pgs_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgs').first)
+redis_ip = "127.0.0.1"
 
 if pgm_ip == api_ip
   pgm_ip = "127.0.0.1"
@@ -115,8 +116,8 @@ template "#{node[:snow][:api][:app_directory]}/shared/config/api.json" do
     variables({
         :pgm_ip => pgm_ip || '127.0.0.1',
         :pgs_ip => pgs_ip || '127.0.0.1',
-        :redis_ip => reverse_ip = search(:node, 'role:reverse').first ? search(:node, 'role:reverse').first[:ipaddress] : '127.0.0.1',
-        :api_ip => reverse_ip = search(:node, 'role:api').first ? search(:node, 'role:api').first[:ipaddress] : '127.0.0.1',
+        :redis_ip => redis_ip,
+        :api_ip => api_ip,
         :smtp => env_bag['api']['smtp'],
         :intercom => env_bag['api']['intercom'],
         :bde => env_bag['api']['bde'],

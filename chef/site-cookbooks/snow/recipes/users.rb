@@ -37,3 +37,7 @@ user "ubuntu" do
   home "/home/ubuntu"
   shell "/bin/bash"
 end
+
+group "ubuntu" do
+  members "ubuntu"
+end

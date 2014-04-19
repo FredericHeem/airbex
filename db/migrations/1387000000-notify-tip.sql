@@ -1,0 +1,1 @@
+UPDATE settings set notify_tip=0

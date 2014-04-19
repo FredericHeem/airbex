@@ -2,6 +2,7 @@ include_recipe "snow::common"
 include_recipe "apt"
 include_recipe "nodejs"
 include_recipe "postgresql::client"
+include_recipe "cron"
 
 package 'git' do
 end
@@ -86,8 +87,8 @@ template "/usr/bin/liability-proof.sh" do
 end
 
 cron_d "liability-proof" do
-  hour 14
-  minute 30
-  command "/usr/bin/liability-proof.sh"
+  minute  0
+  command '/usr/bin/liability-proof.sh'
+  user "postgres"
 end
 

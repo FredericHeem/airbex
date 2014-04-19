@@ -28,8 +28,7 @@ unless File.exists? "#{pg_data_path}/recovery.conf"
       action :create
   end
 
-  backup_fetch_command = "envdir /etc/wal-e.d/env /usr/local/bin/wal-e backup-fetch #{pg_data_path} LATEST"
-  #backup_fetch_command = "#{wal_e_config['exe']} backup-fetch #{pg_data_path} LATEST
+  backup_fetch_command = "envdir /etc/wal-e.d/env-restore /usr/local/bin/wal-e backup-fetch #{pg_data_path} LATEST"
       
   Chef::Log.info "fetch latest backup from s3 for recover server"
   execute "wal-e fetch latest backup" do

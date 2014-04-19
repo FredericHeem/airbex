@@ -1,6 +1,7 @@
 # Save Write Ahead Log to Amazon s3
 include_recipe "aws"
 include_recipe "awscli"
+include_recipe "cron"
 
 aws = Chef::EncryptedDataBagItem.load("aws", 'main')
 bag = Chef::EncryptedDataBagItem.load("snow", 'main')
@@ -22,37 +23,64 @@ directory "/etc/wal-e.d" do
     group "postgres"
 end
   
+
 directory "/etc/wal-e.d/env" do
     owner "root"
     group "postgres"
 end
 
-file "/etc/wal-e.d/env/AWS_ACCESS_KEY_ID" do
-  content aws['aws_access_key_id']
-  mode '640'
-  owner "root"
-  group "postgres"
-  action :create
+directory "/etc/wal-e.d/env-restore" do
+    owner "root"
+    group "postgres"
 end
 
-file "/etc/wal-e.d/env/AWS_SECRET_ACCESS_KEY" do
-  content aws['aws_secret_access_key']
-  mode '640'
-  owner "root"
-  group "postgres"
-  action :create
+["/etc/wal-e.d/env/AWS_ACCESS_KEY_ID","/etc/wal-e.d/env-restore/AWS_ACCESS_KEY_ID"].each do |key| 
+    file key do
+      content aws['aws_access_key_id']
+      mode '640'
+      owner "root"
+      group "postgres"
+      action :create
+    end
 end
 
-file "/etc/wal-e.d/env/WALE_S3_PREFIX" do
-  content "s3://#{env_bag['pgm_s3']['s3_bucket']}"
-  mode '640'
-  owner "root"
-  group "postgres"
-  action :create
+["/etc/wal-e.d/env/AWS_SECRET_ACCESS_KEY","/etc/wal-e.d/env-restore/AWS_SECRET_ACCESS_KEY"].each do |secret|
+    file secret do
+      content aws['aws_secret_access_key']
+      mode '640'
+      owner "root"
+      group "postgres"
+      action :create
+    end
+end
+
+s3_bucket = env_bag['pgm_s3']['s3_bucket']
+if s3_bucket
+    file "/etc/wal-e.d/env/WALE_S3_PREFIX" do
+      content "s3://#{s3_bucket}"
+      mode '640'
+      owner "root"
+      group "postgres"
+      action :create
+    end
+end 
+
+s3_bucket_restore = env_bag['pgm_s3']['s3_bucket_restore']
+if s3_bucket_restore.nil? 
+    s3_bucket_restore = env_bag['pgm_s3']['s3_bucket']
+end
+
+if s3_bucket_restore 
+    file "/etc/wal-e.d/env-restore/WALE_S3_PREFIX" do
+      content "s3://#{s3_bucket_restore}"
+      mode '640'
+      owner "root"
+      group "postgres"
+      action :create
+    end
 end
 
 cron_d "wal-backup-s3" do
-  hour 15
   minute 0
   user 'postgres'
   command "/usr/bin/envdir /etc/wal-e.d/env /usr/local/bin/wal-e backup-push /pgmdata/main"

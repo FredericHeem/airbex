@@ -3,6 +3,7 @@ include_recipe "apt"
 include_recipe "aws"
 include_recipe "awscli"
 include_recipe "snow::db_disk"
+include_recipe "cron"
 
 aws = Chef::EncryptedDataBagItem.load("aws", 'main')
 bag = Chef::EncryptedDataBagItem.load("snow", 'main')

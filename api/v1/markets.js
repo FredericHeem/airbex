@@ -24,6 +24,8 @@ exports.index = function(req, res, next) {
             var m = row.base_currency_id + row.quote_currency_id
             return {
                 id: m,
+                bc:row.base_currency_id,
+                qc:row.quote_currency_id,
                 last: formatPriceOrNull(row.last, m),
                 high: formatPriceOrNull(row.high, m),
                 low: formatPriceOrNull(row.low, m),

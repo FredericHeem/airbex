@@ -40,6 +40,8 @@ deploy_wrapper 'frontend' do
     sloppy true
 end
 
+operator = bag["operator"]
+
 # Deployment config
 deploy_revision node[:snow][:frontend][:app_directory] do
     user "ubuntu"
@@ -56,7 +58,7 @@ deploy_revision node[:snow][:frontend][:app_directory] do
         code %{
           npm install
           PATH=$PATH:./node_modules/.bin
-          grunt production
+          SNOW_OPERATOR=#{operator} grunt production
         }
       end
     end    

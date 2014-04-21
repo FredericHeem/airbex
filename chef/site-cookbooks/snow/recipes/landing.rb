@@ -35,8 +35,8 @@ end
 deploy_revision node[:snow][:landing][:app_directory] do
     user "ubuntu"
     group "ubuntu"
-    repo env_bag["repository"]["front"]["url"]
-    branch env_bag["repository"]["front"]["branch"]
+    repo env_bag["repository"]["landing"]["url"]
+    branch env_bag["repository"]["landing"]["branch"]
     ssh_wrapper "/home/ubuntu/landing-ssh-wrapper/landing_deploy_wrapper.sh"
     action :deploy
     before_symlink do

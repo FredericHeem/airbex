@@ -9,11 +9,20 @@ hostentry do
   roles ["admin", "frontend", "api", "landing"]
 end
 
-reverse_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:reverse').first)
-frontend_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:frontend').first)
-admin_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:admin').first)
-api_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:api').first)
-landing_ip  = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:landing').first)
+reverse_node = search(:node, "role:reverse AND chef_environment:#{node.chef_environment}").first
+reverse_ip = NetworkUtils.get_private_ipv4_for_node(reverse_node)
+
+frontend_node = search(:node, "role:frontend AND chef_environment:#{node.chef_environment}").first
+frontend_ip = NetworkUtils.get_private_ipv4_for_node(frontend_node)
+
+admin_node = search(:node, "role:admin AND chef_environment:#{node.chef_environment}").first
+admin_ip = NetworkUtils.get_private_ipv4_for_node(admin_node)
+
+api_node = search(:node, "role:api AND chef_environment:#{node.chef_environment}").first
+api_ip = NetworkUtils.get_private_ipv4_for_node(api_node)
+
+landing_node = search(:node, "role:landing AND chef_environment:#{node.chef_environment}").first
+landing_ip  = NetworkUtils.get_private_ipv4_for_node(landing_node)
 
 if frontend_ip == reverse_ip
   frontend_ip = "127.0.0.1"

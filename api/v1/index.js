@@ -8,6 +8,4 @@ module.exports = function(app) {
         require('./' + name)(app)
     })
 
-    require('./bitcoin')(app, 'BTC')
-    require('./bitcoin')(app, 'LTC')
 }

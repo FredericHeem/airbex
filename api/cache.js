@@ -26,7 +26,7 @@ var async = require('async')
 }
 , debug = require('debug')('snow:api:cache')
 
-module.exports = exports = function(conn, cb) {
+module.exports = exports = function(app, conn, cb) {
     if (!conn) {
         debug("no db connection, use hardcoded")
         _.extend(exports, hardcoded)
@@ -71,6 +71,11 @@ module.exports = exports = function(conn, cb) {
             debug("currency_id: %s scale: %s, fiat: %s", x.currency_id, x.scale, x.fiat)
             exports[x.currency_id] = x.scale
             exports.fiat[x.currency_id] = x.fiat
+            
+            if(x.fiat == false){
+            	require('./v1/bitcoin')(app, x.currency_id)
+            }
+            
         })
 
         cb && cb()

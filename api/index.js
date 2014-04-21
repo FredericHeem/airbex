@@ -87,7 +87,7 @@ app.use(function(req, res) {
 })
 
 var cache = app.cache = require('./cache')
-cache(module.parent ? null : app.conn, function(err) {
+cache(app, module.parent ? null : app.conn, function(err) {
     if (err) throw err
     server.listen(config.port)
 })

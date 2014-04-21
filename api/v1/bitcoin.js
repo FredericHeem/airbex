@@ -1,9 +1,10 @@
 var util = require('util')
 , num = require('num')
+var debug = require('debug')('snow:crypto')
 
 module.exports = exports = function(app, currencyId) {
     var prefix = '/v1/' + currencyId
-
+    debug("registering ", currencyId)
     app.post(prefix + '/out', app.security.demand.otp(app.security.demand.withdraw(2), true),
         exports.withdraw.bind(exports, currencyId))
     app.get(prefix + '/address', app.security.demand.deposit(3), exports.address.bind(exports, currencyId))

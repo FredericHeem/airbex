@@ -111,14 +111,14 @@ define :workercrypto do
     
     role = "role:#{cryptoName}d"
     
-    cryptod_node = search(:node, "#{node} AND chef_environment:#{node.chef_environment}").first
+    cryptod_node = search(:node, "#{role} AND chef_environment:#{node.chef_environment}").first
     cryptod_ip = NetworkUtils.get_private_ipv4_for_node(cryptod_node)
     
     pgm_node = search(:node, "role:pgm AND chef_environment:#{node.chef_environment}").first
     pgm_ip = NetworkUtils.get_private_ipv4_for_node(pgm_node)
     
     pgs_node = search(:node, "role:pgs AND chef_environment:#{node.chef_environment}").first
-    pgs_ip = NetworkUtils.get_private_ipv4_for_node( pgs_node)
+    pgs_ip = NetworkUtils.get_private_ipv4_for_node(pgs_node)
 
     if pgm_ip == cryptod_ip
       pgm_ip = "127.0.0.1"

@@ -5,9 +5,9 @@ include_recipe "snow::common"
 bag = Chef::EncryptedDataBagItem.load("snow", 'main')
 env_bag = bag[node.chef_environment]
 
-hostentry do
-  roles ["admin", "frontend", "api", "landing"]
-end
+#hostentry do
+#  roles ["admin", "frontend", "api", "landing"]
+#end
 
 reverse_node = search(:node, "role:reverse AND chef_environment:#{node.chef_environment}").first
 reverse_ip = NetworkUtils.get_private_ipv4_for_node(reverse_node)

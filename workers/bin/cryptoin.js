@@ -20,7 +20,7 @@ var dbClient = new Client(config.pg_url)
 
 var daemon = new Bitcoin(cryptoEndPoint);
 
-debug("Listen incoming transaction for currency ", config.currency);
+debug("Listen incoming transaction for currency %s, min conf %s", config.currency, config.minconf);
 
 async.series(
         [

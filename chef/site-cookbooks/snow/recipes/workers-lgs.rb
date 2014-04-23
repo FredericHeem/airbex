@@ -1,7 +1,7 @@
 workercrypto "workers-lgs" do
     cryptoName  "logos"
     cryptoCode "LGS"
-    workerDir node[:snow][:workers_lgs][:app_directory]
+    workerDir "#{node[:snow][:workers][:app_directory]}-lgs"
     minConf 6
 end
  

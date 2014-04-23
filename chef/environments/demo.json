@@ -16,6 +16,10 @@
           "aws_device": "sdl",
           "os_device": "xvdl"
       },
+      "dogecoind": {
+          "aws_device": "sdm",
+          "os_device": "xvdm"
+      },
       "branch": "master",
       "workers": {
         "bitcoinin": {

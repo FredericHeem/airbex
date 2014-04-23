@@ -152,7 +152,7 @@ define :compilecrypto do
       })
       owner "ubuntu"
       group "ubuntu"
-      mode 0664
+      mode 0600
     end
     
     service "#{deamonName}" do

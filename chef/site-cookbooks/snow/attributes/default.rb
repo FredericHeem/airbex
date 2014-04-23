@@ -25,23 +25,11 @@ default['snow']['frontend']['port'] = 8010
 default['snow']['landing']['app_directory'] = "/home/ubuntu/snow-landing"
 default['snow']['landing']['port'] = 8050
 
-
 default['snow']['workers']['app_directory'] = "/home/ubuntu/snow-workers"
-default['snow']['workers']['bitcoinin']['min_conf'] = 6
-default['snow']['workers']['litecoinin']['min_conf'] = 6
-
-default['snow']['workers_btc']['app_directory'] = "/home/ubuntu/snow-workers-btc"
-default['snow']['workers_ltc']['app_directory'] = "/home/ubuntu/snow-workers-ltc"
-default['snow']['workers_lgs']['app_directory'] = "/home/ubuntu/snow-workers-lgs"
-
-default['snow']['workers']['logosin']['min_conf'] = 6
-
-default['snow']['branch'] = 'master'
+default['snow']['workers']['min_conf'] = 6
 
 # Append to the existing (ssh and load)
 default["monit"]["default_monitrc_configs"] = []
-
-default['snow']['frontend']['branch'] = 'master'
 
 node.set['varnish']['listen_port'] = 8030
 
@@ -56,8 +44,6 @@ default[:app][:ebs] = {
   :raid => true,
   :size => 10 # size is in GB
 }
-
-
 
 if aws['aws_access_key_id']
     default['s3cmd']['secret_key'] = aws['aws_secret_access_key']

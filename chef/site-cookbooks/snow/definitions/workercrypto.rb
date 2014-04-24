@@ -8,7 +8,8 @@ define :workercrypto do
     cryptoName = params[:cryptoName]
     cryptoCode = params[:cryptoCode]
     workerDir = params[:workerDir]
-   
+    scale = params[:scale] || 8
+    
     package 'git' do
     end
     
@@ -136,7 +137,8 @@ define :workercrypto do
             :cryptod_ip => '127.0.0.1',
             :crypto => env_bag[cryptoName],
             :env_bag => env_bag,
-            :currency => cryptoCode
+            :currency => cryptoCode,
+            :scale => scale
         })
         notifies :restart, resources(:service => "snow-#{cryptoName}in")
         notifies :restart, resources(:service => "snow-#{cryptoName}out")

@@ -9,6 +9,7 @@ run_list(
   "role[reverse]",
   "role[bitcoind]",
   "role[litecoind]",
+  "role[dogecoind]",
   "role[workers]",
   "recipe[snow::aws_eip]"
 )

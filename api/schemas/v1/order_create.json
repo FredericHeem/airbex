@@ -4,7 +4,7 @@
         "market": {
             "type": "string",
             "required": true,
-            "pattern": "^[A-Z]{6}$"
+            "pattern": "^[A-Z]{6,12}$"
         },
         "price": {
             "type": ["string", "null"],

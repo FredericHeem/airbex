@@ -26,7 +26,12 @@ var async = require('async')
 }
 , debug = require('debug')('snow:api:cache')
 
+
 module.exports = exports = function(app, conn, cb) {
+	
+	exports.markets = {};
+	exports.currencies = {};
+	
     if (!conn) {
         debug("no db connection, use hardcoded")
         _.extend(exports, hardcoded)
@@ -47,7 +52,7 @@ module.exports = exports = function(app, conn, cb) {
         },
         markets: function(cb) {
             conn.read.query([
-                'SELECT scale, base_currency_id || quote_currency_id pair',
+                'SELECT *',
                 'FROM market'
             ].join('\n'), function(err, res) {
                 if (err) return cb(err)
@@ -57,20 +62,19 @@ module.exports = exports = function(app, conn, cb) {
     }, function(err, res) {
         if (err) return cb(err)
 
-        /*
         debug("#markets %s", res.markets.length)
         res.markets.forEach(function(x) {
-            debug("pair: %s scale: %s", x.pair, x.scale)
-            exports[x.pair] = x.scale
+            debug("market: %s", JSON.stringify(x))
+            var marketName = x.name || (x.base_currency_id + x.quote_currency_id);
+            exports.markets[marketName] = x
         })
-        */
+        
         exports.fiat = {}
 
         debug("#currencies %s", res.currencies.length)
         res.currencies.forEach(function(x) {
-            debug("currency_id: %s scale: %s, fiat: %s", x.currency_id, x.scale, x.fiat)
-            exports[x.currency_id] = x.scale
-            exports.fiat[x.currency_id] = x.fiat
+            debug("currency: %s", JSON.stringify(x))
+            exports.currencies[x.currency_id] = x
             
             if(x.fiat == false){
             	require('./v1/bitcoin')(app, x.currency_id)
@@ -90,7 +94,7 @@ exports.parseCurrency = function(value, currency) {
     if (!value.match(numberRegex)) {
         throw new Error('Invalid number format ' + value)
     }
-    var scale = exports[currency]
+    var scale = exports.currencies[currency].scale
     , result = num(value).mul(Math.pow(10, scale))
     result.set_precision(0)
     return result.toString()
@@ -100,7 +104,8 @@ exports.parseOrderVolume = function(value, marketId) {
     if (!value.match(numberRegex)) {
         throw new Error('Invalid number format ' + value)
     }
-    var scale_base_currency = exports[marketId.substr(0, 3)]
+    var scale_base_currency = exports.currencies[exports.getBaseCurrency(marketId)].scale
+    
     , result = num(value).mul(Math.pow(10, scale_base_currency))
     result.set_precision(0)
     return result.toString()
@@ -110,23 +115,34 @@ exports.parseOrderPrice = function(value, marketId) {
     if (!value.match(numberRegex)) {
         throw new Error('Invalid number format ' + value)
     }
-    var scale_quote_currency = exports[marketId.substr(3)]
+    var scale_quote_currency = exports.currencies[exports.getQuoteCurrency(marketId)].scale
     , result = num(value).mul(Math.pow(10, scale_quote_currency))
     result.set_precision(0)
     return result.toString()
 }
 
 exports.formatCurrency = function(value, currency) {
-    var scale = exports[currency]
+    var scale = exports.currencies[currency].scale
     return num(value, scale).toString()
 }
 
 exports.formatOrderPrice = function(value, marketId) {
-    var scale_quote_currency = exports[marketId.substr(3)]
+    var scale_quote_currency = exports.currencies[exports.getQuoteCurrency(marketId)].scale
     return num(value, scale_quote_currency).toString()
 }
 
 exports.formatOrderVolume = function(value, marketId) {
-    var scale_base_currency = exports[marketId.substr(0, 3)]
+    var scale_base_currency = exports.currencies[exports.getBaseCurrency(marketId)].scale
+    
     return num(value, scale_base_currency).toString()
+}
+
+exports.getBaseCurrency = function (market){
+	debug("market %s, %s", market, JSON.stringify(exports.markets[market]))
+	return exports.markets[market].base_currency_id
+}
+
+exports.getQuoteCurrency = function (market){
+	debug("getQuoteCurrency market %s, %s", market, JSON.stringify(exports.markets[market]))
+	return exports.markets[market].quote_currency_id
 }

@@ -13,6 +13,9 @@ exports.create = function(req, res, next) {
 
     debug("create order: ", JSON.stringify(req.body));
     
+    var market = req.body.market;
+    //debug("%s",JSON.stringify(req.app.cache.markets[market]))
+    
     if (req.body.price !== null && !req.body.price.match(/^\d+(\.\d+)?$/)) {
         res.send({
             name: 'BadRequest',
@@ -21,7 +24,7 @@ exports.create = function(req, res, next) {
     }
 
     var price = null
-    , amount = req.app.cache.parseOrderVolume(req.body.amount, req.body.market)
+    , amount = req.app.cache.parseOrderVolume(req.body.amount, market)
     , query
 
     if (amount <= 0) {
@@ -31,14 +34,46 @@ exports.create = function(req, res, next) {
         })
     }
 
+    if(req.body.type === "bid"){
+    	if(amount < req.app.cache.markets[market].bidminvolume){
+            return res.send(400, {
+                name: 'BadRequest',
+                message: 'Volume too low'
+            })       		
+    	}
+    } else {
+    	if(amount < req.app.cache.markets[market].askminvolume){
+            return res.send(400, {
+                name: 'BadRequest',
+                message: 'Volume too low'
+            })       		
+    	}       	
+    }
+    
     if (req.body.price !== null) {
-        price = req.app.cache.parseOrderPrice(req.body.price, req.body.market)
+        price = req.app.cache.parseOrderPrice(req.body.price, market)
 
         if (price <= 0) {
             return res.send({
                 name: 'BadRequest',
                 message: 'Price is <= 0'
             })
+        }
+        
+        if(req.body.type === "bid"){
+        	if(price < req.app.cache.markets[market].bidminprice){
+                return res.send(400, {
+                    name: 'BadRequest',
+                    message: 'Price too low'
+                })       		
+        	}
+        } else {
+        	if(price > req.app.cache.markets[market].askmaxprice){
+                return res.send(400, {
+                    name: 'BadRequest',
+                    message: 'Price too high'
+                })       		
+        	}       	
         }
     }
 
@@ -51,7 +86,7 @@ exports.create = function(req, res, next) {
             ].join('\n'),
             values: [
                 req.user.id,
-                req.body.market,
+                market,
                 req.body.type == 'bid' ? 0 : 1,
                 price,
                 amount
@@ -68,7 +103,7 @@ exports.create = function(req, res, next) {
             ].join('\n'),
             values: [
                 req.user.id,
-                req.body.market,
+                market,
                 req.body.type,
                 price,
                 amount
@@ -128,7 +163,7 @@ exports.create = function(req, res, next) {
         }
 
         req.app.activity(req.user.id, 'CreateOrder', {
-            market: req.body.market,
+            market: market,
             type: req.body.type,
             price: req.body.price,
             amount: req.body.amount,

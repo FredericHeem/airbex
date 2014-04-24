@@ -31,8 +31,7 @@ exports.index = function(req, res, next) {
                 low: formatPriceOrNull(row.low, m),
                 bid: formatPriceOrNull(row.bid, m),
                 ask: formatPriceOrNull(row.ask, m),
-                volume: formatVolumeOrNull(row.volume, m),
-                scale: req.app.cache[m]
+                volume: formatVolumeOrNull(row.volume, m)
             }
         }))
     })

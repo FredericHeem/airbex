@@ -6,12 +6,14 @@ var async = require('async')
 var config = require('../lib/config.js')();
 
 var  cryptoEndPoint = {
-    currency : config.currency,
+    currency: config.currency,
+    scale: config.scale,
     host: config.host,
     port: config.port,
     user: config.rpcuser,
     pass: config.rpcpass,
-    ssl: config.ssl || false
+    ssl: config.ssl || false,
+    minconf: config.minconf
 }
 
 var pg = require('pg')
@@ -50,7 +52,7 @@ async.series(
             if (err)  {
                 
             } else {
-                new CryptoIn(cryptoEndPoint, dbClient, config.minconf)
+                new CryptoIn(cryptoEndPoint, dbClient)
             }
         });
 

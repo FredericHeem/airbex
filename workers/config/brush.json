@@ -1,5 +1,6 @@
 {
     "currency":"BTC",
+    "scale":8,
     "pg_url": {
                 "user":"postgres",
                 "host": "127.0.0.1",

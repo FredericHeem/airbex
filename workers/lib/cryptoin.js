@@ -5,14 +5,15 @@ var num = require('num')
 , EventEmitter = require('events').EventEmitter
 , util = require('util')
 
-var CryptoIn = module.exports = function(ep, db, minConf) {
+var CryptoIn = module.exports = function(ep, db) {
     _.bindAll(this)
     var that = this
     , Bitcoin = require('bitcoin').Client
     this.bitcoin = new Bitcoin(ep)
-    this.minConf = minConf || 3
+    this.minConf = ep.minConf || 3
     this.db = db
     this.currency = ep.currency
+    this.scale = ep.scale || 8
     this.currencyLC = this.currency.toLowerCase();
     
     async.forever(function(cb) {
@@ -99,7 +100,7 @@ CryptoIn.prototype.processOutput = function(txid, o, cb) {
     if (!o.scriptPubKey.addresses) return cb()
     if (o.scriptPubKey.addresses.length !== 1) return cb()
     var address = o.scriptPubKey.addresses[0]
-    , satoshi = +num(o.value.toFixed(8)).mul(1e8)
+    , satoshi = +num(o.value.toFixed(this.scale)).mul(Math.pow(10, this.scale))
     
     var queryText =
             [
@@ -112,7 +113,12 @@ CryptoIn.prototype.processOutput = function(txid, o, cb) {
         text: queryText,
         values: [this.currency, txid, address, satoshi]
     }, function(err, dr) {
+    	debug("processOutput currency: %s, txid: %s, address: %s, satoshi: %s", 
+    		this.currency, txid, address, satoshi)
+    		
         if (err) {
+        	debug("processOutput currency: %s, txid: %s, address: %s, satoshi: %s, error: %s", 
+            		this.currency, txid, address, satoshi, JSON.stringify(err))
             if (err.code === '23505') {
                 console.log('Skipped duplicate CryptoIn transaction %s', txid)
                 return cb()

@@ -21,17 +21,21 @@ exports.index = function(req, res, next) {
     req.app.conn.read.query(query, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows.map(function(row) {
-            var m = row.base_currency_id + row.quote_currency_id
+            var name = row.name || (row.base_currency_id + row.quote_currency_id)
             return {
-                id: m,
+                id: name,
                 bc:row.base_currency_id,
                 qc:row.quote_currency_id,
-                last: formatPriceOrNull(row.last, m),
-                high: formatPriceOrNull(row.high, m),
-                low: formatPriceOrNull(row.low, m),
-                bid: formatPriceOrNull(row.bid, m),
-                ask: formatPriceOrNull(row.ask, m),
-                volume: formatVolumeOrNull(row.volume, m)
+                last: formatPriceOrNull(row.last, name),
+                high: formatPriceOrNull(row.high, name),
+                low: formatPriceOrNull(row.low, name),
+                bid: formatPriceOrNull(row.bid, name),
+                ask: formatPriceOrNull(row.ask, name),
+                volume: formatVolumeOrNull(row.volume, name),
+                bidminvolume: formatVolumeOrNull(row.bidminvolume, name),
+                bidminprice: formatPriceOrNull(row.bidminprice,name),
+                askminvolume: formatVolumeOrNull(row.askminvolume,name),
+                askmaxprice: formatPriceOrNull(row.askmaxprice,name)
             }
         }))
     })

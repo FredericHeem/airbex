@@ -43,7 +43,7 @@ deploy_revision node[:snow][:workers][:app_directory] do
     end
     keep_releases 2
     symlinks({
-         "config/workers.json" => "workers/config/#{node.chef_environment}.json"
+         "config/workers.json" => "workers/config/config.#{node.chef_environment}.json"
     })
     symlink_before_migrate({})
     create_dirs_before_symlink(['workers', 'workers/config'])
@@ -61,9 +61,18 @@ directory "#{node[:snow][:workers][:app_directory]}/shared/config" do
   group "ubuntu"
 end
 
+worker_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:workers').first)
 pgm_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgm').first)
 pgs_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgs').first)
 
+if pgm_ip == worker_ip
+  pgm_ip = "127.0.0.1"
+end
+
+if pgs_ip == worker_ip
+  pgs_ip = "127.0.0.1"
+end 
+    
 template "#{node[:snow][:workers][:app_directory]}/shared/config/workers.json" do
     source 'workers/config.json.erb'
     variables({

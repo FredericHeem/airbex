@@ -1,7 +1,7 @@
 update market
- set askminvolume=500,
+ set askminvolume=100,
      askmaxprice=10000,
-     bidminvolume=500,
-     bidminprice=500,
+     bidminvolume=100,
+     bidminprice=5,
      name='LGSBTC'
  where base_currency_id='LGS';

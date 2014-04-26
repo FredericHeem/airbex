@@ -28,19 +28,21 @@ exports.process = function(row, cb) {
         template = 'fill-order'
         locals.market = details.market
         locals.type = details.type
-        locals.base = details.market.substr(0, 3)
-        locals.quote = details.market.substr(3)
+        locals.base = exports.app.cache.getBaseCurrency(details.market)
+        var baseScale = exports.app.cache.getCurrencyScale(locals.base)
+        locals.quote = exports.app.cache.getQuoteCurrency(details.market)
+        var quoteScale = exports.app.cache.getCurrencyScale(locals.quote)
         locals.price = details.price ? stripZeroes(details.price) : null
         var fee_ratio = details.fee_ratio ? details.fee_ratio : 0;
         if(details.type == 'bid'){
             var total = num(details.total).mul(num("1").add(fee_ratio))
-            total.set_precision(5)
-            locals.total = parseFloat(total.toString()).toFixed(2)
+            total.set_precision(quoteScale)
+            locals.total = total.toString()
             locals.original = stripZeroes(details.original)
         } else {
             locals.total = stripZeroes(details.total)
             var original = num(details.original).mul(num("1").add(fee_ratio))
-            original.set_precision(8)
+            original.set_precision(baseScale)
             locals.original = original.toString()
         }
         

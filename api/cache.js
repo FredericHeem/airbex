@@ -146,3 +146,7 @@ exports.getQuoteCurrency = function (market){
 	debug("getQuoteCurrency market %s, %s", market, JSON.stringify(exports.markets[market]))
 	return exports.markets[market].quote_currency_id
 }
+
+exports.getCurrencyScale = function(currency) {
+    return exports.currencies[currency].scale
+}

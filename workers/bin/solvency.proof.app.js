@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-var config = require('konfu')
+var config = require('../lib/config.js')();
 var async = require('async')
 var SolvencyProof = require('../solvency.proof.js')
-var currencies = ["BTC", "LTC"];
-//var currencies = ["LTC"];
+var currencies = ["BTC", "LGS", "LTC", "DOGE"];
 var solvencyProof = new SolvencyProof(config)
 
 async.waterfall(

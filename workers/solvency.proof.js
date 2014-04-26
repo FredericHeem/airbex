@@ -29,7 +29,7 @@ SolvencyProof.prototype.createCompleteTree = function(accounts) {
 }
 
 SolvencyProof.prototype.saveCompleteTreeToDb = function(client, currency, completeTree, cb) {
-    console.log("saveCompleteTreeToDb")
+    console.log("saveCompleteTreeToDb ", currency)
     var completeTreeSerialized = completeTree.serializeToArray()
     console.log(completeTreeSerialized);
     
@@ -119,7 +119,7 @@ SolvencyProof.prototype.createAccountsJson = function(client, currency, cb) {
         console.log("#users ", dr.rowCount)
         if (!dr.rowCount) {
             console.log("no users")
-            return cb()
+            return cb(null, null)
         }
         var accounts = [];
         dr.rows.map(function(row) {
@@ -142,8 +142,12 @@ SolvencyProof.prototype.createAndSaveRoot = function(client, currency, cb) {
                  SolvencyProof.prototype.createAccountsJson(client, currency, callback);
              },
              function(accounts, callback) {
-                 var completeTree = SolvencyProof.prototype.createCompleteTree(accounts);
-                 SolvencyProof.prototype.saveCompleteTreeToDb(client, currency, completeTree, callback);
+            	 if(accounts){
+                     var completeTree = SolvencyProof.prototype.createCompleteTree(accounts);
+                     SolvencyProof.prototype.saveCompleteTreeToDb(client, currency, completeTree, callback);
+            	 } else {
+            		 callback()
+            	 }
              }
              ],
              function(err) {

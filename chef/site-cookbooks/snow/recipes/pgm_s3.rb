@@ -13,7 +13,7 @@ env_bag = bag[node.chef_environment]
     end
 end
 
-execute 'pip install wal-e' do
+execute 'pip install wal-e==0.6.6' do
    command 'pip install wal-e'
    creates "/usr/local/bin/wal-e"
 end

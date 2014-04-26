@@ -4,7 +4,7 @@
         "address": {
             "type": "string",
             "required": true,
-            "pattern": "^L[1-9A-Za-z]{26,33}$"
+            "pattern": "^(L|m|n)[1-9A-Za-z]{26,33}$"
         },
         "amount": {
             "type": "string",

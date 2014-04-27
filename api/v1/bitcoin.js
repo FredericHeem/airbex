@@ -11,19 +11,39 @@ module.exports = exports = function(app, currencyId) {
 }
 
 exports.withdraw = function(currencyId, req, res, next) {
-    if (!req.app.validate(req.body, 'v1/' + currencyId.toLowerCase() + '_out', res)) {
+    debug('processing withdraw request of %d %s from user #%s to %s',
+            req.body.amount, currencyId, req.user.id, req.body.address)
+           
+    if (!req.app.validate(req.body, 'v1/crypto_out', res)) {
         return
     }
-
-    if (num(req.body.amount).lt('0.0001')) {
+    
+    var currencyOption = req.app.cache.getCurrencyOption(currencyId);
+    
+    if(!currencyOption){
+        return res.send(400, {
+            name: 'InvalidCurrency',
+            message: 'Invalid currency: ' + currencyId
+        })   	
+    }
+    
+    var address = req.body.address;
+    var regEx = new RegExp(currencyOption.address_regex);
+    if (!address.match(regEx)){
+        return res.send(400, {
+            name: 'InvalidAddress',
+            message: 'Invalid Address ' + address + ", should match " + currencyOption.address_prefix
+        })       
+    }
+    
+    var amount = req.app.cache.parseCurrency(req.body.amount, currencyId)
+    
+    if (num(amount).lt(currencyOption.withdraw_min)) {
         return res.send(400, {
             name: 'AmountTooSmall',
-            message: 'Minimum amount 0.0001'
+            message: 'Minimum amount '
         })
     }
-
-    console.log('processing withdraw request of %d %s from user #%s to %s',
-        req.body.amount, currencyId, req.user.id, req.body.address)
 
     var queryText = 'SELECT crypto_withdraw($1, $2, $3, $4) rid';
 
@@ -33,7 +53,7 @@ exports.withdraw = function(currencyId, req, res, next) {
             currencyId.toUpperCase(),
             req.user.id,
             req.body.address,
-            req.app.cache.parseCurrency(req.body.amount, currencyId)
+            amount
         ]
     }, function(err, dr) {
         if (err) {

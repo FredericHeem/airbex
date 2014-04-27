@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "properties": {
+        "address": {
+            "type": "string",
+            "required": true,
+            "pattern": "^[1-9A-Za-z]{27,34}$"
+        },
+        "amount": {
+            "type": "string",
+            "required": true,
+            "pattern": "^\\d+(\\.\\d{1,8})?$"
+        }
+    }
+}

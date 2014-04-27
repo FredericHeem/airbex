@@ -11,4 +11,7 @@ DROP VIEW IF EXISTS match_view;
 ALTER TABLE currency
     ALTER currency_id TYPE text;
     
+ 
+
+    
     

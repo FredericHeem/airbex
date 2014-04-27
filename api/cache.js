@@ -44,7 +44,7 @@ module.exports = exports = function(app, conn, cb) {
     async.parallel({
         currencies: function(cb) {
             conn.read.query({
-                text: 'SELECT currency_id, scale, fiat FROM currency'
+                text: 'SELECT * FROM currency'
             }, function(err, res) {
                 if (err) return cb(err)
                 cb(null, res.rows)
@@ -149,4 +149,8 @@ exports.getQuoteCurrency = function (market){
 
 exports.getCurrencyScale = function(currency) {
     return exports.currencies[currency].scale
+}
+
+exports.getCurrencyOption = function(currency) {
+    return exports.currencies[currency]
 }

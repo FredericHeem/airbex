@@ -4,7 +4,7 @@ module.exports = exports = function(app) {
 
 exports.index = function(req, res, next) {
     var query = [
-        'SELECT currency_id, scale, fiat',
+        'SELECT *',
         'FROM currency',
         'ORDER BY currency_id'
     ].join('\n')
@@ -15,7 +15,11 @@ exports.index = function(req, res, next) {
             return {
                 id: row.currency_id,
                 fiat: row.fiat,
-                scale: row.scale
+                scale: row.scale,
+                name: row.name,
+                withdraw_min: req.app.cache.formatCurrency(row.withdraw_min, row.currency_id),
+                withdraw_max: req.app.cache.formatCurrency(row.withdraw_max, row.currency_id),
+                address_regex: row.address_regex
             }
         }))
     })

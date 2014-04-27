@@ -35,7 +35,10 @@ exports.index = function(req, res, next) {
                 bidminvolume: formatVolumeOrNull(row.bidminvolume, name),
                 bidminprice: formatPriceOrNull(row.bidminprice,name),
                 askminvolume: formatVolumeOrNull(row.askminvolume,name),
-                askmaxprice: formatPriceOrNull(row.askmaxprice,name)
+                askmaxprice: formatPriceOrNull(row.askmaxprice,name),
+                bidmintotal: formatPriceOrNull(row.bidmintotal,name),
+                askmintotal: formatPriceOrNull(row.askmintotal,name),
+                
             }
         }))
     })

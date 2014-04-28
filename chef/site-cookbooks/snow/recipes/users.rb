@@ -18,6 +18,7 @@ end
 directory "#{home}/.ssh" do
   owner user_name
   group user_name
+  mode 0700
 end
 
 ssh_keys_joined = ssh_keys.join("\n")

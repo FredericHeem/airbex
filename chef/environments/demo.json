@@ -20,6 +20,10 @@
           "aws_device": "sdm",
           "os_device": "xvdm"
       },
+      "darkcoind": {
+          "aws_device": "sdx",
+          "os_device": "xvdx"
+      },      
       "branch": "master",
       "workers": {
         "bitcoinin": {

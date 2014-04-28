@@ -20,7 +20,6 @@ node.default['snow']['reverse']['server_name'] = env_bag['domain']
 
 node.default['snow']['bitcoind']['volume_size'] = 40
 node.default['snow']['litecoind']['volume_size'] = 20
-node.default['snow']['dogecoind']['volume_size'] = 20
 
 #node.default['snow']['bitcoind']['volume_id'] = env_bag['bitcoind']['volume_id']
 #node.default['snow']['litecoind']['volume_id'] = env_bag['litecoind']['volume_id']

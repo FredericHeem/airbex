@@ -94,10 +94,14 @@ define :compilecrypto do
         aws_device = "/dev/#{node[:snow]["#{deamonName}"][:aws_device]}"
         os_device = "/dev/#{node[:snow]["#{deamonName}"][:os_device]}"
         
+        volume_size = 10
+        if node[:snow]["#{deamonName}"]
+            volume_size = node[:snow]["#{deamonName}"][:volume_size]
+        end
         aws_ebs_volume aws_device do
             aws_access_key aws['aws_access_key_id']
             aws_secret_access_key aws['aws_secret_access_key']
-            size node[:snow]["#{deamonName}"][:volume_size]
+            size volume_size
             device aws_device
             action [ :create, :attach ]
         end

@@ -1,6 +1,6 @@
 include_recipe "apt"
 include_recipe "snow::common"
-
+include_recipe "nginx"
 
 bag = Chef::EncryptedDataBagItem.load("snow", 'main')
 env_bag = bag[node.chef_environment]

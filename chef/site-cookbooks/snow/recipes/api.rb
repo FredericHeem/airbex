@@ -46,7 +46,6 @@ deploy_revision node[:snow][:api][:app_directory] do
     branch env_bag["repository"]["main"]["branch"]
     ssh_wrapper "/home/ubuntu/api-ssh-wrapper/api_deploy_wrapper.sh"
     action :deploy
-    branch node[:snow][:branch]
     notifies :restart, "service[snow-api]"
     keep_releases 2
     symlinks({

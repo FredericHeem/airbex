@@ -49,13 +49,15 @@ pg_database_extensions "snow" do
 end
 
 # Automatic backups
-include_recipe "cron"
-include_recipe "snow::ebssnapshot"
 
-cron_d "ebs-snapshot-db-snow" do
-  hour 15
-  minute 0
-  command "/usr/bin/ebs-snapshot.sh /pgmdata #{node[:snow][:pgm][:volume_id]}"
+if node[:cloud] && node[:cloud][:ec2]
+    include_recipe "snow::ebssnapshot"
+    
+    cron_d "ebs-snapshot-db-snow" do
+      hour 15
+      minute 0
+      command "/usr/bin/ebs-snapshot.sh /pgmdata #{node[:snow][:pgm][:volume_id]}"
+    end
 end
 
 diskmonit "pgmdata" do

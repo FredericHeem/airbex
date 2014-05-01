@@ -1,7 +1,7 @@
-template "/etc/apt/sources.list" do
-    source "apt-sources.list.erb"
-    notifies :run, 'execute[apt-get update]', :immediately
-end
+#template "/etc/apt/sources.list" do
+#    source "apt-sources.list.erb"
+#    notifies :run, 'execute[apt-get update]', :immediately
+#end
 
 execute "apt-get-update-periodic" do
   command "apt-get update"

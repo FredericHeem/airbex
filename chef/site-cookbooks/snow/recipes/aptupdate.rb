@@ -4,7 +4,7 @@
 #end
 
 execute "apt-get-update-periodic" do
-  command "apt-get update"
+  command "apt-key update && apt-get update"
   ignore_failure false
   only_if do
     File.exists?('/var/lib/apt/periodic/update-success-stamp') &&

@@ -3,14 +3,16 @@
   "url_admin" : "http://localhost:5071/",
   "pg_write_url" : "postgres://postgres:postgres@localhost:5432/snow",
   "userMax":"2", 
-  "market" : "BTCEUR",
+  "market" : "LGSBTC",
+  "base_currency" : "LGS",
+  "quote_currency": "BTC",
   "price" : "150",
   "bid_price" : "1000",
   "ask_price" : "500",
   "volume" : "0.2",
   "documentOk":"",
   "documentTooBig":"",
-  
+  "btc_depsosit_address":"1MfWN6iGMJgHPfp1phyX8DK9g5ucV4GaLZ",
   "users" :
       [
 

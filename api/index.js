@@ -22,15 +22,6 @@ app.conn = {
     write: config.pg_write_url ? pg(config.pg_write_url, config.pg_native) : {}
 }
 
-//var allowCrossDomain = function(req, res, next) {
-//    res.header('Access-Control-Allow-Origin', "http://blockchain.info");
-//    res.header('Access-Control-Allow-Methods', 'GET');
-//    res.header('Access-Control-Allow-Headers', 'Content-Type');
-//    next();
-//}
-//
-//app.use(allowCrossDomain);
-
 app.use(express.limit('5mb'));
 app.use(express.bodyParser())
 app.use(express.cookieParser())

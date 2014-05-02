@@ -1,5 +1,5 @@
 /*global require*/
-var debug = require('debug')('testDbUser');
+var debug = require('debug')('snowBot');
 var request = require('supertest');
 var async = require('async');
 var SnowDb = require('./snow-db');
@@ -156,6 +156,7 @@ module.exports = function (config) {
             })
         },
         function(bankValidateInfo, callback) {
+        	debug("bankValidateInfo: ", JSON.stringify(bankValidateInfo));
             admin.bankCreditValidate(bankValidateInfo, function(err, bankValidateResult) {
                 if (err) throw err
                 debug("bankCreditValidate: %s", JSON.stringify(bankValidateResult))
@@ -164,7 +165,7 @@ module.exports = function (config) {
         }],
 
         function(err) {
-            debug("mirrorOrderBook done")
+            debug("createAndValidateBankCredit done")
             done(err);
         });
     }

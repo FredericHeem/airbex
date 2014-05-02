@@ -14,7 +14,7 @@ describe('Admin', function () {
     "use strict";
     var url = config.url_admin;
     var timeout = 1000 * 60 * 60;
-    
+    var quote_currency = config.quote_currency;
     var snowBot = new SnowBot(config);
     var snowChef = new SnowChef(snowBot, config);
     var admin_config = config.users[0];
@@ -75,19 +75,7 @@ describe('Admin', function () {
                 done()
             });
         });
-//        it('AdminBankCreditsCreateOk', function (done) {
-//            var bankCreditInfo = {
-//                    "user_id" : "13",
-//                    "amount" : "1",
-//                    "currency_id" : "EUR",
-//                    "reference" : "my first deposit"
-//            }
-//            adminClient.bankCreditCreate(bankCreditInfo, function(err, bankCreditResult) {
-//                if (err) throw err
-//                debug("bankCreditCreate: ", JSON.stringify(bankCreditResult));
-//                done();
-//            })
-//        });
+
         it('AdminBankCreditsGetOk', function (done) {
             adminClient.bankCredits(function(err, bankCredits) {
                 if (err) throw err
@@ -98,35 +86,16 @@ describe('Admin', function () {
         it('AdminBankCreditsCreateAll', function (done) {
             var bankCreditInfo = {
                     "amount" : "10000",
-                    "currency_id" : "EUR",
+                    "currency_id" : quote_currency,
                     "reference" : "my first deposit for 1000"
             }
             snowChef.createAndValidateBankCredit(config.users, adminClient, bankCreditInfo, done)
         });         
-//        it('AdminBankCreditsValidateOk', function (done) {
-//            var bankValidateInfo = {
-//                "bank_credit_id" : "8"
-//            }
-//            client.bankCreditValidate(bankValidateInfo, function(err, bankValidateResult) {
-//                if (err) throw err
-//                debug("bankCreditValidate: ",  bankValidateResult)
-//                done();
-//            })
-//        });
-//        it('AdminBankCreditsCancelOk', function (done) {
-//            var bankCancelInfo = {
-//                "bank_credit_id" : "1"
-//            }
-//            client.bankCreditCancel(bankCancelInfo, function(err, bankCancelResult) {
-//                if (err) throw err
-//                debug("bankCreditCancel: ",  bankCancelResult)
-//                done();
-//            })
-//        });        
+      
         it('AdminBankCreditsCreateAndValidateOk', function (done) {
             var bankCreditInfo = {
                     "amount" : "1000",
-                    "currency_id" : "EUR",
+                    "currency_id" : quote_currency,
                     "reference" : "my first deposit for 1000"
             }
             
@@ -136,7 +105,7 @@ describe('Admin', function () {
             var bankCreditInfo = {
                     "user_id" : "15",
                     "amount" : "2000",
-                    "currency_id" : "EUR",
+                    "currency_id" : quote_currency,
                     "reference" : "my first deposit for 1000"
             }
             createAndCancelBankCredit(adminClient, bankCreditInfo, done)

@@ -30,7 +30,7 @@ function bodyToError(body) {
 function updateRequestWithKey(client, data){
     data.json = true;
     if(client.sessionKey){
-        //debug("using session key %s", client.sessionKey)
+        debug("using session key %s", client.sessionKey)
         var jar = request.jar()
         var cookie = request.cookie("session=" + client.sessionKey)
         jar.add(cookie, client.url);
@@ -169,6 +169,69 @@ Snow.prototype.securitySession = function(cb) {
     })
 }
 
+Snow.prototype.purchaseOrderCreate = function(purchaseOrderData, cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "POST";
+    data.json = purchaseOrderData;
+    request(this.url + 'v1/purchaseOrder/', data , function(err, res, body) {
+        if (err) return cb(err)
+        if (res.statusCode != 201) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
+Snow.prototype.purchaseOrderRead = function(cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "GET";
+    request(this.url + 'v1/purchaseOrder/', data , function(err, res, body) {
+        if (err) return cb(err)
+        if (res.statusCode != 200) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
+Snow.prototype.purchaseOrdersRead = function(cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "GET";
+    request(this.url + 'v1/admin/purchaseOrder/',data , function(err, res, body) {
+    	console.log(err);
+    	console.log(res.statusCode);
+        if (err) return cb(err)
+        if (res.statusCode != 200) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
+Snow.prototype.purchaseOrderUpdate = function(po_id, po_data, cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "POST";
+    data.json = po_data;
+    request(this.url + 'v1/admin/purchaseOrder/' + po_id, data , function(err, res, body) {
+    	console.log(err);
+    	console.log(res.statusCode);
+        if (err) return cb(err)
+        if (res.statusCode === 404) return cb(res.body)
+        if (res.statusCode != 201) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
+Snow.prototype.purchaseOrderCancel = function(purchaseOrderId, cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "DELETE";
+    request(this.url + 'v1/purchaseOrder/' + purchaseOrderId , data, function(err, res, body) {
+        if (err) return cb(err)
+        if (res.statusCode === 404) return cb(res.body)
+        if (res.statusCode != 204) return cb(new Error('http error ' + res.statusCode))
+        cb(null)
+    })
+}
+
 Snow.prototype.bankCredits = function(cb) {
     var data = { };
     data = updateRequestWithKey(this, data);
@@ -185,7 +248,7 @@ Snow.prototype.bankCreditCreate = function(bankCreditInfo, cb) {
     data.method = "POST";
     bankCreditInfo.state = "review";
     data.json = bankCreditInfo;
-    
+    console.log("bankCreditCreate ", JSON.stringify(data))
     request(this.url + 'admin/bankCredits', data , function(err, res, body) {
         if (err) return cb(err)
         if (res.statusCode != 201) return cb(bodyToError(body))

@@ -26,6 +26,6 @@
   },
   
   "scripts": {
-    "test": "DEBUG='* -mocha:*' NODE_ENV=local mocha"
+    "test": "DEBUG='* -mocha:*' NODE_ENV=local mocha -g PurchaseOrder"
   }
 }

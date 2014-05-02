@@ -25,7 +25,7 @@
     "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master"
   },
   "scripts": {
-    "start": "DEBUG='* -express:* -connect:*' NODE_ENV=brush node index.js",
+    "start": "DEBUG='*' NODE_ENV=brush node index.js",
     "pack": "tar -zcf node_modules.tar.gz node_modules",
     "unpack": "tar -zxf node_modules.tar.gz",
     "test": "mocha",

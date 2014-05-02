@@ -53,6 +53,7 @@ exports.beginCreate = function(req, res, next) {
 
         if(req.app.config.smtp){
             req.app.email.send(req.body.email, language, 'verify-email', { code: code }, function(err) {
+            	debug("email sent")
                 if (err) return next(err)
                 res.send(204)
             })

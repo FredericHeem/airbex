@@ -1,3 +1,5 @@
+var debug = require('debug')('snow:admin:credit')
+
 module.exports = exports = function(app) {
     app.post('/admin/bankCredits', app.security.demand.admin, exports.createBankCredit)
     app.get('/admin/bankCredits', app.security.demand.admin, exports.getBankCredits)
@@ -35,17 +37,19 @@ exports.getBankCredits = function(req, res, next) {
 }
 
 exports.createBankCredit = function(req, res, next) {
+	
     var query = {
         text: [
-            'INSERT INTO bank_credit (user_id, currency_id, amount, reference)',
-            'VALUES ($1, $2, $3, $4)',
+            'INSERT INTO bank_credit (user_id, currency_id, amount, reference, purchase_order_id)',
+            'VALUES ($1, $2, $3, $4, $5)',
             'RETURNING bank_credit_id'
         ].join('\n'),
         values: [
             req.body.user_id,
             req.body.currency_id,
             req.app.cache.parseCurrency(req.body.amount, req.body.currency_id),
-            req.body.reference
+            req.body.reference,
+            req.body.purchase_order_id || 0
         ]
     }
 
@@ -63,6 +67,7 @@ exports.createBankCredit = function(req, res, next) {
 }
 
 exports.approveBankCredit = function(req, res, next) {
+	debug("approveBankCredit %s", req.params.id)
     var query = {
         text: [
             'UPDATE bank_credit',

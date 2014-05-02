@@ -1,0 +1,62 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+username = ENV['USER']
+environment = ENV['KNIFE_ENV']
+orgname = ENV['ORGNAME']
+#role = "solo-#{orgname}"
+#role = "frontend"
+chef_server_url = ENV['CHEF_SERVER_URL']
+chef_path = "../../chef/"
+
+box      = 'trusty64daily'
+url      = 'http://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box'
+hostname = "snow-#{orgname}-#{environment}-#{box}-#{username}"
+
+domain   = 'example.com'
+ip       = '192.168.0.2'
+ram      = '2048'
+
+
+validation_client_name = "validator-#{environment}"
+validation_key_path = chef_path + ".chef/#{orgname}/validator-#{environment}.pem"
+encrypted_data_bag_secret_key_path = chef_path + '.chef/' + orgname + '/encrypted_data_bag_secret'
+
+node_name = hostname
+
+Vagrant.configure("2") do |config|
+  config.vm.box = box
+  config.vm.box_url = url
+  
+  config.vm.hostname = hostname
+  config.vm.network :forwarded_port, guest: 8000, host: 8000
+  config.vm.network :forwarded_port, guest: 8010, host: 8010
+  config.vm.network :forwarded_port, guest: 8020, host: 8020
+  config.vm.network :forwarded_port, guest: 8050, host: 8050
+  config.vm.network :forwarded_port, guest: 9001, host: 9001
+  config.vm.network :forwarded_port, guest: 80, host: 8008
+  config.vm.network :forwarded_port, guest: 443, host: 443
+  config.vm.network :private_network, ip: ip
+  config.vm.synced_folder ".", "/vagrant"
+  config.omnibus.chef_version = :latest
+  
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = true
+    vb.customize [
+    'modifyvm', :id,
+    '--name', hostname,
+    '--memory', ram
+    ]
+  end
+
+  #config.vm.provision "chef_client" do |chef|
+  #  chef.chef_server_url = chef_server_url
+  #  chef.validation_client_name = validation_client_name
+  #  chef.validation_key_path = validation_key_path
+  #  chef.encrypted_data_bag_secret_key_path = encrypted_data_bag_secret_key_path
+  #  chef.node_name = node_name
+  #  chef.environment = environment
+  #  chef.add_role role
+  #end
+  
+  
+end

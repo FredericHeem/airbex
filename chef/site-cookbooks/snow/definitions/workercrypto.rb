@@ -75,7 +75,6 @@ define :workercrypto do
         branch env_bag["repository"]["main"]["branch"]
         ssh_wrapper "/home/ubuntu/workers-ssh-wrapper/workers_deploy_wrapper.sh"
         action :deploy
-        branch node[:snow][:branch]
         before_symlink do
           bash "npm install" do
             user "root"

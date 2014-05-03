@@ -17,6 +17,7 @@ var balances = require('../controllers/balances')
 , login = require('../controllers/login')
 , notfound = require('../controllers/notfound')
 , authorize = require('../authorize')
+, purchaseorders = require('../controllers/purchaseorders')
 
 module.exports = function() {
     router
@@ -67,6 +68,10 @@ module.exports = function() {
     .add(/^balances$/, function() {
         if (!authorize.admin()) return
         master(balances(), 'admin')
+    })
+    .add(/^purchaseorders(?:\?userId=(\d+))?$/, function(userId) {
+        if (!authorize.admin()) return
+        master(purchaseorders(userId), 'admin')
     })
     .add(/^transactions(?:\?userId=(\d+))?$/, function(userId) {
         if (!authorize.admin()) return

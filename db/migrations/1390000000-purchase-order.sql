@@ -8,7 +8,8 @@ CREATE TABLE "purchase_order" (
     amount bigint NOT NULL CHECK (amount >= 0),
     amount_credited bigint DEFAULT 0 CHECK (amount_credited >= 0),
     address text,
-    state text NOT NULL DEFAULT 'created',
+    amount_purchased bigint DEFAULT 0 CHECK (amount_purchased >= 0),
+    state text NOT NULL DEFAULT 'PaymentPending',
     created_at timestamptz DEFAULT(current_timestamp),
     lastupdated_at timestamptz DEFAULT(current_timestamp)
 );
@@ -47,9 +48,9 @@ BEGIN
         NEW.state := 'credited';        
             
         UPDATE purchase_order
-        SET state='credited',
+        SET state='PaymentApproved',
             amount_credited=NEW.amount
-        WHERE id = OLD.purchase_order_id AND state = 'created';            
+        WHERE id = OLD.purchase_order_id AND state = 'PaymentReviewing';            
         
     END IF;
 
@@ -61,3 +62,30 @@ CREATE TRIGGER bank_credit_approved_trigger
   ON bank_credit
   FOR EACH ROW
   EXECUTE PROCEDURE bank_credit_approved_trigger();
+  
+  
+CREATE OR REPLACE FUNCTION bank_credit_create_trigger()
+    RETURNS TRIGGER AS $$
+DECLARE
+    tid int;
+BEGIN
+    RAISE NOTICE 'bank_credit_create_trigger: user %, poid: %, state %, amount %s in %s',
+        NEW.user_id,
+        NEW.purchase_order_id,
+        NEW.state,
+        NEW.amount,
+        NEW.currency_id;
+        
+    UPDATE purchase_order
+    SET state='PaymentReviewing'
+    WHERE id = NEW.purchase_order_id AND state = 'PaymentPending';    
+              
+
+    RETURN NEW;
+END; $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER bank_credit_create_trigger
+  AFTER INSERT
+  ON bank_credit
+  FOR EACH ROW
+  EXECUTE PROCEDURE bank_credit_create_trigger();

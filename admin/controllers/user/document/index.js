@@ -10,7 +10,6 @@ module.exports = function(userId) {
     , controller = {
         $el: $el
     }
-    
 
     // Insert header
     $el.find('.header-placeholder').replaceWith(header(userId, 'orders').$el)

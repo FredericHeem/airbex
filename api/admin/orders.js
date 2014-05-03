@@ -1,3 +1,5 @@
+var order = require("../order")
+
 module.exports = exports = function(app) {
     app.get('/admin/orders', app.security.demand.admin, function(req, res, next) {
         exports.query(req.app, req.query, function(err, items) {
@@ -5,6 +7,11 @@ module.exports = exports = function(app) {
             res.send(items)
         })
     })
+    app.post('/admin/orders', app.security.demand.admin, exports.create)
+}
+
+exports.create = function(req, res, next) {
+	order.createInstantBuy(req.body.user_id, req, res, next)
 }
 
 exports.query = function(app, query, cb) {

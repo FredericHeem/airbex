@@ -4,24 +4,27 @@ var _ = require('lodash')
 , builder = require('pg-builder')
 
 module.exports = exports = function(app) {
-	 app.post('/v1/admin/purchaseOrder/:id', app.security.demand.admin, exports.update)
-	 app.get('/v1/admin/purchaseOrder', app.security.demand.admin, exports.read)
+	 app.post('/admin/purchaseOrder/:id', app.security.demand.admin, exports.update)
+	 app.get('/admin/purchaseOrder', app.security.demand.admin, exports.read)
 }
 
 function formatPurchaseOrderRow(cache, row) {
     return {
         id: row.id,
         user_id: row.user_id,
-        market_id: row.market_id,
+        market_name: row.name,
+        base_currency: cache.getBaseCurrency(row.name),
+        quote_currency:cache.getQuoteCurrency(row.name),
         type: row.type,
         address: row.address,
-        amount: cache.formatOrderVolume(row.amount, row.name),
+        amount: cache.formatOrderPrice(row.amount, row.name),
         state: row.state,
         created_at: row.created_at
     }
 }
 
 exports.read = function(req, res, next) {
+	debug("read")
 	var user_id = req.user.id;
     req.app.conn.read.query({
         text: [

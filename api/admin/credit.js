@@ -37,7 +37,7 @@ exports.getBankCredits = function(req, res, next) {
 }
 
 exports.createBankCredit = function(req, res, next) {
-	
+	debug("createBankCredit %s", JSON.stringify(req.body))
     var query = {
         text: [
             'INSERT INTO bank_credit (user_id, currency_id, amount, reference, purchase_order_id)',

@@ -9,7 +9,7 @@ exports.spend = function(req, res, next) {
 
     debug("spend: ", JSON.stringify(req.body));
     
-    var quote = req.body.market.substr(3, 3)
+    var quote = req.app.cache.getQuoteCurrency(req.body.market)
 
     req.app.conn.write.query({
         text: [

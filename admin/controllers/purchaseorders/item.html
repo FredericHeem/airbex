@@ -1,0 +1,16 @@
+<tr class="purchaseorder" data-id="<%= id %>">
+    <td><%= user_id %></td>
+    <td><%= id %></td>
+    <td><%= numbers.format(amount, { currency: quote_currency }) %></td>
+    <td><%= moment(created_at).format('LLL') %></td>
+    <td><%= address %></td>
+    <td class="actions">
+        <% if (state == 'PaymentPending') { %>
+        <button class="btn btn-success credit" data-id="<%= id %>" data-action="credit">Credit <%= quote_currency %></button>
+        <% } else if (state == 'PaymentApproved'){ %>
+        <button class="btn btn-success buy" data-id="<%= id %>" data-action="buy">Buy <%= base_currency %></button>
+        <% } %>
+    </td>
+    <td><span id="status" class="label"><%= state %></span></td>
+    <td><button class="btn btn-danger reject" data-id="<%= id %>" data-action="reject">Cancel</button></span></td>
+</tr>

@@ -112,10 +112,12 @@ exports.create = function(req, res, next) {
 function formatPurchaseOrderRow(cache, row) {
     return {
         id: row.id,
-        market_id: row.market_id,
+        market_name: row.name,
+        base_currency: cache.getBaseCurrency(row.name),
+        quote_currency:cache.getQuoteCurrency(row.name),
         type: row.type,
         address: row.address,
-        amount: cache.formatOrderVolume(row.amount, row.name),
+        amount: cache.formatOrderPrice(row.amount, row.name),
         state: row.state,
         created_at: row.created_at
     }

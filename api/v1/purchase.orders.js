@@ -67,7 +67,7 @@ exports.create = function(req, res, next) {
     				  address
     				  ]
     }
-    debug("create %s", query);
+
     req.app.conn.write.query(query, function(err, dr) {
         if (err) {
             debug("create purchase order error: %s", err.message);

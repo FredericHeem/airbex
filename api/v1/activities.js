@@ -10,6 +10,7 @@ var detailWhitelist = {
     ChangePassword: [],
     RemoveApiKey: [],
     CreateApiKey: ['canTrade', 'canDeposit', 'canWithdraw'],
+    PurchaseOrderCreate: ['market', 'type', 'amount', 'address'],
     CreateOrder: ['market', 'type', 'price', 'amount', 'aon'],
     CancelOrder: ['id'],
     SendToUser: ['to', 'amount', 'currency', 'code'],
@@ -67,7 +68,6 @@ exports.index = function(req, res, next) {
 
             var result = _.pick(row, 'type', 'id')
             result.created = row.created_at
-
             // Admin activities are sent as is
             if (row.type.match(/^Admin/)) {
                 result.details = row.details

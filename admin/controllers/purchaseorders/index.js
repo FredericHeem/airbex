@@ -41,7 +41,7 @@ module.exports = function(userId) {
 		var bankCreditInfo = {
         	"user_id": items_model[id].user_id,
 			"amount" : items_model[id].amount,
-			"currency_id" : "CHF",
+			"currency_id" : items_model[id].quote_currency,
 			"reference" : "",
 			"purchase_order_id" : id
 	    }

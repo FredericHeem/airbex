@@ -45,25 +45,7 @@ exports.beginCreate = function(req, res, next) {
             return next(err)
         }
 
-        var language = 'en-US'
-
-        if (/(nb|no)/i.exec(req.get('Accept-Language'))) {
-            language = 'nb-NO'
-        }
-
-        if(req.app.config.smtp){
-            req.app.email.send(req.body.email, language, 'verify-email', { code: code }, function(err) {
-            	debug("email sent")
-                if (err) return next(err)
-                res.send(204)
-            })
-        } else {
-            debug("smtp not configured")
-            return res.send(400, {
-                name: 'SmtpNotConfigured',
-                message: 'SMTP is not configured'
-            })
-        }
+        res.send(204)
     })
 }
 

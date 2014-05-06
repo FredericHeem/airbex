@@ -6,6 +6,7 @@ var debug = require('debug')('snow:email:notify')
 module.exports = exports = function(app) {
     exports.app = app
     exports.schedule()
+    exports.scheduleUserPending()
 }
 
 function stripZeroes(x) {
@@ -114,29 +115,78 @@ exports.tick = function() {
         async.each(dr.rows, exports.process, function() {
             if (!dr.rowCount) {
                 // TODO: Remove magic number
+            	debug('no mail to send')
                 return exports.schedule()
+            } else {
+            	exports.schedule()
             }
-
-            var tip = _.max(dr.rows, 'activity_id').activity_id
-
-            debug('setting tip to %s', tip)
-
-            exports.app.conn.write.query({
-                text: [
-                    'UPDATE settings SET notify_tip = $1',
-                    'WHERE notify_tip < $1'
-                ].join('\n'),
-                values: [tip]
-            }, function(err) {
-                if (err) {
-                    console.error('Failed to set notify tip')
-                    console.error(err)
-                } else {
-                    debug('set tip to %s', tip)
-                }
-
-                exports.schedule()
-            })
         })
     })
 }
+
+exports.scheduleUserPending = function() {
+    // TODO: Remove magic number
+    return setTimeout(exports.tickUserPending, 5e3)
+}
+
+exports.processUserPending = function(row, cb) {
+	var language = 'en-US';
+
+	debug("sending email to %s", row.email)
+	if(exports.app.config.smtp){
+		exports.app.email.send(row.email, language, 'verify-email', { code: row.code }, function(err) {
+			debug("email sent")
+			if (err)  {
+				debug("ERROR sending email")
+				return cb(err)
+			} else {
+	            exports.app.conn.write.query({
+	                text: [
+	                    "UPDATE user_pending SET state ='emailsent'",
+	                    'WHERE email=$1'
+	                ].join('\n'),
+	                values: [row.email]
+	            }, function(err) {
+	                if (err) {
+	                    console.error('Failed to set user_pending state')
+	                    console.error(err)
+	                    cb(err)
+	                } else {
+	                    debug('set email state for %s', row.email)
+	                    cb()
+	                }
+	            })
+			}
+			
+		})
+	} else {
+		debug("smtp not configured")
+		cb("smtp not configured")
+	}
+}
+
+exports.tickUserPending = function() {
+    debug('tickUserPending')
+
+    var query = "SELECT * FROM user_pending where state='created'"
+
+    exports.app.conn.read.query(query, function(err, dr) {
+        if (err) {
+            // TODO: Raven
+            console.error('tickUserPending Failed to check for new email notifications')
+            console.error(err)
+            return exports.scheduleUserPending()
+        }
+
+        debug('tickUserPending processing %s rows', dr.rowCount || 'no')
+
+        async.each(dr.rows, exports.processUserPending, function() {
+            if (!dr.rowCount) {
+            	debug('no user pending mail to send')
+            } 
+            exports.scheduleUserPending()
+        })
+        
+    })
+}
+

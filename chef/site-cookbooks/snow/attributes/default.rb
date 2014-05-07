@@ -36,8 +36,6 @@ node.set['varnish']['listen_port'] = 8030
 default['postgresql']['initdb'] = false
 default['postgresql']['version'] = "9.2"
 default['postgresql']['data_directory'] = "/pgmdata/main/"
-default['postgresql']['hba_file'] = "/pgmdata/main/pg_hba.conf"
-default['postgresql']['ident_file'] = "/pgmdata/main/pg_ident.conf"
 
 default[:app][:ec2] = false
 default[:app][:ebs] = {

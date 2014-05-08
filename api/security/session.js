@@ -41,7 +41,12 @@ exports.handler = function(req, res, next) {
 
         exports.app.security.users.fromUserId(session.userId, function(err, user) {
             if (err) return next(err)
-            assert(user, 'User #' + session.userId + ' in session not found')
+            if(!user) {
+                return res.send(401, {
+                    name: 'SessionNotFound',
+                    message: 'User not found in session'
+                })
+            }
             req.user = user
             debug('session attached (user #%d)', user.id)
             next()

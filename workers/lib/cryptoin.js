@@ -113,8 +113,7 @@ CryptoIn.prototype.processOutput = function(txid, o, cb) {
         text: queryText,
         values: [this.currency, txid, address, satoshi]
     }, function(err, dr) {
-    	debug("processOutput currency: %s, txid: %s, address: %s, satoshi: %s", 
-    		this.currency, txid, address, satoshi)
+    	//debug("processOutput currency: %s, txid: %s, address: %s, satoshi: %s",  this.currency, txid, address, satoshi)
     		
         if (err) {
         	debug("processOutput currency: %s, txid: %s, address: %s, satoshi: %s, error: %s", 

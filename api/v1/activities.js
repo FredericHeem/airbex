@@ -24,6 +24,7 @@ var detailWhitelist = {
     Credit: ['currency', 'amount'],
     FillOrder: ['market', 'total', 'original', 'type', 'price'],
     BTCWithdraw: ['amount', 'address'],
+    Withdraw: ['currency', 'amount', 'address'],
     WithdrawRequest: ['amount', 'bankAccount', 'currency', 'method'],
     CancelWithdrawRequest: ['bankAccount'],
     WithdrawComplete: ['amount', 'currency', 'method'],

@@ -68,8 +68,9 @@ exports.withdraw = function(currencyId, req, res, next) {
             return next(err)
         }
 
-        req.app.activity(req.user.id, currencyId + 'Withdraw', {
+        req.app.activity(req.user.id, 'Withdraw', {
             address: req.body.address,
+            currency: currencyId,
             amount: req.body.amount
         })
 

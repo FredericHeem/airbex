@@ -78,14 +78,11 @@ directory "#{node[:snow][:api][:app_directory]}/shared/config" do
   group "ubuntu"
 end
 
-api_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:api').first)
-pgm_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgm').first)
-pgs_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgs').first)
+api_ip = env_bag['api']['ip'] || "127.0.0.1"
+pgm_ip = env_bag['pgm']['ip'] || "127.0.0.1"
+pgs_ip = env_bag['pgs']['ip'] || "127.0.0.1"
 redis_ip = "127.0.0.1"
 
-if pgm_ip == api_ip
-  pgm_ip = "127.0.0.1"
-end
     
 execute "pg-migrate-install" do
     user "root"

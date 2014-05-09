@@ -9,36 +9,11 @@ env_bag = bag[node.chef_environment]
 #  roles ["admin", "frontend", "api", "landing"]
 #end
 
-reverse_node = search(:node, "role:reverse AND chef_environment:#{node.chef_environment}").first
-reverse_ip = NetworkUtils.get_private_ipv4_for_node(reverse_node)
-
-frontend_node = search(:node, "role:frontend AND chef_environment:#{node.chef_environment}").first
-frontend_ip = NetworkUtils.get_private_ipv4_for_node(frontend_node)
-
-admin_node = search(:node, "role:admin AND chef_environment:#{node.chef_environment}").first
-admin_ip = NetworkUtils.get_private_ipv4_for_node(admin_node)
-
-api_node = search(:node, "role:api AND chef_environment:#{node.chef_environment}").first
-api_ip = NetworkUtils.get_private_ipv4_for_node(api_node)
-
-landing_node = search(:node, "role:landing AND chef_environment:#{node.chef_environment}").first
-landing_ip  = NetworkUtils.get_private_ipv4_for_node(landing_node)
-
-if frontend_ip == reverse_ip
-  frontend_ip = "127.0.0.1"
-end
-
-if admin_ip == reverse_ip
-  admin_ip= "127.0.0.1"
-end
-
-if landing_ip == reverse_ip
-  landing_ip = "127.0.0.1"
-end
-
-if api_ip == reverse_ip
-  api_ip = "127.0.0.1"
-end
+api_ip = env_bag['api']['ip'] || "127.0.0.1"
+admin_ip = "127.0.0.1"
+landing_ip = "127.0.0.1"
+reverse_ip = "127.0.0.1"
+frontend_ip = "127.0.0.1"
 
 Chef::Log.info("frontend has IP address #{frontend_ip}")
 Chef::Log.info("api has IP address #{api_ip}")

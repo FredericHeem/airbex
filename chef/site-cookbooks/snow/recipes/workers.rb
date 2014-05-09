@@ -60,17 +60,11 @@ directory "#{node[:snow][:workers][:app_directory]}/shared/config" do
   group "ubuntu"
 end
 
-worker_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:workers').first)
-pgm_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgm').first)
-pgs_ip = NetworkUtils.get_private_ipv4_for_node(search(:node, 'role:pgs').first)
-
-if pgm_ip == worker_ip
-  pgm_ip = "127.0.0.1"
+pgm_ip = env_bag['pgm']['ip'] || "127.0.0.1"
+pgs_ip = "127.0.0.1"
+if env_bag['pgs']
+  pgs_ip = env_bag['pgs']['ip'] || "127.0.0.1"
 end
-
-if pgs_ip == worker_ip
-  pgs_ip = "127.0.0.1"
-end 
     
 template "#{node[:snow][:workers][:app_directory]}/shared/config/workers.json" do
     source 'workers/config.json.erb'

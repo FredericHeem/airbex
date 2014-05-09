@@ -6,8 +6,7 @@ include_recipe "aws"
 include_recipe "solo-search"
 include_recipe "snow::pgm_s3"
 
-pgm_node = search(:node, "role:pgm AND chef_environment:#{node.chef_environment}").first
-master_ip = NetworkUtils.get_private_ipv4_for_node(pgm_node)
+pgm_ip = env_bag['pgm']['ip'] || "127.0.0.1"
 
 pg_data_path = node[:postgresql][:data_directory]
 Chef::Log.info "postgres data path #{pg_data_path}"
@@ -43,7 +42,7 @@ unless File.exists? "#{pg_data_path}/recovery.conf"
     owner "postgres"
     group "postgres"
     mode 0664
-    variables :master_ip => master_ip
+    variables :master_ip => pgm_ip
   end
 
   service 'postgresql' do

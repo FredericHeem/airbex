@@ -112,14 +112,32 @@ exports.tick = function() {
 
         debug('processing %s rows', dr.rowCount || 'no')
 
-        async.each(dr.rows, exports.process, function() {
+       async.each(dr.rows, exports.process, function() {
             if (!dr.rowCount) {
                 // TODO: Remove magic number
-            	debug('no mail to send')
                 return exports.schedule()
-            } else {
-            	exports.schedule()
             }
+
+            var tip = _.max(dr.rows, 'activity_id').activity_id
+
+            debug('setting tip to %s', tip)
+
+            exports.app.conn.write.query({
+                text: [
+                    'UPDATE settings SET notify_tip = $1',
+                    'WHERE notify_tip < $1'
+                ].join('\n'),
+                values: [tip]
+            }, function(err) {
+                if (err) {
+                    console.error('Failed to set notify tip')
+                    console.error(err)
+                } else {
+                    debug('set tip to %s', tip)
+                }
+
+                exports.schedule()
+            })
         })
     })
 }

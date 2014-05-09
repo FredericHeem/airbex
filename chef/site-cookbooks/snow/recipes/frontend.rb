@@ -9,20 +9,12 @@ include_recipe "solo-search"
   end
 end
 
-
-admin_ip = search(:node, 'role:admin').first ? search(:node, 'role:admin').first[:ipaddress] : nil
-api_ip = search(:node, 'role:api').first ? search(:node, 'role:api').first[:ipaddress] : nil
-
 # Nginx configuration
 template '/etc/nginx/sites-available/snow-frontend' do
   source "frontend/nginx.conf.erb"
   owner "root"
   group "root"
   notifies :reload, "service[nginx]"
-  variables({
-    :api_ip => api_ip || '127.0.0.1',
-    :admin_ip => admin_ip || '127.0.0.1'
-  })
 end
 
 # include_recipe 'deploy_wrapper'

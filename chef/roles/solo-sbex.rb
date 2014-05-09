@@ -6,8 +6,8 @@ run_list(
   "role[admin]",
   "role[landing]",
   "role[api]",
-  "role[reverse]",
   "role[bitcoind]",
   "role[workers]",
+  "role[reverse]",
   "recipe[snow::aws_eip]"
 )

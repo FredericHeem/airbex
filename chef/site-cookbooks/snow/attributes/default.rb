@@ -47,6 +47,6 @@ if aws['aws_access_key_id']
     default['s3cmd']['secret_key'] = aws['aws_secret_access_key']
     default['s3cmd']['access_key'] = aws['aws_access_key_id']
     default['s3cmd']['user'] = 'postgres'
-    default['s3cmd']['config_dir'] = '/var/lib/postgres'
+    default['s3cmd']['config_dir'] = '/var/lib/postgresql'
 
 end

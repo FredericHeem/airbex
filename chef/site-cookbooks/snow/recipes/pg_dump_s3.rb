@@ -3,7 +3,7 @@ bag = Chef::EncryptedDataBagItem.load("snow", 'main')
 env_bag = bag[node.chef_environment]
 
 if aws['aws_access_key_id']
-  include_recipe "s3cmd"
+  include_recipe "chef-s3cmd"
 
   template "/usr/bin/pg_dump_s3.sh" do
     source "pg_dump_s3.sh.erb"

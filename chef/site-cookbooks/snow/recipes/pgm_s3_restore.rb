@@ -6,7 +6,6 @@ include_recipe "aws"
 include_recipe "solo-search"
 include_recipe "snow::pgm_s3"
 
-
 pgm_node = search(:node, "role:pgm AND chef_environment:#{node.chef_environment}").first
 master_ip = NetworkUtils.get_private_ipv4_for_node(pgm_node)
 

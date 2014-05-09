@@ -2,6 +2,7 @@
 include_recipe "aws"
 include_recipe "awscli"
 include_recipe "cron"
+include_recipe "s3cmd"
 
 aws = Chef::EncryptedDataBagItem.load("aws", 'main')
 bag = Chef::EncryptedDataBagItem.load("snow", 'main')

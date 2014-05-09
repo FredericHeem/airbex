@@ -76,6 +76,12 @@ e.g.
     <td>User to install .s3cfg config file</td>
     <td><tt>ubuntu</tt></td>
   </tr>
+  <tr>
+    <td><tt>['s3cmd']['config_dir']</tt></td>
+    <td>String</td>
+    <td>Directory where the .s3cfg config file will be installed.  This must be explicitly set if the user account is created by chef.</td>
+    <td><tt>['s3cmd']['user']'s home directory</tt></td>
+  </tr>
 </table>
 
 Usage

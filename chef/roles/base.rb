@@ -6,6 +6,8 @@ run_list(
     "recipe[solo-search]",
     "recipe[snow::users]",
     "recipe[openssh]",
+    "recipe[iptables]",
+    "recipe[iptables::ssh]",
     "recipe[chef-client::delete_validation]"
 )
 override_attributes({

@@ -6,5 +6,8 @@ run_list(
 override_attributes({
   "nginx" => {
     "default_site_enabled" => false
+  },
+  "iptables" => {
+    'enabled' => true
   }
 })

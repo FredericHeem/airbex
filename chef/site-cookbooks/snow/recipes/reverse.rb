@@ -63,3 +63,7 @@ end
 nginx_site 'snow-reverse' do
   action :enable
 end
+
+include_recipe "iptables"
+iptables_rule "all_http"
+iptables_rule "all_https"

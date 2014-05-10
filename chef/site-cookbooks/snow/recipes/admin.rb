@@ -9,6 +9,9 @@ include_recipe "solo-search"
   end
 end
 
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
+env_bag = bag[node.chef_environment]
+
 # Nginx configuration
 api_ip = env_bag['api']['ip'] || "127.0.0.1"
 
@@ -21,10 +24,6 @@ template '/etc/nginx/sites-available/snow-admin' do
     :api_ip => api_ip || '127.0.0.1'
   })
 end
-
-# include_recipe 'deploy_wrapper'
-bag = Chef::EncryptedDataBagItem.load("snow", 'main')
-env_bag = bag[node.chef_environment]
 
 ssh_known_hosts_entry 'github.com'
 

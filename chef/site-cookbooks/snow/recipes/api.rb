@@ -80,7 +80,10 @@ end
 
 api_ip = env_bag['api']['ip'] || "127.0.0.1"
 pgm_ip = env_bag['pgm']['ip'] || "127.0.0.1"
-pgs_ip = env_bag['pgs']['ip'] || "127.0.0.1"
+pgs_ip = "127.0.0.1"
+if env_bag['pgs']
+  pgs_ip = env_bag['pgs']['ip'] || "127.0.0.1"
+end
 redis_ip = "127.0.0.1"
 
     

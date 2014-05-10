@@ -5,13 +5,16 @@
 
 -A OUTPUT -p tcp --dport 53 -j ACCEPT
 -A OUTPUT -p udp --dport 53 -j ACCEPT
--A INPUT -p tcp --dport 53 -j ACCEPT
--A INPUT -p udp --dport 53 -j ACCEPT
+-A INPUT -p tcp --sport 53 -j ACCEPT
+-A INPUT -p udp --sport 53 -j ACCEPT
 
 -A INPUT -p icmp -j ACCEPT
 -A OUTPUT -p icmp -j ACCEPT
 -A INPUT -i lo -j ACCEPT
 -A OUTPUT -o lo -j ACCEPT
+
+-A OUTPUT -p tcp --dport 443 -j ACCEPT
+-A INPUT -p tcp --sport 443 -j ACCEPT
 
 -P INPUT DROP
 

@@ -1,2 +1,3 @@
 # Snow api Locked Down
--A INPUT -p tcp -s <%= @frontend_ip %> --dport 8000 -j ACCEPT
+# Allow connection from the reverse http proxy
+-A INPUT -p tcp -s <%= @reverse_ip %> --dport 8000 -j ACCEPT

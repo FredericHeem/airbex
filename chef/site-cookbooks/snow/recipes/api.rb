@@ -11,14 +11,14 @@ include_recipe 'deploy_wrapper'
 bag = Chef::EncryptedDataBagItem.load("snow", 'main')
 env_bag = bag[node.chef_environment]
 
-frontend_ip = "127.0.0.1"
-if env_bag['frontend']
-  frontend_ip = env_bag['frontend']['ip'] || "127.0.0.1"
+reverse_ip = "127.0.0.1"
+if env_bag['reverse']
+  reverse_ip = env_bag['reverse']['ip'] || "127.0.0.1"
 end
 
 include_recipe "iptables"
 iptables_rule "iptables_api" do
- variables({:frontend_ip => frontend_ip})
+ variables({:reverse_ip => reverse_ip})
 end
 
 ssh_known_hosts_entry 'github.com'

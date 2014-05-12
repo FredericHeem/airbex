@@ -2,3 +2,7 @@
 # Allow connection from the reverse http proxy
 -A INPUT -p tcp -s <%= @reverse_ip %> --dport 8000 -j ACCEPT
 -A OUTPUT -p tcp -d <%= @reverse_ip %> --sport 8000 -j ACCEPT
+
+# Allow connection to SMTP server
+-A INPUT -p tcp --sport 587 -j ACCEPT
+-A OUTPUT -p tcp  --dport 587 -j ACCEPT

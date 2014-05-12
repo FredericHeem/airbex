@@ -17,6 +17,15 @@ define :workercrypto do
     bag = Chef::EncryptedDataBagItem.load("snow", 'main')
     env_bag = bag[node.chef_environment]
     
+    p2p_port = env_bag[cryptoName]['p2p_port']
+    if p2p_port
+      include_recipe "iptables"
+      iptables_rule "iptables_crypto_#{cryptoName}" do
+         source "iptables_crypto.erb"
+         variables({:p2p_port => p2p_port})
+      end
+    end 
+    
     ssh_known_hosts_entry 'github.com'
     
     deploy_wrapper 'workers' do

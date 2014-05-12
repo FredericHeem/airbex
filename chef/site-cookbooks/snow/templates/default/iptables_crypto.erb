@@ -1,0 +1,5 @@
+# Crypto wallet
+# Allow to connect to the the p2p network
+-A INPUT -p tcp  --sport <%= @p2p_port %> -j ACCEPT
+-A OUTPUT -p tcp --dport <%= @p2p_port %> -j ACCEPT
+

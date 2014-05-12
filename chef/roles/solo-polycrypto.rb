@@ -1,4 +1,4 @@
-name "solo-sbex"
+name "solo-polycrypto"
 run_list(
   "role[base]",
   "role[pgm]",
@@ -10,7 +10,6 @@ run_list(
   "role[bitcoind]",
   "role[litecoind]",
   "role[dogecoind]",
-  "role[darkcoind]",
   "role[workers]",
   "recipe[snow::aws_eip]"
 )

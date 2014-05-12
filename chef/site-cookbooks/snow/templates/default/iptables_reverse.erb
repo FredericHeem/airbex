@@ -1,5 +1,5 @@
 # Reverse
-# Allow to connect to api server
+# Allow to connect to the api server
 -A INPUT -p tcp -s <%= @api_ip %> --sport 8000 -j ACCEPT
 -A OUTPUT -p tcp -d <%= @api_ip %> --dport 8000 -j ACCEPT
 

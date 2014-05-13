@@ -21,7 +21,7 @@ define :compilecrypto do
       key "C300EE8C"
     end
     
-    %w(build-essential libtool automake libssl-dev libboost-all-dev git libdb4.8-dev libdb4.8++-dev pkg-config libminiupnpc-dev).each do |pkg|
+    %w(build-essential libtool automake libssl-dev libboost-all-dev git libdb5.1-dev libdb5.1++-dev pkg-config libminiupnpc-dev).each do |pkg|
         package pkg do
             action :install
             options "--force-yes"

@@ -13,8 +13,8 @@
 -A INPUT -i lo -j ACCEPT
 -A OUTPUT -o lo -j ACCEPT
 
--A OUTPUT -p tcp --dport 443 -j ACCEPT
--A INPUT -p tcp --sport 443 -j ACCEPT
+-A OUTPUT -p udp --dport 123 -j ACCEPT
+-A INPUT -p udp --sport 123 -j ACCEPT
 
 -P INPUT DROP
 

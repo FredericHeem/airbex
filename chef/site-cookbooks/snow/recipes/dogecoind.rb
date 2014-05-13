@@ -3,6 +3,6 @@ compilecrypto "dogecoind" do
     deamonName "dogecoind"
     cryptoCode "doge"
     gitRepo "git@github.com:dogecoin/dogecoin.git"
-    gitRef "9bc0ea885ad40b23398a311c5aeae6e18e6bd005"
-    compileCommand "cd src && sudo make -f makefile.unix"
+    gitRef "20c2a7ecbb53d034a01305c8e63c0ee327bd9917"
+    compileCommand "./autogen.sh && ./configure --enable-tests=false && make"
 end

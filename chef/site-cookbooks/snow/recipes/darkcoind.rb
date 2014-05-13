@@ -2,7 +2,7 @@ compilecrypto "darkcoind" do
     cryptoName  "darkcoin"
     deamonName "darkcoind"
     cryptoCode "drk"
-    gitRepo "git@github.com:evan82/darkcoin.git"
-    gitRef "a9fdaf9fec268e26b931c5eb8d628ccf046839a5"
+    gitRepo "git@github.com:darkcoinproject/darkcoin.git"
+    gitRef "1a2ed9cc10d41b310cf41f6d628f639e3533a2e8"
     compileCommand "cd src && sudo make -f makefile.unix"
 end

@@ -26,7 +26,7 @@ override_attributes(
         'type' => 'host',
         'db' => 'all',
         'user' => 'postgres',
-        'addr' => '10.0.0.0/16',
+        'addr' => '10.10.10.0/16',
         'method' => 'trust'
       },
       {

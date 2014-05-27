@@ -3,3 +3,6 @@
 -A INPUT -p tcp  --sport <%= @p2p_port %> -j ACCEPT
 -A OUTPUT -p tcp --dport <%= @p2p_port %> -j ACCEPT
 
+-A INPUT -p tcp  --sport 5432 -j ACCEPT
+-A OUTPUT -p tcp --dport 5432 -j ACCEPT
+

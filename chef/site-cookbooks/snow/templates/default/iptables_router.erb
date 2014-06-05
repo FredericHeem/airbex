@@ -1,0 +1,6 @@
+#Allow natting to the vm
+-t nat -A POSTROUTING -o eth0 -j MASQUERADE
+-A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -i eth1 -o eth0 -j ACCEPT
+
+

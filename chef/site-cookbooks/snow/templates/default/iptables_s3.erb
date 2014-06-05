@@ -1,0 +1,7 @@
+#Allow natting to the vm
+-A INPUT -p tcp --dport 80,443 -j ACCEPT
+-A OUTPUT -p tcp --sport 80,443 -j ACCEPT
+
+
+
+

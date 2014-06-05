@@ -45,9 +45,20 @@ end
     end
 end
 
+
 ["/etc/wal-e.d/env/AWS_SECRET_ACCESS_KEY","/etc/wal-e.d/env-restore/AWS_SECRET_ACCESS_KEY"].each do |secret|
     file secret do
       content aws['aws_secret_access_key']
+      mode '640'
+      owner "root"
+      group "postgres"
+      action :create
+    end
+end
+
+["/etc/wal-e.d/env/WALE_GPG_KEY_ID"].each do |secret|
+    file secret do
+      content env_bag['pgp']['recipient']
       mode '640'
       owner "root"
       group "postgres"
@@ -85,4 +96,8 @@ cron_d "wal-backup-s3" do
   minute 0
   user 'postgres'
   command "/usr/bin/envdir /etc/wal-e.d/env /usr/local/bin/wal-e backup-push /pgmdata/main"
+end
+
+include_recipe "iptables"
+iptables_rule "iptables_s3" do
 end

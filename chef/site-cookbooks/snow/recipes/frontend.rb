@@ -17,11 +17,12 @@ template '/etc/nginx/sites-available/snow-frontend' do
   notifies :reload, "service[nginx]"
 end
 
-# include_recipe 'deploy_wrapper'
+include_recipe 'deploy_wrapper'
+
 bag = Chef::EncryptedDataBagItem.load("snow", 'main')
 env_bag = bag[node.chef_environment]
 
-ssh_known_hosts_entry 'github.com'
+ssh_known_hosts_entry 'gitlab.com'
 
 deploy_wrapper 'frontend' do
     ssh_wrapper_dir '/home/ubuntu/frontend-ssh-wrapper'

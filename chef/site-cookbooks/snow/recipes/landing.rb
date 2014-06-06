@@ -16,11 +16,12 @@ template '/etc/nginx/sites-available/snow-landing' do
   notifies :reload, "service[nginx]"
 end
 
-# include_recipe 'deploy_wrapper'
+include_recipe 'deploy_wrapper'
+
 bag = Chef::EncryptedDataBagItem.load("snow", 'main')
 env_bag = bag[node.chef_environment]
 
-ssh_known_hosts_entry 'github.com'
+ssh_known_hosts_entry 'gitlab.com'
 
 deploy_wrapper 'landing' do
     ssh_wrapper_dir '/home/ubuntu/landing-ssh-wrapper'

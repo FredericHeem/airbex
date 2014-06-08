@@ -1,0 +1,6 @@
+Please copy in this folder the following keys: 
+encrypted_data_bag_secret
+myuser.pem
+validator-demo.pem
+validator-dev.pem
+

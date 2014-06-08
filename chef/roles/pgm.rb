@@ -26,14 +26,14 @@ override_attributes(
         'type' => 'host',
         'db' => 'all',
         'user' => 'postgres',
-        'addr' => '10.10.10.0/16',
+        'addr' => '10.0.0.0/24',
         'method' => 'trust'
       },
       {
         'type' => 'host',
         'db' => 'replication',
         'user' => 'postgres',
-        'addr' => '10.0.1.0/24',
+        'addr' => '10.0.0.0/24',
         'method' => 'trust'
       }
     ],

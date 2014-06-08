@@ -14,7 +14,7 @@ override_attributes({
   "openssh" => {
      "server" => {
       "allow_agent_forwarding" => "no",
-      "allow_tcp_forwarding" =>  "no",
+      "allow_tcp_forwarding" =>  "yes",
       "client_alive_count_max" =>  "0",
       "client_alive_interval" =>  "1200",
       "ignore_user_known_hosts" =>  "yes",

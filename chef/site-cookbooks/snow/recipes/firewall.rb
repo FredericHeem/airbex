@@ -13,6 +13,13 @@ iptables_rule "iptables_router" do
  variables({:reverse_ip => reverse_ip})
 end
 
+template "/etc/sysctl.conf" do
+    source "router/sysctl.conf.erb"
+    owner "root"
+    group "root"
+    mode 0755
+end
+
 
 
 

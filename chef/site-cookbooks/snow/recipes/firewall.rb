@@ -13,6 +13,14 @@ iptables_rule "iptables_router" do
  variables({:reverse_ip => reverse_ip})
 end
 
+template "/etc/iptables.snat" do
+  source "router/nat.conf.erb"
+  owner  "root"
+  group  "root"
+  mode   "0644"
+  notifies :run, resources(:execute => "rebuild-iptables")
+end
+
 template "/etc/sysctl.conf" do
     source "router/sysctl.conf.erb"
     owner "root"

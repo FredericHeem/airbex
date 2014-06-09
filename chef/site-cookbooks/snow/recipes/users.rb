@@ -1,6 +1,9 @@
 include_recipe "sudo"
 
-user = Chef::EncryptedDataBagItem.load("users", 'ops')
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
+env_bag = bag[node.chef_environment]
+
+user = env_bag['users']['ops']
 user_name = user['id']
 password  = user['password']
 ssh_keys   = user['ssh_keys']

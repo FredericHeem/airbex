@@ -1,0 +1,4 @@
+# Snow api Locked Down
+# Allow connection from the workers
+-A INPUT -p tcp  --dport 5432 -j ACCEPT
+-A OUTPUT -p tcp --sport 5432 -j ACCEPT

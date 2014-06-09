@@ -60,6 +60,11 @@ if node[:cloud] && node[:cloud][:ec2]
     end
 end
 
+
+include_recipe "iptables"
+iptables_rule "iptables_pgm" do
+end
+
 diskmonit "pgmdata" do
     path "/pgmdata"
 end

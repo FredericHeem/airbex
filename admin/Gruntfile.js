@@ -29,47 +29,56 @@ module.exports = function(grunt) {
             install: {
                 options: {
                     layout: 'byComponent',
-                    cleanBowerDir: true
+                    cleanBowerDir: true,
+                    targetDir:'vendor'
                 }
             }
         },
 
         concat: {
-            development_js: {
-                options: {
-                    separator: ';'
-                },
+        	development_js: {
+        		options: {
+        			separator: ';'
+        		},
 
-                files: {
-                    'public/head.js': [
-                        'lib/modernizr/modernizr.js'
-                    ],
-                    'public/vendor.js': [
-                        'lib/jquery/jquery.js',
-                        'lib/jquery.cookie/jquery.cookie.js',
-                        'lib/sjcl/sjcl.js',
-                        'node_modules/alertify/lib/alertify.js',
-                        'lib/bootstrap/js/bootstrap.js',
-                        'lib/bootstrap-notify/js/bootstrap-notify.js'
-                    ]
-                }
-            },
+        		files: {
+        			'public/head.js': [
+        			                   'lib/modernizr/modernizr.js'
+        			                   ],
+        			                   'public/vendor.js':
+        			                	   [
+        			                	    'vendor/jquery/jquery.js',
+        			                	    'vendor/jquery.cookie/jquery.cookie.js',
+        			                	    'vendor/sjcl/sjcl.js',
+        			                	    'vendor/blueimp-file-upload/jquery.ui.widget.js',
+        			                	    'vendor/blueimp-file-upload/jquery.iframe-transport.js',
+        			                	    'vendor/blueimp-file-upload/jquery.fileupload.js',
+        			                	    'vendor/blueimp-file-upload/jquery.fileupload-process.js',
+        			                	    'vendor/blueimp-file-upload/jquery.fileupload-validate.js',
+        			                	    'vendor/alertify/js/alertify.js',
+        			                	    'vendor/bootstrap/js/bootstrap.js',
+        			                	    'vendor/bootstrap-notify/js/bootstrap-notify.js'
+        			                	    ]
+        		}
+        	},
 
-            development_css: {
-                options: {
-                    separator: ';'
-                },
+        	development_css: {
+        		options: {
+        			separator: ';'
+        		},
 
-                files: {
-                    'public/vendor.css': [
-                        'lib/bootstrap/css/bootstrap.min.css',
-                        'lib/bootstrap/css/bootstrap-responsive.min.css',
-                        'lib/bootstrap-notify/css/bootstrap-notify.css',
-                        'node_modules/alertify/themes/alertify.core.css',
-                        'node_modules/alertify/themes/alertify.bootstrap.css'
-                    ]
-                }
-            }
+        		files: {
+        			'public/vendor.css': [
+        			                      'vendor/blueimp-file-upload/jquery.fileupload.css',
+        			                      'lib/bootstrap/css/bootstrap.min.css',
+        			                      'lib/bootstrap/css/bootstrap-responsive.min.css',
+        			                      'lib/bootstrap-notify/css/bootstrap-notify.css',
+        			                      'node_modules/alertify/themes/alertify.core.css',
+        			                      'node_modules/alertify/themes/alertify.bootstrap.css'
+
+        			                      ]
+        		}
+        	}
         },
 
         browserify: {

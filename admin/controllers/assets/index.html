@@ -1,0 +1,35 @@
+<div class="container">
+	<div class="row">
+		<div class="span12">
+			<div class="nav-container"></div>
+
+			<h3>Asset</h3>
+			<form>
+				<span class="btn btn-success fileinput-button"> <i
+					class="fa fa-plus"></i> <span>Add asset file</span> <!-- The file input field used as target for the file upload widget -->
+					<input name="asset" id="fileupload" type="file" name="files[]"
+					multiple>
+				</span> <br> <br>
+				<!-- The global progress bar -->
+				<div id="progress" class="progress">
+					<div class="progress-bar progress-bar-success"></div>
+				</div>
+				<!-- The container for the uploaded files -->
+				<div id="files" class="files"></div>
+				
+				<br>
+			</form>
+			<table class="asset-table table table-bordered table-striped">
+				<thead>
+					<tr class="header">
+						<th>Currency</th>
+						<th>Date</th>
+						<th>Asset</th>
+					</tr>
+				</thead>
+
+				<tbody></tbody>
+			</table>
+		</div>
+	</div>
+</div>

@@ -18,9 +18,11 @@
     "bootstrap-notify": "0.1.0",
     "jquery": "2.0.3",
     "jquery.cookie": "1.3.1",
-    "bootstrap": "https://github.com/bowerjs/bootstrap.git#a5b6d14ca2e104d9db9d536a2196c03be2b0a313",
+    "bootstrap": "3.0.x",
     "modernizr": "2.6.2",
+    "alertify":"0.3.10",
     "raven-js": "1.0.8",
+    "blueimp-file-upload" : "9.5.7",
     "sjcl": "https://github.com/bitwiseshiftleft/sjcl.git#c5c2c8b0c8e9451afe724fac718287c133d107d1"
   },
   "exportsOverride": {

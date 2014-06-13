@@ -8,7 +8,7 @@ module.exports = exports = function(app) {
 }
 
 function getId(config, currency){
-    var name = config.company | "Justcoin";
+    var name = config.company | "Airbex";
     return name + " " + currency + " liabilities";
 }
 
@@ -44,17 +44,16 @@ function getCompleteTreeFromDb(currency, app, next, cb){
 }
 
 exports.root = function(req, res, next) {
-    var currency = req.params.currency;
-    debug("root: ", currency);
-    getCompleteTreeFromDb(currency, req.app, next, function(err, completeTree){
-        if(err){
-            res.send(400, {error:err})
-        } else {
-            var root = completeTree.root();
-            debug("root ", root);
-            res.send({ root: root.data });
-        }
-    })
+	var currency = req.params.currency;
+	debug("root: ", currency);
+	getCompleteTreeFromDb(currency, req.app, next, function(err, completeTree){
+		if(err){
+			res.send(400, {error:err})
+		} else {
+			var root = lproof.serializeRoot(completeTree, currency);
+			res.send(root);
+		}
+	})
 }
 
 exports.liability = function(req, res, next) {

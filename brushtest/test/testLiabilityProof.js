@@ -109,9 +109,29 @@ describe('LiabilityProof', function () {
         it('LiabilityGetAllLTC', function (done) {
             snowBot.liabilityGetAll(client, currency, function(err, root, partialTree){
                 assert(!err);
-                //console.log("root: ", JSON.stringify(root));
-                //console.log("partialTree: ", JSON.stringify(partialTree));
                 verify_liability(root, partialTree)
+                done();
+            })
+        });
+    });
+    
+    describe('AssetProofAll', function () {
+        this.timeout(timeout);
+        it('AssetProofAllOK', function (done) {
+            snowBot.getAssetsAll(client, function(err, assetsAll){
+                assert(!err);
+                assert(assetsAll)
+                done();
+            })
+        });
+    });
+    describe('AssetProofBTC', function () {
+        this.timeout(timeout);
+        var currency = "btc";
+        it('AssetProofBTCOK', function (done) {
+            snowBot.getAssets(client, function(err, assets){
+                assert(!err);
+                assert(assets)
                 done();
             })
         });

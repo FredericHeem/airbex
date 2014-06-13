@@ -1,10 +1,14 @@
-var debug = require('debug')('snow:liabilityproof')
-, async = require('async')
-, lproof = require('lproof')
-
+var debug = require('debug')('snow:liabilityproof');
+var async = require('async');
+var lproof = require('lproof');
+var fs = require('fs');
+var format = require('util').format;
 module.exports = exports = function(app) {
     app.get('/v1/proof/root/:currency', exports.root)
     app.get('/v1/proof/liability/:currency', app.security.demand.any, exports.liability)
+    app.get('/v1/proof/asset/:currency', exports.assetGet)
+    app.post('/v1/proof/asset/', app.security.demand.admin, exports.assetPost)
+    app.get('/v1/proof/asset/', exports.assetGetAll)
 }
 
 function getId(config, currency){
@@ -80,4 +84,97 @@ exports.liability = function(req, res, next) {
             }
         }
     })
+}
+
+exports.assetGet = function(req, res, next) {
+	var currency = req.params.currency;
+	debug("asset: ", currency);
+    var query = {
+            text: [
+                   'SELECT asset',
+                   'FROM "asset"',
+                   'WHERE currency=$1',
+                   'ORDER BY created_at desc limit 1'
+                   ].join('\n'),
+                   values: [currency.toUpperCase()]
+    }
+    
+    req.app.conn.read.query(query, function(err, dr) {
+        if (err) {
+            debug("asset db error ", err);
+            next(err)
+        } else if(dr.rowCount > 0){
+            var asset = dr.rows[0].asset;
+            debug("asset: ", JSON.stringify(asset));
+            res.send(asset)
+        } else {
+            debug("asset: no asset found")
+            res.send(400, {error:"NoAssetFound"})
+        }
+    })    	
+}
+
+exports.assetGetAll = function(req, res, next) {
+	debug("assetAll: ");
+    var query = {
+            text: [
+                   'SELECT currency, asset, created_at',
+                   'FROM "asset"'
+                   ].join('\n')
+    }
+    
+    req.app.conn.read.query(query, function(err, dr) {
+        if (err) {
+            debug("asset db error ", err);
+            next(err)
+        } else if(dr.rowCount > 0){
+            res.send(dr.rows)
+        } else {
+            debug("assetAll: no asset found")
+            res.send(400, {error:"NoAssetFound"})
+        }
+    })    	
+}
+
+exports.assetPost = function(req, res, next) {
+    
+    var now = new Date();
+    if(!req.files || !req.files.asset){
+        debug("assetPost no doc");
+        return res.send(400, {
+            name: 'BadRequest',
+            message: 'Request is invalid'
+        })
+    }
+    var assetFile = req.files.asset;
+    
+    var sizeKb = assetFile.size / 1024 | 0
+    
+    if(sizeKb > 5* 1014){
+        debug('assetPost , %s, size %s kB TOO BIG', assetFile.name, sizeKb);
+        return res.send(400, {
+            name: 'BadRequest',
+            message: 'file is too big'
+        })
+    }
+    
+    debug('assetPost  %s, size %s kB',  assetFile.name, sizeKb);
+    
+    fs.readFile(assetFile.path, "utf8", function (err, data) {
+        if (err) throw err;
+        debug('assetPost length %s',data.length)
+        var assetJson = JSON.parse(data)
+        req.app.conn.write.query({
+            text: [
+                'UPDATE asset',
+                'set currency=$1, asset=$2'
+            ].join('\n'),
+            values: [assetJson.currency, assetJson]
+        }, function(err) {
+            if (err) return next(err)
+            res.send({result : format('\nuploaded %s (%d Kb) '
+                    , assetFile.name
+                    , sizeKb )});
+        })
+      });
 }

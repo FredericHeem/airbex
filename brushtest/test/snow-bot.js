@@ -242,5 +242,37 @@ module.exports = function (config) {
                 }
         );         
     } 
+    
+    snowBot.getAssets = function(client, currency, done){
+        debug("getAssets ", currency);
+        var response = {};
+        request(client.config.url).get('v1/proof/asset/' + currency)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+              console.log("error ", err)
+              done(err);
+          } else {
+              console.log("getAsset: ", JSON.stringify(res.body));
+              done(null, res.body);
+          }
+      });  
+    } 
+    
+    snowBot.getAssetsAll = function(client, done){
+        debug("getAssetsAll ");
+        var response = {};
+        request(client.config.url).get('v1/proof/asset/')
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+              console.log("error ", err)
+              done(err);
+          } else {
+              console.log("getAssetsAll: ", JSON.stringify(res.body));
+              done(null, res.body);
+          }
+      });  
+    } 
     return snowBot;
 };

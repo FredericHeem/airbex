@@ -88,10 +88,10 @@ exports.liability = function(req, res, next) {
 
 exports.assetGet = function(req, res, next) {
 	var currency = req.params.currency;
-	debug("asset: ", currency);
+	debug("assetGet: ", currency);
     var query = {
             text: [
-                   'SELECT asset',
+                   'SELECT asset_json',
                    'FROM "asset"',
                    'WHERE currency=$1',
                    'ORDER BY created_at desc limit 1'
@@ -104,9 +104,9 @@ exports.assetGet = function(req, res, next) {
             debug("asset db error ", err);
             next(err)
         } else if(dr.rowCount > 0){
-            var asset = dr.rows[0].asset;
-            debug("asset: ", JSON.stringify(asset));
-            res.send(asset)
+            var asset_json = dr.rows[0].asset_json;
+            debug("asset: ", JSON.stringify(asset_json));
+            res.send(asset_json)
         } else {
             debug("asset: no asset found")
             res.send(400, {error:"NoAssetFound"})
@@ -118,7 +118,7 @@ exports.assetGetAll = function(req, res, next) {
 	debug("assetAll: ");
     var query = {
             text: [
-                   'SELECT currency, asset, created_at',
+                   'SELECT asset_id, currency, block, asset_json, created_at',
                    'FROM "asset"'
                    ].join('\n')
     }
@@ -137,44 +137,49 @@ exports.assetGetAll = function(req, res, next) {
 }
 
 exports.assetPost = function(req, res, next) {
-    
-    var now = new Date();
-    if(!req.files || !req.files.asset){
-        debug("assetPost no doc");
-        return res.send(400, {
-            name: 'BadRequest',
-            message: 'Request is invalid'
-        })
-    }
-    var assetFile = req.files.asset;
-    
-    var sizeKb = assetFile.size / 1024 | 0
-    
-    if(sizeKb > 5* 1014){
-        debug('assetPost , %s, size %s kB TOO BIG', assetFile.name, sizeKb);
-        return res.send(400, {
-            name: 'BadRequest',
-            message: 'file is too big'
-        })
-    }
-    
-    debug('assetPost  %s, size %s kB',  assetFile.name, sizeKb);
-    
-    fs.readFile(assetFile.path, "utf8", function (err, data) {
-        if (err) throw err;
-        debug('assetPost length %s',data.length)
-        var assetJson = JSON.parse(data)
-        req.app.conn.write.query({
-            text: [
-                'UPDATE asset',
-                'set currency=$1, asset=$2'
-            ].join('\n'),
-            values: [assetJson.currency, assetJson]
-        }, function(err) {
-            if (err) return next(err)
-            res.send({result : format('\nuploaded %s (%d Kb) '
-                    , assetFile.name
-                    , sizeKb )});
-        })
-      });
+
+	if(!req.files || !req.files.asset){
+		debug("assetPost no doc");
+		return res.send(400, {
+			name: 'BadRequest',
+			message: 'Request is invalid'
+		})
+	}
+
+	var assetFile = req.files.asset;
+
+	var sizeKb = assetFile.size / 1024 | 0
+
+	if(sizeKb > 5* 1014){
+		debug('assetPost , %s, size %s kB TOO BIG', assetFile.name, sizeKb);
+		return res.send(400, {
+			name: 'FileToBig',
+			message: 'file is too big'
+		})
+	}
+	debug('assetPost  %s, size %s kB',  assetFile.name, sizeKb);
+	if(assetFile.size === 0){
+		return res.send(400, {
+			name: 'FileEmpty',
+			message: 'Empty file'
+		})		
+	}
+	
+	fs.readFile(assetFile.path, "utf8", function (err, data) {
+		if (err) throw err;
+		debug('assetPost length %s',data.length)
+		var assetJson = JSON.parse(data)
+		req.app.conn.write.query({
+			text: [
+			       'INSERT INTO asset(currency, block, asset_json)',
+			       'VALUES($1, $2, $3)'
+			       ].join('\n'),
+			       values: [assetJson.currency, assetJson.blockhash, assetJson]
+		}, function(err) {
+			if (err) return next(err)
+			res.send({result : format('\nuploaded %s (%d Kb) '
+					, assetFile.name
+					, sizeKb )});
+		})
+	});
 }

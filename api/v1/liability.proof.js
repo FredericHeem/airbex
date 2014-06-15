@@ -127,11 +127,8 @@ exports.assetGetAll = function(req, res, next) {
         if (err) {
             debug("asset db error ", err);
             next(err)
-        } else if(dr.rowCount > 0){
-            res.send(dr.rows)
         } else {
-            debug("assetAll: no asset found")
-            res.send(400, {error:"NoAssetFound"})
+        	res.send(dr.rows)
         }
     })    	
 }

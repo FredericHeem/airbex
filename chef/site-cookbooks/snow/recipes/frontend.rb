@@ -51,7 +51,7 @@ deploy_revision node[:snow][:frontend][:app_directory] do
         code %{
           npm install
           PATH=$PATH:./node_modules/.bin
-          SNOW_OPERATOR=#{operator} grunt production
+          SNOW_OPERATOR=#{operator} NODE_ENV=prod grunt production
         }
       end
     end    

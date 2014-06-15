@@ -118,7 +118,7 @@ exports.assetGetAll = function(req, res, next) {
 	debug("assetAll: ");
     var query = {
             text: [
-                   'SELECT asset_id, currency, block, asset_json, created_at',
+                   'SELECT asset_id, currency, blockhash, asset_json, created_at',
                    'FROM "asset"'
                    ].join('\n')
     }
@@ -168,7 +168,7 @@ exports.assetPost = function(req, res, next) {
 		var assetJson = JSON.parse(data)
 		req.app.conn.write.query({
 			text: [
-			       'INSERT INTO asset(currency, block, asset_json)',
+			       'INSERT INTO asset(currency, blockhash, asset_json)',
 			       'VALUES($1, $2, $3)'
 			       ].join('\n'),
 			       values: [assetJson.currency, assetJson.blockhash, assetJson]

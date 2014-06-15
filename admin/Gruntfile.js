@@ -70,11 +70,11 @@ module.exports = function(grunt) {
         		files: {
         			'public/vendor.css': [
         			                      'vendor/blueimp-file-upload/jquery.fileupload.css',
-        			                      'lib/bootstrap/css/bootstrap.min.css',
-        			                      'lib/bootstrap/css/bootstrap-responsive.min.css',
-        			                      'lib/bootstrap-notify/css/bootstrap-notify.css',
-        			                      'node_modules/alertify/themes/alertify.core.css',
-        			                      'node_modules/alertify/themes/alertify.bootstrap.css'
+        			                      'vendor/bootstrap/css/bootstrap.min.css',
+        			                      'vendor/bootstrap/css/bootstrap-responsive.min.css',
+        			                      'vendor/bootstrap-notify/css/bootstrap-notify.css',
+        			                      'vendor/alertify/themes/alertify.core.css',
+        			                      'vendor/alertify/themes/alertify.bootstrap.css'
 
         			                      ]
         		}

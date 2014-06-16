@@ -25,7 +25,7 @@ var CryptoAsset = module.exports = function(ep, db) {
                 console.error(err)
                 that.emit(err)
             }
-            setTimeout(cb, 5e3)
+            setTimeout(cb, 30e3)
         })
     })
 }
@@ -33,7 +33,7 @@ var CryptoAsset = module.exports = function(ep, db) {
 util.inherits(CryptoAsset, EventEmitter)
 
 CryptoAsset.prototype.getListReceivedByAddress = function(cb) {
-	this.bitcoin.cmd('listreceivedbyaddress', 0, false, function (err, res){
+	this.bitcoin.cmd('listunspent', 1, function (err, res){
 		var addresses = [];
         if (err) return cb(err);
 

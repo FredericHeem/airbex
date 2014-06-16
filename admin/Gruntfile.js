@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 
         		files: {
         			'public/head.js': [
-        			                   'lib/modernizr/modernizr.js'
+        			                   'vendor/modernizr/modernizr.js'
         			                   ],
         			                   'public/vendor.js':
         			                	   [
@@ -73,8 +73,8 @@ module.exports = function(grunt) {
         			                      'vendor/bootstrap/css/bootstrap.min.css',
         			                      'vendor/bootstrap/css/bootstrap-responsive.min.css',
         			                      'vendor/bootstrap-notify/css/bootstrap-notify.css',
-        			                      'vendor/alertify/themes/alertify.core.css',
-        			                      'vendor/alertify/themes/alertify.bootstrap.css'
+        			                      'vendor/alertify/css/alertify.core.css',
+        			                      'vendor/alertify/css/alertify.bootstrap.css'
 
         			                      ]
         		}

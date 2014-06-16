@@ -1,4 +1,5 @@
+    <td><%= asset_id %></td>
     <td><%= currency %></td>
     <td><%= blockhash %></td>
     <td><%= created_at %></td>
-    <td><%= JSON.stringify(asset_json.signatures, null, 2) %></td>
+    <td> <a href="v1/proof/asset/<%= asset_id %>/signatures/">Signatures</a></td>

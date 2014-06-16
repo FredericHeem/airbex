@@ -114,26 +114,4 @@ describe('LiabilityProof', function () {
             })
         });
     });
-    
-    describe('AssetProofAll', function () {
-        this.timeout(timeout);
-        it('AssetProofAllOK', function (done) {
-            snowBot.getAssetsAll(client, function(err, assetsAll){
-                assert(!err);
-                assert(assetsAll)
-                done();
-            })
-        });
-    });
-    describe('AssetProofBTC', function () {
-        this.timeout(timeout);
-        var currency = "btc";
-        it('AssetProofBTCOK', function (done) {
-            snowBot.getAssets(client, function(err, assets){
-                assert(!err);
-                assert(assets)
-                done();
-            })
-        });
-    });
 });

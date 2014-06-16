@@ -86,12 +86,65 @@ exports.liability = function(req, res, next) {
     })
 }
 
+function insertSignature(app, asset_id, address, signature, cb){
+	debug("%s => %s", address, signature)
+	app.conn.write.query({
+		text: [
+		       'INSERT INTO signatures(asset_id, address, signature)',
+		       "SELECT $1, $2, $3",
+		       'WHERE',
+		       '    NOT EXISTS (',
+		       '        SELECT address FROM signatures WHERE address = $2 AND asset_id = $1',
+		       '    );'
+		       ].join('\n'),
+		       values: [asset_id, address, signature]
+	}, function(err, dr) {
+		if (err) return cb(err)
+		cb()
+	})
+}
+
+function insertSignatures(app, asset_id, signatures, cb){
+	debug("insertSignatures id %s, signature:", asset_id, JSON.stringify(signatures))
+	async.each(signatures, function (addressSignature, done) {
+    	debug("insertSignatures  ", JSON.stringify(addressSignature))
+    	insertSignature(app, asset_id, addressSignature.address, addressSignature.signature, done)
+    }, cb);
+}
+
+function getSignatures(app, asset_id, cb){
+	debug("getSignatures id: %s", asset_id);
+	var query = {
+			text: [
+			       'SELECT address, signature, wallet',
+			       'FROM "signatures"',
+			       'WHERE asset_id=$1'
+			       ].join('\n'),
+			       values: [asset_id]
+
+	}
+	
+	app.conn.read.query(query, function(err, dr) {
+		if(err) cb(err);
+		var signatures = [];
+        dr.rows.map(function(row) {
+        	debug("getSignatures: %s => %s", row.address, row.signature)
+        	signatures.push({
+        		address: row.address,
+        		signature: row.signature,
+        		wallet: row.wallet || undefined
+        	})
+        })
+		cb(null, signatures);
+	})
+}
+
 exports.assetGet = function(req, res, next) {
 	var currency = req.params.currency;
 	debug("assetGet: ", currency);
     var query = {
             text: [
-                   'SELECT asset_json',
+                   'SELECT asset_id, blockhash, message',
                    'FROM "asset"',
                    'WHERE currency=$1',
                    'ORDER BY created_at desc limit 1'
@@ -100,17 +153,27 @@ exports.assetGet = function(req, res, next) {
     }
     
     req.app.conn.read.query(query, function(err, dr) {
+    	var asset_json = {}
         if (err) {
             debug("asset db error ", err);
             next(err)
         } else if(dr.rowCount > 0){
-            var asset_json = dr.rows[0].asset_json;
-            debug("asset: ", JSON.stringify(asset_json));
-            res.send(asset_json)
+        	var row = dr.rows[0];
+        	
+        	getSignatures(req.app, row.asset_id, function(err, signatures){
+        		if(err) next(err);
+                asset_json = {
+                		currency: currency,
+                		message: row.message,
+                		blockhash: row.blockhash, 
+                		signatures: signatures}
+                debug("asset: ", JSON.stringify(asset_json));
+            	res.send(asset_json)
+        	})
         } else {
-            debug("asset: no asset found")
-            res.send(400, {error:"NoAssetFound"})
-        }
+        	res.send({})
+        } 
+    	
     })    	
 }
 
@@ -118,7 +181,7 @@ exports.assetGetAll = function(req, res, next) {
 	debug("assetAll: ");
     var query = {
             text: [
-                   'SELECT asset_id, currency, blockhash, asset_json, created_at',
+                   'SELECT asset_id, currency, blockhash, message, created_at',
                    'FROM "asset"'
                    ].join('\n')
     }
@@ -132,6 +195,8 @@ exports.assetGetAll = function(req, res, next) {
         }
     })    	
 }
+
+
 
 exports.assetPost = function(req, res, next) {
 
@@ -168,15 +233,23 @@ exports.assetPost = function(req, res, next) {
 		var assetJson = JSON.parse(data)
 		req.app.conn.write.query({
 			text: [
-			       'INSERT INTO asset(currency, blockhash, asset_json)',
-			       'VALUES($1, $2, $3)'
+			       'INSERT INTO asset(currency, blockhash, message)',
+			       'VALUES($1, $2, $3) RETURNING asset_id;'
 			       ].join('\n'),
-			       values: [assetJson.currency, assetJson.blockhash, assetJson]
-		}, function(err) {
+			       values: [assetJson.currency, assetJson.blockhash, assetJson.message]
+		}, function(err, dr) {
 			if (err) return next(err)
-			res.send({result : format('\nuploaded %s (%d Kb) '
-					, assetFile.name
-					, sizeKb )});
+			var asset_id = dr.rows[0].asset_id;
+			console.log(JSON.stringify(dr))
+			
+			insertSignatures(req.app,asset_id, assetJson.signatures, function(err){
+				if (err) return next(err)
+				res.send({result : format('\nuploaded %s (%d Kb) '
+						, assetFile.name
+						, sizeKb )});	
+			})
+			
+			
 		})
 	});
 }

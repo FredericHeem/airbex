@@ -274,5 +274,29 @@ module.exports = function (config) {
           }
       });  
     } 
+    
+    snowBot.uploadAsset = function(client, file_path, done) {
+        var config = client.config
+        debug("uploadAsset email:%s, url: %s", config.email, config.url);
+        var postData = {
+            
+        };
+        var cookie = "session=" + client.sessionKey;
+        
+        request(config.url).post('v1/proof/asset/')
+        .attach('asset', file_path)
+        .set('cookie', cookie)
+        .end(function (err, res) {
+            if(err){
+               done(err, res)  
+            } else if(res && res.statusCode != 200){
+                done("bad error code", res);
+            } else {
+                done(null, res)
+            }
+        });
+        
+    };
+    
     return snowBot;
 };

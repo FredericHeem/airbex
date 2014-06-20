@@ -33,20 +33,26 @@ var CryptoAsset = module.exports = function(ep, db) {
 util.inherits(CryptoAsset, EventEmitter)
 
 CryptoAsset.prototype.getListReceivedByAddress = function(cb) {
-	this.bitcoin.cmd('listunspent', 1, function (err, res){
-		var addresses = [];
+    this.bitcoin.cmd('listunspent', 1, function (err, res){
+        var addressesDup = {}
+        var addresses = [];
         if (err) return cb(err);
 
         if (!res.length) {
           return cb('No address found in bitcoin wallet!');
         }
         res.forEach(function (hash) {
-          addresses.push(hash.address);
+          debug("listunspent: ", hash.address)
+          if(!addressesDup[hash.address]){
+            addressesDup[hash.address] = hash.address;
+            addresses.push(hash.address);
+          }
         });
-        
+        debug("listunspent: #addr %s", addresses.length)
         cb(null, addresses);
       });
 }
+
 
 CryptoAsset.prototype.getAssetsFromDb = function(cb) {
     var query = {
@@ -79,6 +85,7 @@ CryptoAsset.prototype.getSignaturesFromDb = function(asset_id, cb) {
             values:[asset_id]
     }
     var me = this;
+	me.signaturesOriginal = {}
     this.db.query(query, function(err, dr) {
         if (err) return cb(err)
         
@@ -109,6 +116,7 @@ CryptoAsset.prototype.updateSignaturesToDb = function(address, signature, cb) {
 CryptoAsset.prototype.signAddresses = function(addresses, cb) {
 	console.log(JSON.stringify(addresses))
     var me = this;
+	me.signaturesToAdd = [];
     async.each(addresses, function (addr, done) {
     	debug("processing addr: %s, msg: %s", addr, me.messageToSign)
     	if(!me.signaturesOriginal[addr]){

@@ -21,7 +21,7 @@ function getCompleteTreeFromDb(currency, app, next, cb){
     
     var query = {
             text: [
-                   'SELECT tree',
+                   'SELECT tree, created_at',
                    'FROM "liability"',
                    'WHERE currency=$1',
                    'ORDER BY created_at desc limit 1'
@@ -35,10 +35,11 @@ function getCompleteTreeFromDb(currency, app, next, cb){
             next(err)
         } else if(dr.rowCount > 0){
             var completeTreeJson = dr.rows[0].tree;
+            var create_at = dr.rows[0].created_at
             debug("tree ", completeTreeJson);
             var Tree = lproof.Tree;
             var completeTree = Tree.deserializeFromArray(JSON.stringify(completeTreeJson))
-            cb(null, completeTree);
+            cb(null, completeTree, create_at);
         } else {
             debug("root: no tree found")
             cb({error:"NoCompleteTreeFound"})
@@ -50,11 +51,18 @@ function getCompleteTreeFromDb(currency, app, next, cb){
 exports.root = function(req, res, next) {
 	var currency = req.params.currency;
 	debug("root: ", currency);
-	getCompleteTreeFromDb(currency, req.app, next, function(err, completeTree){
+	getCompleteTreeFromDb(currency, req.app, next, function(err, completeTree, create_at){
 		if(err){
 			res.send(400, {error:err})
 		} else {
-			var root = lproof.serializeRoot(completeTree, currency);
+			var date = new Date(create_at);
+			
+			var root = {
+				root: completeTree.root().data,
+				currency: currency,
+				timestamp: date.getTime()
+			};
+
 			res.send(root);
 		}
 	})

@@ -13,6 +13,11 @@ function stripZeroes(x) {
     return ~x.indexOf('.') ? x.replace(/\.?0+$/, '') : x
 }
 
+function getAmountWithFee(amount, scale, fee_ratio){
+    var amountWithFee = num(amount).set_precision(scale);
+    return amountWithFee.mul(num("1").add(fee_ratio)).round(scale - 1).set_precision(scale);
+}
+
 exports.process = function(row, cb) {
     var template
     , locals = {
@@ -36,15 +41,13 @@ exports.process = function(row, cb) {
         locals.price = details.price ? stripZeroes(details.price) : null
         var fee_ratio = details.fee_ratio ? details.fee_ratio : 0;
         if(details.type == 'bid'){
-            var total = num(details.total).mul(num("1").add(fee_ratio))
-            total.set_precision(quoteScale)
-            locals.total = total.toString()
+        	var total = getAmountWithFee(details.total, quoteScale, fee_ratio);
+            locals.total = stripZeroes(total.toString())
             locals.original = stripZeroes(details.original)
         } else {
-            locals.total = stripZeroes(details.total)
-            var original = num(details.original).mul(num("1").add(fee_ratio))
-            original.set_precision(baseScale)
-            locals.original = original.toString()
+            locals.total = stripZeroes(num(details.total).set_precision(quoteScale).toString())
+            var original = getAmountWithFee(details.original, baseScale, fee_ratio);
+            locals.original = stripZeroes(original.toString())
         }
         
     } else if (row.type == 'WithdrawComplete') {

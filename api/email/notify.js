@@ -14,8 +14,8 @@ function stripZeroes(x) {
 }
 
 function getAmountWithFee(amount, scale, fee_ratio){
-    var amountWithFee = num(amount).set_precision(scale);
-    return amountWithFee.mul(num("1").add(fee_ratio)).round(scale - 1).set_precision(scale);
+    var amountWithFee = num(amount).set_precision(scale + 4);
+    return amountWithFee.mul(num("1").add(fee_ratio)).round(scale);
 }
 
 exports.process = function(row, cb) {
@@ -35,9 +35,9 @@ exports.process = function(row, cb) {
         locals.market = details.market
         locals.type = details.type
         locals.base = exports.app.cache.getBaseCurrency(details.market)
-        var baseScale = exports.app.cache.getCurrencyScale(locals.base)
+        var baseScale = exports.app.cache.getCurrencyScaleDisplay(locals.base)
         locals.quote = exports.app.cache.getQuoteCurrency(details.market)
-        var quoteScale = exports.app.cache.getCurrencyScale(locals.quote)
+        var quoteScale = exports.app.cache.getCurrencyScaleDisplay(locals.quote)
         locals.price = details.price ? stripZeroes(details.price) : null
         var fee_ratio = details.fee_ratio ? details.fee_ratio : 0;
         if(details.type == 'bid'){

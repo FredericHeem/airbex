@@ -138,7 +138,7 @@ exports.formatOrderVolume = function(value, marketId) {
 }
 
 exports.getMarket = function (market_id){
-	debug("market %s, %s", market_id, JSON.stringify(exports.markets[market_id]));
+	//debug("market %s, %s", market_id, JSON.stringify(exports.markets[market_id]));
 	return exports.markets[market_id];
 }
 
@@ -154,6 +154,10 @@ exports.getQuoteCurrency = function (market){
 
 exports.getCurrencyScale = function(currency) {
     return exports.currencies[currency].scale
+}
+
+exports.getCurrencyScaleDisplay = function(currency) {
+    return exports.currencies[currency].scale_display
 }
 
 exports.getCurrencyOption = function(currency) {

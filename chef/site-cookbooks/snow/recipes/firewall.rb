@@ -28,6 +28,20 @@ template "/etc/sysctl.conf" do
     mode 0755
 end
 
+template "/usr/bin/iptables_tor.sh" do
+    source "iptables_tor.sh.erb"
+    owner "root"
+    group "root"
+    mode 0755
+end
+
+cron_d "iptables-tor" do
+  minute  0
+  command '/usr/bin/iptables_tor.sh'
+  user "root"
+end
+
+
 
 
 

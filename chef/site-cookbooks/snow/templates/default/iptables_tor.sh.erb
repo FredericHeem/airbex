@@ -1,0 +1,26 @@
+#!/bin/sh
+
+URL="https://check.torproject.org/cgi-bin/TorBulkExitList.py?ip=92.155.43.230"
+TORIPLIST=/tmp/toriplist
+GETTORLIST()
+{
+/usr/bin/wget  --no-check-certificate -O ${TORIPLIST} ${URL}
+} # End of GETTORLIST
+BLOCKADDRESSES()
+{
+/sbin/ipset flush tor
+/sbin/ipset -N tor iphash
+
+for node in `/bin/grep -v -e ^# ${TORIPLIST}`
+do
+  /sbin/ipset -q -A tor $node
+done
+/sbin/iptables -D INPUT -m set --match-set tor src -j DROP
+/sbin/iptables -I INPUT 1 -m set --match-set tor src -j DROP
+
+} # End of BLOCKADDRESSES
+
+GETTORLIST
+BLOCKADDRESSES
+
+rm -f ${TORIPLIST}

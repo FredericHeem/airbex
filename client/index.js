@@ -10,8 +10,8 @@ var debug = require('debug')('snow')
 , Snow = module.exports = function(config) {
     this.url = config.url;
     this.config = config;
-    this.apikey = config.apikey;
-    debug('endpoint %s, url: %s, user key: ', config.email, this.url, this.user_key)
+    this.apikey = config.key;
+    debug('endpoint %s, url: %s, user key: %s, api key: %s', config.email, this.url, this.user_key, this.apikey)
 }
 
 function sha256(s) {
@@ -29,6 +29,7 @@ function bodyToError(body) {
 
 function updateRequestWithKey(client, data){
     data.json = true;
+    debug("updateRequestWithKey %s", client.apikey)
     if(client.sessionKey){
         debug("using session key %s", client.sessionKey)
         var jar = request.jar()
@@ -36,7 +37,7 @@ function updateRequestWithKey(client, data){
         jar.add(cookie, client.url);
         data.jar = jar;
     } else if(client.apikey){
-        //debug("using api key")
+        debug("using api key %s", client.apikey)
         data.qs = {"key": client.apikey};
     } else {
         debug("using no session key or api key found")
@@ -68,9 +69,8 @@ Snow.prototype.orders = function(cb) {
 }
 
 Snow.prototype.markets = function(cb) {
-    request(this.url + 'v1/markets', {
-        json: true
-    }, function(err, res, body) {
+	var data = updateRequestWithKey(this, {});
+    request(this.url + 'v1/markets', data, function(err, res, body) {
         if (err) return cb(err)
         if (res.statusCode !== 200) return cb(bodyToError(body))
         cb(err, body)
@@ -128,9 +128,10 @@ Snow.prototype.order = function(order, cb) {
 }
 
 Snow.prototype.whoami = function(cb) {
+	console.log("whoami");
     var data = { };
     data = updateRequestWithKey(this, data);
-    console.log(JSON.stringify(data));
+    console.log("whoami %s", JSON.stringify(data));
     request(this.url + 'v1/whoami', data, function(err, res, body) {
         if (err) return cb(err)
         if (res.statusCode != 200) return cb(new Error('Status: ' + res.statusCode))
@@ -346,11 +347,12 @@ Snow.prototype.getBalanceForCurrency = function(balances, currency){
 
 Snow.prototype.createTableMarkets = function(markets){
 	var table = new Table({
-        head: ['Market', 'Bid', 'Ask', 'Last', 'High', 'Low', 'Volume'],
-        colWidths: [8, 12, 12, 12, 12, 12, 12]
+        head: ['Market', 'Bid', 'Ask', 'Last', 'High', 'Low', 'Volume', 'fee_bid_taker', 'fee_bid_maker', 'fee_ask_taker', 'fee_ask_maker'],
+        colWidths: [8, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]
     })
-
+	
     markets.forEach(function(market) {
+    	console.log(JSON.stringify(market));
         table.push([
             market.id,
             market.bid || '',
@@ -358,7 +360,11 @@ Snow.prototype.createTableMarkets = function(markets){
             market.last || '',
             market.high || '',
             market.low || '',
-            market.volume || '0'
+            market.volume || '0',
+            market.fee_bid_taker,
+            market.fee_bid_maker,
+            market.fee_ask_taker,
+            market.fee_ask_maker
         ])
     })
     return table

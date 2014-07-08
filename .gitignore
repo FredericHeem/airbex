@@ -1,5 +1,10 @@
+node_modules/
+.project
 /.gitignore
 /btc
 /ltc
 /Jakefile
 *.ps1
+npm-debug.log
+.vagrant
+

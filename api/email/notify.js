@@ -13,9 +13,14 @@ function stripZeroes(x) {
     return ~x.indexOf('.') ? x.replace(/\.?0+$/, '') : x
 }
 
-function getAmountWithFee(amount, scale, fee_ratio){
+function getBidAmountWithFee(amount, scale, fee_ratio){
     var amountWithFee = num(amount).set_precision(scale + 4);
     return amountWithFee.mul(num("1").add(fee_ratio)).round(scale);
+}
+
+function getAskAmountWithFee(amount, scale, fee_ratio){
+    var amountWithFee = num(amount).set_precision(scale + 4);
+    return amountWithFee.mul(num("1").sub(fee_ratio)).round(scale);
 }
 
 exports.process = function(row, cb) {
@@ -41,13 +46,12 @@ exports.process = function(row, cb) {
         locals.price = details.price ? stripZeroes(details.price) : null
         var fee_ratio = details.fee_ratio ? details.fee_ratio : 0;
         if(details.type == 'bid'){
-        	var total = getAmountWithFee(details.total, quoteScale, fee_ratio);
+        	var total = getBidAmountWithFee(details.total, quoteScale, fee_ratio);
             locals.total = stripZeroes(total.toString())
             locals.original = stripZeroes(details.original)
         } else {
-            locals.total = stripZeroes(num(details.total).set_precision(quoteScale).toString())
-            var original = getAmountWithFee(details.original, baseScale, fee_ratio);
-            locals.original = stripZeroes(original.toString())
+            locals.total = stripZeroes(getAskAmountWithFee(details.total, quoteScale, fee_ratio).toString())
+            locals.original = stripZeroes(details.original)
         }
         
     } else if (row.type == 'WithdrawComplete') {

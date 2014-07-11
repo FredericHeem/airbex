@@ -75,9 +75,9 @@ exports.send = function(user, language, templateName, locals, cb) {
 
     locals || (locals = {})
     locals.websiteUrl = config.website_url
-    locals.company = config.company || 'SBEX';
-    locals.email_support = config.email_support || 'support@sbex.ch';
-    locals.signature = config.signature || 'SBEX, the Swiss Bitcoin EXchange';
+    locals.company = config.company || 'AIRBEX';
+    locals.email_support = config.email_support || 'support@airbex.net';
+    locals.signature = config.signature || 'AIRBEX, the Auditable Bitcoin EXchange';
     
     locals.filename = path.relative(path.join(__dirname, '..'), templateFn)
 

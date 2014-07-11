@@ -5,7 +5,7 @@ Your exchange order has been filled
 
 <p>
     Your order to <%= type == 'bid' ? 'buy' : 'sell' %>
-    <%= original %> <%= base %> at
+    <%= filled %> <%= base %> at
 
     <% if (+price) { %>
     the price <%= price %> <%= quote %>
@@ -13,7 +13,7 @@ Your exchange order has been filled
     market price
     <% } %>
 
-    has been completed. The order total was <%= total %> <%= quote %>.
+    has been completed.
 </p>
 
 <% include signature.html %>

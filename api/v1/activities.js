@@ -22,7 +22,7 @@ var detailWhitelist = {
     CreateVoucher: ['currency', 'amount'],
     Withdraw: ['method', 'amount', 'currency', 'address'],
     Credit: ['currency', 'amount'],
-    FillOrder: ['market', 'total', 'original', 'type', 'price', 'fee_ratio'],
+    FillOrder: ['market', 'total', 'original', 'filled', 'type', 'price', 'fee_ratio'],
     BTCWithdraw: ['amount', 'address'],
     Withdraw: ['currency', 'amount', 'address'],
     WithdrawRequest: ['amount', 'bankAccount', 'currency', 'method'],

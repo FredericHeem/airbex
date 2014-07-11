@@ -39,6 +39,7 @@ exports.process = function(row, cb) {
         template = 'fill-order'
         locals.market = details.market
         locals.type = details.type
+        locals.filled = stripZeroes(details.filled || details.original);
         locals.base = exports.app.cache.getBaseCurrency(details.market)
         var baseScale = exports.app.cache.getCurrencyScaleDisplay(locals.base)
         locals.quote = exports.app.cache.getQuoteCurrency(details.market)

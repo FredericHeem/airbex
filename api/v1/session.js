@@ -1,4 +1,5 @@
 var debug = require('debug')('snow:api:session');
+var _ = require('lodash');
 
 module.exports = exports = function(app) {
     exports.app = app

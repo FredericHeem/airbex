@@ -117,7 +117,7 @@ exports.resetPasswordContinue = function(req, res, next) {
         , phoneNumber = dr.rows[0].phone_number
 
         debug('correct code is %s', code)
-        var company = req.app.config.company || 'SBEX'
+        var company = req.app.config.company || 'AIRBEX'
         var msg = code + ' is your ' + company + ' reset code'
 
         debug('requesting call to %s', phoneNumber)

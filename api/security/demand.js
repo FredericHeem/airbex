@@ -118,25 +118,37 @@ exports.extendRequestSession = function(req, res, next) {
 }
 
 exports.otp = function(inner, optional) {
+    debug('OTP optional %d', optional);
     return function(req, res, next) {
         inner(req, res, function() {
-            assert(req.user)
-            debug('OTP check for user: %s', req.user)
+            var user = req.user;
+            assert(user)
             if (!req.session) {
                 debug('OTP check skipped for non-primary key (API)')
                 return next()
             }
-
+            
             if (!req.user.tfaSecret) {
-                if (optional) {
-                    debug('Optional OTP check skipped')
-                    return next()
-                }
-
+                debug('Password required');
+                if(req.body.sessionKey){
+                    var token = req.app.userToken[req.user.id]
+                    //debug('otp: has token %s', token)
+                    if(token){
+                        var sessionKey = exports.app.security.session.getSessionKey(token, user.primaryKey)
+                        //debug('otp: got key %s, should match %s', req.body.sessionKey, sessionKey)
+                        if(req.body.sessionKey === sessionKey){
+                            req.app.userToken[req.user.id] = undefined
+                            return next()
+                        }
+                    }
+                } 
+                var token = exports.app.security.session.randomSha256();
+                req.app.userToken[req.user.id] = token
+                //debug("otp create token: %s", token)
                 return res.send(401, {
-                    name: 'OtpRequired',
-                    messge: 'One-time password is required for this request, ' +
-                        'but the user does not have OTP required.'
+                    name: 'PasswordRequired',
+                    message: 'Please enter your password',
+                    token:token
                 })
             }
 

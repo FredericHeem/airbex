@@ -20,6 +20,8 @@ module.exports = exports = function(app) {
         })
     }
 
+    app.userToken = {};
+    
     app.use(exports.handler)
     return exports
 }
@@ -47,7 +49,9 @@ exports.handler = function(req, res, next) {
                     message: 'User not found in session'
                 })
             }
-            req.user = user
+            
+            req.user = user;
+
             debug('session attached (user #%d)', user.id)
             next()
         })
@@ -64,7 +68,7 @@ exports.extend = function(key, cb) {
 
 exports.create = function(req, email, cb) {
     var ip = req.headers['x-real-ip'];
-    debug('finding user %s to create session from ip: %s', email, ip)
+    debug('create: finding user %s to create session from ip: %s', email, ip)
 
     exports.app.security.users.fromEmail(email, function(err, user) {
         if (err) return cb(err)
@@ -99,7 +103,7 @@ exports.getSessionKey = function(serverSalt, userKey) {
     hash.update(serverSalt)
     hash.update(userKey)
     var res = hash.digest('hex')
-    debug('created session key %s from server salt %s + user key %s',
+    debug('getSessionKey: created session key %s from server salt %s + user key %s',
         pretty(res), pretty(serverSalt), pretty(userKey))
     return res
 }

@@ -312,7 +312,7 @@ exports.startPhoneVerify = function(req, res, next) {
         }
 
         debug('requesting text to %s', number)
-        var company = req.app.config.company || 'SBEX';
+        var company = req.app.config.company || 'AIRBEX';
         var msg = code + ' is your ' + company + ' code'
 
         req.app.phone.text(number, msg, function(err) {
@@ -325,6 +325,7 @@ exports.startPhoneVerify = function(req, res, next) {
 }
 
 exports.changePassword = function(req, res, next) {
+    debug("changePassword user %s", req.user.id);
     if (!req.app.validate(req.body, 'v1/users_changepassword', res)) return
 
     req.app.conn.write.query({

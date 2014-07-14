@@ -284,6 +284,30 @@ Snow.prototype.bankCreditCancel = function(bankCancelInfo, cb) {
         cb(null, body)
     })
 }
+
+Snow.prototype.withdrawCrypto = function(withdrawParam, cb) {
+    var me = this;
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "POST";
+    data.json = withdrawParam;
+    var urlWithdraw = this.url + 'v1/' + withdrawParam.currency + '/out';
+    request(urlWithdraw, data , function(err, res, body) {
+        if (err) return cb(err)
+        if (res.statusCode != 401) return cb(bodyToError(body))
+        assert.equal(body.name, "PasswordRequired")
+        assert(body.token);
+        var sessionKey = me.keyFromCredentials(body.token, me.config.email, me.config.password);
+        data.json.sessionKey = sessionKey;
+        request(urlWithdraw, data, function(err, res, body) {
+            if (err) return cb(err)
+            if (res.statusCode != 401) return cb(bodyToError(body))
+            cb(null, body)
+        })
+    })
+}
+
+
 // I'll need to look at how this is done. I belive you post to
 // security/session with your email and receive a token. You then
 // hash that token with your email and password to retrieve the session

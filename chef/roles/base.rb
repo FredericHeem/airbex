@@ -6,6 +6,7 @@ run_list(
     "recipe[solo-search]",
     "recipe[snow::users]",
     "recipe[openssh]",
+    "recipe[snow::ga]",
     "recipe[iptables]",
     "recipe[iptables::ssh]",
     "recipe[chef-client::delete_validation]"

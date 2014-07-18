@@ -6,7 +6,6 @@ run_list(
     "recipe[solo-search]",
     "recipe[snow::users]",
     "recipe[openssh]",
-    "recipe[snow::ga]",
     "recipe[iptables]",
     "recipe[iptables::ssh]",
     "recipe[chef-client::delete_validation]"
@@ -14,8 +13,8 @@ run_list(
 override_attributes({
   "openssh" => {
      "server" => {
-      "allow_agent_forwarding" => "yes",
-      "allow_tcp_forwarding" =>  "yes",
+      "allow_agent_forwarding" => "no",
+      "allow_tcp_forwarding" =>  "no",
       "client_alive_count_max" =>  "0",
       "client_alive_interval" =>  "1200",
       "ignore_user_known_hosts" =>  "yes",

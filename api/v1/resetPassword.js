@@ -31,7 +31,7 @@ exports.resetPasswordBegin = function(req, res, next) {
 
     req.app.conn.write.query({
         text: [
-            'SELECT reset_password_begin($1, $2, $3), language',
+            'SELECT reset_password_begin($1, $2, $3), language, phone_number, two_factor',
             'FROM "user"',
             'WHERE email_lower = $1'
         ].join('\n'),
@@ -78,11 +78,13 @@ exports.resetPasswordBegin = function(req, res, next) {
             })
         }
 
+        var hasPhone = row.phone_number ? true : false;
+        var has2fa = row.two_factor ? true : false;
         req.app.email.send(req.body.email, row.language, 'reset-password', {
             code: emailCode
         }, function(err) {
             if (err) return next(err)
-            res.send(204)
+            res.send({hasPhone:hasPhone, has2fa:has2fa})
         })
     })
 }
@@ -122,7 +124,7 @@ exports.resetPasswordContinue = function(req, res, next) {
 
         debug('requesting call to %s', phoneNumber)
 
-        res.send('Email confirmed. Next we will text you a 4 digit code. ' +
+        res.send('Email confirmed. ' +
             'Close this window and go back to the password reset window.')
 
         setTimeout(function() {
@@ -137,14 +139,25 @@ exports.resetPasswordContinue = function(req, res, next) {
 
 exports.callDelay = 10e3
 
-exports.resetPasswordEnd = function(req, res, next) {
-    debug("resetPasswordEnd email: %s, code %s", req.body.email, req.body.code); 
+function resetEnd(req, res, next){
+    var phone_code = req.body.code ? req.body.code : "0000";
+    
+    debug("resetPasswordEnd resetting");
     
     req.app.conn.write.query({
         text: 'SELECT reset_password_end($1, $2, $3) success',
-        values: [req.body.email, req.body.code, req.body.key]
+        values: [req.body.email, phone_code, req.body.key]
     }, function(err, dr) {
-        if (err) return next(err)
+        if (err) {
+            if (err.message == 'Must continue first.') {
+                res.send(400, {
+                    name: 'MustConfirmEmailFirst',
+                    message: 'Email must checked first'
+                })
+            }
+
+            return next(err)
+        }
 
         var success = dr.rows[0].success
 
@@ -156,5 +169,60 @@ exports.resetPasswordEnd = function(req, res, next) {
         }
 
         res.send(204)
+    })
+}
+
+exports.resetPasswordEnd = function(req, res, next) {
+    debug("resetPasswordEnd email: %s, code %s, otp: %s", 
+            req.body.email, req.body.code, req.body.otp); 
+    req.app.conn.write.query({
+        text: [
+            'SELECT user_id, two_factor',
+            'FROM "user"',
+            'WHERE email_lower = $1'
+        ].join('\n'),
+        values: [req.body.email.toLowerCase()]
+    }, function(err, dr) {
+        if (err) {
+            return next(err)
+        }
+
+        var row = dr.rows[0]
+
+        if (!row) {
+            return res.send(400, {
+                name: 'UserNotFound',
+                message: 'User not found'
+            })
+        }
+        
+        if(row.two_factor){
+            debug("resetPasswordEnd has 2fa");
+            req.app.security.tfa.consume(row.user_id, null, req.body.otp, function(err, correct) {
+                if (err) {
+                    debug("resetPasswordEnd 2fa error: %s", JSON.stringify(err));
+                    return next(err)
+                }
+                
+                debug("resetPasswordEnd correct 2fa: %s", correct);
+                if (correct === null) {
+                    return res.send(403, {
+                        name: 'BlockedOtp',
+                        message: 'Time-based one-time password has been consumed. Try again in 30 seconds'
+                    })
+                }
+
+                if (!correct) {
+                    return res.send(403, {
+                        name: 'WrongOtp',
+                        message: 'Wrong one-time password'
+                    })
+                }
+                debug("resetPasswordEnd 2fa passed");
+                resetEnd(req, res, next)
+            })
+        } else {
+            resetEnd(req, res, next)
+        }
     })
 }

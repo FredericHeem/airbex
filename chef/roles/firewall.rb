@@ -2,8 +2,7 @@ name "firewall"
 description "FIREWALL+ROUTER"
 run_list(
   "role[base]",
-  "recipe[snow::firewall]",
-  "recipe[snow::ga]"
+  "recipe[snow::firewall]"
 )
 
 override_attributes({

@@ -145,8 +145,9 @@ exports.otp = function(inner, optional) {
                 var token = exports.app.security.session.randomSha256();
                 req.app.userToken[req.user.id] = token
                 //debug("otp create token: %s", token)
+                var errorName = req.body.sessionKey ? 'PasswordInvalid' : 'PasswordRequired'
                 return res.send(401, {
-                    name: 'PasswordRequired',
+                    name: errorName,
                     message: 'Please enter your password',
                     token:token
                 })

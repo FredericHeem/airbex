@@ -142,7 +142,7 @@ exports.callDelay = 10e3
 function resetEnd(req, res, next){
     var phone_code = req.body.code ? req.body.code : "0000";
     
-    debug("resetPasswordEnd resetting");
+    debug("resetPasswordEnd phone_code: %s", phone_code);
     
     req.app.conn.write.query({
         text: 'SELECT reset_password_end($1, $2, $3) success',

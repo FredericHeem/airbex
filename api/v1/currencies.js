@@ -20,6 +20,7 @@ exports.index = function(req, res, next) {
                 name: row.name,
                 withdraw_min: req.app.cache.formatCurrency(row.withdraw_min, row.currency_id),
                 withdraw_max: req.app.cache.formatCurrency(row.withdraw_max, row.currency_id),
+                withdraw_fee: req.app.cache.formatCurrency(row.withdraw_fee, row.currency_id),
                 address_regex: row.address_regex
             }
         }))

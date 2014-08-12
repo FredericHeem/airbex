@@ -1,0 +1,6 @@
+# Insight api
+-A INPUT -p tcp  --dport <%= @crypto['insight_port'] %> -j ACCEPT
+-A OUTPUT -p tcp --sport <%= @crypto['insight_port'] %> -j ACCEPT
+
+-A INPUT -p tcp  --dport <%= @crypto['insight_api_port'] %> -j ACCEPT
+-A OUTPUT -p tcp --sport <%= @crypto['insight_api_port'] %> -j ACCEPT

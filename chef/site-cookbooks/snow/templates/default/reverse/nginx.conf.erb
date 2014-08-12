@@ -37,6 +37,29 @@ server {
 
         proxy_set_header X-Real-IP $remote_addr;
 
+        <% @env['cryptos'].each do |crypto| -%>
+        location /explorer/<%= crypto %>/api/socket.io {
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+            proxy_pass http://<%= @env[crypto]["host"] || 'localhost' %>:<%= @env[crypto]["insight_api_port"] || 3001 %>;
+            break;
+        }
+        location /explorer/<%= crypto %>/api {
+            rewrite ^/explorer/<%= crypto %>/api(/?.*)$ /api$1 break;
+            proxy_pass http://<%= @env[crypto]["host"]|| 'localhost' %>:<%= @env[crypto]["insight_api_port"] || 3001 %>;
+            break;
+        }
+
+        location /explorer/<%= crypto %> {
+            rewrite ^/explorer/<%= crypto %>(/?.*)$ $1 break;
+            proxy_pass http://<%= @env[crypto]["host"] || 'localhost' %>:<%= @env[crypto]["insight_port"] || 3000 %>;
+            break;
+        }
+        <% end %>
+
         location /api {
             rewrite ^/api(/?.*)$ $1 break;
             proxy_pass http://<%= @api_ip %>:<%= node[:snow][:api][:port] %>;

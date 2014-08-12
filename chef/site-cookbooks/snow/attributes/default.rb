@@ -6,6 +6,11 @@ Chef::Application.fatal!("env_bag for #{node.chef_environment} is null") if env_
 
 default['set_fqdn'] = "*.#{env_bag['fqdn']}" || "snow-#{node.chef_environment}"
 
+default['nginx']['enable_default_site'] = false
+
+default['snow']['insight_api']['app_directory'] = "/home/ubuntu/insight-api"
+default['snow']['insight']['app_directory'] = "/home/ubuntu/insight"
+
 default['snow']['api']['app_directory'] = "/home/ubuntu/snow-api"
 default['snow']['api']['port'] = 8000
 default['snow']['api']['smtp'] = nil

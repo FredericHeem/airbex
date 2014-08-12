@@ -87,7 +87,7 @@ default['nginx']['sendfile'] = 'on'
 
 default['nginx']['disable_access_log'] = false
 default['nginx']['install_method'] = 'package'
-default['nginx']['default_site_enabled'] = true
+default['nginx']['default_site_enabled'] = false
 default['nginx']['types_hash_max_size'] = 2048
 default['nginx']['types_hash_bucket_size'] = 64
 

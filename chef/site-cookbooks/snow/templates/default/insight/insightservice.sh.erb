@@ -1,0 +1,10 @@
+#!/bin/bash
+export NODE_ENV=<%= node.chef_environment %>
+#export DEBUG=*
+export BITCOIND_USER=<%= @crypto['username'] %>
+export BITCOIND_PASS=<%= @crypto['password'] %>
+export INSIGHT_NETWORK=<%= @crypto['testnet'] ? "testnet" : "livenet" %>
+export INSIGHT_CURRENCY=<%= @currency %>
+#export BITCOIND_DATADIR=/<%= @currency %>/
+export INSIGHT_SOCKETIOPATH="/explorer/<%= @cryptoName %>/api/socket.io"
+cd <%= @insightApiDir %>/current && node insight.js

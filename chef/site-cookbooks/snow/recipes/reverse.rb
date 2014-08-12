@@ -54,7 +54,8 @@ template '/etc/nginx/sites-available/snow-reverse' do
     :frontend_ip => frontend_ip || '127.0.0.1',
     :landing_ip => landing_ip || '127.0.0.1',
     :api_ip => api_ip || '127.0.0.1',
-    :https => env_bag['https']
+    :https => env_bag['https'],
+    :env => env_bag
   })
   notifies :reload, resources(:service => "nginx")
 end

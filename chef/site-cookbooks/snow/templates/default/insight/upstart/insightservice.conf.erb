@@ -1,0 +1,13 @@
+start on startup
+console log
+env NAME=<%= @service %>
+env HOME=/home/ubuntu
+
+script
+    echo $$ > $NAME.pid
+    sudo -Eu ubuntu /usr/bin/$NAME.sh
+end script
+
+post-stop script
+   rm -f /var/run/$NAME.pid
+end script

@@ -66,10 +66,13 @@ nginx_site 'snow-reverse' do
 end
 
 include_recipe "iptables"
+
 iptables_rule "all_http"
 iptables_rule "all_https"
-include_recipe "iptables"
 
 iptables_rule "iptables_reverse" do
- variables({:api_ip => api_ip})
+ variables({
+   :api_ip => api_ip,
+   :env => env_bag
+ })
 end

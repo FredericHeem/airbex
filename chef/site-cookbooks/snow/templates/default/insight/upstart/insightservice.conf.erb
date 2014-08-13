@@ -4,7 +4,7 @@ env NAME=<%= @service %>
 env HOME=/home/ubuntu
 
 script
-    echo $$ > $NAME.pid
+    echo $$ > /var/run/$NAME.pid
     sudo -Eu ubuntu /usr/bin/$NAME.sh
 end script
 

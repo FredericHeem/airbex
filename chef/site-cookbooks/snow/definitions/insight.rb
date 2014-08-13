@@ -136,4 +136,16 @@ define :insight do
     nginx_site service do
         action :enable
     end
+    
+    template "/etc/monit/conf.d/#{service}.monitrc" do
+      source "insightmonitrc.erb"
+      variables({
+        :insightName => service,
+        :insight_port => env_bag[cryptoName]['insight_port'],
+        :insight_api_port => env_bag[cryptoName]['insight_port']
+      })
+      owner "ubuntu"
+      group "ubuntu"
+      mode 0664
+    end
 end

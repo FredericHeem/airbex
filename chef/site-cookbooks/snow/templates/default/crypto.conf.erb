@@ -4,3 +4,7 @@ rpcallowip=<%= @rpcallowip %>
 txindex=1
 keypool=10000
 testnet=<%= @testnet %>
+checklevel=2
+<% @nodes.each do |node| -%>
+addnode=<%= node %>
+<% end %>

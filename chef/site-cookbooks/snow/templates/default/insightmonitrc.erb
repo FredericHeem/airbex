@@ -1,12 +1,12 @@
-check process <%= @deamonName %>
-    with pidfile /var/run/<%= @deamonName %>.pid
-    start program = "/sbin/start <%= @deamonName %>"
-    stop program  = "/sbin/stop <%= @deamonName %>"
-    if failed port <%= @port %> type tcp
+check process <%= @insightName %>
+    with pidfile /var/run/<%= @insightName %>.pid
+    start program = "/sbin/start <%= @insightName %>"
+    stop program  = "/sbin/stop <%= @insightName %>"
+    if failed port <%= @insight_port %> type tcp
         with timeout 600 seconds
         40 times within 40 cycles
         then alert
-    if failed port <%= @port %> type tcp
+    if failed port <%= @insight_api_port %> type tcp
         with timeout 600 seconds
         40 times within 40 cycles
         then restart

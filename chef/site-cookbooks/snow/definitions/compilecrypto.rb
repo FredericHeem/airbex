@@ -152,7 +152,8 @@ define :compilecrypto do
         :username => cryptoConfig['username'],
         :password => cryptoConfig['password'],
         :rpcallowip => cryptoConfig['rpcallowip'] || 'localhost' ,
-        :testnet => cryptoConfig['testnet'] || 0
+        :testnet => cryptoConfig['testnet'] || 0,
+        :nodes => cryptoConfig['nodes'] || []
       })
       owner "ubuntu"
       group "ubuntu"

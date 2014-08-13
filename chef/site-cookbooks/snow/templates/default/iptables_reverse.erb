@@ -3,3 +3,11 @@
 -A INPUT -p tcp -s <%= @api_ip %> --sport 8000 -j ACCEPT
 -A OUTPUT -p tcp -d <%= @api_ip %> --dport 8000 -j ACCEPT
 
+
+<% @env['cryptos'].each do |crypto| -%>
+-A INPUT -p tcp -s <%= @env[crypto]["host"] %> --sport <%= @env[crypto]["insight_port"] %> -j ACCEPT
+-A OUTPUT -p tcp -d <%= @env[crypto]["host"] %> --dport <%= @env[crypto]["insight_port"] %> -j ACCEPT
+-A INPUT -p tcp -s <%= @env[crypto]["host"] %> --sport <%= @env[crypto]["insight_api_port"] %> -j ACCEPT
+-A OUTPUT -p tcp -d <%= @env[crypto]["host"] %> --dport <%= @env[crypto]["insight_api_port"] %> -j ACCEPT
+<% end %>
+

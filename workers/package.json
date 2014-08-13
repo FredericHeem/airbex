@@ -12,7 +12,7 @@
     "raven": "0.5.1",
     "konphyg": "1.4.0",
     "async": "0.2.8",
-    "pg": "1.1.0",
+    "pg": "3.4.1",
     "ripple-lib": "0.7.29",
     "firebase": "0.6.17",
     "open-exchange-rates": "0.2.0",

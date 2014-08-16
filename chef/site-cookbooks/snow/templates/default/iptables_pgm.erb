@@ -1,4 +1,6 @@
 # Snow api Locked Down
 # Allow connection from the workers
--A INPUT -p tcp  --dport 5432 -j ACCEPT
--A OUTPUT -p tcp --sport 5432 -j ACCEPT
+<% @env['cryptos'].each do |crypto| -%>
+-A INPUT -p tcp -s <%= @env[crypto]["host"] %> --dport 5432 -j ACCEPT
+-A OUTPUT -p tcp -d <%= @env[crypto]["host"] %> --sport 5432 -j ACCEPT
+<% end %>

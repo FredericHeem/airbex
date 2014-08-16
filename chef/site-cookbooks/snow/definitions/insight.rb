@@ -142,7 +142,7 @@ define :insight do
       variables({
         :insightName => service,
         :insight_port => env_bag[cryptoName]['insight_port'],
-        :insight_api_port => env_bag[cryptoName]['insight_port']
+        :insight_api_port => env_bag[cryptoName]['insight_api_port']
       })
       owner "ubuntu"
       group "ubuntu"

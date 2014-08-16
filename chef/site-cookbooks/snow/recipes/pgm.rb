@@ -62,7 +62,12 @@ end
 
 
 include_recipe "iptables"
+iptables_rule "iptables_http_client"
+
 iptables_rule "iptables_pgm" do
+ variables({
+   :env => env_bag
+ })
 end
 
 diskmonit "pgmdata" do

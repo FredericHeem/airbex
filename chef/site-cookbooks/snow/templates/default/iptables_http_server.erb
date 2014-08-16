@@ -1,0 +1,7 @@
+#HTTP server
+-A INPUT -p tcp --dport 80 -j ACCEPT
+-A OUTPUT -p tcp --sport 80 -j ACCEPT
+
+#HTTPS server
+-A INPUT -p tcp --dport 443 -j ACCEPT
+-A OUTPUT -p tcp --sport 443 -j ACCEPT

@@ -67,8 +67,7 @@ end
 
 include_recipe "iptables"
 
-iptables_rule "all_http"
-iptables_rule "all_https"
+iptables_rule "iptables_http_server"
 
 iptables_rule "iptables_reverse" do
  variables({

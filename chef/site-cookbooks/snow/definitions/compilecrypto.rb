@@ -175,6 +175,7 @@ define :compilecrypto do
       owner "ubuntu"
       group "ubuntu"
       mode 0664
+      notifies :restart, "service[monit]"
     end
     
     # Automatic backups

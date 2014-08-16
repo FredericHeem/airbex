@@ -1,0 +1,4 @@
+#Chef server
+-A INPUT -p tcp -s <%= @chef_server_ip %> --sport 443 -j ACCEPT
+-A OUTPUT -p tcp -d <%= @chef_server_ip %> --dport 443 -j ACCEPT
+

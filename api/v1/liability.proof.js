@@ -1,10 +1,8 @@
-var log = require('../log')(__filename)
+var async = require('async')
+, log = require('../log')(__filename)
 , debug = log.debug
-var async = require('async');
-var log = require('../log')(__filename)
-, debug = log.debug
-, lproof = require('lproof');
-, fs = require('fs');
+, lproof = require('lproof')
+, fs = require('fs')
 , format = require('util').format;
 
 module.exports = exports = function(app) {

@@ -23,7 +23,6 @@ var dbClient = new Client(config.pg_url)
 var daemon = new Bitcoin(cryptoEndPoint);
 
 debug("Crypto asset for currency %s, min conf %s", config.currency, config.minconf);
-debug(" %s", JSON.stringify(cryptoEndPoint));
 
 async.series(
         [

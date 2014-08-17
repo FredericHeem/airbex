@@ -37,7 +37,7 @@ define :workercrypto do
         sloppy true
     end
     
-    services = %w(in out address asset)
+    services = %w(in out address asset liability)
     services.each do |service|
       template "/etc/init/snow-#{cryptoName}#{service}.conf" do
         source "workers/upstart/cryptoservice.conf.erb"
@@ -98,6 +98,7 @@ define :workercrypto do
         notifies :restart, "service[snow-#{cryptoName}out]"
         notifies :restart, "service[snow-#{cryptoName}address]"
         notifies :restart, "service[snow-#{cryptoName}asset]"
+        notifies :restart, "service[snow-#{cryptoName}liability]"
         keep_releases 2
         symlinks({
              "config/workers.json" => "workers/config/config.#{node.chef_environment}.json"
@@ -143,6 +144,7 @@ define :workercrypto do
         notifies :restart, resources(:service => "snow-#{cryptoName}out")
         notifies :restart, resources(:service => "snow-#{cryptoName}address")
         notifies :restart, resources(:service => "snow-#{cryptoName}asset")
+        notifies :restart, resources(:service => "snow-#{cryptoName}liability")
     end
  
     services.each do |service|

@@ -29,7 +29,8 @@
     "cryptoin": "DEBUG=* NODE_ENV=brush node bin/cryptoin.js",
     "cryptoout": "DEBUG=* NODE_ENV=brush node bin/cryptoout.js",
     "cryptoaddress": "DEBUG=* NODE_ENV=brush node bin/cryptoaddress.js",
-    "cryptoasset": "DEBUG=* NODE_ENV=brush node bin/cryptoasset.js"
+    "cryptoasset": "DEBUG=* NODE_ENV=brush node bin/cryptoasset.js",
+    "cryptoliability": "DEBUG=* NODE_ENV=brush node bin/cryptoliability.js"
   },
   "devDependencies": {
     "mocha": "1.7.0",

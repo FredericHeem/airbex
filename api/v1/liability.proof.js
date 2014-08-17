@@ -1,9 +1,12 @@
 var log = require('../log')(__filename)
 , debug = log.debug
 var async = require('async');
-var lproof = require('lproof');
-var fs = require('fs');
-var format = require('util').format;
+var log = require('../log')(__filename)
+, debug = log.debug
+, lproof = require('lproof');
+, fs = require('fs');
+, format = require('util').format;
+
 module.exports = exports = function(app) {
     app.get('/v1/proof/root/:currency', exports.root)
     app.get('/v1/proof/liability/:currency', app.security.demand.any, exports.liability)

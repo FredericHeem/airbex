@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:cryptoaddress')
+var log = require('../log')(__filename)
+, debug = log.debug
 , async = require('async')
 , _ = require('lodash')
 , EventEmitter = require('events').EventEmitter

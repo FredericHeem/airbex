@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:ripple:federation')
+var log = require('../log')(__filename)
+, debug = log.debug
 , request = require('request')
 , parseUrl = require('url').parse
 

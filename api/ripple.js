@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:ripple')
+var log = require('./log')(__filename)
+, debug = log.debug
 , Remote = require('ripple-lib').Remote
 
 module.exports = exports = function(app) {

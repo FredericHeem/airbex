@@ -1,6 +1,7 @@
 var util = require('util')
 , num = require('num')
-var debug = require('debug')('snow:crypto')
+var log = require('../log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(app, currencyId) {
     var prefix = '/v1/' + currencyId

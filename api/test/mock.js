@@ -1,6 +1,7 @@
 var _ = require('lodash')
 , assert = require('assert')
-, debug = require('debug')('snow:test')
+var log = require('../../log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(target, name, fake) {
     assert(target, 'target is null')

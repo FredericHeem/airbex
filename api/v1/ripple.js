@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:v1:ripple')
+var log = require('../log')(__filename)
+, debug = log.debug
 , num = require('num')
 
 module.exports = exports = function(app) {

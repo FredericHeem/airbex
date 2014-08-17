@@ -1,5 +1,6 @@
 var Out = module.exports = {}
-, debug = require('debug')('snow:out')
+, log = require('../log')(__filename)
+, debug = log.debug
 , _= require('lodash')
 , util = require('util')
 

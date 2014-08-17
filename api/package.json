@@ -22,7 +22,8 @@
     "analytics-node": "0.5.0",
     "twilio": "1.4.0",
     "redis": "0.9.1",
-    "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master"
+    "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
+    "winston": "0.7.x"
   },
   "scripts": {
     "start": "DEBUG='*' NODE_ENV=brush node index.js",

@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:email:notify')
+var log = require('../log')(__filename)
+, debug = log.debug
 , _ = require('lodash')
 , async = require('async')
 , num = require('num')

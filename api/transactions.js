@@ -1,7 +1,8 @@
 /* jshint evil: true */
 var builder = require('pg-builder')
 , _ = require('lodash')
-, debug = require('debug')('snow:transactions')
+, log = require('log')(__filename)
+, debug = log.debug
 , util = require('util')
 
 exports.format = function(app, row) {

@@ -1,5 +1,6 @@
 var async = require('async')
-, debug = require('debug')('snow:cryptoaddress')
+, log = require('../log')(__filename)
+, debug = log.debug
 , Bitcoin = require('bitcoin').Client
 , CryptoAddress = require('../lib/cryptoaddress')
 

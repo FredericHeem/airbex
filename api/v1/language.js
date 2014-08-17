@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:language')
+var log = require('../log')(__filename)
+, debug = log.debug
 , util = require('util')
 , languageRe = /^([a-z]{1,8}(?:-[a-z]{1,8})?)(?:;q=([0-9](?:\.[0-9])?))?$/i
 

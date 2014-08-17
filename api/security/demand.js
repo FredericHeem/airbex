@@ -1,5 +1,6 @@
 var assert = require('assert')
-, debug = require('debug')('snow:security:demand')
+, log = require('../log')(__filename)
+, debug = log.debug
 , format = require('util').format
 
 module.exports = exports = function(app) {

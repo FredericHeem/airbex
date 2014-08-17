@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:solvencyproof');
+var log = require('./log')(__filename)
+, debug = log.debug;
 var util = require('util')
 , async = require('async')
 , fs = require('fs')

@@ -1,5 +1,6 @@
 var async = require('async')
-, debug = require('debug')('snow:cryptoout')
+, log = require('../log')(__filename)
+, debug = log.debug
 , Bitcoin = require('bitcoin').Client
 , CryptoOut = require('../lib/cryptoout')
 

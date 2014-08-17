@@ -1,5 +1,6 @@
 var crypto = require('crypto')
-, debug = require('debug')('snow:users:create')
+var log = require('../log')(__filename)
+, debug = log.debug
 , config = require('konfu')
 
 module.exports = exports = function(app) {

@@ -3,7 +3,7 @@
 var config = require('../lib/config.js')();
 var async = require('async')
 var SolvencyProof = require('../solvency.proof.js')
-var currencies = ["BTC", "LGS", "LTC", "DOGE"];
+var currencies = ["BTC", "LTC", "DOGE"];
 var solvencyProof = new SolvencyProof(config)
 
 async.waterfall(

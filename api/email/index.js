@@ -4,7 +4,8 @@ var assert = require('assert')
 , fs = require('fs')
 , path = require('path')
 , config = require('konfu')
-, debug = require('debug')('snow:email')
+, log = require('../log')(__filename)
+, debug = log.debug
 , fallback = 'en-US'
 
 module.exports = exports = function(app) {

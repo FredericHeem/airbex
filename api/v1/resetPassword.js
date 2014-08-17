@@ -1,5 +1,6 @@
 var crypto = require('crypto')
-, debug = require('debug')('snow:resetPassword')
+var log = require('../log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(app) {
     app.post('/v1/resetPassword', exports.resetPasswordBegin)

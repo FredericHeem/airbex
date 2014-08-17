@@ -11,10 +11,10 @@ var config = require('konfu')
 , http = require('http')
 , server = http.createServer(app)
 , pg = require('./pg')
-, debug = require('debug')('snow:api:index')
+,log = require('./log')(__filename)
+ debug = log.debug
 
 app.config = config
-
 debug("listening on port %s", config.port)
 
 app.conn = {

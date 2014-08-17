@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:liabilityproof');
+var log = require('../log')(__filename)
+, debug = log.debug
 var async = require('async');
 var lproof = require('lproof');
 var fs = require('fs');

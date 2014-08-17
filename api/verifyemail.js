@@ -1,7 +1,8 @@
 var format = require('util').format
 , request = require('request')
 , config = require('konfu')
-, debug = require('debug')('snow:verifyemail')
+, log = require('./log')(__filename)
+, debug = log.debug
 , urlFormat = 'http://check.block-disposable-email.com/easyapi/json/%s/%s'
 
 module.exports = function(email, cb) {

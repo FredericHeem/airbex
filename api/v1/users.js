@@ -1,5 +1,6 @@
 var _ = require('lodash')
-, debug = require('debug')('snow:users')
+var log = require('../log')(__filename)
+, debug = log.debug
 , libphonenumber = require('libphonenumber')
 
 

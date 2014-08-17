@@ -1,5 +1,6 @@
 var assert = require('assert')
-, debug = require('debug')('snow:security:tfa')
+var log = require('../log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(app) {
     exports.app = app

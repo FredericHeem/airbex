@@ -1,6 +1,7 @@
 var _ = require('lodash')
 , format = require('util').format
-, debug = require('debug')('snow:users:documents')
+, log = require('../log')(__filename)
+, debug = log.debug
 , builder = require('pg-builder')
 
 module.exports = exports = function(app) {

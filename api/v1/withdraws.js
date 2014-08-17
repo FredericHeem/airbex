@@ -1,6 +1,7 @@
 var withdraws = require('../withdraws')
 , _ = require('lodash')
-, debug = require('debug')('snow:withdraw')
+, log = require('../log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(app) {
     app.del('/v1/withdraws/:id', app.security.demand.withdraw, exports.cancel)

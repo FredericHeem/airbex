@@ -1,5 +1,5 @@
-var debug = require('debug')('snow:users:uploadid')
-//var formidable = require("formidable");
+var log = require('../log')(__filename)
+, debug = log.debug;
 var _ = require('lodash');
 var fs = require('fs');
 var format = require('util').format;

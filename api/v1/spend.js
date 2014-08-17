@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:spend')
+var log = require('../log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(app) {
     app.post('/v1/spend', app.security.demand.trade, exports.spend)

@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:cryptoout')
+var log = require('../log')(__filename)
+, debug = log.debug
 , num = require('num')
 , util = require('util')
 , async = require('async')

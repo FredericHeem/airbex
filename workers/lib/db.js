@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:db')
+var log = require('../log')(__filename)
+, debug = log.debug
 module.exports = function(url, useNative) {
         var pg = useNative ? require('pg')['native'] : require('pg')
     , Client = pg.Client

@@ -1,6 +1,7 @@
-var debug = require('debug')('snow:blockchain')
-var request = require('supertest');
-var http = require('http');
+var log = require('../log')(__filename)
+, debug = log.debug
+, request = require('supertest')
+, http = require('http');
 
 module.exports = exports = function(app) {
     app.get('/v1/blockchain/:currency/address/:address', exports.address)

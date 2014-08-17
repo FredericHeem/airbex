@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:security:session')
+var log = require('../log')(__filename)
+, debug = log.debug
 , crypto = require('crypto')
 , assert = require('assert')
 , MemoryStore = require('./session.memory')

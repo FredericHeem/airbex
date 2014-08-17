@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:auth')
+, log = require('./log')(__filename)
+, debug = log.debug
 , assert = require('assert')
 , format = require('util').format
 

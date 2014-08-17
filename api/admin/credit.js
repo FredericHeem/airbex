@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:admin:credit')
+var log = require('../log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(app) {
     app.post('/admin/bankCredits', app.security.demand.admin, exports.createBankCredit)

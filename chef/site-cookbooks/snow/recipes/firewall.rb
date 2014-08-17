@@ -16,6 +16,13 @@ iptables_rule "iptables_router" do
  variables({:reverse_ip => reverse_ip})
 end
 
+bastion_ip = env_bag['bastion_ip']
+if bastion_ip
+    iptables_rule "iptables_bastion" do
+     variables({:bastion_ip => bastion_ip})
+    end
+end
+
 template "/etc/iptables.snat" do
   source "router/nat.conf.erb"
   owner  "root"

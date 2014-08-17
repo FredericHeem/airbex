@@ -1,5 +1,6 @@
 var util = require('util')
-var debug = require('debug')('snow:api:segment')
+var log = require('./log')(__filename)
+, debug = log.debug
 
 module.exports = function(app) {
     var analytics;

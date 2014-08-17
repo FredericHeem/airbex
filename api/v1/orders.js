@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:orders')
+var log = require('../log')(__filename)
+, debug = log.debug
 var order = require("../order")
 
 module.exports = exports = function(app) {

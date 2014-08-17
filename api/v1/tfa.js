@@ -1,4 +1,5 @@
-var debug = require('debug')('snow:tfa')
+var log = require('../log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(app) {
     app.post('/v1/twoFactor/enable', app.security.demand.primary, exports.enable)

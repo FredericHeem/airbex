@@ -24,8 +24,8 @@ var async = require('async')
         'CHF': true
     }
 }
-, debug = require('debug')('snow:api:cache')
-
+, log = require('./log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(app, conn, cb) {
 	

@@ -123,18 +123,26 @@ module.exports = function(config) {
         });
     }
    
-   MarketMaker.loopGetOrderBookAndSendOrders = function() {
-       var that = this
-       MarketMaker.getBalanceTarget(function(err, balances) {
-           if (err) throw err;
-           var bcBalance = client.getBalanceForCurrency(balances, baseCurrency);
-           var qcBalance = client.getBalanceForCurrency(balances, quoteCurrency);
-           MarketMaker.getOrderBookAndSendOrders(bcBalance.available, qcBalance.available, function(err) {
-               if (err) throw err;
-               debug("loopGetOrderBookAndSendOrders recheduled");
-               setTimeout(MarketMaker.loopGetOrderBookAndSendOrders, 15e3)
-           })
-       });
+   MarketMaker.loopGetOrderBookAndSendOrders = function(done) {
+       var me = this;
+       async.waterfall(
+               [
+                function(callback) {
+                    me.cancelAllOrders(callback)
+                },
+                function(callback) {
+                    me.getBalanceTarget(callback)
+                },
+                function(balances, callback) {
+                    var bcBalance = client.getBalanceForCurrency(balances, baseCurrency);
+                    var qcBalance = client.getBalanceForCurrency(balances, quoteCurrency);
+                    me.getOrderBookAndSendOrders(bcBalance.available, qcBalance.available, callback);
+                }
+                ],
+                function(err) {
+                   done(err)
+               }
+       );
    }
 
     MarketMaker.getOrderBookAndSendOrders = function(balanceBC, balanceQC, done) {
@@ -143,7 +151,7 @@ module.exports = function(config) {
         balanceQC = Math.min(balanceQC, config.max_qc_on_offer);
         MarketMaker.getOrderBook(balanceBC, balanceQC, function(err, bids, asks) {
             if (err) throw err;
-            MarketMaker.cancelAndSendOrders(bids, asks, function(err){
+            MarketMaker.sendOrders(bids, asks, function(err){
                 done(err)
             })
         })
@@ -267,7 +275,7 @@ module.exports = function(config) {
                 var biQuantity = new bigdecimal.BigDecimal(quote[1]);
                 var biVolumeAtIndex = biPrice.multiply(biQuantity);
                 if (biVolumeAtIndex.compareTo(biAvailableVolume) >= 0) {
-                    //Whe can only take availableVolume, 
+                    //We can only take availableVolume, 
                     if (biAvailableVolume.compareTo(biMinVolume) >= 0) {
                         var biRemainingQty = biAvailableVolume.divide(biPrice, 8, new bigdecimal.RoundingMode.DOWN());
                         var quotePartial = [quote[0], biRemainingQty.toString()];

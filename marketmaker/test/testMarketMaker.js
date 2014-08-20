@@ -70,7 +70,7 @@ describe('MarketMaker', function () {
         this.timeout(5 * 60 * 1000);
 
         it('GetMarketDepthAndSendOrdersSimple', function(done) {
-            marketMaker.getOrderBookAndSendOrders(10, 10000, function(err) {
+            marketMaker.getOrderBookAndSendOrders(1, 10000, function(err) {
                 if (err) throw err;
                 done();
             })
@@ -85,12 +85,12 @@ describe('MarketMaker', function () {
                 })
             })
         });       
- /*       it('LoopGetMarketDepthAndSendOrders', function(done) {
+        it('LoopGetMarketDepthAndSendOrders', function(done) {
             marketMaker.loopGetOrderBookAndSendOrders(function(err) {
                 if (err) throw err;
                 done();
             })
-        });*/
+        });
         
     });    
     describe('SendOrder', function() {

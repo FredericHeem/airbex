@@ -193,7 +193,7 @@ exports.processUserPending = function(row, cb) {
 }
 
 exports.tickUserPending = function() {
-    debug('tickUserPending')
+    //debug('tickUserPending')
 
     var query = "SELECT * FROM user_pending where state='created'"
 
@@ -205,7 +205,7 @@ exports.tickUserPending = function() {
             return exports.scheduleUserPending()
         }
 
-        debug('tickUserPending processing %s rows', dr.rowCount || 'no')
+        //debug('tickUserPending processing %s rows', dr.rowCount || 'no')
 
         async.each(dr.rows, exports.processUserPending, function() {
             if (!dr.rowCount) {

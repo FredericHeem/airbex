@@ -1,5 +1,5 @@
 {
-    "currency":"DOGE",
+    "currency":"LTC",
     "pg_url": {
                 "user":"postgres",
                 "host": "127.0.0.1",

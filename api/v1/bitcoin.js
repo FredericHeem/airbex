@@ -1,23 +1,50 @@
 var util = require('util')
 , num = require('num')
-var log = require('../log')(__filename)
-, debug = log.debug
+, crypto = require('crypto')
+, log = require('../log')(__filename)
+, debug = log.debug;
+
 
 module.exports = exports = function(app, currencyId) {
     var prefix = '/v1/' + currencyId
-    debug("registering ", currencyId)
     app.post(prefix + '/out', app.security.demand.otp(app.security.demand.withdraw(2), true),
         exports.withdraw.bind(exports, currencyId))
     app.get(prefix + '/address', app.security.demand.any, exports.address.bind(exports, currencyId))
+    app.post('/v1/withdraw/verify/:code([a-f0-9]{20})', exports.withdrawVerifyCode)
+}
+
+exports.code = function() {
+    return crypto.randomBytes(10).toString('hex')
+}
+
+exports.withdrawVerifyCode = function(req, res, next) {
+    debug('withdrawVerifyCode code: %s', req.params.code);
+    req.app.conn.write.query({
+        text: 'SELECT withdraw_verify_code($1)',
+        values: [req.params.code]
+    }, function(err, dr) {
+        if (err) {
+            if (err.message == 'Unknown email verification code') {
+                return res.send(409, {
+                    name: 'UnknownEmailVerifyCode',
+                    message: 'The code is already verified or the code has been expired'
+                })
+            }
+            return next(err)
+        }
+        
+        res.send(204)
+    })
 }
 
 exports.withdraw = function(currencyId, req, res, next) {
-    debug('processing withdraw request of %d %s from user #%s to %s',
+    log.info('processing withdraw request of %d %s from user #%s to %s',
             req.body.amount, currencyId, req.user.id, req.body.address)
-           
+
     if (!req.app.validate(req.body, 'v1/crypto_out', res)) {
         return
     }
+    var address = req.body.address;
     
     var currencyOption = req.app.cache.getCurrencyOption(currencyId);
     
@@ -45,20 +72,23 @@ exports.withdraw = function(currencyId, req, res, next) {
             message: 'Minimum amount '
         })
     }
-
-    var queryText = 'SELECT crypto_withdraw($1, $2, $3, $4) rid';
+    
+    var code = exports.code()
+    debug("withdraw code ", code)
+    var queryText = 'SELECT crypto_withdraw($1, $2, $3, $4, $5) rid';
 
     req.app.conn.write.query({
         text: queryText,
         values: [
             currencyId.toUpperCase(),
             req.user.id,
-            req.body.address,
-            amount
+            address,
+            amount,
+            code
         ]
     }, function(err, dr) {
         if (err) {
-            console.log("withdraw error ", err.message);
+            log.error("withdraw error ", err.message);
             if (err.message.match(/non_negative_available/)) {
                 return res.send(500, {
                     name: 'NoFunds',
@@ -69,10 +99,12 @@ exports.withdraw = function(currencyId, req, res, next) {
             return next(err)
         }
 
-        req.app.activity(req.user.id, 'Withdraw', {
+        req.app.activity(req.user.id, 'CryptoWithdraw', {
             address: req.body.address,
             currency: currencyId,
-            amount: req.body.amount
+            amount: req.body.amount,
+            address: address,
+            code:code
         })
 
         res.send(201, { id: dr.rows[0].rid })

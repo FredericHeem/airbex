@@ -153,7 +153,7 @@ exports.prototype.fetchActivitiesAfter = function(id, cb) {
             'SELECT *',
             'FROM activity',
             'WHERE activity_id > $1 AND',
-            'type NOT IN (\'ChangePassword\', \'CreateOrder\', \'CancelOrder\', \'BTCWithdraw\', \'LTCWithdraw\', \'RippleWithdraw\', \'AdminWithdrawCancel\', \'CancelWithdrawRequest\', \'AdminBankAccountCredit\', \'SendToUser\', \'AdminEditUser\', \'AdminWithdrawProcess\', \'AdminWithdrawComplete\', \'CreateVoucher\', \'WithdrawComplete\', \'AdminVerifyBankAccount\', \'VerifyBankAccount\', \'FillOrder\', \'ReceiveFromUser\', \'RemoveTwoFactor\', \'AdminAddBankCredit\', \'AdminApproveBankCredit\', \'AdminCancelBankCredit\', \'ReceiveFomUser\')',
+            'type NOT IN (\'ChangePassword\', \'CreateOrder\', \'CancelOrder\', \'CryptoWithdraw\', \'LTCWithdraw\', \'RippleWithdraw\', \'AdminWithdrawCancel\', \'CancelWithdrawRequest\', \'AdminBankAccountCredit\', \'SendToUser\', \'AdminEditUser\', \'AdminWithdrawProcess\', \'AdminWithdrawComplete\', \'CreateVoucher\', \'WithdrawComplete\', \'AdminVerifyBankAccount\', \'VerifyBankAccount\', \'FillOrder\', \'ReceiveFromUser\', \'RemoveTwoFactor\', \'AdminAddBankCredit\', \'AdminApproveBankCredit\', \'AdminCancelBankCredit\', \'ReceiveFomUser\')',
             'ORDER BY activity_id',
             'LIMIT 100'
         ].join('\n'),

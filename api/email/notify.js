@@ -78,11 +78,12 @@ exports.process = function(row, cb) {
         template = 'enable-two-factor'
     } else if (row.type == 'RemoveTwoFactor') {
         template = 'remove-two-factor'
-    } else if (row.type == 'BTCWithdraw') {
+    } else if (row.type == 'CryptoWithdraw') {
         template = 'crypto-withdraw-request'
         locals.amount = stripZeroes(details.amount)
-        locals.currency = 'BTC'
+        locals.currency = details.currency
         locals.address = details.address;
+        locals.code = details.code;
     } else if (row.type == 'WithdrawRequest') {
         template = 'withdraw-request'
         locals.amount = stripZeroes(details.amount)

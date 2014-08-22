@@ -119,6 +119,11 @@ module.exports = function(activity) {
             activity.details.amount, activity.details.currency, activity.details.address)
     }
 
+    if (activity.type == 'CryptoWithdraw') {
+        return format('You requested to withdraw %s %s to %s',
+            numbers.format(activity.details.amount), activity.details.currency, activity.details.address)
+    }
+    
     if (activity.type == 'LTCWithdraw') {
         return format('You requested to withdraw %s LTC to %s',
             numbers.format(activity.details.amount), activity.details.address)

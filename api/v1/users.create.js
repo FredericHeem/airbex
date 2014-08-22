@@ -8,8 +8,6 @@ module.exports = exports = function(app) {
 
     app.post('/v1/users', exports.beginCreate)
     app.post('/v1/users/verify/:code([a-f0-9]{20})', exports.endCreate)
-
-    // Legacy, remove after 2014-01-01
     app.get('/v1/email/verify/:code([a-f0-9]{20})', exports.endCreate)
 }
 
@@ -71,7 +69,7 @@ exports.endCreate = function(req, res, next) {
             userId: dr.rows[0].user_id.toString(),
             event: 'Signed up'
         })
-        var company = req.app.config.company || 'SBEX';
+        var company = req.app.config.company || 'AIRBEX';
         res.send('Your e-mail has been verified. You can login to ' + company + ' at <a href="' + config.website_url + '">' + config.website_url + '</a>.')
         //res.send(204)
     })

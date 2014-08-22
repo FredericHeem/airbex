@@ -6,5 +6,10 @@ Withdraw request
 <p>
     You have requested to withdraw <%= amount %> <%= currency %> to the address <%= address %>
 </p>
-
+<p>
+    To confirm this withdraw, follow this link:<br>
+    <br>
+    <a href="<%= websiteUrl %>/client/#withdraw/<%= code %>">
+    <%= websiteUrl %>/client/#withdraw/<%= code %></a>
+</p>
 <% include signature.html %>

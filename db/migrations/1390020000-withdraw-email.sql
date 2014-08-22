@@ -67,7 +67,6 @@ BEGIN
     RETURN currval('withdraw_request_request_id_seq');
 END; $$ LANGUAGE plpgsql;
 
-DROP  FUNCTION withdraw_verify_code (code email_verify_code);
 -- Verify the withdraw code sent by email
 CREATE OR REPLACE FUNCTION withdraw_verify_code (
     withdrawCode email_verify_code

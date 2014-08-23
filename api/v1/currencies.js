@@ -21,6 +21,8 @@ exports.index = function(req, res, next) {
                 withdraw_min: req.app.cache.formatCurrency(row.withdraw_min, row.currency_id),
                 withdraw_max: req.app.cache.formatCurrency(row.withdraw_max, row.currency_id),
                 withdraw_fee: req.app.cache.formatCurrency(row.withdraw_fee, row.currency_id),
+                conf_time: row.conf_time,
+                min_conf: row.min_conf,
                 address_regex: row.address_regex
             }
         }))

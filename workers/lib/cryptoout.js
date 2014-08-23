@@ -146,7 +146,7 @@ CryptoOut.prototype.sendBatch = function(requests, cb) {
                 if (!err) return cb()
                 console.error('%s failed to mark items as done', prefix)
                 console.error('%s', prefix, err)
-                cb()
+                cb(err)
             })
         }
 

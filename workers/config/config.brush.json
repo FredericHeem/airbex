@@ -9,7 +9,7 @@
     },
     "host": "127.0.0.1",
     "rpcuser": "frederic",
-    "port": "44555",
+    "port": "19332",
     "rpcpass": "password",
     "minconf": 6
 }

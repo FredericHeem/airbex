@@ -26,7 +26,7 @@
     "winston": "0.7.x"
   },
   "scripts": {
-    "start": "DEBUG='*' NODE_ENV=brush node index.js",
+    "start": "DEBUG='*' NODE_ENV=brush grunt",
     "pack": "tar -zcf node_modules.tar.gz node_modules",
     "unpack": "tar -zxf node_modules.tar.gz",
     "test": "mocha",
@@ -36,7 +36,16 @@
   "devDependencies": {
     "mocha": "1.10.0",
     "expect.js": "0.2.0",
-    "supertest": "0.7.1"
+    "supertest": "0.7.1",
+    "grunt": "~0.4.2",
+    "grunt-cli": "~0.1.11",
+    "grunt-concurrent": "~0.4.2",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-env": "~0.4.1",
+    "grunt-markdown": "~0.5.0",
+    "grunt-mocha-test": "~0.8.1",
+    "grunt-nodemon": "~0.2.0"
   },
   "engines": {
     "node": "~0.10",

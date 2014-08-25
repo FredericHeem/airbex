@@ -72,8 +72,8 @@ exports.cancel = function(req, res, next) {
             'FROM withdraw_request wr',
             'INNER JOIN account a ON a.account_id = wr.account_id',
             'WHERE',
-            '   wr.state = \'requested\' AND',
-            '   a.user_id = $2'
+            '   (wr.state = \'requested\' OR wr.state = \'sendingEmail\') AND',
+            '   a.user_id = $2 AND request_id = $1'
         ].join('\n'),
         values: [+req.params.id, req.user.id]
     }, function(err, dr) {

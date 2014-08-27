@@ -1,10 +1,5 @@
-name "landing"
-description "Website landing page"
+name "apidoc"
+description "APi docs"
 run_list(
-  "recipe[snow::landing]"
+  "recipe[snow::apidoc]"
 )
-override_attributes({
-  "nginx" => {
-    "default_site_enabled" => false
-  }
-})

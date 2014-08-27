@@ -46,7 +46,7 @@ deploy_revision node[:snow][:landing][:app_directory] do
         group "root"
         cwd "#{release_path}/landing"
         code %{
-          npm install
+          npm install --production
           PATH=$PATH:./node_modules/.bin
           export NODE_ENV=#{node.chef_environment}
           grunt
@@ -62,5 +62,19 @@ end
 
 # Enable site
 nginx_site 'snow-landing' do
+  action :enable
+end
+
+#Api docs
+
+template '/etc/nginx/sites-available/snow-apidoc' do
+  source "apidoc/nginx.conf.erb"
+  owner "root"
+  group "root"
+  notifies :reload, "service[nginx]"
+end
+
+# Enable site
+nginx_site 'snow-apidoc' do
   action :enable
 end

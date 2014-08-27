@@ -1,0 +1,20 @@
+server {
+    listen <%= node[:snow][:apidoc][:port] %>;
+    server_name localhost;
+    root /home/ubuntu/snow-landing/current/apidoc/_site;
+    access_log /var/log/snow-apidoc-access.log;
+    error_log /var/log/snow-apidoc-error.log;
+
+    gzip on;
+    gzip_http_version 1.1;
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_proxied any;
+    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript text/x-js;
+    gzip_buffers 16 8k;
+    gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+
+    location = / {
+        try_files /index.html /;
+    }
+}

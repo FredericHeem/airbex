@@ -49,7 +49,7 @@ deploy_revision node[:snow][:frontend][:app_directory] do
         group "root"
         cwd "#{release_path}/frontend"
         code %{
-          npm install
+          npm install --production
           PATH=$PATH:./node_modules/.bin
           SNOW_OPERATOR=#{operator} NODE_ENV=#{node.chef_environment} grunt production
         }

@@ -30,6 +30,9 @@ default['snow']['frontend']['port'] = 8010
 default['snow']['landing']['app_directory'] = "/home/ubuntu/snow-landing"
 default['snow']['landing']['port'] = 8050
 
+default['snow']['apidoc']['app_directory'] = "/home/ubuntu/snow-landing"
+default['snow']['apidoc']['port'] = 8060
+
 default['snow']['workers']['app_directory'] = "/home/ubuntu/snow-workers"
 default['snow']['workers']['min_conf'] = 6
 

@@ -67,7 +67,7 @@ deploy_revision node[:snow][:api][:app_directory] do
         group "root"
         cwd "#{release_path}/api"
         code %{
-          npm install
+          npm install --production
         }
       end
     end

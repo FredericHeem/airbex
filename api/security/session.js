@@ -28,34 +28,45 @@ module.exports = exports = function(app) {
 }
 
 // Extract and validate session, if present
-exports.handler = function(req, res, next) {
-    if (!req.cookies.session) return next()
 
-    exports.store.get(req.cookies.session, function(err, session) {
-        if (err) return next(err)
+exports.getUserAndSessionFromSessionKey = function(sessionKey, cb) {
+    if(!sessionKey) return cb(null, null);
+    debug("getUserAndSessionFromSessionKey: ", sessionKey);
+    exports.store.get(sessionKey, function(err, session) {
+        if (err) return cb(err)
         if (!session) {
-            debug("401 SessionNotFound for ip: %s", req.ip);
-            return res.send(401, {
+            debug("SessionNotFound");
+            return cb({
                 name: 'SessionNotFound',
                 message: 'The specified session could not be found'
             })
         }
-        req.session = session
 
         exports.app.security.users.fromUserId(session.userId, function(err, user) {
-            if (err) return next(err)
+            if (err) return cb(err)
             if(!user) {
-                return res.send(401, {
+                return cb({
                     name: 'SessionNotFound',
                     message: 'User not found in session'
                 })
             }
-            
-            req.user = user;
 
             debug('session attached (user #%d)', user.id)
-            next()
+            cb(null, {session: session, user: user});
         })
+    })
+}
+
+exports.handler = function(req, res, next) {
+    exports.getUserAndSessionFromSessionKey(req.cookies.session, function(err, response){
+        if(err) {
+            return res.send(401, err);
+        } else if(response){
+            req.session = response.session
+            req.user = response.user;
+        }
+        
+        next()
     })
 }
 
@@ -67,9 +78,8 @@ exports.extend = function(key, cb) {
     exports.store.extend(key, cb)
 }
 
-exports.create = function(req, email, cb) {
-    var ip = req.headers['x-real-ip'];
-    debug('create: finding user %s to create session from ip: %s', email, ip)
+exports.create = function(email, ip, cb) {
+    debug('create: finding user %s to create session', email)
 
     exports.app.security.users.fromEmail(email, function(err, user) {
         if (err) return cb(err)

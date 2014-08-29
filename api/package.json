@@ -23,10 +23,11 @@
     "twilio": "1.4.0",
     "redis": "0.9.1",
     "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
-    "winston": "0.7.x"
+    "winston": "0.7.x",
+    "socket.io": "1.0.6"
   },
   "scripts": {
-    "start": "DEBUG='*' NODE_ENV=brush grunt",
+    "start": "DEBUG='' NODE_ENV=brush grunt",
     "pack": "tar -zcf node_modules.tar.gz node_modules",
     "unpack": "tar -zxf node_modules.tar.gz",
     "test": "mocha",

@@ -4,23 +4,46 @@ var _ = require('lodash');
 
 module.exports = exports = function(app) {
     exports.app = app
-    app.post('/security/session', exports.create)
+    app.post('/security/session', exports.createRest)
     app.del('/security/session', exports.remove)
+    
+    app.socketio.sockets.on('connection', exports.createWs);
 }
 
-exports.create = function(req, res, next) {
-    if (!req.app.validate(req.body, 'v1/session_create', res)) {
-        debug("create invalid request")
-        return;
-    }
-    var email = req.body.email.toLowerCase()
+var _create = function(app, sessionParam, ip, cb) {
+    // TODO
+//    if (!app.validate(sessionParam, 'v1/session_create', res)) {
+//        return cb({error:"InvalidRequest"})
+//    }
     
-    exports.app.security.session.create(req, email, function(err, sid) {
-        if (err) return next(err)
+    var email = sessionParam.email.toLowerCase()
+    
+    exports.app.security.session.create(email, ip, function(err, sid) {
+        if (err) return cb(err)
         debug("create session from email: %s, sid: %s", email, sid)
-        res.send(201, {
-            id: sid
+        cb(null, {id: sid})
+    })
+}
+
+exports.createWs = function(client) {
+    log.info("connection");
+    
+    client.on('sessionCreate', function(request){
+        log.info('sessionCreate');
+        var ip = client.request.connection.remoteAddress
+        
+        _create(exports.app, request, ip, function(err, response){
+            if(err) return next(err)
+            client.emit('sessionCreate', response)
         })
+    });
+}
+
+exports.createRest = function(req, res, next) {
+    var ip = req.headers['x-real-ip'] || "???";
+    _create(req.app, req.body, ip, function(err, response){
+        if(err) return next(err)
+        res.send(201, response);
     })
 }
 

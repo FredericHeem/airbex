@@ -1,24 +1,39 @@
+var log = require('../log')(__filename)
+, debug = log.debug;
+
 module.exports = exports = function(app) {
     app.get('/v1/markets', exports.index)
     app.get('/v1/markets/:id/depth', exports.depth)
     app.get('/v1/markets/:id/vohlc', exports.vohlc)
+    
+    app.socketio.sockets.on('connection', function(socket) {
+        socket.on('markets', function(msg){
+            marketsGet(app, null, function(err, response){
+                if(err) {
+                    log.error(JSON.stringify(err))
+                } else {
+                    socket.emit('markets', response)
+                }
+            })
+        });
+        
+    });
 }
 
-exports.index = function(req, res, next) {
+var marketsGet = function(app, user, cb){
+    debug("markets")
     function formatPriceOrNull(p, m) {
         if (p === null) return null
-        return req.app.cache.formatOrderPrice(p, m)
+        return app.cache.formatOrderPrice(p, m)
     }
 
     function formatVolumeOrNull(v, m) {
         if (v === null) return null
-        return req.app.cache.formatOrderVolume(v, m)
+        return app.cache.formatOrderVolume(v, m)
     }
 
-    res.setHeader('Cache-Control', 'public, max-age=10')
-
-    if(req.user && req.user.id){
-        req.app.conn.read.query({
+    if(user && user.id){
+        app.conn.read.query({
             text: [
             "SELECT m.market_id,",
             "m.name,",
@@ -42,10 +57,10 @@ exports.index = function(req, res, next) {
             "(SELECT sum(ma.volume) AS sum FROM (match ma JOIN order_view o ON ((ma.bid_order_id = o.order_id))) WHERE ((o.market_id = m.market_id) AND (age(ma.created_at) < '1 day'::interval))) AS volume", 
             "FROM market m ORDER BY m.base_currency_id, m.quote_currency_id"          
             ].join('\n'),
-            values: [req.user.id]
+            values: [user.id]
         }, function(err, dr) {
-            if (err) return next(err)
-            res.send(dr.rows.map(function(row) {
+            if (err) return cb(err);
+            return cb(null, dr.rows.map(function(row) {
                 var name = row.name || (row.base_currency_id + row.quote_currency_id)
                 return {
                     id: name,
@@ -72,9 +87,9 @@ exports.index = function(req, res, next) {
         })
     } else {
         var query = 'SELECT * FROM market_summary_view';
-        req.app.conn.read.query(query, function(err, dr) {
-            if (err) return next(err)
-            res.send(dr.rows.map(function(row) {
+        app.conn.read.query(query, function(err, dr) {
+            if (err) return cb(err);
+            return cb(null, dr.rows.map(function(row) {
                 var name = row.name || (row.base_currency_id + row.quote_currency_id)
                 return {
                     id: name,
@@ -90,6 +105,13 @@ exports.index = function(req, res, next) {
             }))
         })
     }
+}
+
+exports.index = function(req, res, next) {
+    marketsGet(req.app, req.user, function(err, response){
+        if(err) return next(err);
+        res.send(response);
+    })
 }
 
 exports.depth = function(req, res, next) {

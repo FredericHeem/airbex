@@ -36,7 +36,7 @@ app.intercom = require('./intercom')
 app.segment = require('./segment')(app)
 app.security = require('./security')(app)
 app.phone = require('./phone')(app)
-
+app.socketio = require('./socketio')(app, server);
 
 // set req.ip and req.ips properly
 app.enable('trust proxy');

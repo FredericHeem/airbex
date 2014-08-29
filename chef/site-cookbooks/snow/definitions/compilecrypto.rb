@@ -151,7 +151,7 @@ define :compilecrypto do
       variables({
         :username => cryptoConfig['username'],
         :password => cryptoConfig['password'],
-        :rpcallowip => cryptoConfig['rpcallowip'] || 'localhost' ,
+        :rpcallowip => cryptoConfig['rpcallowip'] || '127.0.0.1' ,
         :testnet => cryptoConfig['testnet'] || 0,
         :nodes => cryptoConfig['nodes'] || []
       })

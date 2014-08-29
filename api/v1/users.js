@@ -5,7 +5,8 @@ var log = require('../log')(__filename)
 
 
 module.exports = exports = function(app) {
-    app.get('/v1/whoami', app.security.demand.any, exports.whoami)
+    exports.app = app;
+    app.get('/v1/whoami', app.security.demand.any, exports.whoamiRest)
     app.post('/v1/users/identity', app.security.demand.primary(1), exports.identity)
     app.post('/v1/users/verify/text', app.security.demand.primary(1), exports.startPhoneVerify)
     app.post('/v1/users/verify/call', app.security.demand.primary(1), exports.voiceFallback)
@@ -15,6 +16,9 @@ module.exports = exports = function(app) {
 
     require('./users.create')(app)
     require('./documents')(app)
+    
+    app.socketio.sockets.on('connection', exports.whoamiWs);
+    
 }
 
 exports.patch = function(req, res, next) {
@@ -58,11 +62,9 @@ exports.patch = function(req, res, next) {
         res.send(204)
     })
 }
-
-exports.whoami = function(req, res, next) {
-    // TODO: extract to view
-	req.app.conn.read.query({
-		text: [
+var whoami = function(app, user, cb) {
+    app.conn.read.query({
+        text: [
             'SELECT',
             '   user_id id,',
             '   email,',
@@ -84,14 +86,14 @@ exports.whoami = function(req, res, next) {
             'FROM user_view',
             'WHERE user_id = $1'
         ].join('\n'),
-		values: [req.user.id]
-	}, function(err, dres) {
-		if (err) return next(err)
-		if (!dres.rows.length) return res.send(404)
+        values: [user.id]
+    }, function(err, dres) {
+        if (err) return cb(err)
+        if (!dres.rows.length) return cb(null)
         // PostgreSQL is not case sensitive. Case sensitive naming must be done here
         // and not using "AS".
         var row = dres.rows[0]
-		res.send({
+        cb(null,{
             id: row.id,
             email: row.email,
             admin: row.admin,
@@ -110,7 +112,43 @@ exports.whoami = function(req, res, next) {
             poi: !!row.poi_approved_at,
             poa: !!row.poa_approved_at
         })
-	})
+    })
+}
+
+exports.whoamiWs = function(client) {
+    log.info("connection");
+    
+    client.on('whoami', function(request){
+        log.info('whoami sessionKey', request.sessionKey);
+        exports.app.security.session.getUserAndSessionFromSessionKey(request.sessionKey,function(err, response){
+            if(err) {
+                log.error("whoami ", err)
+                client.emit("whoami", {error:err})
+            } else if(response){
+                client.session = response.session
+                client.user = response.user;
+                whoami(exports.app, client.user, function(err, user){
+                    if(err) return next(err)
+                    log.info("whoami resp", {data:user});
+                    client.emit('whoami', {data:user})
+                })
+            }
+        }
+        )
+    });
+}
+
+exports.whoamiRest = function(req, res, next) {
+    whoami(req.app, req.user, function(err, response){
+        if(err){
+            next(err)
+        } else if (response){
+            res.send(response)
+        } else {
+            res.send(404)
+        }
+    })
+
 }
 
 exports.identity = function(req, res, next) {

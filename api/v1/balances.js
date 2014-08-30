@@ -15,7 +15,7 @@ exports.balancesWs = function(client) {
         var user = client.user;
         if(!user){
             log.error("NotAuthenticated");
-            client.emit('balances', {error:"NotAuthenticated"})
+            client.emit('balances', {error:{name: "NotAuthenticated"}})
             return 
         }
         balanceGet(exports.app, user, function(err, balances){

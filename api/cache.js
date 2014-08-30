@@ -66,7 +66,7 @@ module.exports = exports = function(app, conn, cb) {
 
         debug("#markets %s", res.markets.length)
         res.markets.forEach(function(x) {
-            debug("market: %s", JSON.stringify(x))
+            //debug("market: %s", JSON.stringify(x))
             var marketName = x.name || (x.base_currency_id + x.quote_currency_id);
             exports.markets[marketName] = x
         })
@@ -75,7 +75,7 @@ module.exports = exports = function(app, conn, cb) {
 
         debug("#currencies %s", res.currencies.length)
         res.currencies.forEach(function(x) {
-            debug("currency: %s", JSON.stringify(x))
+            //debug("currency: %s", JSON.stringify(x))
             exports.currencies[x.currency_id] = x
             
             if(x.fiat == false){

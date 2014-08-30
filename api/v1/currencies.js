@@ -2,32 +2,28 @@ var log = require('../log')(__filename)
 , debug = log.debug;
 
 module.exports = exports = function(app) {
+    exports.app = app;
     app.get('/v1/currencies', exports.index);
-    
-    app.socketio.sockets.on('connection', function(socket) {
-        debug("connection");
-        
-        socket.on('currencies', function(msg){
-            log.info('currencies');
-            currenciesGet(app, function(err, response){
-                if(err) {
-                    log.error(JSON.stringify(err))
-                    socket.emit('currencies', {
-                        error:{
-                            name:"DbError", 
-                            message:JSON.stringify(err)
-                        }
-                    }
-                    )
-                } else {
-                    socket.emit('currencies', {data:response})
-                }
-            })
-        });
-        
-    });
+    app.socketio.router.on("currencies", exports.currenciesWs);
 }
 
+exports.currenciesWs = function(client, args, next) {
+    currenciesGet(exports.app, function(err, response){
+        if(err) {
+            log.error(JSON.stringify(err))
+            client.emit('currencies', {
+                error:{
+                    name:"DbError", 
+                    message:JSON.stringify(err)
+                }
+            }
+            )
+        } else {
+            client.emit('currencies', {data:response})
+        }
+    })
+
+}
 var currenciesGet = function(app, cb){
     var query = [
                  'SELECT *',

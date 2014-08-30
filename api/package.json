@@ -24,7 +24,8 @@
     "redis": "0.9.1",
     "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
     "winston": "0.7.x",
-    "socket.io": "1.0.6"
+    "socket.io": "1.0.6",
+    "socket.io-events":"0.4.1"
   },
   "scripts": {
     "start": "DEBUG='' NODE_ENV=brush grunt",

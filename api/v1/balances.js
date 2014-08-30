@@ -4,29 +4,15 @@ var log = require('../log')(__filename)
 module.exports = exports = function(app) {
     exports.app = app
     app.get('/v1/balances', app.security.demand.any, exports.balancesRest)
-    app.socketio.sockets.on('connection', exports.balancesWs);
+    app.socketio.router.on("balances", app.socketio.demand, exports.balancesWs);
 }
 
-exports.balancesWs = function(client) {
-    debug("balancesWs");
-    
-    client.on('balances', function(request){
-        //debug('balances');
-        var user = client.user;
-        if(!user){
-            log.error("NotAuthenticated");
-            client.emit('balances', {error:{name: "NotAuthenticated"}})
-            return 
-        }
-        balanceGet(exports.app, user, function(err, balances){
-            if(err) {
-                return client.emit('balances', {error: err})
-            } else {
-                //log.debug('balances', balances);
-                client.emit('balances', {data:balances})
-            }
-        })
-    });
+exports.balancesWs = function(client, args, next) {
+    balanceGet(exports.app, client.user, function(err, balances){
+        if(err) return next(new Error(err));
+            //log.debug('balances', balances);
+        client.emit('balances', {data:balances})
+    })
 }
 
 exports.balancesRest = function(req, res, next) {
@@ -37,6 +23,7 @@ exports.balancesRest = function(req, res, next) {
 }
 
 var balanceGet  = function(app, user, cb) {
+    //return cb({name:"errorrrrrrr"});
     app.conn.read.get().query({
         text: [
             'SELECT currency_id, SUM(available) available, SUM("hold") "hold", SUM(balance) balance',

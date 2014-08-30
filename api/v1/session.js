@@ -7,7 +7,7 @@ module.exports = exports = function(app) {
     app.post('/security/session', exports.createRest)
     app.del('/security/session', exports.remove)
     
-    app.socketio.sockets.on('connection', exports.createWs);
+    app.socketio.router.on("sessionCreate", exports.createWs);
 }
 
 var _create = function(app, sessionParam, ip, cb) {
@@ -25,15 +25,13 @@ var _create = function(app, sessionParam, ip, cb) {
     })
 }
 
-exports.createWs = function(client) {
-    client.on('sessionCreate', function(request){
-        var ip = client.request.connection.remoteAddress || "UnknowIp";
-        log.debug('sessionCreate from ip', ip);
-        _create(exports.app, request, ip, function(err, response){
-            if(err) return next(err)
-            client.emit('sessionCreate', response)
-        })
-    });
+exports.createWs = function(client, args, next) {
+    var ip = "UnknowIp";
+    log.debug('sessionCreate from ip', ip);
+    _create(exports.app, args[1], ip, function(err, response){
+        if(err) return next(err)
+        client.emit('sessionCreate', response)
+    })
 }
 
 exports.createRest = function(req, res, next) {

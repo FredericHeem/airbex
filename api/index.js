@@ -54,6 +54,8 @@ routes.forEach(function(name) {
     require('./' + name)(app)
 })
 
+app.socketio.setErrorHandler();
+
 if (config.raven) {
     var raven = require('raven')
     app.use(raven.middleware.express(config.raven))

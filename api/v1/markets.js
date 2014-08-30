@@ -7,27 +7,14 @@ module.exports = exports = function(app) {
     app.get('/v1/markets/:id/depth', exports.depth)
     app.get('/v1/markets/:id/vohlc', exports.vohlc)
     
-    app.socketio.sockets.on('connection', exports.marketsWs);
+    app.socketio.router.on("markets", exports.marketsWs);
 }
 
-exports.marketsWs = function(client) {
-    client.on('markets', function(msg){
-        debug("marketsWs")
-        marketsGet(exports.app, null, function(err, response){
-            if(err) {
-                log.error(JSON.stringify(err))
-                client.emit('markets', {
-                    error:{
-                        name:"DbError", 
-                        message:JSON.stringify(err)
-                    }
-                }
-                )
-            } else {
-                client.emit('markets', {data:response})
-            }
-        })
-    });
+exports.marketsWs = function(client, args, next) {
+    marketsGet(exports.app, null, function(err, response){
+        if(err) return next({name:"DbError", message:JSON.stringify(err)})
+        client.emit('markets', {data:response})
+    })
 }
 
 var marketsGet = function(app, user, cb){

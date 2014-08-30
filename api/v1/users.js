@@ -17,7 +17,7 @@ module.exports = exports = function(app) {
     require('./users.create')(app)
     require('./documents')(app)
     
-    app.socketio.sockets.on('connection', exports.whoamiWs);
+    app.socketio.router.on("whoami", exports.whoamiWs);
     
 }
 
@@ -115,27 +115,19 @@ var whoami = function(app, user, cb) {
     })
 }
 
-exports.whoamiWs = function(client) {
-    log.info("connection");
-    
-    client.on('whoami', function(request){
-        log.info('whoami sessionKey', request.sessionKey);
-        exports.app.security.session.getUserAndSessionFromSessionKey(request.sessionKey,function(err, response){
-            if(err) {
-                log.error("whoami ", err)
-                client.emit("whoami", {error:err})
-            } else if(response){
-                client.session = response.session
-                client.user = response.user;
-                whoami(exports.app, client.user, function(err, user){
-                    if(err) return next(err)
-                    log.info("whoami resp", {data:user});
-                    client.emit('whoami', {data:user})
-                })
-            }
+exports.whoamiWs = function(client, args, next) {
+
+    log.debug('whoami');
+
+    whoami(exports.app, client.user, function(err, user){
+        if(err) {
+            log.error("whoami ", err)
+            client.emit('whoami', {error:err})
+        } else {
+            log.info("whoami ", {data:user});
+            client.emit('whoami', {data:user})
         }
-        )
-    });
+    })
 }
 
 exports.whoamiRest = function(req, res, next) {

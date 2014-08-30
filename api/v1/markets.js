@@ -2,21 +2,31 @@ var log = require('../log')(__filename)
 , debug = log.debug;
 
 module.exports = exports = function(app) {
+    exports.app = app;
     app.get('/v1/markets', exports.index)
     app.get('/v1/markets/:id/depth', exports.depth)
     app.get('/v1/markets/:id/vohlc', exports.vohlc)
     
-    app.socketio.sockets.on('connection', function(socket) {
-        socket.on('markets', function(msg){
-            marketsGet(app, null, function(err, response){
-                if(err) {
-                    log.error(JSON.stringify(err))
-                } else {
-                    socket.emit('markets', response)
+    app.socketio.sockets.on('connection', exports.marketsWs);
+}
+
+exports.marketsWs = function(client) {
+    client.on('markets', function(msg){
+        debug("marketsWs")
+        marketsGet(exports.app, null, function(err, response){
+            if(err) {
+                log.error(JSON.stringify(err))
+                client.emit('markets', {
+                    error:{
+                        name:"DbError", 
+                        message:JSON.stringify(err)
+                    }
                 }
-            })
-        });
-        
+                )
+            } else {
+                client.emit('markets', {data:response})
+            }
+        })
     });
 }
 
@@ -33,7 +43,7 @@ var marketsGet = function(app, user, cb){
     }
 
     if(user && user.id){
-        app.conn.read.query({
+        app.conn.read.get().query({
             text: [
             "SELECT m.market_id,",
             "m.name,",
@@ -87,8 +97,12 @@ var marketsGet = function(app, user, cb){
         })
     } else {
         var query = 'SELECT * FROM market_summary_view';
-        app.conn.read.query(query, function(err, dr) {
-            if (err) return cb(err);
+        app.conn.read.get().query(query, function(err, dr) {
+            debug("getting markets done")
+            if (err) {
+                log.error(JSON.stringify(err))
+                return cb(err);
+            }
             return cb(null, dr.rows.map(function(row) {
                 var name = row.name || (row.base_currency_id + row.quote_currency_id)
                 return {
@@ -115,7 +129,7 @@ exports.index = function(req, res, next) {
 }
 
 exports.depth = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT price, volume, "type"',
             'FROM order_depth_view odv',
@@ -152,7 +166,7 @@ exports.depth = function(req, res, next) {
 }
 
 exports.vohlc = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT *',
             'FROM vohlc',

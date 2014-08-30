@@ -55,7 +55,7 @@ exports.query = function(app, query, cb) {
     values.push(query.offset || 0)
     text.push('LIMIT 100 OFFSET $' + values.length)
 
-    app.conn.read.query({
+    app.conn.read.get().query({
         text: text.join('\n'),
         values: values
     }, function(err, dr) {

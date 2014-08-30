@@ -42,7 +42,7 @@ module.exports = exports = function(app) {
 exports.create = function(app, userId, currency, amount, cb) {
     var voucherId = exports.createId()
 
-    app.conn.write.query({
+    app.conn.write.get().query({
         text: [
             'SELECT create_voucher($1, $2, $3, $4)'
         ].join('\n'),
@@ -75,7 +75,7 @@ exports.createId = function() {
 }
 
 exports.index = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT v.voucher_id, h.amount, a.currency_id',
             'FROM voucher v',
@@ -99,7 +99,7 @@ exports.index = function(req, res, next) {
 exports.redeem = function(app, user, voucher, cb) {
     async.waterfall([
         function(cb) {
-            app.conn.write.query({
+            app.conn.write.get().query({
                 text: [
                     'SELECT redeem_voucher($1, $2) tid'
                 ].join('\n'),
@@ -115,7 +115,7 @@ exports.redeem = function(app, user, voucher, cb) {
                 return cb(null, null)
             }
 
-            app.conn.read.query({
+            app.conn.read.get().query({
                 text: [
                     'SELECT t.amount, a.currency_id',
                     'FROM "transaction" t',

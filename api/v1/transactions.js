@@ -26,7 +26,7 @@ exports.index = function(req, res, next) {
     var limit = Math.min(25, +req.body.limit || 25)
     q = q.limit(limit)
 
-    req.app.conn.read.query(q, function(err, dr) {
+    req.app.conn.read.get().query(q, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rowCount ? {
             count: dr.rows[0].full_row_count,
@@ -59,7 +59,7 @@ exports.csv = function(req, res, next) {
     .where('user_id = ${userId}')
     .p('userId', req.user.id)
 
-    req.app.conn.read.query(q, function(err, dr) {
+    req.app.conn.read.get().query(q, function(err, dr) {
         if (err) return next(err)
 
         var csv = [

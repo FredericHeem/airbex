@@ -47,7 +47,7 @@ exports.patch = function(req, res, next) {
         })
     }
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'UPDATE "user"',
             'SET ' + updateText,
@@ -63,7 +63,7 @@ exports.patch = function(req, res, next) {
     })
 }
 var whoami = function(app, user, cb) {
-    app.conn.read.query({
+    app.conn.read.get().query({
         text: [
             'SELECT',
             '   user_id id,',
@@ -172,7 +172,7 @@ exports.identity = function(req, res, next) {
             req.body.country, req.body.city, req.body.postalArea]
     }
 
-    req.app.conn.write.query(query, function(err, dr) {
+    req.app.conn.write.get().query(query, function(err, dr) {
         if (err) {
             return next(err)
         }
@@ -202,7 +202,7 @@ exports.verifyPhone = function(req, res, next) {
     //if (!req.app.validate(req.body, 'v1/user_verify_phone_code', res)) return
     delete exports.allowedVoiceFallback[req.user.id]
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: 'SELECT verify_phone($1, $2) success',
         values: [req.user.id, req.body.code]
     }, function(err, dr) {
@@ -232,7 +232,7 @@ exports.verifyPhone = function(req, res, next) {
             })
         }
 
-        req.app.conn.read.query({
+        req.app.conn.read.get().query({
             text: [
                 'SELECT phone_number',
                 'FROM "user"',
@@ -311,7 +311,7 @@ exports.startPhoneVerify = function(req, res, next) {
         })
     }
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: 'SELECT create_phone_number_verify_code($2, $1) code',
         values: [req.user.id, number]
     }, function(err, dr) {
@@ -367,7 +367,7 @@ exports.changePassword = function(req, res, next) {
     debug("changePassword user %s", req.user.id);
     if (!req.app.validate(req.body, 'v1/users_changepassword', res)) return
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'UPDATE api_key',
             'SET api_key_id = $2',

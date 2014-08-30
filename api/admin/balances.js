@@ -4,7 +4,7 @@ module.exports = exports = function(app) {
 }
 
 exports.wallets = function(req, res, next) {
-    req.app.conn.read.query([
+    req.app.conn.read.get().query([
         'SELECT *',
         'FROM wallet'
     ].join('\n'), function(err, dr) {
@@ -18,7 +18,7 @@ exports.wallets = function(req, res, next) {
 }
 
 exports.index = function(req, res, next) {
-    req.app.conn.read.query([
+    req.app.conn.read.get().query([
         'SELECT a.currency_id currency, a.type, SUM(a.balance) balance',
         'FROM account a',
         'INNER JOIN "currency" c ON a.currency_id = c.currency_id',

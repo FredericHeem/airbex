@@ -43,18 +43,20 @@ module.exports = exports = function(app, conn, cb) {
     
     async.parallel({
         currencies: function(cb) {
-            conn.read.query({
+            conn.read.get().query({
                 text: 'SELECT * FROM currency'
             }, function(err, res) {
+                debug("query currencies done")
                 if (err) return cb(err)
                 cb(null, res.rows)
             })
         },
         markets: function(cb) {
-            conn.read.query([
+            conn.read.get().query([
                 'SELECT *',
                 'FROM market'
             ].join('\n'), function(err, res) {
+                debug("query markets done")
                 if (err) return cb(err)
                 cb(null, res.rows)
             })

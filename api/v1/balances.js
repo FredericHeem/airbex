@@ -37,7 +37,7 @@ exports.balancesRest = function(req, res, next) {
 }
 
 var balanceGet  = function(app, user, cb) {
-    app.conn.read.query({
+    app.conn.read.get().query({
         text: [
             'SELECT currency_id, SUM(available) available, SUM("hold") "hold", SUM(balance) balance',
             'FROM account_view',

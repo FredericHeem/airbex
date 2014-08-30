@@ -2,7 +2,10 @@ if (module.parent && process.env.NODE_ENV != 'travis') {
     process.env.NODE_ENV = 'test'
 }
 
-console.log(process.versions);
+var log = require('./log')(__filename)
+debug = log.debug
+
+log.info(process.versions);
 
 var config = require('konfu')
 , createSmtpTransport = require('nodemailer').createTransport
@@ -11,11 +14,9 @@ var config = require('konfu')
 , http = require('http')
 , server = http.createServer(app)
 , pg = require('./pg')
-,log = require('./log')(__filename)
- debug = log.debug
 
 app.config = config
-debug("listening on port %s", config.port)
+
 
 app.conn = {
     read: config.pg_read_url ? pg(config.pg_read_url, config.pg_native) : {},
@@ -77,8 +78,13 @@ app.use(function(req, res) {
     res.send(404)
 })
 
+
+
 var cache = app.cache = require('./cache')
 cache(app, module.parent ? null : app.conn, function(err) {
-    if (err) throw err
+    if (err) {
+        log.error(err)
+    }
+    debug("listening on port %s", config.port)
     server.listen(config.port)
 })

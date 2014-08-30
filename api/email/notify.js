@@ -112,7 +112,7 @@ exports.tick = function() {
 
     var query = 'SELECT * FROM pending_email_notify'
 
-    exports.app.conn.read.query(query, function(err, dr) {
+    exports.app.conn.read.get().query(query, function(err, dr) {
         if (err) {
             // TODO: Raven
             console.error('Failed to check for new email notifications')
@@ -132,7 +132,7 @@ exports.tick = function() {
 
             debug('setting tip to %s', tip)
 
-            exports.app.conn.write.query({
+            exports.app.conn.write.get().query({
                 text: [
                     'UPDATE settings SET notify_tip = $1',
                     'WHERE notify_tip < $1'
@@ -168,7 +168,7 @@ exports.processUserPending = function(row, cb) {
 				debug("ERROR sending email")
 				return cb(err)
 			} else {
-	            exports.app.conn.write.query({
+	            exports.app.conn.write.get().query({
 	                text: [
 	                    "UPDATE user_pending SET state ='emailsent'",
 	                    'WHERE email=$1'
@@ -198,7 +198,7 @@ exports.tickUserPending = function() {
 
     var query = "SELECT * FROM user_pending where state='created'"
 
-    exports.app.conn.read.query(query, function(err, dr) {
+    exports.app.conn.read.get().query(query, function(err, dr) {
         if (err) {
             // TODO: Raven
             console.error('tickUserPending Failed to check for new email notifications')

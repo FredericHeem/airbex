@@ -8,7 +8,7 @@ module.exports = exports = function(app) {
 }
 //, app.config.tfaBypass
 exports.remove = function(req, res, next) {
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'UPDATE "user"',
             'SET two_factor = NULL',
@@ -58,7 +58,7 @@ exports.enable = function(req, res, next) {
         })
     }
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'UPDATE "user"',
             'SET two_factor = $2, two_factor_success_counter = $3',

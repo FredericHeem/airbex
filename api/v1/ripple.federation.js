@@ -89,7 +89,7 @@ exports.fromUser = function(user, cb) {
         values: [user]
     }
 
-    exports.app.conn.read.query(query, function(err, dr) {
+    exports.app.conn.read.get().query(query, function(err, dr) {
         if (err) return cb(err)
         if (!dr.rowCount) return cb()
         cb(null, dr.rows[0].tag)

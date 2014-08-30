@@ -47,7 +47,7 @@ exports.uploadId = function(req, res, next) {
         var type = "";
         var data64 = new Buffer(data, 'binary').toString('base64');
         debug('uploadId base 64 length %s',data64.length)
-        req.app.conn.write.query({
+        req.app.conn.write.get().query({
             text: [
                 'INSERT INTO document (user_id, name, type, status, image, size)',
                 'VALUES ($1, $2, $3, $4, $5, $6)'
@@ -67,7 +67,7 @@ exports.getIds = function(req, res, next) {
     var userId = req.user.id;
     debug('getIds %d', userId);
 
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
                'SELECT name, size, last_modified_date, "type", status, message',
                'FROM document',

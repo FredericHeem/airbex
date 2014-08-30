@@ -26,12 +26,9 @@ var _create = function(app, sessionParam, ip, cb) {
 }
 
 exports.createWs = function(client) {
-    log.info("connection");
-    
     client.on('sessionCreate', function(request){
-        log.info('sessionCreate');
-        var ip = client.request.connection.remoteAddress
-        
+        var ip = client.request.connection.remoteAddress || "UnknowIp";
+        log.debug('sessionCreate from ip', ip);
         _create(exports.app, request, ip, function(err, response){
             if(err) return next(err)
             client.emit('sessionCreate', response)

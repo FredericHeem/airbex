@@ -8,7 +8,7 @@ module.exports = exports = function(app) {
 exports.sendVerificationEmail = function(app, userId, cb) {
     var code = crypto.randomBytes(10).toString('hex')
 
-    app.conn.write.query({
+    app.conn.write.get().query({
         text: [
             'SELECT email, language, create_email_verify_code($1, $2)',
             'FROM "user"',
@@ -56,7 +56,7 @@ exports.verify = function(req, res, next) {
         return res.send(400, 'Invalid email verification code in url.')
     }
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: 'SELECT verify_email($1) uid',
         values: [req.params.code]
     }, function(err, dr) {

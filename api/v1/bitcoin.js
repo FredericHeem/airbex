@@ -19,7 +19,7 @@ exports.code = function() {
 
 exports.withdrawVerifyCode = function(req, res, next) {
     debug('withdrawVerifyCode code: %s', req.params.code);
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: 'SELECT withdraw_verify_code($1)',
         values: [req.params.code]
     }, function(err, dr) {
@@ -77,7 +77,7 @@ exports.withdraw = function(currencyId, req, res, next) {
     debug("withdraw code ", code)
     var queryText = 'SELECT crypto_withdraw($1, $2, $3, $4, $5) rid';
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: queryText,
         values: [
             currencyId.toUpperCase(),
@@ -118,7 +118,7 @@ exports.address = function(currencyId, req, res, next) {
         'WHERE account_id = user_currency_account($1, $2) AND currency_id = $2'
     ].join('\n');
 
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: queryText,
         values: [req.user.id, currencyId]
     }, function(err, dr) {

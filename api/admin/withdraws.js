@@ -15,7 +15,7 @@ module.exports = exports = function(app) {
 }
 
 exports.withdraw = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT *',
             'FROM withdraw_request_view',
@@ -47,7 +47,7 @@ exports.withdraw = function(req, res, next) {
 }
 
 exports.cancel = function(req, res, next) {
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: 'SELECT cancel_withdraw_request($1, $2);',
         values: [+req.params.id, req.body.error || null]
     }, function(err, dr) {
@@ -70,7 +70,7 @@ exports.cancel = function(req, res, next) {
 }
 
 exports.process = function(req, res, next) {
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'UPDATE withdraw_request',
             'SET state = \'processing\'',
@@ -94,7 +94,7 @@ exports.process = function(req, res, next) {
 }
 
 exports.complete = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT a.currency_id',
             'FROM withdraw_request wr',
@@ -115,7 +115,7 @@ exports.complete = function(req, res, next) {
 
         var currency = dr.rows[0].currency_id
 
-        req.app.conn.write.query({
+        req.app.conn.write.get().query({
             text: [
                 'SELECT confirm_withdraw($1, $2)',
                 'FROM withdraw_request',

@@ -5,7 +5,7 @@ module.exports = exports = function(app) {
 
 exports.trades = function(req, res, next) {
     var since = req.query.since || 0
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT',
             '   price_decimal::varchar price,',
@@ -29,7 +29,7 @@ exports.trades = function(req, res, next) {
 }
 
 exports.orderbook = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT *',
             'FROM order_depth_view od',

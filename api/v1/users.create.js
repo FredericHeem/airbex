@@ -25,7 +25,7 @@ exports.beginCreate = function(req, res, next) {
 
     debug('email verify code for %s: %s', code, req.body.email)
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'INSERT INTO user_pending (email, api_key_id, code)',
             'VALUES ($1, $2, $3)'
@@ -51,7 +51,7 @@ exports.beginCreate = function(req, res, next) {
 exports.endCreate = function(req, res, next) {
     debug('endCreate code: %s', req.params.code);
     
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: 'SELECT create_user_end($1) user_id',
         values: [req.params.code]
     }, function(err, dr) {

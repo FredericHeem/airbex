@@ -27,7 +27,7 @@ function formatPurchaseOrderRow(cache, row) {
 exports.read = function(req, res, next) {
 	debug("read")
 	var user_id = req.user.id;
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT po.id, po.user_id, m.name, po.type, po.amount, po.address, po.state, po.created_at',
             'FROM purchase_order po',
@@ -63,7 +63,7 @@ exports.update = function(req, res, next) {
     }
     
     debug("update %s", query);
-    req.app.conn.write.query(query, function(err, dr) {
+    req.app.conn.write.get().query(query, function(err, dr) {
     	debug("update got db");
         if (err) {
             debug("update purchase order error: %s", err.message);

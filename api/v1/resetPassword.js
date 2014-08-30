@@ -30,7 +30,7 @@ exports.resetPasswordBegin = function(req, res, next) {
     var emailCode = exports.createEmailCode()
     , phoneCode = exports.createPhoneCode()
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'SELECT reset_password_begin($1, $2, $3), language, phone_number, two_factor',
             'FROM "user"',
@@ -94,7 +94,7 @@ exports.resetPasswordContinue = function(req, res, next) {
     
     debug("resetPasswordContinue code: %s", req.params.code); 
     
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'SELECT code, phone_number',
             'FROM reset_password_continue($1)'
@@ -145,7 +145,7 @@ function resetEnd(req, res, next){
     
     debug("resetPasswordEnd phone_code: %s", phone_code);
     
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: 'SELECT reset_password_end($1, $2, $3) success',
         values: [req.body.email, phone_code, req.body.key]
     }, function(err, dr) {
@@ -176,7 +176,7 @@ function resetEnd(req, res, next){
 exports.resetPasswordEnd = function(req, res, next) {
     debug("resetPasswordEnd email: %s, code %s, otp: %s", 
             req.body.email, req.body.code, req.body.otp); 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'SELECT user_id, two_factor',
             'FROM "user"',

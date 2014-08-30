@@ -3,7 +3,7 @@ module.exports = exports = function(app) {
 }
 
 exports.height = function(req, res, next) {
-    req.app.conn.read.query('SELECT litecoin_height FROM settings', function(err, dr) {
+    req.app.conn.read.get().query('SELECT litecoin_height FROM settings', function(err, dr) {
         if (err) return next(err)
         res.send(200, { height: dr.rows[0].litecoin_height })
     })

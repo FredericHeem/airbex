@@ -47,7 +47,7 @@ exports.demand = function(level, req, res) {
 }
 
 exports.fetchUserFromKey = function(app, key, cb) {
-    app.conn.read.query({
+    app.conn.read.get().query({
         text: [
             'SELECT',
             '   a.user_id,',

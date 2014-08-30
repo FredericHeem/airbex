@@ -12,8 +12,8 @@ exports.createInstantBuy = function(userId, req, res, next) {
 	var amount = req.app.cache.parseCurrency(req.body.amount, quote);
 	debug("createInstantBuy %s in %s", amount, quote);
 
-	req.app.conn.write.query("BEGIN");
-	req.app.conn.write.query({
+	req.app.conn.write.get().query("BEGIN");
+	req.app.conn.write.get().query({
 		text: 
 			[
 			 'SELECT convert_bid($1, market_id, $2) oid',
@@ -53,7 +53,7 @@ exports.createInstantBuy = function(userId, req, res, next) {
 		}
 	})	
 
-	req.app.conn.write.query({
+	req.app.conn.write.get().query({
 		text: "UPDATE purchase_order set state = $1 where id = $2",
 		values: [
 		         'Purchased',
@@ -65,7 +65,7 @@ exports.createInstantBuy = function(userId, req, res, next) {
 			return next(err)
 		}
 	})	
-	req.app.conn.write.query("COMMIT", function() {
+	req.app.conn.write.get().query("COMMIT", function() {
 		debug("commited")
 		res.send(201, {
 			id: ""
@@ -173,7 +173,7 @@ exports.create = function(userId, req, res, next) {
         }
     }
 
-    req.app.conn.write.query(query, function(err, dr) {
+    req.app.conn.write.get().query(query, function(err, dr) {
         if (err) {
             debug("create order error: %s", err.message);
             

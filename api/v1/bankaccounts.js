@@ -6,7 +6,7 @@ module.exports = exports = function(app) {
 }
 
 exports.index = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT * FROM bank_account WHERE user_id = $1'
         ].join('\n'),
@@ -43,7 +43,7 @@ exports.add = function(req, res, next) {
         ]
     }
 
-    req.app.conn.write.query(q, function(err) {
+    req.app.conn.write.get().query(q, function(err) {
         if (err) return next(err)
         res.send(204)
     })

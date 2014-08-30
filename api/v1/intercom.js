@@ -11,7 +11,7 @@ exports.hash = function(app, userId) {
 }
 
 exports.intercom = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT user_id, email_lower,',
             'FLOOR(EXTRACT(epoch FROM created_at))::int created_at',

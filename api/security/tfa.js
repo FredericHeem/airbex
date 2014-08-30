@@ -45,7 +45,7 @@ exports.consume = function(userId, secret, guess, cb) {
     debug('looking up otp details for user %s', userId)
 
     // Is the user locked out from trying?
-    exports.app.conn.read.query({
+    exports.app.conn.read.get().query({
         text: [
             'SELECT',
             '   two_factor_success_counter,',
@@ -69,7 +69,7 @@ exports.consume = function(userId, secret, guess, cb) {
         var counter = exports.validate(secret, guess, dr.rows[0].two_factor_success_counter)
 
         if (counter) {
-            return exports.app.conn.write.query({
+            return exports.app.conn.write.get().query({
                 text: [
                     'UPDATE "user"',
                     'SET',
@@ -85,7 +85,7 @@ exports.consume = function(userId, secret, guess, cb) {
             })
         }
 
-        exports.app.conn.write.query({
+        exports.app.conn.write.get().query({
             text: [
                 'UPDATE "user"',
                 'SET',

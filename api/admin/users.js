@@ -28,7 +28,7 @@ module.exports = exports = function(app) {
 }
 
 exports.forgivePasswordReset = function(req, res, next) {
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: 'UPDATE "user" SET reset_started_at = NULL WHERE user_id = $1',
         values: [+req.params.user]
     }, function(err, dr) {
@@ -46,7 +46,7 @@ exports.forgivePasswordReset = function(req, res, next) {
 }
 
 exports.removeBankAccount = function(req, res, next) {
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: 'DELETE FROM bank_account WHERE bank_account_id = $1',
         values: [req.params.id]
     }, function(err, dr) {
@@ -86,14 +86,14 @@ exports.addBankAccount = function(req, res, next) {
         ]
     }
 
-    req.app.conn.write.query(query, function(err) {
+    req.app.conn.write.get().query(query, function(err) {
         if (err) return next(err)
         res.send(204)
     })
 }
 
 exports.user = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT * FROM admin_user_view WHERE user_id = $1'
         ].join('\n'),
@@ -143,7 +143,7 @@ exports.patch = function(req, res, next) {
         })
     }
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'UPDATE "user"',
             'SET ' + updates.join(),
@@ -178,7 +178,7 @@ exports.patch = function(req, res, next) {
 }
 
 exports.bankAccounts = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT * FROM bank_account WHERE user_id = $1'
         ].join('\n'),
@@ -192,7 +192,7 @@ exports.bankAccounts = function(req, res, next) {
 }
 
 exports.accounts = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT',
             '   a.account_id,',
@@ -222,7 +222,7 @@ exports.accounts = function(req, res, next) {
 }
 
 exports.activity = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT * FROM activity WHERE user_id = $1 ORDER BY created_at DESC LIMIT 100'
         ].join('\n'),
@@ -238,7 +238,7 @@ exports.activity = function(req, res, next) {
 
 exports.documents = function(req, res, next) {
     debug("documents user: %s", req.params.user);
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
                  'SELECT document_id, name, size, last_modified_date, "type", status, message',
                  'FROM document',
@@ -263,7 +263,7 @@ exports.documents = function(req, res, next) {
 
 exports.documentFile = function(req, res, next) {
     debug("documentsFile doc id %s", req.params.document);
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
                  'SELECT name, image',
                  'FROM document',
@@ -289,7 +289,7 @@ exports.documentFile = function(req, res, next) {
 
 exports.documentApprove = function(req, res, next) {
     debug("documentApprove user: %s, doc id %s", req.params.user, req.params.document);
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
                   'UPDATE "document"',
                   "SET status='Accepted'",
@@ -304,7 +304,7 @@ exports.documentApprove = function(req, res, next) {
 
 exports.documentReject = function(req, res, next) {
     debug("documentReject user: %s, doc id %s", req.params.user, req.params.document);
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
                   'UPDATE "document"',
                   "SET status='Rejected'",
@@ -418,7 +418,7 @@ exports.users = function(req, res, next) {
 
     if (req.query.skip) q = q.skip(req.query.skip)
 
-    req.app.conn.read.query(q, function(err, dr) {
+    req.app.conn.read.get().query(q, function(err, dr) {
         if (err) return next(err)
 
         res.send({

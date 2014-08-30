@@ -20,7 +20,7 @@ exports.getBankCredits = function(req, res, next) {
         'ORDER BY bc.bank_credit_id DESC'
     ].join('\n')
 
-    req.app.conn.read.query(query, function(err, dr) {
+    req.app.conn.read.get().query(query, function(err, dr) {
         if (err) return next(err)
 
         res.send(dr.rows.map(function(row) {
@@ -54,7 +54,7 @@ exports.createBankCredit = function(req, res, next) {
         ]
     }
 
-    req.app.conn.write.query(query, function(err, dr) {
+    req.app.conn.write.get().query(query, function(err, dr) {
         if (err) return next(err)
 
         // Log for admin
@@ -81,7 +81,7 @@ exports.approveBankCredit = function(req, res, next) {
         ]
     }
 
-    req.app.conn.write.query(query, function(err, dr) {
+    req.app.conn.write.get().query(query, function(err, dr) {
         if (err) return next(err)
 
         var row = dr.rows[0]
@@ -124,7 +124,7 @@ exports.cancelBankCredit = function(req, res, next) {
         ]
     }
 
-    req.app.conn.write.query(query, function(err, dr) {
+    req.app.conn.write.get().query(query, function(err, dr) {
         if (err) return next(err)
         if (!dr.rowCount) {
             return res.send(404, {

@@ -61,7 +61,7 @@ exports.index = function(req, res, next) {
         }
     }
 
-    req.app.conn.read.query(query, function(err, dr) {
+    req.app.conn.read.get().query(query, function(err, dr) {
         if (err) return next(err)
         res.send(dr.rows.map(function(row) {
             row.details = JSON.parse(row.details)

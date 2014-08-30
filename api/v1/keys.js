@@ -7,7 +7,7 @@ module.exports = exports = function(app) {
 }
 
 exports.remove = function(req, res, next) {
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'DELETE',
             'FROM api_key',
@@ -29,7 +29,7 @@ exports.remove = function(req, res, next) {
 }
 
 exports.index = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT api_key_id, can_trade, can_withdraw, can_deposit',
             'FROM api_key',
@@ -59,7 +59,7 @@ exports.generateApiKey = function() {
 exports.create = function(req, res, next) {
     var key = exports.generateApiKey()
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'INSERT INTO api_key (api_key_id, user_id, "primary",',
             '   can_trade, can_deposit, can_withdraw)',

@@ -27,7 +27,7 @@ function formatOrderRow(cache, row) {
 }
 
 exports.index = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT order_id, base_currency_id || quote_currency_id market,',
             '   type, price, volume,',
@@ -45,7 +45,7 @@ exports.index = function(req, res, next) {
 }
 
 exports.history = function(req, res, next) {
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT order_id, market, type, volume, matched, cancelled,',
             '   original, price, average_price',
@@ -70,7 +70,7 @@ exports.history = function(req, res, next) {
 }
 
 exports.cancel = function(req, res, next) {
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'UPDATE "order"',
             'SET',

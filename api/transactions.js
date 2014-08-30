@@ -74,7 +74,7 @@ exports.query = function(app, query, cb) {
         q = q.limit(query.limit)
     }
 
-    app.conn.read.query(q, function(err, dr) {
+    app.conn.read.get().query(q, function(err, dr) {
         if (err) return cb(err)
 
         if (!dr.rowCount) {

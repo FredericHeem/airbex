@@ -27,7 +27,7 @@ exports.withdrawBank = function(req, res, next) {
         })
     }
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'SELECT withdraw_bank($2, $3, $4, $5)',
             'FROM bank_account',
@@ -66,7 +66,7 @@ exports.withdrawBank = function(req, res, next) {
 
 exports.cancel = function(req, res, next) {
     debug("cancel user:%s, wid:%s", req.user.id, req.params.id)
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'SELECT cancel_withdraw_request($1, null) request_id',
             'FROM withdraw_request wr',

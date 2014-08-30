@@ -12,7 +12,7 @@ exports.spend = function(req, res, next) {
     
     var quote = req.app.cache.getQuoteCurrency(req.body.market)
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'SELECT convert_bid($1, market_id, $2) oid',
             'FROM market',

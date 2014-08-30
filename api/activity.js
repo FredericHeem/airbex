@@ -7,7 +7,7 @@ module.exports = exports = function(app) {
 
 exports.log = function(app, userId, type, details, retry) {
     debug('user #%d activity: %s %s', userId, type, details)
-    app.conn.write.query({
+    app.conn.write.get().query({
         text: 'INSERT INTO activity (user_id, "type", details) VALUES ($1, $2, $3)',
         values: [userId, type, JSON.stringify(details)]
     }, function(err) {

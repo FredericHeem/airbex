@@ -3,7 +3,7 @@ module.exports = exports = function(app) {
 }
 
 exports.panic = function(req, res, next) {
-    req.app.conn.write.query([
+    req.app.conn.write.get().query([
         'ALTER DATABASE justcoin',
         'SET default_transaction_read_only = true;'
     ].join('\n'), function(err) {
@@ -18,7 +18,7 @@ exports.panic = function(req, res, next) {
             return next(err)
         }
 
-        req.app.conn.write.query([
+        req.app.conn.write.get().query([
             'SET TRANSACTION read write;',
             'SELECT pg_terminate_backend(pid)',
             'FROM pg_stat_activity;'

@@ -35,7 +35,7 @@ var currenciesGet = function(app, cb){
                  'ORDER BY currency_id'
                  ].join('\n');
 
-    app.conn.read.query(query, function(err, dr) {
+    app.conn.read.get().query(query, function(err, dr) {
         if (err) return cb(err)
         return cb(null, dr.rows.map(function(row) {
             return {

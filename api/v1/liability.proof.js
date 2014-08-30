@@ -31,7 +31,7 @@ function getCompleteTreeFromDb(currency, app, next, cb){
                    values: [currency.toUpperCase()]
     }
     
-    app.conn.read.query(query, function(err, dr) {
+    app.conn.read.get().query(query, function(err, dr) {
         if (err) {
             debug("getCompleteTreeFromDb db error ", err);
             next(err)
@@ -98,7 +98,7 @@ exports.liability = function(req, res, next) {
 
 function insertSignature(app, asset_id, address, signature, cb){
 	debug("%s => %s", address, signature)
-	app.conn.write.query({
+	app.conn.write.get().query({
 		text: [
 		       'INSERT INTO signatures(asset_id, address, signature)',
 		       "SELECT $1, $2, $3",
@@ -134,7 +134,7 @@ function getSignatures(app, asset_id, cb){
 
 	}
 	
-	app.conn.read.query(query, function(err, dr) {
+	app.conn.read.get().query(query, function(err, dr) {
 		if(err) cb(err);
 		var signatures = [];
         dr.rows.map(function(row) {
@@ -162,7 +162,7 @@ exports.assetGet = function(req, res, next) {
                    values: [currency.toUpperCase()]
     }
     
-    req.app.conn.read.query(query, function(err, dr) {
+    req.app.conn.read.get().query(query, function(err, dr) {
     	var asset_json = {}
         if (err) {
             debug("asset db error ", err);
@@ -196,7 +196,7 @@ exports.assetGetAll = function(req, res, next) {
                    ].join('\n')
     }
     
-    req.app.conn.read.query(query, function(err, dr) {
+    req.app.conn.read.get().query(query, function(err, dr) {
         if (err) {
             debug("asset db error ", err);
             next(err)
@@ -241,7 +241,7 @@ exports.assetPost = function(req, res, next) {
 		if (err) throw err;
 		debug('assetPost length %s',data.length)
 		var assetJson = JSON.parse(data)
-		req.app.conn.write.query({
+		req.app.conn.write.get().query({
 			text: [
 			       'INSERT INTO asset(currency, blockhash, message)',
 			       'VALUES($1, $2, $3) RETURNING asset_id;'

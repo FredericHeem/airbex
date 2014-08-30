@@ -69,7 +69,7 @@ exports.create = function(req, res, next) {
     				  ]
     }
 
-    req.app.conn.write.query(query, function(err, dr) {
+    req.app.conn.write.get().query(query, function(err, dr) {
         if (err) {
             debug("create purchase order error: %s", err.message);
             
@@ -127,7 +127,7 @@ function formatPurchaseOrderRow(cache, row) {
 exports.read = function(req, res, next) {
 	var user_id = req.user.id;
 	debug("read: user id: ", user_id)
-    req.app.conn.read.query({
+    req.app.conn.read.get().query({
         text: [
             'SELECT po.id, m.name, po.type, po.amount, po.address, po.state, po.created_at',
             'FROM purchase_order po',
@@ -144,7 +144,7 @@ exports.read = function(req, res, next) {
 
 exports.cancel = function(req, res, next) {
 	debug("cancel id %s for user: ", req.params.id, req.user.id);
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: [
             'UPDATE "purchase_order"',
             'SET',

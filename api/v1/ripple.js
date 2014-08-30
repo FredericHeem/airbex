@@ -30,7 +30,7 @@ exports.withdraw = function(req, res, next) {
         'SELECT ripple_withdraw(user_currency_account($1, $2), $3, $4) rid'
     ].join('\n')
 
-    req.app.conn.write.query({
+    req.app.conn.write.get().query({
         text: queryText,
         values: [
             req.user.id,

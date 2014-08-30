@@ -61,7 +61,7 @@ exports.template = _.memoize(function(fn) {
 // User can be either user id or email address
 exports.send = function(user, language, templateName, locals, cb) {
     if (typeof user == 'number') {
-        return exports.app.conn.read.query({
+        return exports.app.conn.read.get().query({
             text: 'SELECT email FROM "user" WHERE user_id = $1',
             values: [user]
         }, function(err, dr) {

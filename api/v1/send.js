@@ -32,7 +32,7 @@ exports.friendlyCurrency = function(currency) {
 }
 
 exports.sendToExistingUser = function(app, from, to, currency, amount, cb) {
-    app.conn.write.query({
+    app.conn.write.get().query({
         text: [
             'SELECT',
             '   user_transfer_to_email($1, $2, $3, $4) tid,',
@@ -75,7 +75,7 @@ exports.sendToExistingUser = function(app, from, to, currency, amount, cb) {
 }
 
 exports.getSenderName = function(app, email, cb) {
-    app.conn.read.query({
+    app.conn.read.get().query({
         text: [
             'SELECT first_name, last_name, email',
             'FROM "user"',

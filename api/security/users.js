@@ -38,7 +38,7 @@ var userQuery = [
 ].join('\n')
 
 exports.query = function(condition, value, cb) {
-    exports.app.conn.read.query({
+    exports.app.conn.read.get().query({
         text: [
             userQuery,
             condition

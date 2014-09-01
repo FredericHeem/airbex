@@ -110,7 +110,7 @@ var marketsGet = function(app, user, cb){
 }
 
 exports.marketsWs = function(client, args, next) {
-    var callbackId = args[1].callbackId;
+    var callbackId = exports.app.socketio.callbackId(args);
     marketsGet(exports.app, client.user, function(err, response){
         if(err) return next({name:"DbError", message:JSON.stringify(err)})
         client.emit(wsMessages.markets, {callbackId: callbackId, data:response})
@@ -127,7 +127,7 @@ exports.index = function(req, res, next) {
 exports.depthWs = function(client, args, next) {
     
     var params = args[1];
-    var callbackId = params.callbackId;
+    var callbackId = exports.app.socketio.callbackId(args);
     depthGet(exports.app, params, function(err, response){
         if(err) return next({name:"DbError", message:JSON.stringify(err)})
         debug("depthGet for ", JSON.stringify(response));

@@ -8,7 +8,7 @@ module.exports = exports = function(app) {
 }
 
 exports.balancesWs = function(client, args, next) {
-    var callbackId = args[1].callbackId;
+    var callbackId = exports.app.socketio.callbackId(args);
     balanceGet(exports.app, client.user, function(err, balances){
         if(err) return next(err);
         client.emit('balances', {callbackId: callbackId, data:balances})

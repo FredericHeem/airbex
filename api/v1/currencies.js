@@ -8,7 +8,7 @@ module.exports = exports = function(app) {
 }
 
 exports.currenciesWs = function(client, args, next) {
-    var callbackId = args[1].callbackId;
+    var callbackId = exports.app.socketio.callbackId(args);
     currenciesGet(exports.app, function(err, response){
         if(err) return next(err);
         client.emit('currencies', {callbackId: callbackId, data:response})

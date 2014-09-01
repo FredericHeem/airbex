@@ -43,16 +43,24 @@ module.exports = function (app, server) {
         }
     }
 
+    
+    function callbackId(args){
+        return args[1] ? args[1].callbackId : undefined;
+    }
+    
     function onError(err, client, args, next){
-        var message = args ? args[0]: ''
-        log.error("onError: message: %s, error: %s", message, JSON.stringify(err));
-        client.emit(message, {error:err})
+        var message = args ? args[0]: '';
+        log.info("onError: message: %s, callbackId: %s, error: %s",
+                message, callbackId(args), JSON.stringify(err));
+        client.emit(message, {callbackId: callbackId(args), error:err})
     }
     
     //Must be invoked at end
     function setErrorHandler(){
         router.on(onError);
     }
+
+    
     router.on(attachUserFromSessionKey);
     
     io.use(router);
@@ -61,6 +69,7 @@ module.exports = function (app, server) {
         io: io,
         router: router,
         demand: demand,
-        setErrorHandler: setErrorHandler
+        setErrorHandler: setErrorHandler,
+        callbackId:callbackId
     }
 };

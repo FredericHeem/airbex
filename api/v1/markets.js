@@ -1,24 +1,23 @@
 var log = require('../log')(__filename)
 , debug = log.debug;
 
+var wsMessages = {
+    markets:'markets',
+    marketDepth: '/v1/market/depth'
+};
+
 module.exports = exports = function(app) {
     exports.app = app;
     app.get('/v1/markets', exports.index)
-    app.get('/v1/markets/:id/depth', exports.depth)
-    app.get('/v1/markets/:id/vohlc', exports.vohlc)
+    app.get('/v1/markets/:marketId/depth', exports.depthRest)
+    app.get('/v1/markets/:marketId/vohlc', exports.vohlc)
     
-    app.socketio.router.on("markets", exports.marketsWs);
-}
-
-exports.marketsWs = function(client, args, next) {
-    marketsGet(exports.app, null, function(err, response){
-        if(err) return next({name:"DbError", message:JSON.stringify(err)})
-        client.emit('markets', {data:response})
-    })
+    app.socketio.router.on(wsMessages.markets, exports.marketsWs);
+    app.socketio.router.on(wsMessages.marketDepth, exports.depthWs);
 }
 
 var marketsGet = function(app, user, cb){
-    debug("markets")
+    
     function formatPriceOrNull(p, m) {
         if (p === null) return null
         return app.cache.formatOrderPrice(p, m)
@@ -30,6 +29,7 @@ var marketsGet = function(app, user, cb){
     }
 
     if(user && user.id){
+        debug("markets with user id: ", user.id)
         app.conn.read.get().query({
             text: [
             "SELECT m.market_id,",
@@ -83,6 +83,7 @@ var marketsGet = function(app, user, cb){
             }))
         })
     } else {
+        debug("markets public");
         var query = 'SELECT * FROM market_summary_view';
         app.conn.read.get().query(query, function(err, dr) {
             debug("getting markets done")
@@ -108,6 +109,14 @@ var marketsGet = function(app, user, cb){
     }
 }
 
+exports.marketsWs = function(client, args, next) {
+    var callbackId = args[1].callbackId;
+    marketsGet(exports.app, client.user, function(err, response){
+        if(err) return next({name:"DbError", message:JSON.stringify(err)})
+        client.emit(wsMessages.markets, {callbackId: callbackId, data:response})
+    })
+}
+
 exports.index = function(req, res, next) {
     marketsGet(req.app, req.user, function(err, response){
         if(err) return next(err);
@@ -115,8 +124,32 @@ exports.index = function(req, res, next) {
     })
 }
 
-exports.depth = function(req, res, next) {
-    req.app.conn.read.get().query({
+exports.depthWs = function(client, args, next) {
+    
+    var params = args[1];
+    var callbackId = params.callbackId;
+    depthGet(exports.app, params, function(err, response){
+        if(err) return next({name:"DbError", message:JSON.stringify(err)})
+        debug("depthGet for ", JSON.stringify(response));
+        client.emit(wsMessages.marketDepth, {callbackId: callbackId, data:response})
+    })
+}
+
+exports.depthRest = function(req, res, next) {
+    depthGet(exports.app, req.params, function(err, response){
+        if(err) return next(err)
+        res.setHeader('Cache-Control', 'public, max-age=10');
+        res.send(response);
+    })
+}
+
+var depthGet = function(app, params, cb) {
+    if(!params || !params.marketId){
+        return cb({name:"BadRequest", message:"Invalid parameter"})
+    }
+    
+    debug("depthGet for ", params.marketId)
+    app.conn.read.get().query({
         text: [
             'SELECT price, volume, "type"',
             'FROM order_depth_view odv',
@@ -124,19 +157,18 @@ exports.depth = function(req, res, next) {
             'WHERE m.base_currency_id || m.quote_currency_id = $1',
             'ORDER BY CASE WHEN type = \'ask\' THEN price ELSE -price END'
         ].join('\n'),
-        values: [req.params.id]
+        values: [params.marketId]
     }, function(err, dr) {
-        if (err) return next(err)
+        if (err) return cb(err)
 
-        res.setHeader('Cache-Control', 'public, max-age=10')
-
-        res.send({
+        cb(null, {
+            marketId:params.marketId, 
             bids: dr.rows.filter(function(row) {
                 return row.type == 'bid'
             }).map(function(row) {
                 return [
-                    req.app.cache.formatOrderPrice(row.price, req.params.id),
-                    req.app.cache.formatOrderVolume(row.volume, req.params.id)
+                    app.cache.formatOrderPrice(row.price, params.marketId),
+                    app.cache.formatOrderVolume(row.volume, params.marketId)
                 ]
             }),
 
@@ -144,8 +176,8 @@ exports.depth = function(req, res, next) {
                 return row.type == 'ask'
             }).map(function(row) {
                 return [
-                    req.app.cache.formatOrderPrice(row.price, req.params.id),
-                    req.app.cache.formatOrderVolume(row.volume, req.params.id)
+                    app.cache.formatOrderPrice(row.price, params.marketId),
+                    app.cache.formatOrderVolume(row.volume, params.marketId)
                 ]
             })
         })
@@ -159,7 +191,7 @@ exports.vohlc = function(req, res, next) {
             'FROM vohlc',
             'WHERE market = $1'
         ].join('\n'),
-        values: [req.params.id]
+        values: [req.params.marketId]
     }, function(err, dr) {
         if (err) return next(err)
 
@@ -167,11 +199,11 @@ exports.vohlc = function(req, res, next) {
         res.send(dr.rows.map(function(row) {
             return {
                 date: row.date,
-                volume: req.app.cache.formatOrderVolume(row.volume, req.params.id),
-                open: req.app.cache.formatOrderPrice(row.open, req.params.id),
-                high: req.app.cache.formatOrderPrice(row.high, req.params.id),
-                low: req.app.cache.formatOrderPrice(row.low, req.params.id),
-                close: req.app.cache.formatOrderPrice(row.close, req.params.id)
+                volume: req.app.cache.formatOrderVolume(row.volume, req.params.marketId),
+                open: req.app.cache.formatOrderPrice(row.open, req.params.marketId),
+                high: req.app.cache.formatOrderPrice(row.high, req.params.marketId),
+                low: req.app.cache.formatOrderPrice(row.low, req.params.marketId),
+                close: req.app.cache.formatOrderPrice(row.close, req.params.marketId)
             }
         }))
     })

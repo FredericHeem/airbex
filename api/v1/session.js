@@ -11,11 +11,11 @@ module.exports = exports = function(app) {
 }
 
 var _create = function(app, sessionParam, ip, cb) {
-    // TODO
-//    if (!app.validate(sessionParam, 'v1/session_create', res)) {
-//        return cb({error:"InvalidRequest"})
-//    }
-    
+    var error = app.validateWs(sessionParam, 'v1/session_create');
+    if(error){
+        return cb(error);
+    }
+
     var email = sessionParam.email.toLowerCase()
     
     exports.app.security.session.create(email, ip, function(err, sid) {
@@ -26,7 +26,7 @@ var _create = function(app, sessionParam, ip, cb) {
 }
 
 exports.createWs = function(client, args, next) {
-    var ip = "UnknowIp";
+    var ip = client.handshake.headers['x-real-ip'] || '127.0.0.1';
     log.debug('sessionCreate from ip', ip);
     _create(exports.app, args[1], ip, function(err, response){
         if(err) return next(err)

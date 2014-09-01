@@ -31,6 +31,7 @@ app.smtp = config.smtp ? createSmtpTransport(config.smtp.service, config.smtp.op
 app.tarpit = require('./tarpit')()
 app.activity = require('./activity')(app)
 app.validate = require('./validate')
+app.validateWs = require('./validateWs')
 app.email = require('./email')(app)
 app.ripple = require('./ripple')(app)
 app.intercom = require('./intercom')

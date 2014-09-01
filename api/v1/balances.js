@@ -8,10 +8,10 @@ module.exports = exports = function(app) {
 }
 
 exports.balancesWs = function(client, args, next) {
+    var callbackId = args[1].callbackId;
     balanceGet(exports.app, client.user, function(err, balances){
-        if(err) return next(new Error(err));
-            //log.debug('balances', balances);
-        client.emit('balances', {data:balances})
+        if(err) return next(err);
+        client.emit('balances', {callbackId: callbackId, data:balances})
     })
 }
 
@@ -23,7 +23,6 @@ exports.balancesRest = function(req, res, next) {
 }
 
 var balanceGet  = function(app, user, cb) {
-    //return cb({name:"errorrrrrrr"});
     app.conn.read.get().query({
         text: [
             'SELECT currency_id, SUM(available) available, SUM("hold") "hold", SUM(balance) balance',

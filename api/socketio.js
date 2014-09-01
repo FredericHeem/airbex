@@ -9,24 +9,23 @@ module.exports = function (app, server) {
     var router = require('socket.io-events')();
     
     function demand(client, args, next){
-        debug("demand");
+        //debug("demand");
         var user = client.user;
         if(!user){
-            var message = args[0] || ''
-            debug("demand error: message: %s", message);
-            client.emit(message, {error:{name:"NotAuthenticated"}})
+            next({name:"NotAuthenticated"})
         } else {
             next();
         }
     }
     
-    function authenticate(client, args, next){
-        if(args.length >= 2){
+    function attachUserFromSessionKey(client, args, next){
+        if(args.length >= 2 && args[1]){
+            log.debug("args ", JSON.stringify(args))
             var message = args[0]
             var param = args[1];
             var sessionKey = param.sessionKey;
             if(sessionKey){
-                debug("message: %s, sessionKey: %s", message, sessionKey);
+                //debug("message: %s, sessionKey: %s", message, sessionKey);
                 app.security.session.getUserAndSessionFromSessionKey(sessionKey,function(err, response){
                     if(err) {
                         return next(err);
@@ -54,7 +53,7 @@ module.exports = function (app, server) {
     function setErrorHandler(){
         router.on(onError);
     }
-    router.on(authenticate);
+    router.on(attachUserFromSessionKey);
     
     io.use(router);
     

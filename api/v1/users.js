@@ -116,16 +116,14 @@ var whoami = function(app, user, cb) {
 }
 
 exports.whoamiWs = function(client, args, next) {
-
     log.debug('whoami');
-
+    var callbackId = args[1].callbackId;
     whoami(exports.app, client.user, function(err, user){
         if(err) {
-            log.error("whoami ", err)
-            client.emit('whoami', {error:err})
+            next(err);
         } else {
-            log.info("whoami ", {data:user});
-            client.emit('whoami', {data:user})
+            log.debug("whoami ", {data:user});
+            client.emit('whoami', {callbackId: callbackId, data:user})
         }
     })
 }

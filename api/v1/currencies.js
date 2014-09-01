@@ -8,19 +8,10 @@ module.exports = exports = function(app) {
 }
 
 exports.currenciesWs = function(client, args, next) {
+    var callbackId = args[1].callbackId;
     currenciesGet(exports.app, function(err, response){
-        if(err) {
-            log.error(JSON.stringify(err))
-            client.emit('currencies', {
-                error:{
-                    name:"DbError", 
-                    message:JSON.stringify(err)
-                }
-            }
-            )
-        } else {
-            client.emit('currencies', {data:response})
-        }
+        if(err) return next(err);
+        client.emit('currencies', {callbackId: callbackId, data:response})
     })
 
 }

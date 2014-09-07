@@ -19,33 +19,51 @@ module.exports = function (app, server) {
     }
     
     function attachUserFromSessionKey(client, args, next){
-        if(args.length >= 2 && args[1]){
+        if(args.length >= 2 && args[1] && args[1].header && args[1].header.sessionKey){
             log.debug("args ", JSON.stringify(args))
-            var message = args[0]
-            var param = args[1];
-            var sessionKey = param.sessionKey;
-            if(sessionKey){
-                //debug("message: %s, sessionKey: %s", message, sessionKey);
-                app.security.session.getUserAndSessionFromSessionKey(sessionKey,function(err, response){
-                    if(err) {
-                        return next(err);
-                    } else if(response){
-                        client.session = response.session
-                        client.user = response.user;
-                        next();
-                    }
-                })
-            } else {
-                next();
-            }
+            var sessionKey = args[1].header.sessionKey;
+            app.security.session.getUserAndSessionFromSessionKey(sessionKey,function(err, response){
+                if(err) {
+                    return next(err);
+                } else if(response){
+                    client.session = response.session
+                    client.user = response.user;
+                    next();
+                } else {
+                    next();
+                }
+            })
         } else {
             next();
         }
     }
 
+    function attachUserFromApiKey(client, args, next){
+        if(args.length >= 2 && args[1] && args[1].header && args[1].header.apiKey){
+            log.debug("args ", JSON.stringify(args))
+            var apiKey = args[1].header.apiKey;
+            app.security.keys.getUserFromApiKey(apiKey,function(err, response){
+                if(err) {
+                    return next(err);
+                } else if(response){
+                    client.user = response.user;
+                }
+                next()
+            })
+        } else {
+            next();
+        }
+    }
     
     function callbackId(args){
-        return args[1] ? args[1].callbackId : undefined;
+        var param = args[1];
+        if(param){
+            var header = param.header;
+            if(header){
+                return header.callbackId
+            }
+        }
+        return undefined;
     }
     
     function onError(err, client, args, next){
@@ -60,8 +78,8 @@ module.exports = function (app, server) {
         router.on(onError);
     }
 
-    
     router.on(attachUserFromSessionKey);
+    router.on(attachUserFromApiKey);
     
     io.use(router);
     

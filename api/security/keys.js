@@ -37,3 +37,23 @@ exports.handler = function(req, res, next) {
         })
     })
 }
+
+exports.getUserFromApiKey = function(apiKey, cb) {
+    debug("getUserFromApiKey");
+    exports.lookup(apiKey, function(err, key) {
+        if (err) return cb(err)
+        if (!key) {
+            return cb({
+                name: 'ApiKeyNotFound',
+                message: 'API key not found'
+            })
+        }
+
+        exports.app.security.users.fromUserId(key.userId, function(err, user) {
+            if (err) return cb(err)
+            assert(user)
+            debug('getUserFromApiKey: %s attached (user #%d)', key.id.substr(0, 10), user.id)
+            cb(null, {key:key, user:user})
+        })
+    })
+}

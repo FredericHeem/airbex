@@ -117,7 +117,7 @@ var whoami = function(app, user, cb) {
 
 exports.whoamiWs = function(client, args, next) {
     log.debug('whoami');
-    var callbackId = args[1].callbackId;
+    var callbackId = exports.app.socketio.callbackId(args);
     whoami(exports.app, client.user, function(err, user){
         if(err) {
             next(err);

@@ -27,6 +27,7 @@ app.use(express.limit('5mb'));
 app.use(express.bodyParser())
 app.use(express.cookieParser())
 
+app.socketio = require('./socketio')(app, server);
 app.smtp = config.smtp ? createSmtpTransport(config.smtp.service, config.smtp.options) : {}
 app.tarpit = require('./tarpit')()
 app.activity = require('./activity')(app)
@@ -38,7 +39,7 @@ app.intercom = require('./intercom')
 app.segment = require('./segment')(app)
 app.security = require('./security')(app)
 app.phone = require('./phone')(app)
-app.socketio = require('./socketio')(app, server);
+
 
 // set req.ip and req.ips properly
 app.enable('trust proxy');

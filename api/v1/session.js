@@ -28,7 +28,8 @@ var _create = function(app, sessionParam, ip, cb) {
 exports.createWs = function(client, args, next) {
     var ip = client.handshake.headers['x-real-ip'] || '127.0.0.1';
     log.debug('sessionCreate from ip', ip);
-    _create(exports.app, args[1], ip, function(err, response){
+    var inputs = args[1] ? args[1].inputs : undefined;
+    _create(exports.app, inputs, ip, function(err, response){
         if(err) return next(err)
         client.emit('sessionCreate', response)
     })

@@ -4,14 +4,14 @@ var log = require('../log')(__filename)
 module.exports = exports = function(app) {
     exports.app = app
     app.get('/v1/balances', app.security.demand.any, exports.balancesRest)
-    app.socketio.router.on("balances", app.socketio.demand, exports.balancesWs);
+    app.socketio.router.on("/v1/balances", app.socketio.demand, exports.balancesWs);
 }
 
 exports.balancesWs = function(client, eventName, data, next) {
     var callbackId = exports.app.socketio.callbackId(data);
     balanceGet(exports.app, client.user, function(err, balances){
         if(err) return next(err);
-        client.emit('balances', {callbackId: callbackId, data:balances})
+        client.emit('/v1/balances', {callbackId: callbackId, data:balances})
     })
 }
 

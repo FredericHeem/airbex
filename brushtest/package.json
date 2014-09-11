@@ -15,7 +15,6 @@
     "should": "x",
     "supertest": "0.7.1",
 	"methods":"x",
-    "async": "0.1.x",
     "mocha": "1.18.x",
     "mocha-html-cov-reporter": "x",
     "grunt": "~0.4.x",

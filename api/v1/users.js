@@ -17,7 +17,7 @@ module.exports = exports = function(app) {
     require('./users.create')(app)
     require('./documents')(app)
     
-    app.socketio.router.on("whoami", exports.whoamiWs);
+    app.socketio.router.on("/v1/whoami", exports.whoamiWs);
     
 }
 
@@ -123,7 +123,7 @@ exports.whoamiWs = function(client, eventName, data, next) {
             next(err);
         } else {
             log.debug("whoami ", {data:user});
-            client.emit('whoami', {callbackId: callbackId, data:user})
+            client.emit('/v1/whoami', {callbackId: callbackId, data:user})
         }
     })
 }

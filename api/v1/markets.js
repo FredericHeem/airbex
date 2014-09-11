@@ -2,7 +2,7 @@ var log = require('../log')(__filename)
 , debug = log.debug;
 
 var wsMessages = {
-    markets:'markets',
+    markets:'/v1/markets',
     marketDepth: '/v1/market/depth'
 };
 

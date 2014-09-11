@@ -4,17 +4,17 @@ var log = require('../log')(__filename)
 module.exports = exports = function(app) {
     exports.app = app;
     app.get('/v1/currencies', exports.index);
-    app.socketio.router.on("currencies", exports.currenciesWs);
+    app.socketio.router.on("/v1/currencies", exports.currenciesWs);
 }
 
 exports.currenciesWs = function(client, eventName, data, next) {
     var callbackId = exports.app.socketio.callbackId(data);
     currenciesGet(exports.app, function(err, response){
         if(err) return next(err);
-        client.emit('currencies', {callbackId: callbackId, data:response})
+        client.emit('/v1/currencies', {callbackId: callbackId, data:response})
     })
-
 }
+
 var currenciesGet = function(app, cb){
     var query = [
                  'SELECT *',

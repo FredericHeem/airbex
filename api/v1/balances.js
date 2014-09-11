@@ -7,8 +7,8 @@ module.exports = exports = function(app) {
     app.socketio.router.on("balances", app.socketio.demand, exports.balancesWs);
 }
 
-exports.balancesWs = function(client, args, next) {
-    var callbackId = exports.app.socketio.callbackId(args);
+exports.balancesWs = function(client, eventName, data, next) {
+    var callbackId = exports.app.socketio.callbackId(data);
     balanceGet(exports.app, client.user, function(err, balances){
         if(err) return next(err);
         client.emit('balances', {callbackId: callbackId, data:balances})

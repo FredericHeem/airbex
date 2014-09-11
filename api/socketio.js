@@ -1,27 +1,87 @@
 var log = require('./log')(__filename)
 , debug = log.debug;
 
+
+var Router = function(io){
+    
+    var defaultFunctions = [];
+    var errorCb;
+      
+    this.onDefault = function(cb){
+        defaultFunctions.push(cb)
+    }
+    
+    this.onError = function(cb){
+        errorCb = cb
+    }
+
+    function onEvent(socket, index, functions, eventName, data){
+        //debug("Router.onEvent eventName: %s, index %s/%s", eventName, index, functions.length);
+        
+        function next(error){
+            if(error){
+                //debug("Router next error: %s", error)
+                if(errorCb){
+                    errorCb(error, socket, eventName, data);
+                }
+            } else {
+                index++;
+                //debug("Router next index %s", index);
+                if(index < functions.length){
+                    onEvent(socket, index, functions, eventName, data)
+                } else {
+                    debug("Router done");
+                }
+            }
+           
+        }
+        
+        functions[index](socket, eventName, data, next);
+    }
+    
+    this.on = function(eventName){
+        if(arguments.length < 2){
+            throw new Error('missing handler handler');
+        }
+        
+        var functions = Object.create(defaultFunctions);
+        
+        for(var i = 1; i < arguments.length; i++){
+            functions.push(arguments[i])
+        }
+        
+        //debug("Router.on %s has %s cb, #defaults %s", eventName, functions.length, defaultFunctions.length);
+        
+        io.on('connection', function (socket) {
+            socket.on(eventName, function (data) {
+                console.log(data);
+                onEvent(socket, 0, functions, eventName, data);
+            });
+        });
+    }
+}
+
 module.exports = function (app, server) {
     "use strict";
     
     var io = require('socket.io').listen(server);
     
-    var router = require('socket.io-events')();
+    var router = new Router(io);
     
-    function demand(client, args, next){
+    function demand(client, eventName, data, next){
         //debug("demand");
         var user = client.user;
         if(!user){
-            next({name:"NotAuthenticated"})
+            next({name:"NotAuthenticated", message:'Not Authenticated'})
         } else {
             next();
         }
     }
     
-    function attachUserFromSessionKey(client, args, next){
-        if(args.length >= 2 && args[1] && args[1].header && args[1].header.sessionKey){
-            log.debug("args ", JSON.stringify(args))
-            var sessionKey = args[1].header.sessionKey;
+    function attachUserFromSessionKey(client, eventName, data, next){
+        if(data && data.header && data.header.sessionKey){
+            log.debug("attachUserFromSessionKey eventName %s, data: %s", eventName, JSON.stringify(data))
+            var sessionKey = data.header.sessionKey;
             app.security.session.getUserAndSessionFromSessionKey(sessionKey,function(err, response){
                 if(err) {
                     return next(err);
@@ -38,14 +98,15 @@ module.exports = function (app, server) {
         }
     }
 
-    function attachUserFromApiKey(client, args, next){
-        if(args.length >= 2 && args[1] && args[1].header && args[1].header.apiKey){
-            log.debug("args ", JSON.stringify(args))
-            var apiKey = args[1].header.apiKey;
+    function attachUserFromApiKey(client, eventName, data, next){
+        if(data && data.header && data.header.apiKey){
+            log.debug("attachUserFromApiKey eventName %s, data: %s", eventName, JSON.stringify(data))
+            var apiKey = data.header.apiKey;
             app.security.keys.getUserFromApiKey(apiKey,function(err, response){
                 if(err) {
                     return next(err);
                 } else if(response){
+                    //log.debug("attachUserFromApiKey: message: %s, %s", eventName, JSON.stringify(response));
                     client.user = response.user;
                 }
                 next()
@@ -55,10 +116,9 @@ module.exports = function (app, server) {
         }
     }
     
-    function callbackId(args){
-        var param = args[1];
-        if(param){
-            var header = param.header;
+    function callbackId(data){
+        if(data){
+            var header = data.header;
             if(header){
                 return header.callbackId
             }
@@ -66,28 +126,21 @@ module.exports = function (app, server) {
         return undefined;
     }
     
-    function onError(err, client, args, next){
-        var message = args ? args[0]: '';
+    function onError(err, client, eventName, data, next){
+        var message = eventName ? eventName: '';
         log.info("onError: message: %s, callbackId: %s, error: %s",
-                message, callbackId(args), JSON.stringify(err));
-        client.emit(message, {callbackId: callbackId(args), error:err})
+                message, callbackId(data), JSON.stringify(err));
+        client.emit(message, {message: message, callbackId: callbackId(data), error:err})
     }
     
-    //Must be invoked at end
-    function setErrorHandler(){
-        router.on(onError);
-    }
-
-    router.on(attachUserFromSessionKey);
-    router.on(attachUserFromApiKey);
-    
-    io.use(router);
+    router.onDefault(attachUserFromSessionKey);
+    router.onDefault(attachUserFromApiKey);
+    router.onError(onError);
     
     return {
         io: io,
         router: router,
         demand: demand,
-        setErrorHandler: setErrorHandler,
         callbackId:callbackId
     }
 };

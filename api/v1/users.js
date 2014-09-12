@@ -17,7 +17,7 @@ module.exports = exports = function(app) {
     require('./users.create')(app)
     require('./documents')(app)
     
-    app.socketio.router.on("/v1/whoami", exports.whoamiWs);
+    app.socketio.router.on("/v1/whoami", app.socketio.demand, exports.whoamiWs);
     
 }
 

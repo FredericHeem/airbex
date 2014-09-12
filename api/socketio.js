@@ -1,7 +1,6 @@
 var log = require('./log')(__filename)
 , debug = log.debug;
 
-
 var Router = function(io){
     
     var defaultFunctions = [];
@@ -116,6 +115,11 @@ module.exports = function (app, server) {
         }
     }
     
+    function onMessage(client, eventName, data, next){
+        log.debug("onMessage ", eventName);
+        next()
+    }
+    
     function callbackId(data){
         if(data){
             var header = data.header;
@@ -133,6 +137,7 @@ module.exports = function (app, server) {
         client.emit(message, {message: message, callbackId: callbackId(data), error:err})
     }
     
+    //router.onDefault(onMessage);
     router.onDefault(attachUserFromSessionKey);
     router.onDefault(attachUserFromApiKey);
     router.onError(onError);

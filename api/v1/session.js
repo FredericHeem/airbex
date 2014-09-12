@@ -7,7 +7,7 @@ module.exports = exports = function(app) {
     app.post('/security/session', exports.createRest)
     app.del('/security/session', exports.remove)
     
-    app.socketio.router.on("sessionCreate", exports.createWs);
+    app.socketio.router.on("/v1/sessionCreate", exports.createWs);
 }
 
 var _create = function(app, sessionParam, ip, cb) {
@@ -25,13 +25,14 @@ var _create = function(app, sessionParam, ip, cb) {
     })
 }
 
-exports.createWs = function(client, args, next) {
+exports.createWs = function(client, eventName, data, next) {
     var ip = client.handshake.headers['x-real-ip'] || '127.0.0.1';
     log.debug('sessionCreate from ip', ip);
-    var inputs = args[1] ? args[1].inputs : undefined;
+    var callbackId = exports.app.socketio.callbackId(data);
+    var inputs = data ? data.inputs : undefined;
     _create(exports.app, inputs, ip, function(err, response){
         if(err) return next(err)
-        client.emit('sessionCreate', response)
+        client.emit('/v1/sessionCreate',  {callbackId: callbackId, data:response})
     })
 }
 

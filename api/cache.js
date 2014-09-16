@@ -28,10 +28,9 @@ var async = require('async')
 , debug = log.debug
 
 module.exports = exports = function(app, conn, cb) {
-	
-	exports.markets = {};
-	exports.currencies = {};
-	
+    exports.markets = {};
+    exports.currencies = {};
+
     if (!conn) {
         debug("no db connection, use hardcoded")
         _.extend(exports, hardcoded)
@@ -75,7 +74,7 @@ module.exports = exports = function(app, conn, cb) {
 
         debug("#currencies %s", res.currencies.length)
         res.currencies.forEach(function(x) {
-            //debug("currency: %s", JSON.stringify(x))
+            debug("currency: %s", JSON.stringify(x))
             exports.currencies[x.currency_id] = x
             
             if(x.fiat == false){

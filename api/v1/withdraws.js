@@ -20,7 +20,7 @@ module.exports = exports = function(app) {
 exports.withdrawBank = function(req, res, next) {
     if (!req.app.validate(req.body, 'v1/withdraw_bank', res)) return
 
-    if (!req.app.cache.fiat[req.body.currency]) {
+    if (!req.app.cache.currencies[req.body.currency].fiat) {
         return res.send(400, {
             name: 'CannotWithdrawNonFiatToBank',
             message: 'Cannot withdraw non-fiat to a bank account'

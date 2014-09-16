@@ -1,6 +1,7 @@
 var log = require('../log')(__filename)
 , debug = log.debug
-var order = require("../order")
+, order = require("../order")
+
 
 module.exports = exports = function(app) {
     app.del('/v1/orders/:id', app.security.demand.trade, exports.cancel)

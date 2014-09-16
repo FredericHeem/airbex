@@ -210,7 +210,7 @@ exports.tickUserPending = function() {
 
         async.each(dr.rows, exports.processUserPending, function() {
             if (!dr.rowCount) {
-            	debug('no user pending mail to send')
+            	//debug('no user pending mail to send')
             } 
             exports.scheduleUserPending()
         })

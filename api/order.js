@@ -2,6 +2,7 @@ var log = require('./log')(__filename)
 , debug = log.debug
 , assert = require('assert')
 , format = require('util').format
+, num = require('num');
 
 exports.createInstantBuy = function(userId, req, res, next) {
 	if (!req.app.validate(req.body, 'v1/spend', res)) return
@@ -97,19 +98,19 @@ exports.create = function(userId, req, res, next) {
     }
 
     if(req.body.type === "bid"){
-    	if(amount < req.app.cache.markets[market].bidminvolume){
+        if(num(amount).lt(req.app.cache.markets[market].bidminvolume)){
             return res.send(400, {
                 name: 'BadRequest',
                 message: 'Volume too low'
-            })       		
-    	}
+            })
+        }
     } else {
-    	if(amount < req.app.cache.markets[market].askminvolume){
+        if(num(amount).lt(req.app.cache.markets[market].askminvolume)){
             return res.send(400, {
                 name: 'BadRequest',
                 message: 'Volume too low'
-            })       		
-    	}       	
+            })
+        }
     }
     
     if (req.body.price !== null) {
@@ -123,19 +124,23 @@ exports.create = function(userId, req, res, next) {
         }
         
         if(req.body.type === "bid"){
-        	if(price < req.app.cache.markets[market].bidminprice){
+            if(num(price).lt(req.app.cache.markets[market].bidminprice)){
                 return res.send(400, {
                     name: 'BadRequest',
                     message: 'Price too low'
-                })       		
-        	}
+                })
+            }
         } else {
-        	if(price > req.app.cache.markets[market].askmaxprice){
-                return res.send(400, {
-                    name: 'BadRequest',
-                    message: 'Price too high'
-                })       		
-        	}       	
+            if(num(price).gt(req.app.cache.markets[market].askmaxprice)){
+                var error = {
+                        name: 'BadRequest',
+                        message: 'Price too high',
+                        price:price,
+                        askmaxprice: req.app.cache.markets[market].askmaxprice
+                }
+                log.error(error)
+                return res.send(400, error)
+            }
         }
     }
 
@@ -235,7 +240,5 @@ exports.create = function(userId, req, res, next) {
 
         res.send(201, { id: row.oid })
     })
-
-  
 }
 

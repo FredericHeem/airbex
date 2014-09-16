@@ -71,10 +71,17 @@ module.exports = function (app, server) {
         //debug("demand");
         var user = client.user;
         if(!user){
-            next({name:"NotAuthenticated", message:'Not Authenticated'})
-        } else {
-            next();
+            return next({name:"NotAuthenticated", message:'Not Authenticated'})
         }
+        if (user.tfaSecret && !client.session.tfaPassed){
+            debug('session is primary, user has 2fa enabled, but 2fa is not passed')
+            return next({
+                name: 'OtpRequired',
+                message: 'Two-factor authentication is required for this account'
+            })
+        }
+        
+        next();
     }
     
     function attachUserFromSessionKey(client, eventName, data, next){

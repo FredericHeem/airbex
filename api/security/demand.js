@@ -24,6 +24,7 @@ exports.handler = function() {
 }
 
 exports.demand = function(type, level, req, res, next) {
+    debug('demanding type %s and level %s', type, level)
     if (!req.user) {
         debug('user is not set, demand has failed')
         return res.send(401, {
@@ -31,8 +32,6 @@ exports.demand = function(type, level, req, res, next) {
             message: 'Both API key and session cookie missing'
         })
     }
-
-    debug('demanding type %s and level %s', type, level)
 
     assert((req.apikey && !req.session) || (!req.apikey && req.session))
     assert.equal(typeof req.user, 'object')
@@ -133,10 +132,10 @@ exports.otp = function(inner, optional) {
                 debug('Password required');
                 if(req.body.sessionKey){
                     var token = req.app.userToken[req.user.id]
-                    //debug('otp: has token %s', token)
+                    debug('otp: has token %s', token)
                     if(token){
                         var sessionKey = exports.app.security.session.getSessionKey(token, user.primaryKey)
-                        //debug('otp: got key %s, should match %s', req.body.sessionKey, sessionKey)
+                        debug('otp: got key %s, should match %s', req.body.sessionKey, sessionKey)
                         if(req.body.sessionKey === sessionKey){
                             req.app.userToken[req.user.id] = undefined
                             return next()
@@ -145,7 +144,7 @@ exports.otp = function(inner, optional) {
                 } 
                 var token = exports.app.security.session.randomSha256();
                 req.app.userToken[req.user.id] = token
-                //debug("otp create token: %s", token)
+                debug("otp create token: %s", token)
                 var errorName = req.body.sessionKey ? 'PasswordInvalid' : 'PasswordRequired'
                 return res.send(401, {
                     name: errorName,

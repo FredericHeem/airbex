@@ -57,8 +57,44 @@ describe('TestPasswordRequired', function () {
                     amount:'10000000'
             };
             client.withdrawCrypto(withdrawParam, function(err) {
+                console.log("test error ", JSON.stringify(err))
                 assert(!err || err.name === "NoFunds")
                 done()
+            })
+        });
+        it('TestWithdrawCryptoBTCKo', function (done) {
+            var withdrawParam = {
+                    currency:'BTC',
+                    address:alice_config.btc_deposit_address,
+                    amount:'10000000'
+            };
+            
+            client.withdrawCryptoRaw(null, withdrawParam, function(err, res, body) {
+                assert(res)
+                console.log("res ", res.statusCode);
+                assert.equal(body.name, "PasswordRequired");
+                
+                assert(body.token);
+                client.withdrawCryptoRaw("invalidsession", withdrawParam, function(err, res, body) {
+                    assert(res)
+                    console.log("res ", res.statusCode);
+                    assert.equal(body.name, "PasswordInvalid");
+                    
+                    assert(body.token);
+                    var session = client.keyFromCredentials(body.token, alice_config.email, alice_config.password);
+                    client.withdrawCryptoRaw(session, withdrawParam, function(err, res, body) {
+                        assert(res)
+                        console.log("res ", res.statusCode);
+                        assert.equal(res.statusCode, 500)
+                        assert.notEqual(body.name, "PasswordInvalid");
+                        console.log("body ", body)
+                        //assert(body.token);
+                        done()
+                        
+                    })
+                    
+                })
+                
             })
         });
     });

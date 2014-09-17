@@ -1,6 +1,6 @@
 {
   "name": "snowtest",
-  "description": "functional and performance testing for the the snow exchange",
+  "description": "functional and performance testing for the the airbex exchange",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

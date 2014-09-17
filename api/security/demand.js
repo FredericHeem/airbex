@@ -130,8 +130,9 @@ exports.otp = function(inner, optional) {
             
             if (!req.user.tfaSecret) {
                 debug('Password required');
+                var token = req.app.userToken[req.user.id];
                 if(req.body.sessionKey){
-                    var token = req.app.userToken[req.user.id]
+                    
                     debug('otp: has token %s', token)
                     if(token){
                         var sessionKey = exports.app.security.session.getSessionKey(token, user.primaryKey)

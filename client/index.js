@@ -285,25 +285,35 @@ Snow.prototype.bankCreditCancel = function(bankCancelInfo, cb) {
     })
 }
 
-Snow.prototype.withdrawCrypto = function(withdrawParam, cb) {
+Snow.prototype.withdrawCryptoRaw = function(sessionKey, withdrawParam, cb) {
     var me = this;
     var data = { };
     data = updateRequestWithKey(this, data);
     data.method = "POST";
     data.json = withdrawParam;
+    if(sessionKey){
+        data.json.sessionKey = sessionKey;
+    }
+    console.log("withdrawCryptoRaw ", JSON.stringify(data.json))
     var urlWithdraw = this.url + 'v1/' + withdrawParam.currency + '/out';
-    request(urlWithdraw, data , function(err, res, body) {
+    request(urlWithdraw, data , cb)
+}
+
+Snow.prototype.withdrawCrypto = function(withdrawParam, cb) {
+    var me = this;
+    this.withdrawCryptoRaw(null, withdrawParam, function(err, res, body){
+        console.log("error ", JSON.stringify(err))
+        console.log("body ", JSON.stringify(body))
         if (err) return cb(err)
         if (res.statusCode != 401) return cb(bodyToError(body))
         assert.equal(body.name, "PasswordRequired")
         assert(body.token);
         var sessionKey = me.keyFromCredentials(body.token, me.config.email, me.config.password);
-        data.json.sessionKey = sessionKey;
-        request(urlWithdraw, data, function(err, res, body) {
-            if (err) return cb(err)
-            if (res.statusCode != 401) return cb(bodyToError(body))
-            cb(null, body)
-        })
+        me.withdrawCryptoRaw(sessionKey, withdrawParam, function(err, res, body){
+          if (err) return cb(err)
+          if (res.statusCode != 401) return cb(bodyToError(body))
+          cb(null, body)
+        });
     })
 }
 

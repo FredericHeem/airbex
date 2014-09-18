@@ -17,15 +17,19 @@ var config = require('konfu')
 
 app.config = config
 
-
 app.conn = {
     read: config.pg_read_url ? pg(config.pg_read_url, config.pg_native) : {},
-    write: config.pg_write_url ? pg(config.pg_write_url, config.pg_native) : {}
+    write: config.pg_write_url ? pg(config.pg_write_url, config.pg_native) : {},
+    notifyActivity: config.pg_read_url ? pg(config.pg_read_url, config.pg_native) : {},
+    notifyUserPending: config.pg_read_url ? pg(config.pg_read_url, config.pg_native) : {}
 }
 
 app.use(express.limit('5mb'));
 app.use(express.bodyParser())
 app.use(express.cookieParser())
+
+var EventEmitter = require('events').EventEmitter;
+app.eventEmitter = new EventEmitter();
 
 app.socketio = require('./socketio')(app, server);
 app.smtp = config.smtp ? createSmtpTransport(config.smtp.service, config.smtp.options) : {}

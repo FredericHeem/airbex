@@ -3,11 +3,30 @@ var log = require('../log')(__filename)
 , _ = require('lodash')
 , async = require('async')
 , num = require('num')
+, Queue = require('queue-async');
 
 module.exports = exports = function(app) {
     exports.app = app
-    exports.schedule()
-    exports.scheduleUserPending()
+    
+    app.eventEmitter.on("activity", onActivityWebSocket);
+    
+    exports.tick();
+    var notifyActivity = app.conn.notifyActivity.get();
+    var queueActivity = Queue(1);
+    notifyActivity.query('LISTEN "activity_watcher"');
+    notifyActivity.on('notification', function(data) {
+        debug("activity_watcher", data.payload);
+        queueActivity.defer(exports.tick);
+    });
+    
+    exports.tickUserPending();
+    var notifyUserPending = app.conn.notifyUserPending.get();
+    var queueUserPending = Queue(1);
+    notifyUserPending.query('LISTEN "user_pending_watcher"');
+    notifyUserPending.on('notification', function(data) {
+        debug("user_pending_watcher", data.payload);
+        queueUserPending.defer(exports.tickUserPending);
+    });
 }
 
 function stripZeroes(x) {
@@ -95,19 +114,29 @@ exports.process = function(row, cb) {
     
     if (!template) {
         // TODO: Raven
-        console.error('Not sure how to send activity of type %s', row.type)
+        log.error('Not sure how to send activity of type %s', row.type)
         return cb()
     }
 
-    exports.app.email.send(row.user_id, row.language, template, locals, cb)
+    exports.app.eventEmitter.emit("activity", row.user_id, {type: row.type, details: locals})
+    
+    exports.app.email.send(row.user_id, row.language, template, locals, cb);
 }
 
-exports.schedule = function() {
-    // TODO: Remove magic number
-    return setTimeout(exports.tick, 15e3)
+function onActivityWebSocket(userId, activity){
+    debug("onActivityWebSocket userId %s, type %s", userId, activity);
+    exports.app.security.sessionWs.getSocketId(userId, function(err, socketId){
+        if(err) return;
+        if(socketId){
+            debug("onActivityWebSocket socketId %s", socketId);
+            exports.app.socketio.io.to(socketId).emit('activity', activity);
+        } else {
+            log.error("onActivityWebSocket: cannot socketId from user id %s", userId);
+        }
+    })
 }
 
-exports.tick = function() {
+exports.tick = function(cb) {
     debug('ticking...')
 
     var query = 'SELECT * FROM pending_email_notify'
@@ -115,17 +144,16 @@ exports.tick = function() {
     exports.app.conn.read.get().query(query, function(err, dr) {
         if (err) {
             // TODO: Raven
-            console.error('Failed to check for new email notifications')
-            console.error(err)
-            return exports.schedule()
+            log.error('Failed to check for new email notifications')
+            log.error(err)
+            cb && cb(err)
         }
 
         debug('processing %s rows', dr.rowCount || 'no')
 
-       async.each(dr.rows, exports.process, function() {
+        async.each(dr.rows, exports.process, function() {
             if (!dr.rowCount) {
-                // TODO: Remove magic number
-                return exports.schedule()
+                cb && cb()
             }
 
             var tip = _.max(dr.rows, 'activity_id').activity_id
@@ -140,79 +168,74 @@ exports.tick = function() {
                 values: [tip]
             }, function(err) {
                 if (err) {
-                    console.error('Failed to set notify tip')
-                    console.error(err)
+                    log.error('Failed to set notify tip')
+                    log.error(err)
+                    cb && cb(err)
                 } else {
                     debug('set tip to %s', tip)
                 }
-
-                exports.schedule()
+                cb && cb()
             })
         })
     })
 }
 
-exports.scheduleUserPending = function() {
-    // TODO: Remove magic number
-    return setTimeout(exports.tickUserPending, 5e3)
-}
-
 exports.processUserPending = function(row, cb) {
-	var language = 'en-US';
+    var language = 'en-US';
 
-	debug("sending email to %s", row.email)
-	if(exports.app.config.smtp){
-		exports.app.email.send(row.email, language, 'verify-email', { code: row.code }, function(err) {
-			debug("email sent")
-			if (err)  {
-				debug("ERROR sending email")
-				return cb(err)
-			} else {
-	            exports.app.conn.write.get().query({
-	                text: [
-	                    "UPDATE user_pending SET state ='emailsent'",
-	                    'WHERE email=$1'
-	                ].join('\n'),
-	                values: [row.email]
-	            }, function(err) {
-	                if (err) {
-	                    console.error('Failed to set user_pending state')
-	                    console.error(err)
-	                    cb(err)
-	                } else {
-	                    debug('set email state for %s', row.email)
-	                    cb()
-	                }
-	            })
-			}
-			
-		})
-	} else {
-		debug("smtp not configured")
-		cb("smtp not configured")
-	}
+    debug("sending email to %s", row.email)
+    if(exports.app.config.smtp){
+        exports.app.email.send(row.email, language, 'verify-email', { code: row.code }, function(err) {
+            debug("email sent")
+            if (err)  {
+                debug("ERROR sending email")
+                return cb(err)
+            } else {
+                exports.app.conn.write.get().query({
+                    text: [
+                           "UPDATE user_pending SET state ='emailsent'",
+                           'WHERE email=$1'
+                           ].join('\n'),
+                           values: [row.email]
+                }, function(err) {
+                    if (err) {
+                        log.error('Failed to set user_pending state')
+                        log.error(err)
+                        cb(err)
+                    } else {
+                        debug('set email state for %s', row.email)
+                        cb()
+                    }
+                })
+            }
+
+        })
+    } else {
+        debug("smtp not configured")
+        cb("smtp not configured")
+    }
 }
 
-exports.tickUserPending = function() {
-    //debug('tickUserPending')
+exports.tickUserPending = function(cb) {
+    debug('tickUserPending')
 
     var query = "SELECT * FROM user_pending where state='created'"
 
     exports.app.conn.read.get().query(query, function(err, dr) {
         if (err) {
             // TODO: Raven
-            console.error('tickUserPending Failed to check for new email notifications')
-            console.error(err)
-            return exports.scheduleUserPending()
+            log.error('tickUserPending Failed to check for new email notifications')
+            log.error(err)
+            cb && cb(err)
         }
 
-        //debug('tickUserPending processing %s rows', dr.rowCount || 'no')
+        debug('tickUserPending processing %s rows', dr.rowCount || 'no')
 
         async.each(dr.rows, exports.processUserPending, function() {
             if (!dr.rowCount) {
-            	//debug('no user pending mail to send')
+                debug('no user pending mail to send')
             } 
-            exports.scheduleUserPending()
+            cb && cb();
         })
         
     })

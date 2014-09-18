@@ -4,5 +4,6 @@ module.exports = function(app) {
     exports.keys = require('./keys')(app)
     exports.tfa = require('./tfa')(app)
     exports.demand = require('./demand')(app);
+    exports.sessionWs = require('./sessionWs')(app);
     return exports
 }

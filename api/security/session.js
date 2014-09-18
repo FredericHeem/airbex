@@ -17,7 +17,8 @@ module.exports = exports = function(app) {
         exports.store = new MemoryStore()
     } else if (storeType == 'redis') {
         exports.store = new RedisStore({
-            uri: app.config.session.uri
+            uri: app.config.session.uri,
+            prefix: 'sessions:'
         })
     }
 

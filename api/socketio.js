@@ -62,7 +62,7 @@ var Router = function(io){
 
 module.exports = function (app, server) {
     "use strict";
-    
+    exports.app = app;
     var io = require('socket.io').listen(server);
     
     var router = new Router(io);
@@ -85,7 +85,7 @@ module.exports = function (app, server) {
     }
     
     function attachUserFromSessionKey(client, eventName, data, next){
-        if(data && data.header && data.header.sessionKey){
+        if(data && data.header && data.header.sessionKey && !client.user){
             log.debug("attachUserFromSessionKey eventName %s, data: %s", eventName, JSON.stringify(data))
             var sessionKey = data.header.sessionKey;
             app.security.session.getUserAndSessionFromSessionKey(sessionKey,function(err, response){
@@ -94,7 +94,11 @@ module.exports = function (app, server) {
                 } else if(response){
                     client.session = response.session
                     client.user = response.user;
-                    next();
+                    log.debug("attachUserFromApiKey:  %s", client.user);
+                    app.security.sessionWs.create(response.user.id, client.id,function(err){
+                        if(err) return next(err);
+                        next();
+                    });
                 } else {
                     next();
                 }
@@ -105,7 +109,7 @@ module.exports = function (app, server) {
     }
 
     function attachUserFromApiKey(client, eventName, data, next){
-        if(data && data.header && data.header.apiKey){
+        if(data && data.header && data.header.apiKey && !client.user){
             log.debug("attachUserFromApiKey eventName %s, data: %s", eventName, JSON.stringify(data))
             var apiKey = data.header.apiKey;
             app.security.keys.getUserFromApiKey(apiKey,function(err, response){
@@ -114,8 +118,14 @@ module.exports = function (app, server) {
                 } else if(response){
                     //log.debug("attachUserFromApiKey: message: %s, %s", eventName, JSON.stringify(response));
                     client.user = response.user;
+                    app.security.sessionWs.create(response.user.id, client.id, function(err){
+                        if(err) return next(err);
+                        next();
+                    });
+                } else {
+                    next()
                 }
-                next()
+                
             })
         } else {
             next();

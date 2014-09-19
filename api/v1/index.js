@@ -3,7 +3,7 @@ module.exports = function(app) {
     'currencies', 'activities', 'users', 'withdraws',
     'keys', 'resetPassword', 'spend', 'bankaccounts',
     'language', 'vouchers', 'send', 'tfa', 'transactions', 'session',
-    'liability.proof', 'blockchain','purchase.orders']
+    'liability.proof','purchase.orders']
 
     routes.forEach(function(name) {
         require('./' + name)(app)

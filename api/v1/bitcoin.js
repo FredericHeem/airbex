@@ -124,6 +124,9 @@ exports.address = function(currencyId, req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         var address = dr.rows.length ? dr.rows[0].address : null
+        if(!address){
+            log.error("cannot retrieve %s address for user %s", currencyId, req.user.id)
+        }
         res.send(200, { address: address })
     })
 }

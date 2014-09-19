@@ -85,7 +85,7 @@ define :insight do
             group "root"
             cwd "#{release_path}/"
             code %{
-              npm install
+              npm install --production
             }
           end
         end
@@ -108,7 +108,7 @@ define :insight do
             group "root"
             cwd "#{release_path}/"
             code %{
-              npm install
+              npm install --production
               ./node_modules/bower/bin/bower --allow-root install
               OPERATOR="airbex-#{cryptoName}" ./node_modules/grunt-cli/bin/grunt compile
             }

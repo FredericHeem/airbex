@@ -90,7 +90,7 @@ define :workercrypto do
             group "root"
             cwd "#{release_path}/workers"
             code %{
-              npm install
+              npm install --production
             }
           end
         end

@@ -14,7 +14,7 @@ container.add("exception", {
         colorize: true
     }
 });
-container.get("exception").exitOnError = false;
+container.get("exception").exitOnError = true;
 var keys = [];
 
 module.exports = function(filename) {

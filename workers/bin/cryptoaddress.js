@@ -28,7 +28,7 @@ async.series(
          function(callback) {
              dbClient.connect(function(err) {
                  if(err) {
-                     debug("db connection error: ", err)
+                     log.error("db connection error: ", err)
                  } else {
                      debug("db connected");
                  }
@@ -39,7 +39,7 @@ async.series(
              daemon.getInfo(function(err){
                  debug("daemon.getInfo")
                  if(err){
-                     debug("daemon.getinfo error: ", err)
+                     log.error("daemon.getinfo error: ", err)
                  }
                  callback()
              })

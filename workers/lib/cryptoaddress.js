@@ -25,7 +25,10 @@ CryptoAddress.prototype.loop = function() {
         this.getAccounts,
         this.processAccounts
     ], function(err) {
-        if (err) that.emit('error', err)
+        //if (err) that.emit('error', err)
+        if(err){
+            log.error(err);
+        }
         setTimeout(that.loop, 5e3)
     })
 }
@@ -49,7 +52,7 @@ CryptoAddress.prototype.saveAddress = function(accountId, address, cb) {
 
 CryptoAddress.prototype.processAccounts = function(rows, cb) {
     debug('processing %d work items', rows.length)
-    async.each(rows, this.processAccount, cb)
+    async.eachLimit(rows, 1, this.processAccount, cb)
 }
 
 CryptoAddress.prototype.processAccount = function(row, cb) {

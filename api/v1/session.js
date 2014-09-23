@@ -28,6 +28,7 @@ var _create = function(app, sessionParam, ip, cb) {
 exports.createWs = function(client, eventName, data, next) {
     var ip = client.handshake.headers['x-real-ip'] || '127.0.0.1';
     log.debug('sessionCreate from ip', ip);
+    log.debug('headers ', client.handshake.headers);
     var callbackId = exports.app.socketio.callbackId(data);
     var inputs = data ? data.inputs : undefined;
     _create(exports.app, inputs, ip, function(err, response){

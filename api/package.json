@@ -25,7 +25,7 @@
     "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
     "winston": "0.7.x",
     "socket.io": "1.1.0",
-    "queue-async": "1.0.7"
+    "deferred-queue":"0.5.1"
   },
   "scripts": {
     "start": "DEBUG='' NODE_ENV=brush grunt",

@@ -3,7 +3,7 @@ var log = require('../log')(__filename)
 , _ = require('lodash')
 , async = require('async')
 , num = require('num')
-, Queue = require('queue-async');
+, dq = require('deferred-queue');
 
 module.exports = exports = function(app) {
     exports.app = app
@@ -12,20 +12,20 @@ module.exports = exports = function(app) {
     
     exports.tick();
     var notifyActivity = app.conn.notifyActivity.get();
-    var queueActivity = Queue(1);
+    var queueActivity = dq();
     notifyActivity.query('LISTEN "activity_watcher"');
     notifyActivity.on('notification', function(data) {
         debug("activity_watcher", data.payload);
-        queueActivity.defer(exports.tick);
+        queueActivity.push(exports.tick);
     });
     
     exports.tickUserPending();
     var notifyUserPending = app.conn.notifyUserPending.get();
-    var queueUserPending = Queue(1);
+    var queueUserPending = dq(1);
     notifyUserPending.query('LISTEN "user_pending_watcher"');
     notifyUserPending.on('notification', function(data) {
         debug("user_pending_watcher", data.payload);
-        queueUserPending.defer(exports.tickUserPending);
+        queueUserPending.push(exports.tickUserPending);
     });
 }
 

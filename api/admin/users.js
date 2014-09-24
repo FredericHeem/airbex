@@ -21,10 +21,12 @@ module.exports = exports = function(app) {
         exports.removeBankAccount)
     app.post('/admin/users/:user/forgivePasswordReset', app.security.demand.admin,
         exports.forgivePasswordReset)
-    app.get('/admin/users/:user/documents', app.security.demand.admin, exports.documents)
+    app.get('/admin/users/:user/documents', app.security.demand.admin, exports.usersDocuments)
     app.get('/admin/users/documents/:document', app.security.demand.admin, exports.documentFile)
     app.post('/admin/users/documents/:document/approve', app.security.demand.admin, exports.documentApprove)
     app.post('/admin/users/documents/:document/reject', app.security.demand.admin, exports.documentReject)
+    app.get('/admin/documents', app.security.demand.admin, exports.documents)
+    app.get('/admin/documents/users', app.security.demand.admin, exports.documentsUsers)
 }
 
 exports.forgivePasswordReset = function(req, res, next) {
@@ -235,9 +237,11 @@ exports.activity = function(req, res, next) {
         }))
     })
 }
-
-exports.documents = function(req, res, next) {
-    debug("documents user: %s", req.params.user);
+/**
+ * Get the list of users with pending documents
+ */
+exports.usersDocuments = function(req, res, next) {
+    debug("usersDocuments: %s");
     req.app.conn.read.get().query({
         text: [
                  'SELECT document_id, name, size, last_modified_date, "type", status, message',
@@ -261,6 +265,57 @@ exports.documents = function(req, res, next) {
     })
 }
 
+exports.documents = function(req, res, next) {
+    debug('documents');
+
+    req.app.conn.read.get().query({
+        text: [
+               'SELECT u.user_id, u.first_name, u.last_name, d.name, d.size, d.last_modified_date, d.type, d.status, d.message',
+               'FROM document d',
+               'JOIN \"user\" u ON u.user_id = d.user_id'
+               ].join('\n'),
+               values: []
+    }, function(err, dr) {
+        if (err) return next(err)
+        debug('documents #document ', dr.rows.length);
+        res.send(dr.rows.map(function(row) {
+            debug('documents  ', JSON.stringify(row));
+            return {
+                user_id: row.user_id,
+                first_name: row.first_name,
+                last_name: row.last_name,
+                doc_name: row.name,
+                status: row.status,
+                last_modified_date: row.last_modified_date
+            }
+        }))
+    })
+}
+
+exports.documentsUsers = function(req, res, next) {
+    debug('documentsUsers');
+
+    req.app.conn.read.get().query({
+        text: [
+               'SELECT distinct u.user_id, u.first_name, u.last_name, u.email',
+               'FROM "user" u',
+               'JOIN document d ON u.user_id = d.user_id AND d.status <> \'Accepted\''
+               ].join('\n'),
+               values: []
+    }, function(err, dr) {
+        if (err) return next(err)
+        debug('documentsUsers #users ', dr.rows.length);
+        res.send(dr.rows.map(function(row) {
+            debug('users  ', JSON.stringify(row));
+            return {
+                user_id: row.user_id,
+                first_name: row.first_name,
+                last_name: row.last_name,
+                email: row.email
+            }
+        }))
+    })
+}
 exports.documentFile = function(req, res, next) {
     debug("documentsFile doc id %s", req.params.document);
     req.app.conn.read.get().query({
@@ -285,6 +340,35 @@ exports.documentFile = function(req, res, next) {
             res.send(404);
         } 
     })
+}
+
+
+exports.documents = function(req, res, next) {
+    debug('documents');
+
+    req.app.conn.read.get().query({
+        text: [
+               'SELECT u.user_id, u.first_name, u.last_name, d.name, d.size, d.last_modified_date, d.type, d.status, d.message',
+               'FROM document d',
+               'JOIN \"user\" u ON u.user_id = d.user_id'
+               ].join('\n'),
+               values: []
+    }, function(err, dr) {
+        if (err) return next(err)
+        debug('documents #document ', dr.rows.length);
+        res.send(dr.rows.map(function(row) {
+            debug('documents  ', JSON.stringify(row));
+            return {
+                user_id: row.user_id,
+                first_name: row.first_name,
+                last_name: row.last_name,
+                doc_name: row.name,
+                status: row.status,
+                last_modified_date: row.last_modified_date
+            }
+        }))
+    })
+
 }
 
 exports.documentApprove = function(req, res, next) {

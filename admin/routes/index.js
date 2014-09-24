@@ -19,6 +19,7 @@ var balances = require('../controllers/balances')
 , authorize = require('../authorize')
 , purchaseorders = require('../controllers/purchaseorders')
 , assets = require('../controllers/assets')
+, documents = require('../controllers/documents')
 
 module.exports = function() {
     router
@@ -97,6 +98,10 @@ module.exports = function() {
     .add(/^credits$/, function() {
         if (!authorize.admin()) return
         master(require('../controllers/credits')(), 'admin')
+    })
+    .add(/^documents$/, function() {
+        if (!authorize.admin()) return
+        master(documents(), 'admin')
     })
     .add(/^(.+)$/, function(hash) {
         master(notfound(hash))

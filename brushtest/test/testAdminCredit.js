@@ -32,7 +32,7 @@ describe('Admin', function () {
             }
         });
     });
-   
+    
 
     
     function createAndCancelBankCredit(client, bankCreditInfo, done) {
@@ -62,7 +62,8 @@ describe('Admin', function () {
             })
         });
     });
-    describe('AdminAuthenticatedCredit', function () {
+
+    describe('AdminAuthenticated', function () {
         this.timeout(timeout);
         var adminClient = new (require('../../client/index'))(admin_config);
         
@@ -75,7 +76,25 @@ describe('Admin', function () {
                 done()
             });
         });
-
+        
+        describe('AdminKYC', function () {
+            this.timeout(timeout);
+            it('AdminDocuments', function (done) {
+                adminClient.adminDocuments(function(err, documents) {
+                    if (err) throw err
+                    debug("adminDocuments: %s",  JSON.stringify(documents, null, 4));
+                    done();
+                })
+            });
+            it('AdminDocumentsUsers', function (done) {
+                adminClient.adminDocumentsUsers(function(err, documentsUsers) {
+                    if (err) throw err
+                    debug("adminDocumentsUsers: %s",  JSON.stringify(documentsUsers, null, 4));
+                    done();
+                })
+            });
+        });
+       
         it('AdminBankCreditsGetOk', function (done) {
             adminClient.bankCredits(function(err, bankCredits) {
                 if (err) throw err

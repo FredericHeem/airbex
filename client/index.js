@@ -233,6 +233,26 @@ Snow.prototype.purchaseOrderCancel = function(purchaseOrderId, cb) {
     })
 }
 
+Snow.prototype.adminDocuments = function(cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    request(this.url + 'admin/documents', data , function(err, res, body) {
+        if (err) return cb(err)
+        if (res.statusCode != 200) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
+Snow.prototype.adminDocumentsUsers = function(cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    request(this.url + 'admin/documents/users', data , function(err, res, body) {
+        if (err) return cb(err)
+        if (res.statusCode != 200) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
 Snow.prototype.bankCredits = function(cb) {
     var data = { };
     data = updateRequestWithKey(this, data);

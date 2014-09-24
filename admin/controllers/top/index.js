@@ -14,6 +14,15 @@ module.exports = function() {
         })
     }
 
+    function documentUpdated() {
+        api.call('admin/documents/users')
+        .done(function(documents) {
+            $el.find('.active-document-count').html(documents.length)
+        })
+    }
+    
+    documentUpdated();
+    
     api.on('user', userUpdated)
 
     $el.on('click', '[data-action="sign-out"]', function(e) {

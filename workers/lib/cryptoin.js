@@ -20,8 +20,8 @@ var CryptoIn = module.exports = function(ep, db) {
     async.forever(function(cb) {
         that.check(function(err) {
             if (err) {
-                console.error(err)
-                that.emit(err)
+                log.error(err)
+                //that.emit(err)
             }
             setTimeout(cb, 5e3)
         })
@@ -114,11 +114,11 @@ CryptoIn.prototype.processOutput = function(txid, o, cb) {
         text: queryText,
         values: [this.currency, txid, address, satoshi]
     }, function(err, dr) {
-    	//debug("processOutput currency: %s, txid: %s, address: %s, satoshi: %s",  this.currency, txid, address, satoshi)
-    		
+        //debug("processOutput currency: %s, txid: %s, address: %s, satoshi: %s",  this.currency, txid, address, satoshi)
+
         if (err) {
-        	debug("processOutput currency: %s, txid: %s, address: %s, satoshi: %s, error: %s", 
-            		this.currency, txid, address, satoshi, JSON.stringify(err))
+            debug("processOutput currency: %s, txid: %s, address: %s, satoshi: %s, error: %s", 
+                    this.currency, txid, address, satoshi, JSON.stringify(err));
             if (err.code === '23505') {
                 console.log('Skipped duplicate CryptoIn transaction %s', txid)
                 return cb()
@@ -126,7 +126,7 @@ CryptoIn.prototype.processOutput = function(txid, o, cb) {
             return cb(err)
         }
         if (!dr.rowCount) return cb()
-        console.log('Credited %s with %s %s from %s (internal %s)',
+        log.info('Credited %s with %s %s from %s (internal %s)',
             address, o.value, this.currency, txid, dr.rows[0].tid)
         cb(null, dr.rows[0].tid)
     })

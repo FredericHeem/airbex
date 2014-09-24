@@ -10,7 +10,7 @@
     "alertify": "https://github.com/fabien-d/alertify.js/archive/0.3.11.tar.gz"
   },
   "devDependencies": {
-    "grunt-bower": "0.7.0",
+    "grunt-bower": "1.3.8",
     "grunt-cli": "0.1.9",
     "grunt": "0.4.1",
     "grunt-browserify": "1.2.9",

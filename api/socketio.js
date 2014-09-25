@@ -94,7 +94,7 @@ module.exports = function (app, server) {
                 } else if(response){
                     client.session = response.session
                     client.user = response.user;
-                    log.debug("attachUserFromSessionKey: %s", client.user);
+                    //log.debug("attachUserFromSessionKey: %s", client.user);
                     app.security.sessionWs.create(response.user.id, client.id,function(err){
                         if(err) return next(err);
                         next();

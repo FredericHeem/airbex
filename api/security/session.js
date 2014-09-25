@@ -32,7 +32,7 @@ module.exports = exports = function(app) {
 
 exports.getUserAndSessionFromSessionKey = function(sessionKey, cb) {
     if(!sessionKey) return cb(null, null);
-    debug("getUserAndSessionFromSessionKey: ", sessionKey);
+    //debug("getUserAndSessionFromSessionKey: ", sessionKey);
     exports.store.get(sessionKey, function(err, session) {
         if (err) return cb(err)
         if (!session) {

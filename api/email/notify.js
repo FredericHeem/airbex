@@ -149,11 +149,12 @@ exports.tick = function(cb) {
             cb && cb(err)
         }
 
-        debug('processing %s rows', dr.rowCount || 'no')
+        //debug('processing %s rows', dr.rowCount || 'no')
 
         async.each(dr.rows, exports.process, function() {
             if (!dr.rowCount) {
                 cb && cb()
+                return;
             }
 
             var tip = _.max(dr.rows, 'activity_id').activity_id

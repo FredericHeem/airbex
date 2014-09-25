@@ -1,46 +1,24 @@
 /*global describe, it, before, after*/
 var assert = require('assert');
 var request = require('supertest');
-var async = require('async');
 var config = require('./configTest.js')();
-var num = require('num');
 var debug = require('debug')('snowtest')
-var SnowBot = require('./snow-bot');
-var SnowChef = require('./snow-chef');
+var TestMngr = require('./TestMngr');
 
-describe('SnowClient', function () {
+describe('SnowChef', function () {
     "use strict";
     
-    var alice_config = config.users[1];
-    var bob_config = config.users[2];
-    alice_config.url = config.url; 
-    bob_config.url = config.url; 
-    var client = new (require('../../client/index'))(alice_config);
-    var client_bob = new (require('../../client/index'))(bob_config);
-    var clients = [];
-    clients.push(client);
-    clients.push(client_bob);
+    var testMngr = new TestMngr(config);
+    var snowBot = testMngr.bot();
+    var snowChef = testMngr.chef();
+    var clients = testMngr.clients();
     
-    var snowBot = new SnowBot(config);
-    var snowChef = new SnowChef(snowBot, config);
-
     before(function(done) {
         debug("before");
-        async.waterfall(
-                [
-                 function(callback) {
-                     snowChef.securitySession(clients, callback)
-                 },
-                 function(callback) {
-                     snowBot.db.pgClient.connect(callback);
-                 }
-                 ],
-
-                 function(err) {
-                    debug("init done")
-                    done(err);
-                }
-        );
+        testMngr.dbConnect()
+        .then(testMngr.login())
+        .then(done)
+        .fail(done);
     });
     
     describe('SnowChefFunding', function () {

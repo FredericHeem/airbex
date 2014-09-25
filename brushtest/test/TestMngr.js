@@ -5,7 +5,7 @@ var SnowChef = require('./snow-chef');
 var SnowClient = require('../../client/index');
 
 var TestMngr = function(config){
-    debug("TestMngr ", JSON.stringify(config, null, 4));
+    debug("TestMngr ");
     var clientsMap = {};
     var clients = [];
     var clientsConfig = {};
@@ -32,6 +32,10 @@ var TestMngr = function(config){
         return clientsMap[name];
     }
     
+    this.clients = function(){
+        return clients;
+    }
+    
     this.clientConfig = function(name){
         return clientsConfig[name];
     }
@@ -52,9 +56,11 @@ var TestMngr = function(config){
     }
     
     this.login = function(){
+        debug("login");
         var deferred = Q.defer();
         snowChef.securitySession(clients, function(err){
             if(err) return deferred.reject(err)
+            debug("logged in");
             deferred.resolve()
             
         })

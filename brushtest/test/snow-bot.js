@@ -14,6 +14,7 @@ module.exports = function (config) {
         
         client.order(order, function(err, id) {
             if(err){
+                
                 if(err.name == "InsufficientFunds"){
                     done()
                 } else {

@@ -69,11 +69,9 @@ module.exports = function (bot, config) {
     snowChef.markets = function(clients, done) {
         debug("markets #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
-            client.markets(function(err, markets) {
-                if (err) throw err
+            client.markets().then(function(markets) {
                 console.log(client.createTableMarkets(markets).toString())
-                callback();
-            })
+            }).then(done).fail(callback)
         }, function(err) {
             debug("markets done: " + err ? err : "");
             done(err);

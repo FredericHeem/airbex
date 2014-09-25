@@ -4,25 +4,17 @@ var request = require('supertest');
 var async = require('async');
 var config = require('./configTest.js')();
 var debug = require('debug')('testDbUser');
-var pg = require('pg');
-var crypto = require('crypto');
-var sjcl = require('sjcl');
-var SnowBot = require('./snow-bot');
-var SnowChef = require('./snow-chef');
 var lproof = require('lproof')
+var TestMngr = require('./TestMngr');
 
 describe('LiabilityProof', function () {
     "use strict";
-    var url = config.url;
-    var timeout = 1000 * 60 * 60;
-    var alice_config = config.users[1];
-    alice_config.url = config.url; 
-    var client = new (require('../../client/index'))(alice_config);
-    var snowBot = new SnowBot(config);
-    var snowChef = new SnowChef(snowBot, config);
+    var testMngr = new TestMngr(config);
+    var snowBot = testMngr.bot();
+    var snowChef = testMngr.chef();
+    var clientAdmin = testMngr.client("admin");
+    var client = testMngr.client("alice");
     
-    var clients = []; 
-    clients.push(client);
     
     var verify_liability = function(root, partialTree){
         var ptree = lproof.deserializePartialTree(JSON.stringify(partialTree));
@@ -31,42 +23,11 @@ describe('LiabilityProof', function () {
     
     before(function(done) {
         debug("before");
-        this.timeout(5 * 1000);
-        snowChef.securitySession(clients, done)
+        testMngr.login().then(done).fail(done);
     });
     
-    describe('BlockChainBTC', function () {
-        this.timeout(timeout);
-        it('AddressBTCOk', function (done) {
-            var address = "1MfWN6iGMJgHPfp1phyX8DK9g5ucV4GaLZ"
-            request(config.url).get('v1/blockchain/btc/address/' + address).end(function(err, res) {
-                assert.equal(res.statusCode, 200)
-                var response = res.body;
-                assert(response)
-                assert.equal(response.status, "success")
-                if (err) {
-                    done(err);
-                } else {
-                    assert.equal(address, response.data.address)
-                    console.log("bc returns ", JSON.stringify(response))
-                    done();
-                }
-            });
-        });
-        // wait for block.io fix
-//        it('AddressBTCKo', function (done) {
-//            var address = "1MfWN6iGMJgHPfp1phyX8DK9g5ucV4GaLL"
-//            request(config.url).get('v1/blockchain/btc/address/' + address).end(function(err, res) {
-//                assert.equal(res.statusCode, 400)
-//                var response = res.body;
-//                assert(response)
-//                assert(response.error);
-//                done();
-//            });
-//        });
-    });
+
     describe('LiabilityProofBTC', function () {
-        this.timeout(timeout);
         var currency = "btc";
         it('LiabilityGetAllBTC', function (done) {
             snowBot.liabilityGetAll(client, currency, function(err, root, partialTree){
@@ -104,7 +65,6 @@ describe('LiabilityProof', function () {
         });
     });
     describe('LiabilityProofLTC', function () {
-        this.timeout(timeout);
         var currency = "ltc";
         it('LiabilityGetAllLTC', function (done) {
             snowBot.liabilityGetAll(client, currency, function(err, root, partialTree){

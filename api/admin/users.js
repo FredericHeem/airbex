@@ -22,7 +22,8 @@ module.exports = exports = function(app) {
     app.post('/admin/users/:user/forgivePasswordReset', app.security.demand.admin,
         exports.forgivePasswordReset)
     app.get('/admin/users/:user/documents', app.security.demand.admin, exports.usersDocuments)
-    app.get('/admin/users/documents/:document', app.security.demand.admin, exports.documentFile)
+    app.get('/admin/users/documents/:document/view', app.security.demand.admin, exports.documentFileView)
+    app.get('/admin/users/documents/:document/download', app.security.demand.admin, exports.documentFileDownload)
     app.post('/admin/users/documents/:document/approve', app.security.demand.admin, exports.documentApprove)
     app.post('/admin/users/documents/:document/reject', app.security.demand.admin, exports.documentReject)
     app.get('/admin/documents', app.security.demand.admin, exports.documents)
@@ -316,7 +317,39 @@ exports.documentsUsers = function(req, res, next) {
         }))
     })
 }
-exports.documentFile = function(req, res, next) {
+exports.documentFileView = function(req, res, next) {
+    debug("documentsFile doc id %s", req.params.document);
+    req.app.conn.read.get().query({
+        text: [
+                 'SELECT name, image',
+                 'FROM document',
+                 'WHERE document_id = $1',
+        ].join('\n'),
+        values: [req.params.document]
+    }, function(err, dr) {
+        if (err) return next(err)
+        var row = dr.rows[0];
+        if(row && row.image){
+            var data = new Buffer(row.image, 'base64').toString('base64');
+            debug("sending %s/%s", data.length, row.image.length);
+            res.writeHead(200, {'content-type':'text/html'});
+            var extension = row.name.split('.').pop();
+            var dataType = "image";
+            if(extension === 'pdf') {
+                res.write('<object data="data:application/pdf;base64,' + data + '" type="application/pdf" width="100%" height="100%"></object>');
+            } else {
+                res.write('<img src="data:image/' + extension + ';base64,' + data + '">');
+            }
+            
+            res.end();
+        } else {
+            debug("cannot find document payload in db");
+            res.send(404);
+        } 
+    })
+}
+
+exports.documentFileDownload = function(req, res, next) {
     debug("documentsFile doc id %s", req.params.document);
     req.app.conn.read.get().query({
         text: [
@@ -341,7 +374,6 @@ exports.documentFile = function(req, res, next) {
         } 
     })
 }
-
 
 exports.documents = function(req, res, next) {
     debug('documents');

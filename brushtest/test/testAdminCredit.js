@@ -93,6 +93,14 @@ describe('Admin', function () {
                     done();
                 })
             });
+            it('AdminGetDocument', function (done) {
+                var docNumber = 1;
+                adminClient.adminDocumentView(docNumber, function(err, document) {
+                    if (err) throw err
+                    debug("AdminGetDocument: %s",  JSON.stringify(document, null, 4));
+                    done();
+                })
+            });
         });
        
         it('AdminBankCreditsGetOk', function (done) {

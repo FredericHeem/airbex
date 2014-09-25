@@ -233,6 +233,16 @@ Snow.prototype.purchaseOrderCancel = function(purchaseOrderId, cb) {
     })
 }
 
+Snow.prototype.adminDocumentView = function(doc_id, cb) {
+    var data = updateRequestWithKey(this, {});
+    request(this.url + 'admin/users/documents/view' + doc_id, data , function(err, res, body) {
+        if (err) return cb(err)
+        debug("adminDocument res")
+        if (res.statusCode != 200) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
 Snow.prototype.adminDocuments = function(cb) {
     var data = { };
     data = updateRequestWithKey(this, data);

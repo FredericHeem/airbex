@@ -14,7 +14,6 @@ describe('Admin', function () {
     var snowChef = testMngr.chef();
     
     before(function(done) {
-        debug("before")
         testMngr.dbConnect().then(done).fail(done);
     });
     

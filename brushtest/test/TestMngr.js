@@ -6,7 +6,8 @@ var SnowClient = require('../../client/index');
 
 var TestMngr = function(config){
     debug("TestMngr ", JSON.stringify(config, null, 4));
-    var clients = {};
+    var clientsMap = {};
+    var clients = [];
     var clientsConfig = {};
     var snowBot = new SnowBot(config);
     var snowChef = new SnowChef(snowBot, config);
@@ -14,8 +15,9 @@ var TestMngr = function(config){
     config.users.forEach(function(userConfig){
         userConfig.url = config.url; 
         var client = new SnowClient(userConfig);
-        clients[userConfig.name] = client;
+        clientsMap[userConfig.name] = client;
         clientsConfig[userConfig.name] = userConfig;
+        clients.push(client);
     })
     
     this.bot = function(){
@@ -27,7 +29,7 @@ var TestMngr = function(config){
     }
     
     this.client = function(name){
-        return clients[name];
+        return clientsMap[name];
     }
     
     this.clientConfig = function(name){
@@ -46,6 +48,16 @@ var TestMngr = function(config){
                 deferred.resolve();
             }
         });
+        return deferred.promise;
+    }
+    
+    this.login = function(){
+        var deferred = Q.defer();
+        snowChef.securitySession(clients, function(err){
+            if(err) return deferred.reject(err)
+            deferred.resolve()
+            
+        })
         return deferred.promise;
     }
 };

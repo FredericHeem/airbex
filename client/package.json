@@ -10,7 +10,8 @@
     "debug": "0.7.2",
     "optimist": "~0.4.0",
     "cli-table": "~0.2.0",
-    "sjcl" : "x"
+    "sjcl" : "x",
+    "q": "1.0.1"
   },
   "devDependencies": {
   },

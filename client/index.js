@@ -6,6 +6,7 @@ var debug = require('debug')('snow')
 , Table = require('cli-table')
 , sjcl = require('sjcl')
 , debug = require('debug')('Client')
+, Q = require("q")
 
 , Snow = module.exports = function(config) {
     this.url = config.url;
@@ -66,15 +67,18 @@ Snow.prototype.orders = function(cb) {
         }
         cb(null, body)
     })
+    
 }
 
 Snow.prototype.markets = function(cb) {
+    var deferred = Q.defer();
 	var data = updateRequestWithKey(this, {});
     request(this.url + 'v1/markets', data, function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode !== 200) return cb(bodyToError(body))
-        cb(err, body)
+        if (err) return deferred.reject(err)
+        if (res.statusCode !== 200) return deferred.reject(bodyToError(body))
+        deferred.resolve(body);
     })
+    return deferred.promise;
 }
 
 // Groups depth from array to bids and asks
@@ -414,7 +418,6 @@ Snow.prototype.createTableMarkets = function(markets){
         head: ['Market', 'Bid', 'Ask', 'Last', 'High', 'Low', 'Volume', 'fee_bid_taker', 'fee_bid_maker', 'fee_ask_taker', 'fee_ask_maker'],
         colWidths: [8, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]
     })
-	
     markets.forEach(function(market) {
     	console.log(JSON.stringify(market));
         table.push([
@@ -425,10 +428,10 @@ Snow.prototype.createTableMarkets = function(markets){
             market.high || '',
             market.low || '',
             market.volume || '0',
-            market.fee_bid_taker,
-            market.fee_bid_maker,
-            market.fee_ask_taker,
-            market.fee_ask_maker
+            market.fee_bid_taker || '',
+            market.fee_bid_maker || '',
+            market.fee_ask_taker || '',
+            market.fee_ask_maker || ''
         ])
     })
     return table

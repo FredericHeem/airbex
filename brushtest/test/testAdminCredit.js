@@ -3,37 +3,20 @@ var assert = require('assert');
 var request = require('supertest');
 var async = require('async');
 var config = require('./configTest.js')();
-var num = require('num');
 var debug = require('debug')('testAdminCredit');
-var pg = require('pg');
-var crypto = require('crypto')
-var SnowBot = require('./snow-bot');
-var SnowChef = require('./snow-chef');
+var TestMngr = require('./TestMngr');
 
 describe('Admin', function () {
     "use strict";
-    var url = config.url_admin;
-    var timeout = 1000 * 60 * 60;
+    var testMngr = new TestMngr(config);
     var quote_currency = config.quote_currency;
-    var snowBot = new SnowBot(config);
-    var snowChef = new SnowChef(snowBot, config);
-    var admin_config = config.users[0];
-    admin_config.url = config.url; 
-    var alice = config.users[1];
+    var snowBot = testMngr.bot();
+    var snowChef = testMngr.chef();
     
     before(function(done) {
         debug("before")
-        snowBot.db.pgClient.connect(function(err) {
-            if (err) {
-                debug("db connect error: %s, connection: %s", err, config.pg_write_url);
-                done(err);
-            } else {
-                done();
-            }
-        });
+        testMngr.dbConnect().then(done).fail(done);
     });
-    
-
     
     function createAndCancelBankCredit(client, bankCreditInfo, done) {
         client.bankCreditCreate(bankCreditInfo, function(err, bankCreditResult) {
@@ -51,9 +34,7 @@ describe('Admin', function () {
     }
     
     describe('AdminNotAuthenticated', function () {
-        this.timeout(timeout);
-        var client = new (require('../../client/index'))(admin_config);
-        
+        var client = testMngr.client("admin");
         it('AdminBankCreditsNotAuthenticated', function (done) {
             client.bankCredits(function(err, bankCredits) {
                 assert(err)
@@ -64,8 +45,7 @@ describe('Admin', function () {
     });
 
     describe('AdminAuthenticated', function () {
-        this.timeout(timeout);
-        var adminClient = new (require('../../client/index'))(admin_config);
+        var adminClient = testMngr.client("admin");
         
         before(function(done) {
             debug("before")
@@ -78,7 +58,6 @@ describe('Admin', function () {
         });
         
         describe('AdminKYC', function () {
-            this.timeout(timeout);
             it('AdminDocuments', function (done) {
                 adminClient.adminDocuments(function(err, documents) {
                     if (err) throw err
@@ -126,7 +105,7 @@ describe('Admin', function () {
                     "reference" : "my first deposit for 1000"
             }
             
-            snowBot.createAndValidateBankCredit(adminClient, alice.email, bankCreditInfo, done)
+            snowBot.createAndValidateBankCredit(adminClient, testMngr.clientConfig('alice').email, bankCreditInfo, done)
         });
         it('AdminBankCreditsCreateAndCancelOk', function (done) {
             var bankCreditInfo = {

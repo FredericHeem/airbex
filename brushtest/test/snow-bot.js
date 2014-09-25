@@ -142,6 +142,7 @@ module.exports = function (config) {
         function(callback) {
             snowBot.db.getUserIdFromEmail(email, function(err, user_id) {
                 bankCreditInfo.user_id = user_id;
+                debug("createAndValidateBankCredit: userid ", user_id)
                 callback(err);
             });
         },

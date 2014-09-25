@@ -21,10 +21,11 @@
     "pg": "x",
     "pg-builder": "x",
     "sjcl" : "x",
-    "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master"
+    "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
+    "q": "1.0.1"
   },
   
   "scripts": {
-    "test": "DEBUG='* -mocha:*' NODE_ENV=local mocha -g PurchaseOrder"
+    "test": "DEBUG='* -mocha:*' NODE_ENV=local mocha"
   }
 }

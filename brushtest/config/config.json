@@ -17,6 +17,7 @@
       [
 
 {
+    "name": "admin",
     "email" : "frederic.heem@gmail.com",
     "password" : "9dcpw400",
     "admin": "true",
@@ -25,6 +26,7 @@
     "btc_deposit_address":"1MfWN6iGMJgHPfp1phyX8DK9g5ucV4GaLZ"
 },
 {
+    "name": "alice",
     "email" : "alice@nomail.com",
     "password" : "password",
     "country":"FR",
@@ -33,6 +35,7 @@
 }
 ,
 {
+    "name": "bob",
     "email" : "bob@nomail.com",
     "password" : "password",
     "country":"UK",
@@ -40,6 +43,7 @@
 }
 ,
 {
+    "name":"mamak",
     "email" : "mamak@nomail.com",
     "password" : "password",
     "country":"DE",

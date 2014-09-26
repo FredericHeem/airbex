@@ -1,11 +1,11 @@
 /*global describe, it, before, after*/
 var assert = require('assert');
 var request = require('supertest');
-var debug = require('debug')('testMarkets')
+var debug = require('debug')('testWhoami')
 var config = require('./configTest.js')();
 var TestMngr = require('./TestMngr');
 
-describe('Markets', function () {
+describe('Whoami', function () {
     "use strict";
     
     var testMngr = new TestMngr(config);
@@ -15,27 +15,31 @@ describe('Markets', function () {
     var client = testMngr.client("alice");
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
-
-    describe('MarketPublic', function () {
-        it('MarketPublic', function (done) {
-            client.markets().then(function(markets) {
-                console.log(client.createTableMarkets(markets).toString())
-                done();
-            }).fail(done)
+   
+    describe('WhoamiPublic', function () {
+        it('WhoamiPublicAlice', function (done) {
+            client.whoami()
+            .fail(function(err){
+                assert(err)
+                assert.equal(err.name, "NotAuthenticated")
+                done()
+            });
         });
     });
     
-    describe('Markets', function () {
+    describe('WhoamiAuth', function () {
         before(function(done) {
             debug("before");
             this.timeout(5 * 1000);
             testMngr.login().then(done).fail(done);
         });
-        it('MarketAuthenticated', function (done) {
-            client.markets().then(function(markets) {
-                console.log(client.createTableMarkets(markets).toString())
-                done();
-            }).fail(done)
+        it('WhoamiAuthAlice', function (done) {
+            client.whoami()
+            .then(function(user) {
+                console.log(client.createTableUser(user).toString())
+                done()
+            })
+            .fail(done)
         });
     });
 });

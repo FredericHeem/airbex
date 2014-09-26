@@ -48,39 +48,9 @@ describe('Admin', function () {
         
         before(function(done) {
             debug("before")
-            adminClient.securitySession(function(err, sessionKey) {
-                if (err) throw err
-                assert(sessionKey)
-                debug("securitySession key %s", sessionKey)
-                done()
-            });
+            adminClient.securitySession().fail(done).finally(done);
         });
         
-        describe('AdminKYC', function () {
-            it('AdminDocuments', function (done) {
-                adminClient.adminDocuments(function(err, documents) {
-                    if (err) throw err
-                    debug("adminDocuments: %s",  JSON.stringify(documents, null, 4));
-                    done();
-                })
-            });
-            it('AdminDocumentsUsers', function (done) {
-                adminClient.adminDocumentsUsers(function(err, documentsUsers) {
-                    if (err) throw err
-                    debug("adminDocumentsUsers: %s",  JSON.stringify(documentsUsers, null, 4));
-                    done();
-                })
-            });
-            it('AdminGetDocument', function (done) {
-                var docNumber = 1;
-                adminClient.adminDocumentView(docNumber, function(err, document) {
-                    if (err) throw err
-                    debug("AdminGetDocument: %s",  JSON.stringify(document, null, 4));
-                    done();
-                })
-            });
-        });
-       
         it('AdminBankCreditsGetOk', function (done) {
             adminClient.bankCredits(function(err, bankCredits) {
                 if (err) throw err

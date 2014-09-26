@@ -13,25 +13,20 @@ module.exports = function (bot, config) {
     snowChef.securitySession = function (clients, done){
         debug("securitySession #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
-            client.securitySession(function(err, sessionKey) {
-                if (err) throw err
-                //assert(sessionKey);
-                debug("securitySession key %s", sessionKey)
-                callback()
-            });
+            client.securitySession()
+            .then(function(){callback()})
+            .fail(callback);
         }, function(err) {
             debug("securitySession done: " + err ? err : "");
             done(err);
-        });        
+        });
     }
+    
     snowChef.balances = function(clients, done) {
         debug("balances #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
-            client.balances(function(err, balances) {
-                if (err) throw err
-                console.log(client.createTableBalances(balances).toString())
-                callback()
-            });
+            debug("balances ", JSON.stringify(client))
+            client.balances().then(function(){callback()}).fail(callback);
         }, function(err) {
             debug("balances done: " + err ? err : "");
             done(err);
@@ -41,11 +36,7 @@ module.exports = function (bot, config) {
     snowChef.orders = function(clients, done) {
         debug("orders #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
-            client.orders(function(err, orders) {
-                if (err) throw err
-                console.log(client.createTableOrders(orders).toString())
-                callback()
-            })   
+            client.orders().then(function(){callback()}).fail(callback);  
         }, function(err) {
             debug("orders done: " + err);
             done(err);
@@ -55,11 +46,11 @@ module.exports = function (bot, config) {
     snowChef.whoami = function(clients, done) {
         debug("whoami #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
-            client.whoami(function(err, user) {
-                if (err) throw err
+            client.whoami().then(function(user) {
                 console.log(client.createTableUser(user).toString())
                 callback()
-            });
+            })
+            .fail(callback);
         }, function(err) {
             debug("whoami done: " + err ? err : "");
             done(err);
@@ -71,7 +62,9 @@ module.exports = function (bot, config) {
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
             client.markets().then(function(markets) {
                 console.log(client.createTableMarkets(markets).toString())
-            }).then(done).fail(callback)
+                callback()
+            })
+            .fail(callback)
         }, function(err) {
             debug("markets done: " + err ? err : "");
             done(err);
@@ -81,10 +74,7 @@ module.exports = function (bot, config) {
     snowChef.cancellAllOrders = function(clients, done) {
         debug("cancellAllOrders #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
-           client.cancelAll(function(err) {
-                if (err) throw err
-                callback()
-            });
+           client.cancelAll().then(callback).fail(callback);
         }, function(err) {
             debug("cancellAllOrders done: " + err ? err : "");
             done(err);

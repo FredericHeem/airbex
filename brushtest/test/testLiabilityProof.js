@@ -3,7 +3,7 @@ var assert = require('assert');
 var request = require('supertest');
 var async = require('async');
 var config = require('./configTest.js')();
-var debug = require('debug')('testDbUser');
+var debug = require('debug')('testLiability');
 var lproof = require('lproof')
 var TestMngr = require('./TestMngr');
 

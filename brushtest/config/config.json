@@ -9,7 +9,7 @@
   "price" : "150",
   "bid_price" : "1000",
   "ask_price" : "500",
-  "volume" : "0.2",
+  "volume" : "5000000",
   "documentOk":"",
   "documentTooBig":"",
   "btc_depsosit_address":"1MfWN6iGMJgHPfp1phyX8DK9g5ucV4GaLZ",
@@ -40,14 +40,6 @@
     "password" : "password",
     "country":"UK",
     "btc_deposit_address":"1eqghyo891XZXMog2kGHZ7GDfJrmyuPMR"
-}
-,
-{
-    "name":"mamak",
-    "email" : "mamak@nomail.com",
-    "password" : "password",
-    "country":"DE",
-    "btc_deposit_address":"15zfKBxF1vjYRrjcLBkBsJtJ4HJatrB5it"
 }
 ]
  

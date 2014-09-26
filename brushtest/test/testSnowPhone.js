@@ -4,33 +4,26 @@ var request = require('supertest');
 var async = require('async');
 var config = require('./configTest.js')();
 var num = require('num');
-var debug = require('debug')('snowtest')
+var debug = require('debug')('testPhone')
 var SnowBot = require('./snow-bot');
 var SnowChef = require('./snow-chef');
+var TestMngr = require('./TestMngr');
 
 describe('SnowPhone', function () {
     "use strict";
-    var admin_config = config.users[0];
-    var alice_config = config.users[1];
-    var bob_config = config.users[2];
-    alice_config.url = config.url; 
-    bob_config.url = config.url; 
-    var client = new (require('../../client/index'))(alice_config);
-    var client_bob = new (require('../../client/index'))(bob_config);
-    var clients = [];
-    clients.push(client);
-    clients.push(client_bob);
-    
-    var snowBot = new SnowBot(config);
-    var snowChef = new SnowChef(snowBot, config);
-    
-
+    var testMngr = new TestMngr(config);
+    var snowBot = testMngr.bot();
+    var snowChef = testMngr.chef();
+    var clientAdmin = testMngr.client("admin");
+    var adminConfig = testMngr.clientConfig("alice");
+    var client = testMngr.client("alice");
+    var clientConfig = testMngr.clientConfig("alice");
     
     describe('PhoneKo', function () {
         it('StartPhoneVerifyNotAuthenticated', function (done) {
             var postData = {
-                    "number": admin_config.number,
-                    "country": admin_config.country
+                    "number": adminConfig.number,
+                    "country": adminConfig.country
             };
             
             request(config.url).post('v1/users/verify/text/').send(postData).expect(401).end(function(err, res) {
@@ -46,29 +39,10 @@ describe('SnowPhone', function () {
     describe('PhoneOk', function () {
         before(function(done) {
             debug("before");
-            
-            async.series(
-                    [
-                     function(callback) {
-                         client.securitySession(callback)
-                     },
-                     function(callback) {
-                         snowBot.db.pgClient.connect(function(err) {
-                             if (err) {
-                                 debug("db connect error: %s, connection: %s", err, config.pg_write_url);
-                                 callback(err);
-                             } else {
-                                 debug("db connected");
-                                 callback();
-                             }
-                         });
-                     }
-                     
-                     ],
-
-                     function(err) {
-                        done(err);
-                    });
+            testMngr.dbConnect()
+            .then(testMngr.login)
+            .then(done)
+            .fail(done);
         });
         it('StartPhoneVerifyAuthenticated', function (done) {
             this.timeout(5*1000);

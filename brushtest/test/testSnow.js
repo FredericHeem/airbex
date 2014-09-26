@@ -30,33 +30,6 @@ describe('SnowClient', function () {
         testMngr.login().then(done).fail(done);
     });
     
-    describe('UploadDoc', function () {
-        it('UploadDocOk', function (done) {
-            var file = '/Users/frederic/Downloads/a_style_logo_Mod3.jpg';
-            snowBot.uploadDocument(client, file, function(err, res){
-                assert(!err)
-                done();
-            })
-        });
-//        it('UploadDocTooBig', function (done) {
-//            this.timeout(60*1000);
-//            var file = '/Users/frederic/Downloads/bfg-1.11.0.jar';
-//            snowBot.uploadDocument(client, file, function(err, res){
-//                assert(res.statusCode == 400)
-//                done();
-//            })
-//        });        
-    });    
-    describe('Whoami', function () {
-        it('WhoamiAlice', function (done) {
-            client.whoami(function(err, user) {
-                if (err) throw err
-                console.log(client.createTableUser(user).toString())
-                done()
-            });
-        });
-    });
-    
     describe('Depth', function() {
         it('Depth', function(done) {
             client.depth(config.market, function(err, depth) {
@@ -66,15 +39,4 @@ describe('SnowClient', function () {
             })
         });
     });
-
-    describe('Balances', function () {
-        it('BalancesAlice', function (done) {
-            client.balances(function(err, balances) {
-                if (err) throw err
-                console.log(client.createTableBalances(balances).toString())
-                done()
-            });
-        });
-    });
-   
 });

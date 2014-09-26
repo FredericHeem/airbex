@@ -11,19 +11,17 @@ module.exports = function (config) {
     
     snowBot.tradeUntillNoFunds = function(client, order, done) {
         debug("tradeUntillNoFunds email:%s", client.email);
-        
-        client.order(order, function(err, id) {
-            if(err){
-                
-                if(err.name == "InsufficientFunds"){
-                    done()
-                } else {
-                    done(err)
-                }
+
+        client.order(order)
+        .then(function(res) {
+            debug('Order bid #%s placed', res.id)
+            setTimeout(snowBot.tradeUntillNoFunds(client, order, done), 100)
+        })
+        .fail(function(err){
+            if(err.name == "InsufficientFunds"){
+                done()
             } else {
-                debug('Order bid #%s placed', id)
-                setTimeout(snowBot.tradeUntillNoFunds(client, order, done), 100)
-                //snowBot.tradeUntillNoFunds(client, done)
+                done(err)
             }
         })
     };
@@ -58,9 +56,6 @@ module.exports = function (config) {
     snowBot.uploadDocument = function(client, file_path, done) {
         var config = client.config
         debug("uploadDocument email:%s", config.email);
-        var postData = {
-            
-        };
         var cookie = "session=" + client.sessionKey;
         
         request(config.url).post('v1/users/documents')

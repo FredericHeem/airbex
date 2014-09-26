@@ -74,13 +74,25 @@ exports.createInstantBuy = function(userId, req, res, next) {
 	})
 }
 exports.create = function(userId, req, res, next) {
-    debug("create order user: %s, %s", userId, JSON.stringify(req.body));
-    if (!req.app.validate(req.body, 'v1/order_create', res)) return
+    log.verbose("create order user: %s, %s", userId, JSON.stringify(req.body));
+    if (!req.app.validate(req.body, 'v1/order_create', res)) {
+        log.error("create order: InvalidRequest")
+        return;
+    }
+    
     var market = req.body.market;
+    if(!req.app.cache.markets[market]){
+        log.error("create order: Market is invalid")
+        return  res.send({
+            name: 'BadRequest',
+            message: 'Market is invalid'
+        })
+    }
     //debug("%s",JSON.stringify(req.app.cache.markets[market]))
     
     if (req.body.price !== null && !req.body.price.match(/^\d+(\.\d+)?$/)) {
-        res.send({
+        log.error("create order: Price is invalid")
+        return res.send({
             name: 'BadRequest',
             message: 'Price is invalid'
         })
@@ -89,13 +101,6 @@ exports.create = function(userId, req, res, next) {
     var price = null
     , amount = req.app.cache.parseOrderVolume(req.body.amount, market)
     , query
-
-    if (amount <= 0) {
-        return res.send({
-            name: 'BadRequest',
-            message: 'Amount is <= 0'
-        })
-    }
 
     if(req.body.type === "bid"){
         if(num(amount).lt(req.app.cache.markets[market].bidminvolume)){
@@ -180,7 +185,7 @@ exports.create = function(userId, req, res, next) {
 
     req.app.conn.write.get().query(query, function(err, dr) {
         if (err) {
-            debug("create order error: %s", err.message);
+            log.error("create order error: %s", err.message);
             
             if (err.message.match(/transaction_amount_check/)) {
                 return res.send(400, {

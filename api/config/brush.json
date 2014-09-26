@@ -4,7 +4,6 @@
     "email_from": "support@airbex.net",
     "email_support": "support@airbex.net",
     "signature":"Airbex, the crypto currency exchange",
-    "smtp": {"service":"SMTP","options":{"service":"Mailgun","auth":{"user":"postmaster@airbex.mailgun.org","pass":"6c30ln3j1vc0"}}},
     "pg_read_url": {
         "user": "postgres",
         "host": "localhost",

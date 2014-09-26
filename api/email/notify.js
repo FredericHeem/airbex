@@ -22,7 +22,7 @@ module.exports = exports = function(app) {
     var queueActivity = dq();
     notifyActivity.query('LISTEN "activity_watcher"');
     notifyActivity.on('notification', function(data) {
-        debug("activity_watcher", JSON.stringify(data));
+        log.verbose("activity_watcher", data.payload);
         queueActivity.push(exports.tick);
     });
 

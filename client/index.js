@@ -263,8 +263,8 @@ Snow.prototype.bankCreditCancel = function(bankCancelInfo, cb) {
 
 Snow.prototype.withdrawCryptoRaw = function(sessionKey, withdrawParam, cb) {
     var me = this;
-    var data = { };
-    data = updateRequestWithKey(this, data);
+    var deferred = Q.defer();
+    var data = updateRequestWithKey(this, {});
     data.method = "POST";
     data.json = withdrawParam;
     if(sessionKey){
@@ -272,25 +272,46 @@ Snow.prototype.withdrawCryptoRaw = function(sessionKey, withdrawParam, cb) {
     }
     console.log("withdrawCryptoRaw ", JSON.stringify(data.json))
     var urlWithdraw = this.url + 'v1/' + withdrawParam.currency + '/out';
-    request(urlWithdraw, data , cb)
+    request(urlWithdraw, data , function(err, res, body){
+        if (err) return deferred.reject(err)
+        console.log(res.statusCode)
+        deferred.resolve({res:res, body:body});
+    })
+    return deferred.promise;
 }
 
-Snow.prototype.withdrawCrypto = function(withdrawParam, cb) {
+Snow.prototype.withdrawCrypto = function(withdrawParam) {
     var me = this;
-    this.withdrawCryptoRaw(null, withdrawParam, function(err, res, body){
-        console.log("error ", JSON.stringify(err))
+    var deferred = Q.defer();
+    this.withdrawCryptoRaw(null, withdrawParam)
+    .then(function(result){
+        var body = result.body;
+        var res = result.res;
         console.log("body ", JSON.stringify(body))
-        if (err) return cb(err)
-        if (res.statusCode != 401) return cb(bodyToError(body))
+        console.log("res.statusCode  ", res.statusCode )
+        if (res.statusCode != 401) return deferred.reject(bodyToError(body))
         assert.equal(body.name, "PasswordRequired")
         assert(body.token);
         var sessionKey = me.keyFromCredentials(body.token, me.config.email, me.config.password);
-        me.withdrawCryptoRaw(sessionKey, withdrawParam, function(err, res, body){
-          if (err) return cb(err)
-          if (res.statusCode != 401) return cb(bodyToError(body))
-          cb(null, body)
+        console.log("sessionKey", sessionKey)
+        return sessionKey;
+    }).then(function(sessionKey){
+        console.log("sessionKey", sessionKey)
+        me.withdrawCryptoRaw(sessionKey, withdrawParam)
+        .then(function(param){
+            if (param.res.statusCode != 401) return deferred.reject(bodyToError(param.body))
+            deferred.revolve(param.body)
+        })
+        .fail(function(err){
+            deferred.reject(err)
         });
+        
     })
+    .fail(function(err){
+        deferred.reject(err)
+    });
+    
+    return deferred.promise;
 }
 
 

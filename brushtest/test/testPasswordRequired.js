@@ -28,9 +28,10 @@ describe('TestPasswordRequired', function () {
                     address:clientConfig.btc_deposit_address,
                     amount:'10000000'
             };
-            client.withdrawCrypto(withdrawParam, function(err) {
-                console.log("test error ", JSON.stringify(err))
-                assert(!err || err.name === "NoFunds")
+            client.withdrawCrypto(withdrawParam).then(function() {
+                done()
+            }).fail(function(err){
+                assert(err && err.name === "NoFunds")
                 done()
             })
         });
@@ -41,33 +42,39 @@ describe('TestPasswordRequired', function () {
                     amount:'10000000'
             };
             
-            client.withdrawCryptoRaw(null, withdrawParam, function(err, res, body) {
+            client.withdrawCryptoRaw(null, withdrawParam)
+            .then(function(result) {
+                var body = result.body;
+                var res = result.res;
                 assert(res)
-                console.log("res ", res.statusCode);
                 assert.equal(body.name, "PasswordRequired");
-                
                 assert(body.token);
-                client.withdrawCryptoRaw("invalidsession", withdrawParam, function(err, res, body) {
-                    assert(res)
-                    console.log("res ", res.statusCode);
-                    assert.equal(body.name, "PasswordInvalid");
-                    
-                    assert(body.token);
-                    var session = client.keyFromCredentials(body.token, clientConfig.email, clientConfig.password);
-                    client.withdrawCryptoRaw(session, withdrawParam, function(err, res, body) {
-                        assert(res)
-                        console.log("res ", res.statusCode);
-                        assert.equal(res.statusCode, 500)
-                        assert.notEqual(body.name, "PasswordInvalid");
-                        console.log("body ", body)
-                        //assert(body.token);
-                        done()
-                        
-                    })
-                    
-                })
-                
             })
-        });
+            .then(function(){
+                return client.withdrawCryptoRaw("invalidsession", withdrawParam)
+                .then(function(result) {
+                    var res = result.res;
+                    var body  = result.body;
+                    assert(res)
+                    assert.equal(body.name, "PasswordInvalid");
+                    assert(body.token);
+                    return body.token
+                })
+            })
+            .then(function(token){
+                var session = client.keyFromCredentials(token, clientConfig.email, clientConfig.password);
+                console.log("session ", session)
+                client.withdrawCryptoRaw(session, withdrawParam)
+                .then(function(result) {
+                    var body = result.body;
+                    var res = result.res;
+                    console.log("res ", res.statusCode);
+                    console.log("body ", body)
+                    done()
+                })
+                .fail(done)
+            })
+            .fail(done);
+        })
     });
 });

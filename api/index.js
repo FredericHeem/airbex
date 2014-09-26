@@ -19,9 +19,7 @@ app.config = config
 
 app.conn = {
     read: config.pg_read_url ? pg(config.pg_read_url, config.pg_native) : {},
-    write: config.pg_write_url ? pg(config.pg_write_url, config.pg_native) : {},
-    notifyActivity: config.pg_read_url ? pg(config.pg_read_url, config.pg_native) : {},
-    notifyUserPending: config.pg_read_url ? pg(config.pg_read_url, config.pg_native) : {}
+    write: config.pg_write_url ? pg(config.pg_write_url, config.pg_native) : {}
 }
 
 app.use(express.limit('5mb'));
@@ -52,7 +50,8 @@ if (module.parent) {
     app.ripple.remote = {}
 } else {
     app.notify = require('./email/notify')(app)
-    app.ripple.connect()
+    app.notifyUserPending = require('./email/notifyUserPending')(app)
+    //app.ripple.connect()
 }
 
 var routes = ['bitcoincharts', 'v1', 'admin']

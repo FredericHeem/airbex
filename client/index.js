@@ -214,55 +214,51 @@ Snow.prototype.adminDocumentsUsers = function(cb) {
 }
 
 Snow.prototype.bankCredits = function(cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
+    var deferred = Q.defer();
+    var data = updateRequestWithKey(this, {});
     request(this.url + 'admin/bankCredits', data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 200) return cb(bodyToError(body))
-        cb(null, body)
+        onResult(err, res, body, deferred, 200)
     })
+    return deferred.promise;
 }
 
 Snow.prototype.bankCreditCreate = function(bankCreditInfo, cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
+    var deferred = Q.defer();
+    var data = updateRequestWithKey(this, {});
     data.method = "POST";
     bankCreditInfo.state = "review";
     data.json = bankCreditInfo;
     console.log("bankCreditCreate ", JSON.stringify(data))
     request(this.url + 'admin/bankCredits', data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 201) return cb(bodyToError(body))
-        cb(null, body)
+        onResult(err, res, body, deferred, 201)
     })
+    return deferred.promise;
 }
 
 Snow.prototype.bankCreditValidate = function(bankValidateInfo, cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
+    var deferred = Q.defer();
+    data = updateRequestWithKey(this, {});
     data.method = "POST";
     data.json = bankValidateInfo;
     
     request(this.url + 'admin/bankCredits/' + bankValidateInfo.bank_credit_id + '/approve', 
             data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 201) return cb(bodyToError(body))
-        cb(null, body)
+        onResult(err, res, body, deferred, 201)
     })
+    return deferred.promise;
 }
 
 Snow.prototype.bankCreditCancel = function(bankCancelInfo, cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
+    var deferred = Q.defer();
+    data = updateRequestWithKey(this, {});
     data.method = "POST";
     data.json = bankCancelInfo;
     
     request(this.url + 'admin/bankCredits/' + bankCancelInfo.bank_credit_id + '/cancel', 
             data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 204) return cb(bodyToError(body))
-        cb(null, body)
+        onResult(err, res, body, deferred, 204)
     })
+    return deferred.promise;
 }
 
 Snow.prototype.withdrawCryptoRaw = function(sessionKey, withdrawParam, cb) {

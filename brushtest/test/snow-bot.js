@@ -143,22 +143,23 @@ module.exports = function (config) {
             });
         },
         function(callback) {
-            admin.bankCreditCreate(bankCreditInfo, function(err, bankCreditResult) {
-                if (err) throw err
+            admin.bankCreditCreate(bankCreditInfo)
+            .then(function(bankCreditResult) {
                 debug("bankCreditCreate: ", JSON.stringify(bankCreditResult));
                 var bankValidateInfo = {
                     "bank_credit_id": bankCreditResult.id
                 };
-                callback(err, bankValidateInfo);
+                callback(null, bankValidateInfo);
             })
+            .fail(callback)
         },
         function(bankValidateInfo, callback) {
         	debug("bankValidateInfo: ", JSON.stringify(bankValidateInfo));
-            admin.bankCreditValidate(bankValidateInfo, function(err, bankValidateResult) {
-                if (err) throw err
+            admin.bankCreditValidate(bankValidateInfo)
+            .then(function(bankValidateResult) {
                 debug("bankCreditValidate: %s", JSON.stringify(bankValidateResult))
-                done();
-            })
+                callback();
+            }).fail(callback)
         }],
 
         function(err) {

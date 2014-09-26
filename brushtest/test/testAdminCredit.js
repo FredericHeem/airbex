@@ -18,27 +18,30 @@ describe('Admin', function () {
     });
     
     function createAndCancelBankCredit(client, bankCreditInfo, done) {
-        client.bankCreditCreate(bankCreditInfo, function(err, bankCreditResult) {
-            if (err) throw err
+        client.bankCreditCreate(bankCreditInfo)
+        .then(function(bankCreditResult) {
             debug("bankCreditCreate: ", JSON.stringify(bankCreditResult));
             var bankCancelInfo = {
                 "bank_credit_id" : bankCreditResult.id
             };
-            client.bankCreditCancel(bankCancelInfo, function(err, bankCancelResult) {
-                if (err) throw err
-                debug("bankCreditCancel: %s",  JSON.stringify(bankCancelResult));
+            return bankCancelInfo;
+        }).then(function(bankCancelInfo){
+            client.bankCreditCancel(bankCancelInfo)
+            .then(function(bankCancelResult) {
                 done();
-            })
+            }).fail(done)
         })
+        .fail(done)
     }
     
     describe('AdminNotAuthenticated', function () {
         var client = testMngr.client("admin");
         it('AdminBankCreditsNotAuthenticated', function (done) {
-            client.bankCredits(function(err, bankCredits) {
+            client.bankCredits()
+            .fail(function(err){
                 assert(err)
-                debug("bankCredits: %s", err)
-                done();
+                assert.equal(err.name, 'NotAuthenticated')
+                done()
             })
         });
     });
@@ -52,11 +55,13 @@ describe('Admin', function () {
         });
         
         it('AdminBankCreditsGetOk', function (done) {
-            adminClient.bankCredits(function(err, bankCredits) {
-                if (err) throw err
+            adminClient.bankCredits()
+            .then(function(bankCredits) {
+                assert(bankCredits)
                 debug("bankCredits: ", bankCredits)
                 done();
             })
+            .fail(done)
         });
         it('AdminBankCreditsCreateAll', function (done) {
             var bankCreditInfo = {

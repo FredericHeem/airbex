@@ -9,7 +9,7 @@
   "price" : "150",
   "bid_price" : "1000",
   "ask_price" : "500",
-  "volume" : "5000000",
+  "volume" : "50",
   "documentOk":"",
   "documentTooBig":"",
   "btc_depsosit_address":"1MfWN6iGMJgHPfp1phyX8DK9g5ucV4GaLZ",

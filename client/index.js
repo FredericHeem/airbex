@@ -1,5 +1,6 @@
 var debug = require('debug')('snow')
 , assert = require('assert')
+, fs = require('fs')
 , request = require('request')
 , num = require('num')
 , async = require('async')
@@ -46,6 +47,12 @@ function updateRequestWithKey(client, data){
     return data;
 }
 
+function onResult(err, res, body, deferred, statusCode){
+    if (err) return deferred.reject(err)
+    if (res.statusCode != statusCode) return deferred.reject(bodyToError(body))
+    deferred.resolve(body);
+}
+
 Snow.prototype.getUserKey = function(email, password) {
     return sha256(email.toLowerCase() + password);
 }
@@ -56,27 +63,20 @@ Snow.prototype.keyFromCredentials = function(sid, email, password) {
     return skey
 }
 
-Snow.prototype.orders = function(cb) {
+Snow.prototype.orders = function() {
+    var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});
     request(this.url + 'v1/orders', data, function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode !== 200) {
-            debug('status code %s from orders', res.statusCode)
-            debug(JSON.stringify(body))
-            return cb(bodyToError(body))
-        }
-        cb(null, body)
+        onResult(err, res, body, deferred, 200)
     })
-    
+    return deferred.promise;
 }
 
-Snow.prototype.markets = function(cb) {
+Snow.prototype.markets = function() {
     var deferred = Q.defer();
-	var data = updateRequestWithKey(this, {});
+    var data = updateRequestWithKey(this, {});
     request(this.url + 'v1/markets', data, function(err, res, body) {
-        if (err) return deferred.reject(err)
-        if (res.statusCode !== 200) return deferred.reject(bodyToError(body))
-        deferred.resolve(body);
+        onResult(err, res, body, deferred, 200)
     })
     return deferred.promise;
 }
@@ -92,68 +92,69 @@ Snow.prototype.depth = function(market, cb) {
     })
 }
 
-Snow.prototype.cancel = function(id, cb) {
+Snow.prototype.cancel = function(id) {
+    var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});
     data.method = 'DELETE';
     request(this.url + 'v1/orders/' + id, data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode === 404) return cb(new Error('Order ' + id + ' not found'))
-        if (res.statusCode != 204) return cb(bodyToError(body))
-        cb()
+        if (err) return deferred.reject(err)
+        if (res.statusCode === 404) return deferred.reject({name:'OrderNotFound', message:'Order ' + id + ' not found'})
+        if (res.statusCode != 204) return deferred.reject(bodyToError(body))
+        deferred.resolve();
     })
+    return deferred.promise;
 }
 
-Snow.prototype.cancelAll = function(cb) {
+Snow.prototype.cancelAll = function() {
     var that = this
-
-    this.orders(function(err, orders) {
-        if (err) return cb(err)
+    var deferred = Q.defer();
+    this.orders().then(function(orders) {
         var maxOpsParallel = 128;
         async.forEachLimit(orders, maxOpsParallel, function(order, callback) {
-            that.cancel(order.id, function(err) {
-                if (err) throw err
-                callback()
-            });
+            that.cancel(order.id).then(callback).fail(callback)
         }, function(err) {
-            cb(err);
+            if(err) return deferred.reject(err);
+            deferred.resolve();
         });  
+    }).fail(function(err){
+        deferred.reject(err)
     })
+    return deferred.promise;
 }
 
-Snow.prototype.order = function(order, cb) {
+Snow.prototype.order = function(order) {
+    var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});
     data.json = order;
     data.method = "POST";
     request(this.url + 'v1/orders', data, function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 201) return cb(bodyToError(body))
-        cb(null, body.id)
+        onResult(err, res, body, deferred, 201)
     })
+    return deferred.promise;
 }
 
-Snow.prototype.whoami = function(cb) {
+Snow.prototype.whoami = function() {
 	console.log("whoami");
-    var data = { };
-    data = updateRequestWithKey(this, data);
+	var deferred = Q.defer();
+    var data = updateRequestWithKey(this, {});
     console.log("whoami %s", JSON.stringify(data));
     request(this.url + 'v1/whoami', data, function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 200) return cb(new Error('Status: ' + res.statusCode))
-        debug("whoami res %s", body)
-        cb(null, body)
+        onResult(err, res, body, deferred, 200)
     })
+    return deferred.promise;
 }
 
-Snow.prototype.balances = function(cb) {
+Snow.prototype.balances = function() {
+    var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});
     request(this.url + 'v1/balances', data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 200) return cb(bodyToError(body))
-        cb(null, body)
+        onResult(err, res, body, deferred, 200)
     })
+    return deferred.promise;
 }
 
-Snow.prototype.securitySession = function(cb) {
+Snow.prototype.securitySession = function() {
+    var deferred = Q.defer();
     var postData = {
         "email": this.config.email
     };
@@ -162,109 +163,54 @@ Snow.prototype.securitySession = function(cb) {
         json: postData,
         method: 'POST'
     }, function(err, res, body) {
-        if (err) return cb(err)
-
-        if (res.statusCode != 201) return cb(bodyToError(body))
+        if (err) return deferred.reject(err)
+        if (res.statusCode != 201) return deferred.reject(bodyToError(body))
 
         me.securitySessionId = body.id
-
         me.sessionKey = me.keyFromCredentials(me.securitySessionId, me.config.email, me.config.password)
-        debug("sessionKey: %s, securitySession %s", me.sessionKey, me.securitySessionId);
-        cb(null, me.securitySessionId)
+        //debug("securitySession sessionKey: %s, securitySession %s", me.sessionKey, me.securitySessionId);
+        debug("securitySession email: ", me.config.email)
+        deferred.resolve(me.securitySessionId);
     })
+    return deferred.promise;
 }
 
-Snow.prototype.purchaseOrderCreate = function(purchaseOrderData, cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
+Snow.prototype.uploadDocument = function(file_path) {
+    debug("uploadDocument file_path", file_path)
+    var deferred = Q.defer();
+    var data = updateRequestWithKey(this, {});
     data.method = "POST";
-    data.json = purchaseOrderData;
-    request(this.url + 'v1/purchaseOrder/', data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 201) return cb(bodyToError(body))
-        cb(null, body)
-    })
+    fs.createReadStream(file_path).pipe(request(this.url + 'v1/users/documents', data , function(err, res, body) {
+        onResult(err, res, body, deferred, 200)
+    }))
+    return deferred.promise;
 }
 
-Snow.prototype.purchaseOrderRead = function(cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
-    data.method = "GET";
-    request(this.url + 'v1/purchaseOrder/', data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 200) return cb(bodyToError(body))
-        cb(null, body)
-    })
-}
-
-Snow.prototype.purchaseOrdersRead = function(cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
-    data.method = "GET";
-    request(this.url + 'v1/admin/purchaseOrder/',data , function(err, res, body) {
-    	console.log(err);
-    	console.log(res.statusCode);
-        if (err) return cb(err)
-        if (res.statusCode != 200) return cb(bodyToError(body))
-        cb(null, body)
-    })
-}
-
-Snow.prototype.purchaseOrderUpdate = function(po_id, po_data, cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
-    data.method = "POST";
-    data.json = po_data;
-    request(this.url + 'v1/admin/purchaseOrder/' + po_id, data , function(err, res, body) {
-    	console.log(err);
-    	console.log(res.statusCode);
-        if (err) return cb(err)
-        if (res.statusCode === 404) return cb(res.body)
-        if (res.statusCode != 201) return cb(bodyToError(body))
-        cb(null, body)
-    })
-}
-
-Snow.prototype.purchaseOrderCancel = function(purchaseOrderId, cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
-    data.method = "DELETE";
-    request(this.url + 'v1/purchaseOrder/' + purchaseOrderId , data, function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode === 404) return cb(res.body)
-        if (res.statusCode != 204) return cb(new Error('http error ' + res.statusCode))
-        cb(null)
-    })
-}
-
-Snow.prototype.adminDocumentView = function(doc_id, cb) {
+Snow.prototype.adminDocumentView = function(doc_id) {
+    var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});
     request(this.url + 'admin/users/documents/' + doc_id + '/view', data , function(err, res, body) {
-        if (err) return cb(err)
-        debug("adminDocument res")
-        if (res.statusCode != 200) return cb(bodyToError(body))
-        cb(null, body)
+        onResult(err, res, body, deferred, 200)
     })
+    return deferred.promise;
 }
 
 Snow.prototype.adminDocuments = function(cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
+    var deferred = Q.defer();
+    var data = updateRequestWithKey(this, {});
     request(this.url + 'admin/documents', data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 200) return cb(bodyToError(body))
-        cb(null, body)
+        onResult(err, res, body, deferred, 200)
     })
+    return deferred.promise;
 }
 
 Snow.prototype.adminDocumentsUsers = function(cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
+    var deferred = Q.defer();
+    var data = updateRequestWithKey(this, {});
     request(this.url + 'admin/documents/users', data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 200) return cb(bodyToError(body))
-        cb(null, body)
+        onResult(err, res, body, deferred, 200)
     })
+    return deferred.promise;
 }
 
 Snow.prototype.bankCredits = function(cb) {
@@ -459,4 +405,67 @@ Snow.prototype.createTableOrders = function(orders){
 Snow.prototype.createTableDepth = function(depth){
     // TODO
     return JSON.stringify(depth);
+}
+
+Snow.prototype.purchaseOrderRead = function(cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "GET";
+    request(this.url + 'v1/purchaseOrder/', data , function(err, res, body) {
+        if (err) return cb(err)
+        if (res.statusCode != 200) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
+Snow.prototype.purchaseOrderCreate = function(purchaseOrderData, cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "POST";
+    data.json = purchaseOrderData;
+    request(this.url + 'v1/purchaseOrder/', data , function(err, res, body) {
+        if (err) return cb(err)
+        if (res.statusCode != 201) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
+Snow.prototype.purchaseOrdersRead = function(cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "GET";
+    request(this.url + 'v1/admin/purchaseOrder/',data , function(err, res, body) {
+        console.log(err);
+        console.log(res.statusCode);
+        if (err) return cb(err)
+        if (res.statusCode != 200) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
+Snow.prototype.purchaseOrderUpdate = function(po_id, po_data, cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "POST";
+    data.json = po_data;
+    request(this.url + 'v1/admin/purchaseOrder/' + po_id, data , function(err, res, body) {
+        console.log(err);
+        console.log(res.statusCode);
+        if (err) return cb(err)
+        if (res.statusCode === 404) return cb(res.body)
+        if (res.statusCode != 201) return cb(bodyToError(body))
+        cb(null, body)
+    })
+}
+
+Snow.prototype.purchaseOrderCancel = function(purchaseOrderId, cb) {
+    var data = { };
+    data = updateRequestWithKey(this, data);
+    data.method = "DELETE";
+    request(this.url + 'v1/purchaseOrder/' + purchaseOrderId , data, function(err, res, body) {
+        if (err) return cb(err)
+        if (res.statusCode === 404) return cb(res.body)
+        if (res.statusCode != 204) return cb(new Error('http error ' + res.statusCode))
+        cb(null)
+    })
 }

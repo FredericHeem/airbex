@@ -85,7 +85,7 @@ define :insight do
             group "root"
             cwd "#{release_path}/"
             code %{
-              npm install --production
+              npm install --production --unsafe-perm
             }
           end
         end
@@ -108,7 +108,7 @@ define :insight do
             group "root"
             cwd "#{release_path}/"
             code %{
-              npm install --production
+              npm install --unsafe-perm
               ./node_modules/bower/bin/bower --allow-root install
               OPERATOR="airbex-#{cryptoName}" ./node_modules/grunt-cli/bin/grunt compile
             }

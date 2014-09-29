@@ -2,10 +2,10 @@
 var assert = require('assert');
 var request = require('supertest');
 var config = require('./configTest.js')();
-var debug = require('debug')('PasswordRequired')
+var debug = require('debug')('testWithdraw')
 var TestMngr = require('./TestMngr');
 
-describe('TestPasswordRequired', function () {
+describe('TestWithdraw', function () {
     "use strict";
     var testMngr = new TestMngr(config);
     var snowBot = testMngr.bot();
@@ -33,7 +33,32 @@ describe('TestPasswordRequired', function () {
                 done()
             })
         });
-        
+        it('TestWithdrawCryptoBTCInvalidAddressChecksum', function (done) {
+            var withdrawParam = {
+                    currency:'BTC',
+                    address:"12BzXgPgq3scersJWG7c5ku7BFDGfsDdYa",
+                    amount:'10000'
+            };
+            client.withdrawCrypto(withdrawParam).then(function() {
+                done()
+            }).fail(function(err){
+                assert(err && err.name === "InvalidAddress")
+                done()
+            })
+        });
+        it('TestWithdrawCryptoBTCInvalidAddressLength', function (done) {
+            var withdrawParam = {
+                    currency:'BTC',
+                    address:"Invalid",
+                    amount:'10000000'
+            };
+            client.withdrawCrypto(withdrawParam).then(function() {
+                done()
+            }).fail(function(err){
+                assert(err && err.name === "BadRequest")
+                done()
+            })
+        });
         it('TestWithdrawCryptoBTCOk', function (done) {
             var withdrawParam = {
                     currency:'BTC',

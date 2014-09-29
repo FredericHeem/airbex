@@ -12,7 +12,7 @@
   "volume" : "5000000",
   "documentOk":"",
   "documentTooBig":"",
-  "btc_depsosit_address":"1MfWN6iGMJgHPfp1phyX8DK9g5ucV4GaLZ",
+  "btc_depsosit_address":"myb1bPkkryPV1F4q3ukDon4fBrBN9vRudN",
   "users" :
       [
 
@@ -23,7 +23,7 @@
     "admin": "true",
     "country":"IT",
     "number":"0607065268",
-    "btc_deposit_address":"1MfWN6iGMJgHPfp1phyX8DK9g5ucV4GaLZ"
+    "btc_deposit_address":"mvRZcE4GkHsDPtW8fSGLi8VaXe9D5iKpaR"
 },
 {
     "name": "alice",
@@ -31,7 +31,7 @@
     "password" : "password",
     "country":"FR",
     "number":"0607065268",
-    "btc_deposit_address":"12BzXgPgq3scersJWG7c5ku7BFDGfsDdYi"
+    "btc_deposit_address":"mvRZcE4GkHsDPtW8fSGLi8VaXe9D5iKpaR"
 }
 ,
 {
@@ -39,7 +39,7 @@
     "email" : "bob@nomail.com",
     "password" : "password",
     "country":"UK",
-    "btc_deposit_address":"1eqghyo891XZXMog2kGHZ7GDfJrmyuPMR"
+    "btc_deposit_address":"mvRZcE4GkHsDPtW8fSGLi8VaXe9D5iKpaR"
 }
 ]
  

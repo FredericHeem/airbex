@@ -30,7 +30,8 @@
     "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
     "winston": "0.8.x",
     "socket.io": "1.1.0",
-    "deferred-queue":"0.5.1"
+    "deferred-queue":"0.5.1",
+    "bitcore": "git://github.com/FredericHeem/bitcore.git"
   },
   "scripts": {
     "start": "DEBUG='' NODE_ENV=brush grunt",

@@ -2,8 +2,9 @@ var util = require('util')
 , num = require('num')
 , crypto = require('crypto')
 , log = require('../log')(__filename)
-, debug = log.debug;
-
+, debug = log.debug
+, bitcore = require('bitcore')
+, Address = bitcore.Address;
 
 module.exports = exports = function(app, currencyId) {
     var prefix = '/v1/' + currencyId
@@ -44,8 +45,7 @@ exports.withdraw = function(currencyId, req, res, next) {
     if (!req.app.validate(req.body, 'v1/crypto_out', res)) {
         return
     }
-    var address = req.body.address;
-    
+
     var currencyOption = req.app.cache.getCurrencyOption(currencyId);
     
     if(!currencyOption){
@@ -53,6 +53,16 @@ exports.withdraw = function(currencyId, req, res, next) {
             name: 'InvalidCurrency',
             message: 'Invalid currency: ' + currencyId
         })   	
+    }
+    
+    var address = req.body.address;
+    
+    var a = new Address(address, 'base58', currencyId.toLowerCase());
+    if(!a.isValid()){
+        return res.send(400, {
+            name: 'InvalidAddress',
+            message: 'Invalid Address ' + address + " is not valid"
+        });
     }
     
     var address = req.body.address;

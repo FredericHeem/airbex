@@ -165,18 +165,17 @@ module.exports = function (config) {
         })
     };
     
-    snowDb.creditBTC = function (user, amount, done){
-        var address = user.config.btc_deposit_address;
+    snowDb.creditCrypto = function (user, currency, deposit_address, amount, done){
         var hash = crypto.createHash('sha256')
         hash.update(crypto.randomBytes(8))
         var txid = hash.digest('hex')
         
-        debug("creditCrypto amount: %s, address: %s, txid: %s", amount, address, txid);
+        debug("creditCrypto amount: %s, address: %s, txid: %s", amount, deposit_address, txid);
         this.pgClient.query({
             text: [
-                'SELECT btc_credit($1, $2, $3);'
+                'SELECT crypto_credit($1, $2, $3, $4);'
             ].join('\n'),
-            values: [txid, address, amount]
+            values: [currency, txid, deposit_address, amount]
         }, function(err) {
             if (err) return done(err)
             done()

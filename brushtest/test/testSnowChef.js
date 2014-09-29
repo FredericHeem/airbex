@@ -26,8 +26,8 @@ describe('SnowChef', function () {
         it('SnowChefBtcAddress', function (done) {
             snowChef.setDepositAddress(clients, done);
         });
-        it('SnowChefBtcCredit', function (done) {
-            snowChef.creditBTC(clients, done);
+        it('SnowChefCryptoCreditBTC', function (done) {
+            snowChef.creditCrypto(clients, 'BTC', done);
         });
     });    
     

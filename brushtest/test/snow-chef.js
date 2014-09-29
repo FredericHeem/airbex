@@ -91,13 +91,13 @@ module.exports = function (bot, config) {
         });
     }  
  
-    snowChef.creditBTC = function(clients, done) {
-        debug("creditBTC #clients %s", clients.length);
+    snowChef.creditCrypto = function(clients, currency, done) {
+        debug("creditCrypto #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
             var amount = "1000000000";
-           snowChef.bot.db.creditBTC(client, amount, callback) 
+           snowChef.bot.db.creditCrypto(client, currency, client.config.btc_deposit_address, amount, callback) 
         }, function(err) {
-            debug("creditBTC done: " + err ? err : "");
+            debug("creditCrypto done: " + err ? err : "");
             done(err);
         });
     }  

@@ -15,6 +15,15 @@ describe('Orders', function () {
     var client = testMngr.client("alice");
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
+   
+    describe('OrdersNotAuthenticated', function () {
+        it('OrdersNotAuthenticated', function (done) {
+            client.orders().fail(function(error){
+                assert(error)
+                done();  
+            })
+        });
+    });
     
     describe('OrdersAuthenticated', function () {
         before(function(done) {

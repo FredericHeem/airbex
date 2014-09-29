@@ -47,6 +47,30 @@ describe('TestPasswordRequired', function () {
                 done()
             })
         });
+        it('TestWithdrawCryptoBTCNegative', function (done) {
+            var withdrawParam = {
+                    currency:'BTC',
+                    address:clientConfig.btc_deposit_address,
+                    amount:'-100'
+            };
+            client.withdrawCrypto(withdrawParam).then(done).fail(function(err){
+                assert(err);
+                assert.equal(err.name, 'BadRequest')
+                done()
+            })
+        });
+        it('TestWithdrawCryptoBTCNull', function (done) {
+            var withdrawParam = {
+                    currency:'BTC',
+                    address:clientConfig.btc_deposit_address,
+                    amount:'0'
+            };
+            client.withdrawCrypto(withdrawParam).then(done).fail(function(err){
+                assert(err);
+                assert.equal(err.name, 'AmountTooSmall')
+                done()
+            })
+        });
         it('TestWithdrawCryptoBTCKo', function (done) {
             var withdrawParam = {
                     currency:'BTC',

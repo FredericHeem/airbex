@@ -1,5 +1,5 @@
 {
-    "currency":"LTC",
+    "currency":"BTC",
     "pg_url": {
                 "user":"postgres",
                 "host": "127.0.0.1",
@@ -9,7 +9,7 @@
     },
     "host": "127.0.0.1",
     "rpcuser": "frederic",
-    "port": "19332",
+    "port": "18332",
     "rpcpass": "password",
     "minconf": 6
 }

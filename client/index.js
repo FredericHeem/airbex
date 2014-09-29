@@ -153,6 +153,15 @@ Snow.prototype.balances = function() {
     return deferred.promise;
 }
 
+Snow.prototype.getDepositAddress = function(currency) {
+    var deferred = Q.defer();
+    var data = updateRequestWithKey(this, {});
+    request(this.url + 'v1/' + currency + '/address', data , function(err, res, body) {
+        onResult(err, res, body, deferred, 200)
+    })
+    return deferred.promise;
+}
+
 Snow.prototype.securitySession = function() {
     var deferred = Q.defer();
     var postData = {

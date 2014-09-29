@@ -5,7 +5,7 @@ var config = require('./configTest.js')();
 var debug = require('debug')('testDeposit')
 var TestMngr = require('./TestMngr');
 
-describe('TestWithdraw', function () {
+describe('TestDeposit', function () {
     "use strict";
     var testMngr = new TestMngr(config);
     var snowBot = testMngr.bot();
@@ -14,13 +14,36 @@ describe('TestWithdraw', function () {
     var client = testMngr.client("alice");
     var clientConfig = testMngr.clientConfig("alice");
     
-    before(function(done) {
-        testMngr.dbConnect()
-        .then(done)
-        .fail(done);
-    });
+    describe('TestDepositBTCNotAuthenticated', function () {
+        it('TestDepositBTCAddressNotAuthenticated', function (done) {
+            var currency = 'BTC';
+            client.getDepositAddress(currency)
+           .fail(function(err){
+               assert(err);
+               assert.equal(err.name,'NotAuthenticated');
+               done();
+           })
+        });
 
-    describe('TestDepositBTC', function () {
+    });
+    describe('TestDepositBTCAuthenticated', function () {
+        before(function(done) {
+            testMngr.dbConnect()
+            .then(testMngr.login)
+            .then(done)
+            .fail(done);
+        });
+        it('TestDepositBTCAddress', function (done) {
+            var currency = 'BTC';
+            client.getDepositAddress(currency)
+           .then(function(result){
+               assert(result);
+               assert(result.address)
+               console.log("result: ", result)
+               done();
+           })
+           .fail(done)
+        });
         it('TestDepositBTCOk', function (done) {
             var currency = 'BTC';
             var address = 'mvRZcE4GkHsDPtW8fSGLi8VaXe9D5iKpaR';

@@ -95,7 +95,9 @@ module.exports = function (bot, config) {
         debug("creditCrypto #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
             var amount = "1000000000";
-           snowChef.bot.db.creditCrypto(client, currency, client.config.btc_deposit_address, amount, callback) 
+           snowChef.bot.db.creditCrypto(client, currency, client.config.btc_deposit_address, amount)
+           .then(callback)
+           .fail(callback)
         }, function(err) {
             debug("creditCrypto done: " + err ? err : "");
             done(err);

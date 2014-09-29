@@ -4,6 +4,7 @@ var pg = require('pg');
 var request = require('supertest');
 var async = require('async');
 var crypto = require('crypto');
+var Q = require("q");
 
 module.exports = function (config) {
     var snowDb = {};
@@ -165,7 +166,8 @@ module.exports = function (config) {
         })
     };
     
-    snowDb.creditCrypto = function (user, currency, deposit_address, amount, done){
+    snowDb.creditCrypto = function (user, currency, deposit_address, amount){
+        var deferred = Q.defer();
         var hash = crypto.createHash('sha256')
         hash.update(crypto.randomBytes(8))
         var txid = hash.digest('hex')
@@ -177,9 +179,10 @@ module.exports = function (config) {
             ].join('\n'),
             values: [currency, txid, deposit_address, amount]
         }, function(err) {
-            if (err) return done(err)
-            done()
+            if (err) return deferred.reject(err)
+            deferred.resolve();
         })
+        return deferred.promise;
     };
     
     snowDb.setDepositAddress = function(user, currency, done) {

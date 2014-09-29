@@ -16,11 +16,31 @@ describe('Orders', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
    
-    describe('OrdersNotAuthenticated', function () {
+    describe('OrderNotAuthenticated', function () {
         it('OrdersNotAuthenticated', function (done) {
             client.orders().fail(function(error){
                 assert(error)
+                assert.equal(error.name, 'NotAuthenticated');
                 done();  
+            })
+        });
+        it('CancelOrderNotAuthenticated', function (done) {
+            client.cancel(0).fail(function(error){
+                assert(error);
+                assert.equal(error.name, 'NotAuthenticated');
+                done(); 
+            })
+        });
+        it('aliceBidNotAuthenticated', function (done) {
+            client.order({
+                market: config.market,
+                type: "bid",
+                price: config.bid_price,
+                amount: config.volume
+            }).then(done)
+            .fail(function(err){
+                assert(err);
+                done()
             })
         });
     });

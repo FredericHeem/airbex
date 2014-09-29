@@ -13,7 +13,7 @@ var config = require('konfu')
 , app = module.exports = express()
 , http = require('http')
 , server = http.createServer(app)
-, pg = require('./pg')
+, pg = require('./pg');
 
 app.config = config
 
@@ -22,9 +22,15 @@ app.conn = {
     write: config.pg_write_url ? pg(config.pg_write_url, config.pg_native) : {}
 }
 
-app.use(express.limit('5mb'));
-app.use(express.bodyParser())
-app.use(express.cookieParser())
+app.myRouter = express.Router();
+app.use(app.myRouter);
+
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
+app.use(require('cookie-parser')())
 
 var EventEmitter = require('events').EventEmitter;
 app.eventEmitter = new EventEmitter();
@@ -73,23 +79,23 @@ if (config.raven) {
     })
 } else {
     app.use(function(err, req, res, next) {
-        console.error(err)
-        console.error(err.stack)
+        log.error(err)
+        log.error(err.stack)
         next(err)
     })
 }
-
-app.use(function(req, res) {
-    res.send(404)
-})
-
-
 
 var cache = app.cache = require('./cache')
 cache(app, module.parent ? null : app.conn, function(err) {
     if (err) {
         log.error(err)
     }
+    
+    app.use(function(req, res) {
+        log.error("404 for ", req.url)
+        res.send(404)
+    })
+    
     debug("listening on port %s", config.port)
     server.listen(config.port)
 })

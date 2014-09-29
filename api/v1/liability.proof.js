@@ -3,7 +3,8 @@ var async = require('async')
 , debug = log.debug
 , lproof = require('lproof')
 , fs = require('fs')
-, format = require('util').format;
+, format = require('util').format
+, formidable = require("formidable");
 
 module.exports = exports = function(app) {
     app.get('/v1/proof/root/:currency', exports.root)
@@ -206,60 +207,80 @@ exports.assetGetAll = function(req, res, next) {
     })    	
 }
 
+function saveAsset(file, req, res, next){
+    fs.readFile(file.path, "utf8", function (err, data) {
+        if (err) throw err;
+        fs.unlink(file.path);
+        debug('assetPost length %s',data.length)
+        var assetJson = JSON.parse(data)
+        req.app.conn.write.get().query({
+            text: [
+                   'INSERT INTO asset(currency, blockhash, message)',
+                   'VALUES($1, $2, $3) RETURNING asset_id;'
+                   ].join('\n'),
+                   values: [assetJson.currency, assetJson.blockhash, assetJson.message]
+        }, function(err, dr) {
+            if (err) return next(err)
+            var asset_id = dr.rows[0].asset_id;
+            console.log(JSON.stringify(dr))
 
-
+            insertSignatures(req.app,asset_id, assetJson.signatures, function(err){
+                if (err) return next(err)
+                res.send({result : format('\nuploaded %s'
+                        , file.name)});
+            })
+        })
+    });
+}
 exports.assetPost = function(req, res, next) {
+    debug("assetPost ");
+    var form = new formidable.IncomingForm();
 
-	if(!req.files || !req.files.asset){
-		debug("assetPost no doc");
-		return res.send(400, {
-			name: 'BadRequest',
-			message: 'Request is invalid'
-		})
-	}
+    form.on('file', function(fields, file) {
+        debug("assetPost file path: ", file.path);
+        saveAsset(file, req, res, next);
+    }).on('error', function(err) {
+        log.info("an error has occured with form upload");
+        log.info(err);
+        req.resume();
+    })
+    .on('aborted', function(err) {
+        log.info("assetPost user aborted upload");
+    })
+    .on('end', function() {
+        log.debug('assetPost upload done');
+    });
+    
+    form.parse(req, function(err, fields, files) {
+        debug("form.parse files: ")
+    });
+    
+//	if(!req.files || !req.files.asset){
+//		debug("assetPost no doc");
+//		return res.send(400, {
+//			name: 'BadRequest',
+//			message: 'Request is invalid'
+//		})
+//	}
+//
+//	var assetFile = req.files.asset;
+//
+//	var sizeKb = assetFile.size / 1024 | 0
+//
+//	if(sizeKb > 5* 1014){
+//		debug('assetPost , %s, size %s kB TOO BIG', assetFile.name, sizeKb);
+//		return res.send(400, {
+//			name: 'FileToBig',
+//			message: 'file is too big'
+//		})
+//	}
+//	debug('assetPost  %s, size %s kB',  assetFile.name, sizeKb);
+//	if(assetFile.size === 0){
+//		return res.send(400, {
+//			name: 'FileEmpty',
+//			message: 'Empty file'
+//		})		
+//	}
+//	
 
-	var assetFile = req.files.asset;
-
-	var sizeKb = assetFile.size / 1024 | 0
-
-	if(sizeKb > 5* 1014){
-		debug('assetPost , %s, size %s kB TOO BIG', assetFile.name, sizeKb);
-		return res.send(400, {
-			name: 'FileToBig',
-			message: 'file is too big'
-		})
-	}
-	debug('assetPost  %s, size %s kB',  assetFile.name, sizeKb);
-	if(assetFile.size === 0){
-		return res.send(400, {
-			name: 'FileEmpty',
-			message: 'Empty file'
-		})		
-	}
-	
-	fs.readFile(assetFile.path, "utf8", function (err, data) {
-		if (err) throw err;
-		debug('assetPost length %s',data.length)
-		var assetJson = JSON.parse(data)
-		req.app.conn.write.get().query({
-			text: [
-			       'INSERT INTO asset(currency, blockhash, message)',
-			       'VALUES($1, $2, $3) RETURNING asset_id;'
-			       ].join('\n'),
-			       values: [assetJson.currency, assetJson.blockhash, assetJson.message]
-		}, function(err, dr) {
-			if (err) return next(err)
-			var asset_id = dr.rows[0].asset_id;
-			console.log(JSON.stringify(dr))
-			
-			insertSignatures(req.app,asset_id, assetJson.signatures, function(err){
-				if (err) return next(err)
-				res.send({result : format('\nuploaded %s (%d Kb) '
-						, assetFile.name
-						, sizeKb )});	
-			})
-			
-			
-		})
-	});
 }

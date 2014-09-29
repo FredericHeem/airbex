@@ -3,7 +3,7 @@ var crypto = require('crypto')
 module.exports = exports = function(app) {
     app.post('/v1/keys', app.security.demand.otp(app.security.demand.primary, true), exports.create)
     app.get('/v1/keys', app.security.demand.primary, exports.index)
-    app.del('/v1/keys/:id', app.security.demand.primary, exports.remove)
+    app.delete('/v1/keys/:id', app.security.demand.primary, exports.remove)
 }
 
 exports.remove = function(req, res, next) {

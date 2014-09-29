@@ -4,7 +4,7 @@ var withdraws = require('../withdraws')
 , debug = log.debug
 
 module.exports = exports = function(app) {
-    app.del('/v1/withdraws/:id', app.security.demand.withdraw, exports.cancel)
+    app.delete('/v1/withdraws/:id', app.security.demand.withdraw, exports.cancel)
     app.post('/v1/withdraws/bank', app.security.demand.withdraw(4), exports.withdrawBank)
 
     app.get('/v1/withdraws', app.security.demand.any, function(req, res, next) {

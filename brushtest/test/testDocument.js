@@ -22,10 +22,18 @@ describe('Document', function () {
     });
     
     describe('UploadDoc', function () {
+//        it('UploadDocInvalidFile', function (done) {
+//            var file = '../data/a_style.abc';
+//            client.uploadDocument(file).fail(function(err){
+//                done();
+//            });
+//        });
         it('UploadDocOk', function (done) {
-            return done();
-            var file = '../data/a_style.jpg';
-            client.uploadDocument(file).then(done).fail(done);
+            var file = './data/a_style.jpg';
+            client.uploadDocument(file).then(function(result){
+                console.log("result: ", result)
+                assert(result);
+            }).then(done).fail(done);
         });
         it('AdminGetDocument', function (done) {
             var docNumber = 1;

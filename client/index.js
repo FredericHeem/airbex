@@ -176,13 +176,21 @@ Snow.prototype.securitySession = function() {
 }
 
 Snow.prototype.uploadDocument = function(file_path) {
-    debug("uploadDocument file_path", file_path)
+    debug("uploadDocument file_path", file_path);
     var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});
     data.method = "POST";
-    fs.createReadStream(file_path).pipe(request(this.url + 'v1/users/documents', data , function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
-    }))
+    var req = request(this.url + 'v1/users/documents', data , function(err, res, body) {
+        onResult(err, res, body, deferred, 200);
+    });
+    
+    var form = req.form();
+    try {
+        form.append("document", fs.createReadStream(file_path));
+    } catch(e){
+        deferred.reject(e);
+    }
+            
     return deferred.promise;
 }
 
@@ -191,7 +199,7 @@ Snow.prototype.adminDocumentView = function(doc_id) {
     var data = updateRequestWithKey(this, {});
     request(this.url + 'admin/users/documents/' + doc_id + '/view', data , function(err, res, body) {
         onResult(err, res, body, deferred, 200)
-    })
+    });
     return deferred.promise;
 }
 

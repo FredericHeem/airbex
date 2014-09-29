@@ -5,7 +5,7 @@ var _ = require('lodash');
 module.exports = exports = function(app) {
     exports.app = app
     app.post('/security/session', exports.createRest)
-    app.del('/security/session', exports.remove)
+    app.delete('/security/session', exports.remove)
     
     app.socketio.router.on("/v1/sessionCreate", exports.createWs);
 }

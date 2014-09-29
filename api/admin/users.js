@@ -17,7 +17,7 @@ module.exports = exports = function(app) {
     app.post('/admin/users/:user/bankAccounts', app.security.demand.admin,
         exports.addBankAccount)
     app.get('/admin/users/:user/accounts', app.security.demand.admin, exports.accounts)
-    app.del('/admin/users/:user/bankAccounts/:id', app.security.demand.admin,
+    app.delete('/admin/users/:user/bankAccounts/:id', app.security.demand.admin,
         exports.removeBankAccount)
     app.post('/admin/users/:user/forgivePasswordReset', app.security.demand.admin,
         exports.forgivePasswordReset)

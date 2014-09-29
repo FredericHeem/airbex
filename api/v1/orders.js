@@ -4,7 +4,7 @@ var log = require('../log')(__filename)
 
 
 module.exports = exports = function(app) {
-    app.del('/v1/orders/:id', app.security.demand.trade, exports.cancel)
+    app.delete('/v1/orders/:id', app.security.demand.trade, exports.cancel)
     app.post('/v1/orders', app.security.demand.trade(2), exports.create)
     app.get('/v1/orders', app.security.demand.any, exports.index)
     app.get('/v1/orders/history', app.security.demand.any, exports.history)

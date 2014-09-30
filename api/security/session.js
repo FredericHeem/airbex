@@ -61,7 +61,7 @@ exports.getUserAndSessionFromSessionKey = function(sessionKey, cb) {
 exports.handler = function(req, res, next) {
     exports.getUserAndSessionFromSessionKey(req.cookies.session, function(err, response){
         if(err) {
-            return res.send(401, err);
+            return res.status(401).send(err);
         } else if(response){
             req.session = response.session
             req.user = response.user;

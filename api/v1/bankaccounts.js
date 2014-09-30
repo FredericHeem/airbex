@@ -1,8 +1,10 @@
 var _ = require('lodash')
+var log = require('../log')(__filename)
+, debug = log.debug;
 
 module.exports = exports = function(app) {
-    app.get('/v1/bankAccounts', app.security.demand.primary, exports.index)
-    app.post('/v1/bankAccounts', app.security.demand.primary(3), exports.add)
+    app.get('/v1/bankAccounts', app.security.demand.any, exports.index)
+    app.post('/v1/bankAccounts', app.security.demand.any, exports.add)
 }
 
 exports.index = function(req, res, next) {
@@ -13,7 +15,7 @@ exports.index = function(req, res, next) {
         values: [req.user.id]
     }, function(err, dr) {
         if (err) return next(err)
-        res.send(200, dr.rows.map(function(row) {
+        res.status(200).send(dr.rows.map(function(row) {
             return _.extend(_.pick(row, 'iban', 'swiftbic'), {
                 id: row.bank_account_id,
                 displayName: row.display_name,
@@ -44,7 +46,16 @@ exports.add = function(req, res, next) {
     }
 
     req.app.conn.write.get().query(q, function(err) {
-        if (err) return next(err)
-        res.send(204)
+        if (err) {
+            log.error("add error: ", err);
+            if (err.message.match(/enough_information/)) {
+                return res.status(400).send({
+                    name: 'NotEnoughInformation',
+                    message: 'Not enough information to add this bank account'
+                })
+            }
+            return next(err);
+        }
+        res.status(201).end()
     })
 }

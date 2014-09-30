@@ -38,10 +38,10 @@ exports.createWs = function(client, eventName, data, next) {
 }
 
 exports.createRest = function(req, res, next) {
-    var ip = req.headers['x-real-ip'] || "???";
+    var ip = req.headers['x-real-ip'] || '127.0.0.1';
     _create(req.app, req.body, ip, function(err, response){
         if(err) return next(err)
-        res.send(201, response);
+        res.status(201).send(response);
     })
 }
 
@@ -55,6 +55,6 @@ exports.remove = function(req, res, next) {
 
     exports.app.security.session.remove(req.cookies.session, function(err) {
         if (err) return next(err)
-        res.send(204)
+        res.status(204).end()
     })
 }

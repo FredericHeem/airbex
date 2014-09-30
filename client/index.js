@@ -89,7 +89,7 @@ Snow.prototype.post = function(action, param) {
     }
     data.method = "POST";
     request(this.url + action, data, function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
+        onResult(err, res, body, deferred, 201)
     })
     return deferred.promise;
 }
@@ -164,6 +164,11 @@ Snow.prototype.postPasswordRequired = function(action, withdrawParam) {
     
     return deferred.promise;
 }
+
+Snow.prototype.activities = function() {
+    return this.get('v1/activities');
+}
+
 Snow.prototype.orders = function() {
     var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});

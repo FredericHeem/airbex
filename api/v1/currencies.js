@@ -34,9 +34,9 @@ var currenciesGet = function(app, cb){
                 withdraw_min: app.cache.formatCurrency(row.withdraw_min, row.currency_id),
                 withdraw_max: app.cache.formatCurrency(row.withdraw_max, row.currency_id),
                 withdraw_fee: app.cache.formatCurrency(row.withdraw_fee, row.currency_id),
-                conf_time: row.conf_time,
-                min_conf: row.min_conf,
-                address_regex: row.address_regex
+                conf_time: row.fiat == false ? row.conf_time : undefined,
+                min_conf: row.fiat == false ? row.min_conf : undefined,
+                address_regex: row.fiat == false ? row.address_regex : undefined
             }
         }))
     })

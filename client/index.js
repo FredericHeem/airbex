@@ -169,6 +169,10 @@ Snow.prototype.activities = function() {
     return this.get('v1/activities');
 }
 
+Snow.prototype.currencies = function() {
+    return this.get('v1/currencies');
+}
+
 Snow.prototype.orders = function() {
     var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});

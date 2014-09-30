@@ -68,9 +68,9 @@ exports.create = function(req, res, next) {
         values: [
             key,
             req.user.id,
-            req.body.canTrade,
-            req.body.canDeposit,
-            req.body.canWithdraw
+            req.body.canTrade || false,
+            req.body.canDeposit || false,
+            req.body.canWithdraw || false
         ]
     }, function(err) {
         if (err) return next(err)

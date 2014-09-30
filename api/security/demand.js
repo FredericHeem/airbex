@@ -109,8 +109,8 @@ exports.extendRequestSession = function(req, res, next) {
 
     exports.app.security.session.extend(req.cookies.session, function(err) {
         if (err) {
-            console.error('Failed to extend session:')
-            console.error(err)
+            log.error('Failed to extend session:')
+            log.error(err)
         }
         //debug('session extended')
         next()
@@ -147,7 +147,7 @@ exports.otp = function(inner, optional) {
                 req.app.userToken[req.user.id] = token
                 debug("otp create token: %s", token)
                 var errorName = req.body.sessionKey ? 'PasswordInvalid' : 'PasswordRequired'
-                return res.send(401, {
+                return res.status(401).send({
                     name: errorName,
                     message: 'Please enter your password',
                     token:token

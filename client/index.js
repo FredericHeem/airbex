@@ -24,14 +24,14 @@ function sha256(s) {
 function bodyToError(body) {
     assert(body)
     debug("bodyToError: %s", JSON.stringify(body))
-    var error = new Error(body.message || body)
-    if (body.name) error.name = body.name
-    return error
+    return body;
+    //var error = new Error(body.message || body)
+    //if (body.name) error.name = body.name
+    //return error
 }
 
 function updateRequestWithKey(client, data){
-    data.json = true;
-    debug("updateRequestWithKey %s", client.apikey)
+    data.json = {};
     if(client.sessionKey){
         debug("using session key %s", client.sessionKey)
         var jar = request.jar()
@@ -80,6 +80,20 @@ Snow.prototype.get = function(action, param) {
     })
     return deferred.promise;
 }
+
+Snow.prototype.post = function(action, param) {
+    var deferred = Q.defer();
+    var data = updateRequestWithKey(this, {});
+    if(param){
+        data.json = param;
+    }
+    data.method = "POST";
+    request(this.url + action, data, function(err, res, body) {
+        onResult(err, res, body, deferred, 200)
+    })
+    return deferred.promise;
+}
+
 
 Snow.prototype.orders = function() {
     var deferred = Q.defer();
@@ -219,8 +233,8 @@ Snow.prototype.uploadDocument = function(file_path) {
     debug("uploadDocument file_path", file_path);
     var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});
-    data.method = "POST";
-    var req = request(this.url + 'v1/users/documents', data , function(err, res, body) {
+    data.json = true;
+    var req = request.post(this.url + 'v1/users/documents', data , function(err, res, body) {
         onResult(err, res, body, deferred, 200);
     });
     
@@ -309,35 +323,43 @@ Snow.prototype.bankCreditCancel = function(bankCancelInfo, cb) {
     return deferred.promise;
 }
 
-Snow.prototype.withdrawCryptoRaw = function(sessionKey, withdrawParam, cb) {
+Snow.prototype.postRaw = function(action, sessionKey, param) {
     var me = this;
     var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    data.method = "POST";
-    data.json = withdrawParam;
+    var uri = this.url + action
+    var data = updateRequestWithKey(this, {uri:uri});
+    if(param){
+        data.json = param;
+    }
+    
     if(sessionKey){
         data.json.sessionKey = sessionKey;
     }
-    console.log("withdrawCryptoRaw ", JSON.stringify(data.json))
-    var urlWithdraw = this.url + 'v1/' + withdrawParam.currency + '/out';
-    request(urlWithdraw, data , function(err, res, body){
+
+    console.log("postRaw action: %s, sessionKey %s, data: %s", 
+            action, sessionKey, JSON.stringify(data.json))
+    request.post(data , function(err, res, body){
         if (err) return deferred.reject(err)
         console.log(res.statusCode)
+        console.log("postRaw body ", body)
+        console.log("postRaw body ", JSON.stringify(body))
+        //var bodyJson = JSON.parse(body);
         deferred.resolve({res:res, body:body});
     })
     return deferred.promise;
 }
 
-Snow.prototype.withdrawCrypto = function(withdrawParam) {
+Snow.prototype.postPasswordRequired = function(action, withdrawParam) {
     var me = this;
     var deferred = Q.defer();
-    this.withdrawCryptoRaw(null, withdrawParam)
+    this.postRaw(action, null, withdrawParam)
     .then(function(result){
         var body = result.body;
         var res = result.res;
         console.log("body ", JSON.stringify(body))
         console.log("res.statusCode  ", res.statusCode )
         if (res.statusCode != 401) return deferred.reject(bodyToError(body))
+        console.log("body.name ", body.name)
         assert.equal(body.name, "PasswordRequired")
         assert(body.token);
         var sessionKey = me.keyFromCredentials(body.token, me.config.email, me.config.password);
@@ -345,10 +367,10 @@ Snow.prototype.withdrawCrypto = function(withdrawParam) {
         return sessionKey;
     }).then(function(sessionKey){
         console.log("sessionKey", sessionKey)
-        me.withdrawCryptoRaw(sessionKey, withdrawParam)
+        me.postRaw(action, sessionKey, withdrawParam)
         .then(function(param){
-            if (param.res.statusCode != 401) return deferred.reject(bodyToError(param.body))
-            deferred.revolve(param.body)
+            if (param.res.statusCode != 201) return deferred.reject(bodyToError(param.body))
+            deferred.resolve(param.body)
         })
         .fail(function(err){
             deferred.reject(err)
@@ -361,7 +383,15 @@ Snow.prototype.withdrawCrypto = function(withdrawParam) {
     
     return deferred.promise;
 }
+Snow.prototype.withdrawCryptoRaw = function(sessionKey, withdrawParam) {
+    var action = 'v1/' + withdrawParam.currency + '/out';
+    return this.postRaw(action, sessionKey, withdrawParam);
+}
 
+Snow.prototype.withdrawCrypto = function(withdrawParam) {
+    var action = 'v1/' + withdrawParam.currency + '/out';
+    return this.postPasswordRequired(action, withdrawParam)
+}
 
 // I'll need to look at how this is done. I belive you post to
 // security/session with your email and receive a token. You then

@@ -5,7 +5,7 @@ var debug = require('debug')('testApiKeys')
 var config = require('./configTest.js')();
 var TestMngr = require('./TestMngr');
 
-describe('apiKeys', function () {
+describe('ApiKeys', function () {
     "use strict";
     
     var testMngr = new TestMngr(config);
@@ -20,9 +20,8 @@ describe('apiKeys', function () {
         it('ApiKeyPublicAlice', function (done) {
             client.get('v1/keys')
             .fail(function(err){
-                console.log("AAAError ", err)
                 assert(err)
-                //assert.equal(err.name, "NotAuthenticated")
+                assert.equal(err.name, "NotAuthenticated")
                 done()
             });
         });
@@ -30,15 +29,31 @@ describe('apiKeys', function () {
     
     describe('ApiKeyAuth', function () {
         before(function(done) {
-            debug("before");
             this.timeout(5 * 1000);
             testMngr.login().then(done).fail(done);
         });
-        it('ApiKeyAuthAlice', function (done) {
+        it('ApiKeyAuthRead', function (done) {
             client.get('v1/keys').then(function(apiKeys) {
                 assert(apiKeys)
                 done()
             }).fail(done);
+        });
+        it('ApiKeyAuthCreatePasswordRequired', function (done) {
+            client.post('v1/keys')
+            .fail(function(err){
+                assert(err);
+                assert.equal(err.name, "PasswordRequired");
+                assert(err.token);
+                done();
+            });
+        });
+        it('ApiKeyAuthCreateOk', function (done) {
+            client.postPasswordRequired('v1/keys')
+            .then(function(result){
+                assert(result)
+            })
+            .then(done)
+            .fail(done);
         });
     });
    

@@ -1,4 +1,6 @@
 var crypto = require('crypto')
+var log = require('../log')(__filename)
+, debug = log.debug;
 
 module.exports = exports = function(app) {
     app.post('/v1/keys', app.security.demand.otp(app.security.demand.primary, true), exports.create)
@@ -7,6 +9,7 @@ module.exports = exports = function(app) {
 }
 
 exports.remove = function(req, res, next) {
+    log.debug("remove key: %s, user id: ", JSON.stringify(req.params.id), req.user.id)
     req.app.conn.write.get().query({
         text: [
             'DELETE',
@@ -18,13 +21,13 @@ exports.remove = function(req, res, next) {
         if (err) return next(err)
 
         if (!dr.rowCount) {
-            return res.send(404, {
+            return res.status(404).send({
                 name: 'ApiKeyNotFound',
                 message: 'API does not exist, belongs to another user, or is primary.'
             })
         }
 
-        res.send(204)
+        res.status(204).end();
     })
 }
 

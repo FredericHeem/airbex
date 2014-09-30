@@ -23,7 +23,7 @@ function sha256(s) {
 
 function bodyToError(body) {
     assert(body)
-    debug("Error: %s", JSON.stringify(body))
+    debug("bodyToError: %s", JSON.stringify(body))
     var error = new Error(body.message || body)
     if (body.name) error.name = body.name
     return error
@@ -48,8 +48,14 @@ function updateRequestWithKey(client, data){
 }
 
 function onResult(err, res, body, deferred, statusCode){
-    if (err) return deferred.reject(err)
-    if (res.statusCode != statusCode) return deferred.reject(bodyToError(body))
+    if (err) {
+        debug("onResult err: ", err)
+        return deferred.reject(err)
+    }
+    if (res.statusCode != statusCode){
+        debug("onResult statusCode: %s != %s, body: %s", res.statusCode, statusCode, body)
+        return deferred.reject(bodyToError(body))
+    }
     deferred.resolve(body);
 }
 
@@ -61,6 +67,18 @@ Snow.prototype.keyFromCredentials = function(sid, email, password) {
     var ukey = this.getUserKey(email, password);
     var skey = sha256(sid + ukey)
     return skey
+}
+
+Snow.prototype.get = function(action, param) {
+    var deferred = Q.defer();
+    var data = updateRequestWithKey(this, {});
+    if(param){
+        data.json = param;
+    }
+    request(this.url + action, data, function(err, res, body) {
+        onResult(err, res, body, deferred, 200)
+    })
+    return deferred.promise;
 }
 
 Snow.prototype.orders = function() {

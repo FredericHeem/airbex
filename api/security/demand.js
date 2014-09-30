@@ -26,8 +26,8 @@ exports.handler = function() {
 exports.demand = function(type, level, req, res, next) {
     debug('demanding type %s and level %s', type, level)
     if (!req.user) {
-        debug('user is not set, demand has failed')
-        return res.send(401, {
+        debug('user is not set, demand has failed, req: ', req.url)
+        return res.status(401).send({
             name: 'NotAuthenticated',
             message: 'Both API key and session cookie missing'
         })

@@ -8,7 +8,7 @@ var debug = require('debug')('snow')
 , sjcl = require('sjcl')
 , debug = require('debug')('Client')
 , Q = require("q")
-
+, _ = require('lodash')
 , Snow = module.exports = function(config) {
     this.url = config.url;
     this.config = config;
@@ -142,6 +142,19 @@ Snow.prototype.whoami = function() {
         onResult(err, res, body, deferred, 200)
     })
     return deferred.promise;
+}
+
+Snow.prototype.balance = function(currency) {
+    return this.balances().then(function(balances){
+        var itemToFound;
+        _.each(balances, function(item) {
+            if(item.currency === currency){
+                itemToFound = item;
+                return;
+            }
+        })
+        return itemToFound;
+    })
 }
 
 Snow.prototype.balances = function() {

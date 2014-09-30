@@ -35,22 +35,42 @@ describe('TestDeposit', function () {
         });
         it('TestDepositBTCAddress', function (done) {
             var currency = 'BTC';
+            var balanceBefore;
             client.getDepositAddress(currency)
-           .then(function(result){
-               assert(result);
-               assert(result.address)
-               console.log("result: ", result)
-               done();
-           })
-           .fail(done)
+            .then(function(result){
+                assert(result);
+                assert(result.address)
+                console.log("result: ", result)
+                done();
+            })
+            .fail(done)
         });
         it('TestDepositBTCOk', function (done) {
             var currency = 'BTC';
-            var address = 'mvRZcE4GkHsDPtW8fSGLi8VaXe9D5iKpaR';
             var amount = "100000000";
-            snowChef.bot.db.creditCrypto(client, currency, address, amount)
-           .then(done)
-           .fail(done)
+
+            var balanceBefore;
+            client.balance(currency)
+            .then(function(balance){
+                console.log("balances: ", balance)
+                balanceBefore = balance
+            })
+            .then(function(balance){
+                return client.getDepositAddress(currency)
+            })
+            .then(function(result){
+                return snowChef.bot.db.creditCrypto(client, currency, result.address, amount)
+            })
+            .then(function(){
+                console.log("creditCrypto: ")
+                return client.balance(currency)
+            })
+            .then(function(balance){
+                console.log("balance after: ", balance)
+                balanceBefore = balance;
+                done();
+            })
+            .fail(done)
         });
     });
 });

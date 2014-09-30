@@ -1,6 +1,8 @@
 var _ = require('lodash')
 , redis = require('redis')
 , parseUrl = require('url').parse
+, log = require('../log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(opts) {
     this.opts = _.extend({
@@ -8,9 +10,12 @@ module.exports = exports = function(opts) {
         prefix: 'sessions:'
     }, opts)
 
+    debug("opts: ", opts);
+    
     if (opts.uri) {
         var parsedUri = parseUrl(opts.uri)
-        this.redis = redis.createClient(parsedUri.port, parsedUri.hostname)
+        debug("parsedUri: ", parsedUri);
+        this.redis = redis.createClient(parsedUri.port || 6379, parsedUri.hostname)
 
         if (parsedUri.auth) {
             this.redis.auth(parsedUri.auth.split(':')[1])

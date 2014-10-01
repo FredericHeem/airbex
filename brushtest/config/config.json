@@ -28,7 +28,7 @@
 {
     "name": "alice",
     "email" : "alice@nomail.com",
-    "password" : "password",
+    "password" : "newpassword",
     "country":"FR",
     "number":"0607065268",
     "btc_deposit_address":"mvRZcE4GkHsDPtW8fSGLi8VaXe9D5iKpaR"

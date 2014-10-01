@@ -29,23 +29,26 @@ module.exports = function (config) {
             }
         });
     };
-    snowDb.getUserIdFromEmail = function (email, done){
+    snowDb.getUserIdFromEmail = function (email){
+        var deferred = Q.defer();
         debug("getUserIdFromEmail email: %s", email);
         this.pgClient.query({
             text: 'SELECT user_id FROM "user" where email=$1',
             values: [email]
         }, function(err, dres) {
             if (err) {
-                done(err);
+                deferred.reject(err);
             } else if(!dres.rows.length){
-                done("getUserIdFromEmail: no user for such email");
+                deferred.reject({name:"NoSuchUser"})
             } else {
                 var row = dres.rows[0];
                 var user_id = row.user_id;
                 debug("getUserIdFromEmail: %s", user_id);
-                done(null, user_id);
+                deferred.resolve(user_id);
             }
         });
+        
+        return deferred.promise;
     };   
    
 
@@ -191,9 +194,9 @@ module.exports = function (config) {
         async.waterfall(
                 [
                  function(callback) {
-                     snowDb.getUserIdFromEmail(email, function(err, user_id) {
-                         callback(err, user_id);
-                     });
+                     snowDb.getUserIdFromEmail(email).then(function(user_id) {
+                         callback(null, user_id);
+                     }).fail(callback);
                  },
                  function(user_id, callback) {
                      snowDb.getAccountId(user_id, currency, function(err, account_id) {

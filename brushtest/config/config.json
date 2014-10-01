@@ -27,10 +27,14 @@
 },
 {
     "name": "alice",
+    "first_name": "alice",
+    "last_name": "wonderful",
     "email" : "alice@nomail.com",
     "password" : "newpassword",
     "country":"FR",
     "number":"0607065268",
+    "poi":true,
+    "poa":true,
     "btc_deposit_address":"mvRZcE4GkHsDPtW8fSGLi8VaXe9D5iKpaR"
 }
 ,

@@ -365,7 +365,17 @@ exports.changePassword = function(req, res, next) {
         ].join('\n'),
         values: [req.user.id, req.body.key]
     }, function(err) {
-        if (err) return next(err)
+        if (err) {
+            log.error("add error: ", err);
+            if (err.message.match(/duplicate key value/)) {
+                return res.status(400).send({
+                    name: 'DuplicatedKey',
+                    message: 'The same key alreasy exists.'
+                })
+            }
+            return next(err)
+        }
+        
         req.app.activity(req.user.id, 'ChangePassword', {})
         res.send(204)
     })

@@ -13,7 +13,7 @@ var debug = require('debug')('snow')
     this.url = config.url;
     this.config = config;
     this.apikey = config.key;
-    debug('endpoint %s, url: %s, user key: %s, api key: %s', config.email, this.url, this.user_key, this.apikey)
+    //debug('endpoint %s, url: %s, user key: %s, api key: %s', config.email, this.url, this.user_key, this.apikey)
 }
 
 function sha256(s) {
@@ -89,7 +89,17 @@ Snow.prototype.post = function(action, param) {
     }
     data.method = "POST";
     request(this.url + action, data, function(err, res, body) {
-        onResult(err, res, body, deferred, 201)
+        //onResult(err, res, body, deferred, 201)
+        if (err) {
+            debug("post err: ", err)
+            return deferred.reject(err)
+        }
+        if (res.statusCode == 201 || res.statusCode == 204){
+            deferred.resolve(body);
+        } else {
+            //debug("onResult statusCode: %s != %s, body: %s", res.statusCode, statusCode, body)
+            return deferred.reject(bodyToError(body))
+        }
     })
     return deferred.promise;
 }
@@ -150,8 +160,11 @@ Snow.prototype.postPasswordRequired = function(action, withdrawParam) {
         console.log("sessionKey", sessionKey)
         me.postRaw(action, sessionKey, withdrawParam)
         .then(function(param){
-            if (param.res.statusCode != 201) return deferred.reject(bodyToError(param.body))
-            deferred.resolve(param.body)
+            if (param.res.statusCode == 201 || param.res.statusCode == 204) {
+                deferred.resolve(param.body)
+            } else {
+                return deferred.reject(bodyToError(param.body))
+            }
         })
         .fail(function(err){
             deferred.reject(err)
@@ -174,32 +187,16 @@ Snow.prototype.currencies = function() {
 }
 
 Snow.prototype.orders = function() {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    request(this.url + 'v1/orders', data, function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
-    })
-    return deferred.promise;
+    return this.get('v1/orders');
 }
 
 Snow.prototype.markets = function() {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    request(this.url + 'v1/markets', data, function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
-    })
-    return deferred.promise;
+    return this.get('v1/markets');
 }
 
 // Groups depth from array to bids and asks
 Snow.prototype.depth = function(market, cb) {
-    request(this.url + 'v1/markets/' + market + '/depth', {
-        json: true
-    }, function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode !== 200) return cb(bodyToError(body))
-        cb(null, body)
-    })
+    return this.get('v1/markets/' + market + '/depth');
 }
 
 Snow.prototype.cancel = function(id) {
@@ -233,25 +230,11 @@ Snow.prototype.cancelAll = function() {
 }
 
 Snow.prototype.order = function(order) {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    data.json = order;
-    data.method = "POST";
-    request(this.url + 'v1/orders', data, function(err, res, body) {
-        onResult(err, res, body, deferred, 201)
-    })
-    return deferred.promise;
+    return this.post('v1/orders', order);
 }
 
 Snow.prototype.whoami = function() {
-	console.log("whoami");
-	var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    console.log("whoami %s", JSON.stringify(data));
-    request(this.url + 'v1/whoami', data, function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
-    })
-    return deferred.promise;
+    return this.get('v1/whoami');
 }
 
 Snow.prototype.balance = function(currency) {
@@ -268,21 +251,11 @@ Snow.prototype.balance = function(currency) {
 }
 
 Snow.prototype.balances = function() {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    request(this.url + 'v1/balances', data , function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
-    })
-    return deferred.promise;
+    return this.get('v1/balances');
 }
 
 Snow.prototype.getDepositAddress = function(currency) {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    request(this.url + 'v1/' + currency + '/address', data , function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
-    })
-    return deferred.promise;
+    return this.get('v1/' + currency + '/address');
 }
 
 Snow.prototype.securitySession = function() {
@@ -327,80 +300,33 @@ Snow.prototype.uploadDocument = function(file_path) {
 }
 
 Snow.prototype.adminDocumentView = function(doc_id) {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    request(this.url + 'admin/users/documents/' + doc_id + '/view', data , function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
-    });
-    return deferred.promise;
+    return this.get('admin/users/documents/' + doc_id + '/view');
 }
 
 Snow.prototype.adminDocuments = function(cb) {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    request(this.url + 'admin/documents', data , function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
-    })
-    return deferred.promise;
+    return this.get('admin/documents');
 }
 
 Snow.prototype.adminDocumentsUsers = function(cb) {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    request(this.url + 'admin/documents/users', data , function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
-    })
-    return deferred.promise;
+    return this.get( 'admin/documents/users');
 }
 
 Snow.prototype.bankCredits = function(cb) {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    request(this.url + 'admin/bankCredits', data , function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
-    })
-    return deferred.promise;
+    return this.get('admin/bankCredits');
 }
 
 Snow.prototype.bankCreditCreate = function(bankCreditInfo, cb) {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    data.method = "POST";
     bankCreditInfo.state = "review";
-    data.json = bankCreditInfo;
-    console.log("bankCreditCreate ", JSON.stringify(data))
-    request(this.url + 'admin/bankCredits', data , function(err, res, body) {
-        onResult(err, res, body, deferred, 201)
-    })
-    return deferred.promise;
+    return this.post('admin/bankCredits', bankCreditInfo);
 }
 
 Snow.prototype.bankCreditValidate = function(bankValidateInfo, cb) {
-    var deferred = Q.defer();
-    data = updateRequestWithKey(this, {});
-    data.method = "POST";
-    data.json = bankValidateInfo;
-    
-    request(this.url + 'admin/bankCredits/' + bankValidateInfo.bank_credit_id + '/approve', 
-            data , function(err, res, body) {
-        onResult(err, res, body, deferred, 201)
-    })
-    return deferred.promise;
+    return this.post('admin/bankCredits/' + bankValidateInfo.bank_credit_id + '/approve', bankValidateInfo);
 }
 
 Snow.prototype.bankCreditCancel = function(bankCancelInfo, cb) {
-    var deferred = Q.defer();
-    data = updateRequestWithKey(this, {});
-    data.method = "POST";
-    data.json = bankCancelInfo;
-    
-    request(this.url + 'admin/bankCredits/' + bankCancelInfo.bank_credit_id + '/cancel', 
-            data , function(err, res, body) {
-        onResult(err, res, body, deferred, 204)
-    })
-    return deferred.promise;
+    return this.post('admin/bankCredits/' + bankCancelInfo.bank_credit_id + '/cancel', bankCancelInfo);
 }
-
 
 Snow.prototype.withdrawCryptoRaw = function(sessionKey, withdrawParam) {
     var action = 'v1/' + withdrawParam.currency + '/out';
@@ -467,7 +393,7 @@ Snow.prototype.getBalanceForCurrency = function(balances, currency){
             balance = balanceEl;
             return false;
         } else {
-            return true;     
+            return true;
         }
     });
     return balance;
@@ -521,65 +447,65 @@ Snow.prototype.createTableDepth = function(depth){
     return JSON.stringify(depth);
 }
 
-Snow.prototype.purchaseOrderRead = function(cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
-    data.method = "GET";
-    request(this.url + 'v1/purchaseOrder/', data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 200) return cb(bodyToError(body))
-        cb(null, body)
-    })
-}
+//Snow.prototype.purchaseOrderRead = function(cb) {
+//    var data = { };
+//    data = updateRequestWithKey(this, data);
+//    data.method = "GET";
+//    request(this.url + 'v1/purchaseOrder/', data , function(err, res, body) {
+//        if (err) return cb(err)
+//        if (res.statusCode != 200) return cb(bodyToError(body))
+//        cb(null, body)
+//    })
+//}
+//
+//Snow.prototype.purchaseOrderCreate = function(purchaseOrderData, cb) {
+//    var data = { };
+//    data = updateRequestWithKey(this, data);
+//    data.method = "POST";
+//    data.json = purchaseOrderData;
+//    request(this.url + 'v1/purchaseOrder/', data , function(err, res, body) {
+//        if (err) return cb(err)
+//        if (res.statusCode != 201) return cb(bodyToError(body))
+//        cb(null, body)
+//    })
+//}
 
-Snow.prototype.purchaseOrderCreate = function(purchaseOrderData, cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
-    data.method = "POST";
-    data.json = purchaseOrderData;
-    request(this.url + 'v1/purchaseOrder/', data , function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode != 201) return cb(bodyToError(body))
-        cb(null, body)
-    })
-}
-
-Snow.prototype.purchaseOrdersRead = function(cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
-    data.method = "GET";
-    request(this.url + 'v1/admin/purchaseOrder/',data , function(err, res, body) {
-        console.log(err);
-        console.log(res.statusCode);
-        if (err) return cb(err)
-        if (res.statusCode != 200) return cb(bodyToError(body))
-        cb(null, body)
-    })
-}
-
-Snow.prototype.purchaseOrderUpdate = function(po_id, po_data, cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
-    data.method = "POST";
-    data.json = po_data;
-    request(this.url + 'v1/admin/purchaseOrder/' + po_id, data , function(err, res, body) {
-        console.log(err);
-        console.log(res.statusCode);
-        if (err) return cb(err)
-        if (res.statusCode === 404) return cb(res.body)
-        if (res.statusCode != 201) return cb(bodyToError(body))
-        cb(null, body)
-    })
-}
-
-Snow.prototype.purchaseOrderCancel = function(purchaseOrderId, cb) {
-    var data = { };
-    data = updateRequestWithKey(this, data);
-    data.method = "DELETE";
-    request(this.url + 'v1/purchaseOrder/' + purchaseOrderId , data, function(err, res, body) {
-        if (err) return cb(err)
-        if (res.statusCode === 404) return cb(res.body)
-        if (res.statusCode != 204) return cb(new Error('http error ' + res.statusCode))
-        cb(null)
-    })
-}
+//Snow.prototype.purchaseOrdersRead = function(cb) {
+//    var data = { };
+//    data = updateRequestWithKey(this, data);
+//    data.method = "GET";
+//    request(this.url + 'v1/admin/purchaseOrder/',data , function(err, res, body) {
+//        console.log(err);
+//        console.log(res.statusCode);
+//        if (err) return cb(err)
+//        if (res.statusCode != 200) return cb(bodyToError(body))
+//        cb(null, body)
+//    })
+//}
+//
+//Snow.prototype.purchaseOrderUpdate = function(po_id, po_data, cb) {
+//    var data = { };
+//    data = updateRequestWithKey(this, data);
+//    data.method = "POST";
+//    data.json = po_data;
+//    request(this.url + 'v1/admin/purchaseOrder/' + po_id, data , function(err, res, body) {
+//        console.log(err);
+//        console.log(res.statusCode);
+//        if (err) return cb(err)
+//        if (res.statusCode === 404) return cb(res.body)
+//        if (res.statusCode != 201) return cb(bodyToError(body))
+//        cb(null, body)
+//    })
+//}
+//
+//Snow.prototype.purchaseOrderCancel = function(purchaseOrderId, cb) {
+//    var data = { };
+//    data = updateRequestWithKey(this, data);
+//    data.method = "DELETE";
+//    request(this.url + 'v1/purchaseOrder/' + purchaseOrderId , data, function(err, res, body) {
+//        if (err) return cb(err)
+//        if (res.statusCode === 404) return cb(res.body)
+//        if (res.statusCode != 204) return cb(new Error('http error ' + res.statusCode))
+//        cb(null)
+//    })
+//}

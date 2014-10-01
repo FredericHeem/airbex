@@ -39,7 +39,7 @@ exports.withdrawVerifyCode = function(req, res, next) {
 }
 
 exports.withdraw = function(currencyId, req, res, next) {
-    log.info('processing withdraw request of %d %s from user #%s to %s',
+    log.info('withdraw request of %d %s from user #%s to %s',
             req.body.amount, currencyId, req.user.id, req.body.address)
 
     if (!req.app.validate(req.body, 'v1/crypto_out', res)) {
@@ -49,7 +49,7 @@ exports.withdraw = function(currencyId, req, res, next) {
     var currencyOption = req.app.cache.getCurrencyOption(currencyId);
     
     if(!currencyOption){
-        return res.send(400, {
+        return res.status(400).send({
             name: 'InvalidCurrency',
             message: 'Invalid currency: ' + currencyId
         })   	
@@ -59,18 +59,28 @@ exports.withdraw = function(currencyId, req, res, next) {
     
     var a = new Address(address, 'base58', currencyId.toLowerCase());
     if(!a.isValid()){
-        return res.send(400, {
+        return res.status(400).send({
             name: 'InvalidAddress',
             message: 'Invalid Address ' + address + " is not valid"
         });
     }
     
+    var withdraw_min = req.app.cache.currencies[currencyId].withdraw_min;
+    var withdraw_max = req.app.cache.currencies[currencyId].withdraw_max;
+    
     var amount = req.app.cache.parseCurrency(req.body.amount, currencyId)
     
-    if (num(amount).lt(currencyOption.withdraw_min)) {
-        return res.send(400, {
+    if (num(amount).lt(withdraw_min)) {
+        return res.status(400).send({
             name: 'AmountTooSmall',
-            message: 'Minimum amount '
+            message: 'Minimum amount is ' + req.app.cache.formatCurrency(withdraw_min, currencyId) + ' '  + currencyId
+        })
+    }
+    
+    if (num(amount).gt(withdraw_max)) {
+        return res.status(400).send({
+            name: 'AmountTooHigh',
+            message: 'Maximum amount is ' + req.app.cache.formatCurrency(withdraw_max, currencyId) + ' '  + currencyId
         })
     }
     
@@ -107,8 +117,9 @@ exports.withdraw = function(currencyId, req, res, next) {
             address: address,
             code:code
         })
-
-        res.send(201, { id: dr.rows[0].rid })
+        var requestId = dr.rows[0].rid;
+        log.info("withdraw requestId: ", requestId)
+        res.send(201, { id: requestId })
     })
 }
 

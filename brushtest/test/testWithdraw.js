@@ -37,7 +37,7 @@ describe('TestWithdraw', function () {
             var withdrawParam = {
                     currency:'BTC',
                     address:"12BzXgPgq3scersJWG7c5ku7BFDGfsDdYa",
-                    amount:'10000'
+                    amount:'1'
             };
             client.withdrawCrypto(withdrawParam).then(function() {
                 done()
@@ -50,7 +50,7 @@ describe('TestWithdraw', function () {
             var withdrawParam = {
                     currency:'BTC',
                     address:"Invalid",
-                    amount:'10000000'
+                    amount:'1'
             };
             client.withdrawCrypto(withdrawParam).then(function() {
                 done()
@@ -63,7 +63,7 @@ describe('TestWithdraw', function () {
             var withdrawParam = {
                     currency:'BTC',
                     address:clientConfig.btc_deposit_address,
-                    amount:'10000000'
+                    amount:'1'
             };
             client.withdrawCrypto(withdrawParam).then(function() {
                 done()
@@ -96,11 +96,25 @@ describe('TestWithdraw', function () {
                 done()
             })
         });
+        it('TestWithdrawCryptoBTCTooHigh', function (done) {
+            var withdrawParam = {
+                    currency:'BTC',
+                    address:clientConfig.btc_deposit_address,
+                    amount:'1000000'
+            };
+            client.withdrawCrypto(withdrawParam)
+            .fail(function(err){
+                assert(err);
+                console.log(err)
+                assert.equal(err.name, 'AmountTooHigh')
+                done()
+            })
+        });
         it('TestWithdrawCryptoBTCKo', function (done) {
             var withdrawParam = {
                     currency:'BTC',
                     address:clientConfig.btc_deposit_address,
-                    amount:'10000000'
+                    amount:'1'
             };
             
             client.withdrawCryptoRaw(null, withdrawParam)

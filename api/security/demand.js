@@ -67,7 +67,7 @@ exports.demand = function(type, level, req, res, next) {
     if (req.user.securityLevel < level) {
         debug('security level %d is lower than required %d', req.user.securityLevel, level)
 
-        return res.send(401, {
+        return res.status(401).send({
             name: 'SecurityLevelTooLow',
             message: 'The user\'s security level is too low'
         })

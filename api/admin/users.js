@@ -116,6 +116,7 @@ exports.user = function(req, res, next) {
 }
 
 exports.patch = function(req, res, next) {
+    debug("patch: ", JSON.stringify(req.body))
     var updates = {}
     , values = [req.params.id]
     , allowed = ['first_name', 'last_name', 'phone_number', 'country',

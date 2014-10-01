@@ -69,16 +69,31 @@ Snow.prototype.keyFromCredentials = function(sid, email, password) {
     return skey
 }
 
-Snow.prototype.get = function(action, param) {
+Snow.prototype._ops = function(ops, action, resCode, param) {
+    
     var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});
     if(param){
         data.json = param;
     }
+    data.method = ops;
     request(this.url + action, data, function(err, res, body) {
-        onResult(err, res, body, deferred, 200)
+        onResult(err, res, body, deferred, resCode)
     })
     return deferred.promise;
+}
+
+Snow.prototype.get = function(action, param) {
+    return this._ops("GET", action, 200, param);
+}
+
+Snow.prototype.patch = function(action, param) {
+    console.log("patch action: %s, param ", action, JSON.stringify(param))
+    return this._ops("PATCH", action, 204, param);
+}
+
+Snow.prototype.delete = function(action, param) {
+    return this._ops("DELETE", action, 204, param);
 }
 
 Snow.prototype.post = function(action, param) {
@@ -89,7 +104,6 @@ Snow.prototype.post = function(action, param) {
     }
     data.method = "POST";
     request(this.url + action, data, function(err, res, body) {
-        //onResult(err, res, body, deferred, 201)
         if (err) {
             debug("post err: ", err)
             return deferred.reject(err)
@@ -97,22 +111,8 @@ Snow.prototype.post = function(action, param) {
         if (res.statusCode == 201 || res.statusCode == 204){
             deferred.resolve(body);
         } else {
-            //debug("onResult statusCode: %s != %s, body: %s", res.statusCode, statusCode, body)
             return deferred.reject(bodyToError(body))
         }
-    })
-    return deferred.promise;
-}
-
-Snow.prototype.delete = function(action, param) {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    if(param){
-        data.json = param;
-    }
-    data.method = "DELETE";
-    request(this.url + action, data, function(err, res, body) {
-        onResult(err, res, body, deferred, 204)
     })
     return deferred.promise;
 }
@@ -258,6 +258,18 @@ Snow.prototype.getDepositAddress = function(currency) {
     return this.get('v1/' + currency + '/address');
 }
 
+Snow.prototype.login = function(){
+    var deferred = Q.defer();
+    this.securitySession()
+    .then(function(sessionKey){
+        deferred.resolve();
+    })
+    .fail(function(err){
+        deferred.reject(err);
+    });
+    return deferred.promise;
+}
+
 Snow.prototype.securitySession = function() {
     var deferred = Q.defer();
     var postData = {
@@ -336,6 +348,11 @@ Snow.prototype.withdrawCryptoRaw = function(sessionKey, withdrawParam) {
 Snow.prototype.withdrawCrypto = function(withdrawParam) {
     var action = 'v1/' + withdrawParam.currency + '/out';
     return this.postPasswordRequired(action, withdrawParam)
+}
+
+Snow.prototype.adminUserPatch = function(user_id, param) {
+    debug("adminUserPatch user id %s, param: ", user_id, JSON.stringify(param));
+    return this.patch("admin/users/" + user_id, param);
 }
 
 // I'll need to look at how this is done. I belive you post to

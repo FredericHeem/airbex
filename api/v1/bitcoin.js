@@ -65,15 +65,6 @@ exports.withdraw = function(currencyId, req, res, next) {
         });
     }
     
-//    var address = req.body.address;
-//    var regEx = new RegExp(currencyOption.address_regex);
-//    if (!address.match(regEx)){
-//        return res.send(400, {
-//            name: 'InvalidAddress',
-//            message: 'Invalid Address ' + address + ", should match " + currencyOption.address_prefix
-//        })       
-//    }
-    
     var amount = req.app.cache.parseCurrency(req.body.amount, currencyId)
     
     if (num(amount).lt(currencyOption.withdraw_min)) {

@@ -4,6 +4,7 @@ var request = require('supertest');
 var debug = require('debug')('testWithdrawBank')
 var config = require('./configTest.js')();
 var TestMngr = require('./TestMngr');
+var num = require('num');
 
 describe('WithdrawBank', function () {
     "use strict";
@@ -81,6 +82,26 @@ describe('WithdrawBank', function () {
                 done()
             });
         });
+        it('WithdrawBankAmountTooHigh', function (done) {
+            var param = {bankAccount:bankAccountId, amount:"10000000", currency:"EUR"};
+            client.post("v1/withdraws/bank", param)
+            .fail(function(err){
+                assert(err)
+                console.log(err);
+                assert.equal(err.name, "AmountTooHigh")
+                done()
+            });
+        });
+        it('WithdrawBankAmountNoFunds', function (done) {
+            var param = {bankAccount:bankAccountId, amount:"50000", currency:"CZK"};
+            client.post("v1/withdraws/bank", param)
+            .fail(function(err){
+                assert(err)
+                console.log(err);
+                assert.equal(err.name, "NoFunds")
+                done()
+            });
+        });
         it('WithdrawBankInvalidBankAccount', function (done) {
             var param = {bankAccount:99999, amount:"1000", currency:"EUR"};
             client.post("v1/withdraws/bank", param)
@@ -94,7 +115,18 @@ describe('WithdrawBank', function () {
         it('WithdrawBankOk', function (done) {
             var param = {bankAccount:bankAccountId, amount:"1000", currency:"EUR"};
             client.post("v1/withdraws/bank", param)
-            .then(done).fail(done)
+            .then(function(){
+                return client.get("v1/withdraws")
+            }).then(function(withdraws){
+                assert(withdraws);
+                var lastWithdraw = withdraws[0]
+                assert(lastWithdraw);
+                console.log(lastWithdraw)
+                assert.equal(lastWithdraw.currency, "EUR");
+                assert.equal(lastWithdraw.state, "requested");
+                assert(num(param.amount).eq(num(lastWithdraw.amount)))
+                done()
+            }).fail(done)
         });
         
         it('WithdrawBankInvalidCurrency', function (done) {

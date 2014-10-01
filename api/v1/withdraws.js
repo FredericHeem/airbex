@@ -30,7 +30,7 @@ exports.withdrawBank = function(req, res, next) {
             message: 'Invalid currency: ' + currency
         });
     }
-    var withdraw_min = req.app.cache.currencies[currency].withdraw_min;
+
     
     if (!req.app.cache.currencies[currency].fiat) {
         return res.status(400).send({
@@ -38,7 +38,8 @@ exports.withdrawBank = function(req, res, next) {
             message: 'Cannot withdraw non-fiat to a bank account'
         })
     }
-
+    var withdraw_min = req.app.cache.currencies[currency].withdraw_min;
+    var withdraw_max = req.app.cache.currencies[currency].withdraw_max;
     var amountParsed = req.app.cache.parseCurrency(amount, currency)
     
     debug("withdrawBank user_id: %s, %s %s, min: %s, to ba %s", 
@@ -51,6 +52,12 @@ exports.withdrawBank = function(req, res, next) {
         })
     }
     
+    if (num(amountParsed).gt(withdraw_max)) {
+        return res.status(400).send({
+            name: 'AmountTooHigh',
+            message: 'Maximum amount is ' + req.app.cache.formatCurrency(withdraw_max, currency) + ' '  + currency
+        })
+    }
     req.app.conn.write.get().query({
         text: [
             'SELECT withdraw_bank($2, $3, $4, $5)',
@@ -61,7 +68,7 @@ exports.withdrawBank = function(req, res, next) {
             req.user.id,
             +req.body.bankAccount,
             currency,
-            amount,
+            amountParsed,
             req.body.forceSwift === undefined ? null : req.body.forceSwift
         ]
     }, function(err, dr) {

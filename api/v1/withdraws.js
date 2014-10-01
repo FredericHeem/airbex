@@ -23,6 +23,13 @@ exports.withdrawBank = function(req, res, next) {
     var userId = req.user.id;
     var currency = req.body.currency;
     var amount = req.body.amount;
+    
+    if(!req.app.cache.currencies[currency]){
+        return res.status(400).send({
+            name: 'InvalidCurrency',
+            message: 'Invalid currency: ' + currency
+        });
+    }
     var withdraw_min = req.app.cache.currencies[currency].withdraw_min;
     
     if (!req.app.cache.currencies[currency].fiat) {
@@ -32,12 +39,12 @@ exports.withdrawBank = function(req, res, next) {
         })
     }
 
-    var amount = req.app.cache.parseCurrency(amount, currency)
+    var amountParsed = req.app.cache.parseCurrency(amount, currency)
     
     debug("withdrawBank user_id: %s, %s %s, min: %s, to ba %s", 
             userId, amount, currency, withdraw_min, req.body.bankAccount);
     
-    if (num(amount).lt(withdraw_min)) {
+    if (num(amountParsed).lt(withdraw_min)) {
         return res.status(400).send({
             name: 'AmountTooSmall',
             message: 'Minimum amount is ' + req.app.cache.formatCurrency(withdraw_min, currency) + ' '  + currency

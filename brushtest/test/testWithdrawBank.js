@@ -39,7 +39,7 @@ describe('WithdrawBank', function () {
                 assert(bankAccounts);
                 bankAccountId = bankAccounts[0].id;
                 console.log("bankAccountId: ", bankAccountId)
-                console.log(bankAccounts)
+                //console.log(bankAccounts)
                 done()
             }).fail(done);
         })
@@ -88,6 +88,32 @@ describe('WithdrawBank', function () {
                 assert(err)
                 console.log(err);
                 assert.equal(err.name, "BankAccountNotFound")
+                done()
+            });
+        });
+        it('WithdrawBankOk', function (done) {
+            var param = {bankAccount:bankAccountId, amount:"1000", currency:"EUR"};
+            client.post("v1/withdraws/bank", param)
+            .then(done).fail(done)
+        });
+        
+        it('WithdrawBankInvalidCurrency', function (done) {
+            var param = {bankAccount:bankAccountId, amount:"1000", currency:"ABC"};
+            client.post("v1/withdraws/bank", param)
+            .fail(function(err){
+                assert(err)
+                console.log(err);
+                assert.equal(err.name, "InvalidCurrency")
+                done()
+            });
+        });
+        it('WithdrawBankCryptoCurrency', function (done) {
+            var param = {bankAccount:bankAccountId, amount:"1", currency:"BTC"};
+            client.post("v1/withdraws/bank", param)
+            .fail(function(err){
+                assert(err)
+                console.log(err);
+                assert.equal(err.name, "CannotWithdrawNonFiatToBank")
                 done()
             });
         });

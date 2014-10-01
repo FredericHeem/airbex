@@ -2,6 +2,7 @@ var withdraws = require('../withdraws')
 , _ = require('lodash')
 , log = require('../log')(__filename)
 , debug = log.debug
+, num = require('num')
 
 module.exports = exports = function(app) {
     app.delete('/v1/withdraws/:id', app.security.demand.withdraw, exports.cancel)
@@ -19,14 +20,30 @@ module.exports = exports = function(app) {
 
 exports.withdrawBank = function(req, res, next) {
     if (!req.app.validate(req.body, 'v1/withdraw_bank', res)) return
-
-    if (!req.app.cache.currencies[req.body.currency].fiat) {
-        return res.send(400, {
+    var userId = req.user.id;
+    var currency = req.body.currency;
+    var amount = req.body.amount;
+    var withdraw_min = req.app.cache.currencies[currency].withdraw_min;
+    
+    if (!req.app.cache.currencies[currency].fiat) {
+        return res.status(400).send({
             name: 'CannotWithdrawNonFiatToBank',
             message: 'Cannot withdraw non-fiat to a bank account'
         })
     }
 
+    var amount = req.app.cache.parseCurrency(amount, currency)
+    
+    debug("withdrawBank user_id: %s, %s %s, min: %s, to ba %s", 
+            userId, amount, currency, withdraw_min, req.body.bankAccount);
+    
+    if (num(amount).lt(withdraw_min)) {
+        return res.status(400).send({
+            name: 'AmountTooSmall',
+            message: 'Minimum amount is ' + req.app.cache.formatCurrency(withdraw_min, currency) + ' '  + currency
+        })
+    }
+    
     req.app.conn.write.get().query({
         text: [
             'SELECT withdraw_bank($2, $3, $4, $5)',
@@ -36,8 +53,8 @@ exports.withdrawBank = function(req, res, next) {
         values: [
             req.user.id,
             +req.body.bankAccount,
-            req.body.currency,
-            req.app.cache.parseCurrency(req.body.amount, req.body.currency),
+            currency,
+            amount,
             req.body.forceSwift === undefined ? null : req.body.forceSwift
         ]
     }, function(err, dr) {

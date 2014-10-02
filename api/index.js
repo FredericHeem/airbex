@@ -93,7 +93,7 @@ cache(app, module.parent ? null : app.conn, function(err) {
     
     app.use(function(req, res) {
         log.error("404 for ", req.url)
-        res.send(404)
+        res.status(404).end()
     })
     
     debug("listening on port %s", config.port)

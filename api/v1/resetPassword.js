@@ -39,13 +39,14 @@ exports.resetPasswordBegin = function(req, res, next) {
         values: [req.body.email.toLowerCase(), emailCode, phoneCode]
     }, function(err, dr) {
         if (err) {
-            log.error("resetPasswordBegin: ", err.message);
+            
             if (err.message.match(/recent reset attempt/)) {
+                log.log("resetPasswordBegin: ", err.message);
                 // If a specific error is sent,
                 //an attacker would know if the email is registered by sending twice a reset password
                 return res.status(201).send({hasPhone:false, has2fa:false})
             }
-
+            log.error("resetPasswordBegin: ", err.message);
             return next(err)
         }
 
@@ -71,7 +72,7 @@ exports.resetPasswordBegin = function(req, res, next) {
 
 exports.resetPasswordContinue = function(req, res, next) {
     
-    debug("resetPasswordContinue code: %s", req.params.code); 
+    log.info("resetPasswordContinue code: %s", req.params.code); 
     
     req.app.conn.write.get().query({
         text: [
@@ -81,39 +82,27 @@ exports.resetPasswordContinue = function(req, res, next) {
         values: [req.params.code]
     }, function(err, dr) {
         if (err) {
+            log.error("resetPasswordContinue ", err.message)
             if (err.message == 'Codes have expired') {
-                res.status(400).send({
+                return res.status(400).send({
                     name: 'CodesExpired',
                     message: 'The reset codes have expired'
                 })
             }
 
             if (err.message == 'User not found or code already used') {
-                res.send(400, 'Code has already been used. Close this window.')
+                return res.status(400).send({
+                    name: 'ResetPasswordCodeInvalid',
+                    message: 'Reset password code is invalid'
+                })
             }
 
             return next(err)
         }
 
-        var code = dr.rows[0].code
-        , phoneNumber = dr.rows[0].phone_number
-
-        debug('correct code is %s', code)
-        var company = req.app.config.company || 'AIRBEX'
-        var msg = code + ' is your ' + company + ' reset code'
-
-        debug('requesting call to %s', phoneNumber)
-
         res.send('Email confirmed. ' +
             'Close this window and go back to the password reset window.')
 
-        setTimeout(function() {
-            req.app.phone.text(phoneNumber, msg, function(err) {
-                if (!err) return debug('call placed')
-                console.error('Failed to call user at %s', phoneNumber)
-                console.error(err)
-            })
-        }, exports.callDelay)
     })
 }
 
@@ -122,7 +111,7 @@ exports.callDelay = 10e3
 function resetEnd(req, res, next){
     var phone_code = req.body.code ? req.body.code : "0000";
     
-    debug("resetEnd phone_code: %s", phone_code);
+    log.info("resetEnd email: %s", req.body.email);
     
     req.app.conn.write.get().query({
         text: 'SELECT reset_password_end($1, $2, $3) success',
@@ -130,7 +119,7 @@ function resetEnd(req, res, next){
     }, function(err, dr) {
         if (err) {
             if (err.message == 'Must continue first.') {
-                res.status(400).send({
+                return res.status(400).send({
                     name: 'MustConfirmEmailFirst',
                     message: 'Email must checked first'
                 })
@@ -148,12 +137,17 @@ function resetEnd(req, res, next){
             })
         }
 
-        res.send(204)
+        res.status(204).end()
     })
 }
 
 exports.resetPasswordEnd = function(req, res, next) {
-    debug("resetPasswordEnd email: %s, code %s, otp: %s", 
+    if (!req.app.validate(req.body, 'v1/password_reset_end', res)) {
+        log.error("resetPasswordEnd invalid request")
+        return;
+    }
+    
+    log.info("resetPasswordEnd email: %s, code %s, otp: %s", 
             req.body.email, req.body.code, req.body.otp); 
     req.app.conn.write.get().query({
         text: [
@@ -171,8 +165,8 @@ exports.resetPasswordEnd = function(req, res, next) {
 
         if (!row) {
             return res.status(400).send({
-                name: 'UserNotFound',
-                message: 'User not found'
+                name: 'MustConfirmEmailFirst',
+                message: 'Email must checked first'
             })
         }
         

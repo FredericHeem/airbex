@@ -59,12 +59,8 @@ module.exports = function (config) {
             values: [email]
         }, function(err, dres) {
             if (err) {
-                console.log(err)
                 deferred.reject(err);
             } else {
-                //var row = dres.rows[0];
-                //var reset_email_code = row.reset_email_code;
-                //debug("getResetPasswordCode: %s", reset_email_code);
                 deferred.resolve();
             }
         });
@@ -87,7 +83,7 @@ module.exports = function (config) {
                 var row = dres.rows[0];
                 var reset_email_code = row.reset_email_code;
                 debug("getResetPasswordCode: %s", reset_email_code);
-                deferred.resolve(reset_email_code);
+                deferred.resolve({reset_email_code:reset_email_code});
             }
         });
         

@@ -21,11 +21,11 @@ exports.createPhoneCode = function() {
 
 exports.resetPasswordBegin = function(req, res, next) {
     if (!req.app.validate(req.body, 'v1/password_reset_begin', res)) {
-        debug("resetPasswordBegin invalid request")
+        log.error("resetPasswordBegin invalid request")
         return;
     }
-    
-    debug("resetPasswordBegin email: %s", req.body.email);
+    var email = req.body.email
+    log.info("resetPasswordBegin email: %s", email);
     
     var emailCode = exports.createEmailCode()
     , phoneCode = exports.createPhoneCode()
@@ -39,32 +39,11 @@ exports.resetPasswordBegin = function(req, res, next) {
         values: [req.body.email.toLowerCase(), emailCode, phoneCode]
     }, function(err, dr) {
         if (err) {
+            log.error("resetPasswordBegin: ", err.message);
             if (err.message.match(/recent reset attempt/)) {
-                return res.send(403, {
-                    name: 'ResetPasswordLockedOut',
-                    message: 'An attempt to reset the password has been made too recently'
-                })
-            }
-
-            if (err.message.match(/User not found/)) {
-                return res.send(400, {
-                    name: 'UserNotFound',
-                    message: 'User not found'
-                })
-            }
-
-            if (err.message.match(/User does not have a phone number/)) {
-                return res.send(400, {
-                    name: 'NoVerifiedPhone',
-                    message: 'User does not have a verified phone and cannot reset'
-                })
-            }
-
-            if (err.message.match(/User does not have a verified email/)) {
-                return res.send(400, {
-                    name: 'NoVerifiedEmail',
-                    message: 'User does not have a verified email and cannot reset'
-                })
+                // If a specific error is sent,
+                //an attacker would know if the email is registered by sending twice a reset password
+                return res.status(201).send({hasPhone:false, has2fa:false})
             }
 
             return next(err)
@@ -73,10 +52,9 @@ exports.resetPasswordBegin = function(req, res, next) {
         var row = dr.rows[0]
 
         if (!row) {
-            return res.send(400, {
-                name: 'UserNotFound',
-                message: 'User not found'
-            })
+            log.info("resetPasswordBegin: no such user");
+            // Do not return an error if the user cannot be found, it would be a privacy leak
+            return res.status(201).send({hasPhone:false, has2fa:false})
         }
 
         var hasPhone = row.phone_number ? true : false;
@@ -85,7 +63,8 @@ exports.resetPasswordBegin = function(req, res, next) {
             code: emailCode
         }, function(err) {
             if (err) return next(err)
-            res.send({hasPhone:hasPhone, has2fa:has2fa})
+            debug("resetPasswordBegin ok");
+            res.status(201).send({hasPhone:hasPhone, has2fa:has2fa})
         })
     })
 }
@@ -103,7 +82,7 @@ exports.resetPasswordContinue = function(req, res, next) {
     }, function(err, dr) {
         if (err) {
             if (err.message == 'Codes have expired') {
-                res.send(400, {
+                res.status(400).send({
                     name: 'CodesExpired',
                     message: 'The reset codes have expired'
                 })
@@ -143,7 +122,7 @@ exports.callDelay = 10e3
 function resetEnd(req, res, next){
     var phone_code = req.body.code ? req.body.code : "0000";
     
-    debug("resetPasswordEnd phone_code: %s", phone_code);
+    debug("resetEnd phone_code: %s", phone_code);
     
     req.app.conn.write.get().query({
         text: 'SELECT reset_password_end($1, $2, $3) success',
@@ -151,7 +130,7 @@ function resetEnd(req, res, next){
     }, function(err, dr) {
         if (err) {
             if (err.message == 'Must continue first.') {
-                res.send(400, {
+                res.status(400).send({
                     name: 'MustConfirmEmailFirst',
                     message: 'Email must checked first'
                 })
@@ -163,7 +142,7 @@ function resetEnd(req, res, next){
         var success = dr.rows[0].success
 
         if (!success) {
-            return res.send(400, {
+            return res.status(400).send({
                 name: 'WrongPhoneCode',
                 message: 'Wrong phone code supplied'
             })
@@ -191,7 +170,7 @@ exports.resetPasswordEnd = function(req, res, next) {
         var row = dr.rows[0]
 
         if (!row) {
-            return res.send(400, {
+            return res.status(400).send({
                 name: 'UserNotFound',
                 message: 'User not found'
             })
@@ -207,14 +186,14 @@ exports.resetPasswordEnd = function(req, res, next) {
                 
                 debug("resetPasswordEnd correct 2fa: %s", correct);
                 if (correct === null) {
-                    return res.send(403, {
+                    return res.status(403).send({
                         name: 'BlockedOtp',
                         message: 'Time-based one-time password has been consumed. Try again in 30 seconds'
                     })
                 }
 
                 if (!correct) {
-                    return res.send(403, {
+                    return res.status(403).send({
                         name: 'WrongOtp',
                         message: 'Wrong one-time password'
                     })

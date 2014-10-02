@@ -51,7 +51,48 @@ module.exports = function (config) {
         return deferred.promise;
     };   
    
-
+    snowDb.restoreResetPassword = function (email){
+        var deferred = Q.defer();
+        console.log("getResetPasswordCode email: %s", email);
+        this.pgClient.query({
+            text: 'UPDATE "user" set reset_email_code=NULL, reset_started_at=NULL, reset_phone_code=NULL where email=$1',
+            values: [email]
+        }, function(err, dres) {
+            if (err) {
+                console.log(err)
+                deferred.reject(err);
+            } else {
+                //var row = dres.rows[0];
+                //var reset_email_code = row.reset_email_code;
+                //debug("getResetPasswordCode: %s", reset_email_code);
+                deferred.resolve();
+            }
+        });
+        
+        return deferred.promise;
+    };
+    
+    snowDb.getResetPasswordCode = function (email){
+        var deferred = Q.defer();
+        debug("getResetPasswordCode email: %s", email);
+        this.pgClient.query({
+            text: 'SELECT reset_email_code FROM "user" where email=$1',
+            values: [email]
+        }, function(err, dres) {
+            if (err) {
+                deferred.reject(err);
+            } else if(!dres.rows.length){
+                deferred.reject({name:"NoSuchUser"})
+            } else {
+                var row = dres.rows[0];
+                var reset_email_code = row.reset_email_code;
+                debug("getResetPasswordCode: %s", reset_email_code);
+                deferred.resolve(reset_email_code);
+            }
+        });
+        
+        return deferred.promise;
+    };
     
     snowDb.queryUserEmailCode = function(email, done) {
         debug("queryUserEmailCode email:%s", email);

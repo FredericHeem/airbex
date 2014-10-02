@@ -8,7 +8,7 @@ module.exports = function(request, schemaName, res) {
 
     if (!invalid.length) return true
 
-    res.send(400, {
+    res.status(400).send({
         name: 'BadRequest',
         message: 'Request is invalid',
         validation: invalid

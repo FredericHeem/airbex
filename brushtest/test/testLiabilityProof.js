@@ -14,21 +14,30 @@ describe('LiabilityProof', function () {
     var snowChef = testMngr.chef();
     var clientAdmin = testMngr.client("admin");
     var client = testMngr.client("alice");
-    
-    
+    var currency = "btc";
     var verify_liability = function(root, partialTree){
         var ptree = lproof.deserializePartialTree(JSON.stringify(partialTree));
         assert(lproof.verifyTree(ptree, root.root))
     }
     
     before(function(done) {
-        debug("before");
-        testMngr.login().then(done).fail(done);
+        testMngr.start().then(done).fail(done);
     });
     
-
+    describe('LiabilityPublic', function () {
+        it('LiabilityPublicBTC', function (done) {
+            client.get('v1/proof/liability/' + currency)
+            .fail(function(err){
+                assert.equal(err.name, "NotAuthenticated")
+                done()
+            });
+        });
+    });
     describe('LiabilityProofBTC', function () {
-        var currency = "btc";
+        
+        before(function(done) {
+            testMngr.login().then(done).fail(done);
+        });
         it('LiabilityGetAllBTC', function (done) {
             snowBot.liabilityGetAll(client, currency, function(err, root, partialTree){
                 

@@ -16,6 +16,10 @@ describe('Depth', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
     
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('DepthPublic', function () {
         it('DepthPublicAlice', function (done) {
             client.depth("BTCEUR").then(function(depth) {

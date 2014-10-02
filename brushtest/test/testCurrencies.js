@@ -16,6 +16,10 @@ describe('Currencies', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
     
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('CurrenciesPublic', function () {
         it('CurrenciesPublicAlice', function (done) {
             client.currencies().then(function(currencies) {

@@ -1,0 +1,36 @@
+{
+    "company": "Airbex",
+    "website_url": "http://localhost:5073",
+    "email_from": "support@airbex.net",
+    "email_support": "support@airbex.net",
+    "signature":"Airbex, the crypto currency exchange",
+    "pg_read_url": {
+        "user": "postgres",
+        "host": "localhost",
+        "database": "snow",
+        "ssl": false,
+        "password": "postgres1234"
+    },
+    "pg_write_url": {
+        "user": "postgres",
+        "host": "localhost",
+        "database": "snow",
+        "ssl": false,
+        "password": "postgres1234"
+    },
+
+    "port": 5071,
+    "ripple_federation": {
+        "domain": "localhost",
+        "currencies": [
+                       "XRP",
+                       {
+                           "currency": "BTC",
+                           "issuer": "rnipVEZ2hi6qh7BedivFR13rXHYdpzhKfc"
+                       }
+                       ]
+    },
+    "ripple_account": "rnipVEZ2hi6qh7BedivFR13rXHYdpzhKfc",
+    "bde_api_key": null,
+    "tfaBypass": true
+}

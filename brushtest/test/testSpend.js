@@ -17,6 +17,10 @@ describe('Spend', function () {
     var clientBob = testMngr.client("bob");
     var marketName = "BTCEUR";
     
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('SpendPublic', function () {
         it('SpendPublicAlice', function (done) {
             client.post('v1/spend')

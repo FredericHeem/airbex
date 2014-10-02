@@ -1,7 +1,6 @@
 var crypto = require('crypto')
 var log = require('../log')(__filename)
 , debug = log.debug
-, config = require('konfu')
 
 module.exports = exports = function(app) {
     exports.app = app
@@ -69,7 +68,8 @@ exports.endCreate = function(req, res, next) {
             userId: dr.rows[0].user_id.toString(),
             event: 'Signed up'
         })
-        var company = req.app.config.company || 'AIRBEX';
+        var config = req.app.config;
+        var company = config.company || 'AIRBEX';
         res.send('Your e-mail has been verified. You can login to ' + company + ' at <a href="' + config.website_url + '">' + config.website_url + '</a>.')
         //res.send(204)
     })

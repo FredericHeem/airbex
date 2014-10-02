@@ -15,7 +15,7 @@ describe('SnowChef', function () {
     
     before(function(done) {
         debug("before");
-        testMngr.dbConnect()
+        testMngr.start()
         .then(testMngr.login)
         .then(done)
         .fail(done);

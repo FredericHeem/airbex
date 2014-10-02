@@ -32,7 +32,7 @@ module.exports = exports = function(app, conn, cb) {
     exports.currencies = {};
 
     if (!conn) {
-        debug("no db connection, use hardcoded")
+        log.error("no db connection, use hardcoded")
         _.extend(exports, hardcoded)
         cb && cb()
         return exports

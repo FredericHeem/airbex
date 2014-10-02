@@ -14,6 +14,10 @@ describe('TestDeposit', function () {
     var client = testMngr.client("alice");
     var clientConfig = testMngr.clientConfig("alice");
     
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('TestDepositBTCNotAuthenticated', function () {
         it('TestDepositBTCAddressNotAuthenticated', function (done) {
             var currency = 'BTC';
@@ -28,8 +32,7 @@ describe('TestDeposit', function () {
     });
     describe('TestDepositBTCAuthenticated', function () {
         before(function(done) {
-            testMngr.dbConnect()
-            .then(testMngr.login)
+            testMngr.login()
             .then(done)
             .fail(done);
         });

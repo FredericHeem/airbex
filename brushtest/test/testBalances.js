@@ -16,6 +16,10 @@ describe('Balances', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
     
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('BalancesPublic', function () {
         it('BalancesPublicAlice', function (done) {
             client.balances()

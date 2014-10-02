@@ -3,7 +3,6 @@ var assert = require('assert')
 , ejs = require('ejs')
 , fs = require('fs')
 , path = require('path')
-, config = require('konfu')
 , log = require('../log')(__filename)
 , debug = log.debug
 , fallback = 'en-US'
@@ -74,14 +73,15 @@ exports.send = function(user, language, templateName, locals, cb) {
     var templateFn = exports.templateFilename(templateName, language)
     , template = exports.template(templateFn)
 
+    var config = exports.app.config;
+    
     locals || (locals = {})
     locals.websiteUrl = config.website_url
     locals.company = config.company || 'AIRBEX';
     locals.email_support = config.email_support || 'support@airbex.net';
     locals.signature = config.signature || 'AIRBEX, the Auditable Bitcoin EXchange';
     
-    locals.filename = path.relative(path.join(__dirname, '..'), templateFn)
-
+    locals.filename = templateFn;
     var html = ejs.render(template, locals)
     , lines = html.split('\n')
     , subject = lines[0]

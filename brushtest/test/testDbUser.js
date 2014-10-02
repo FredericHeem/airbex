@@ -24,8 +24,7 @@ describe('Users', function () {
     var clients = [];
     
     before(function(done) {
-        debug("before")
-        testMngr.dbConnect().then(done).fail(done);
+        testMngr.start().then(done).fail(done);
     });
     
     var createUsers = function (numClient){

@@ -16,6 +16,10 @@ describe('Activities', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
     
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('ActivitiesPublic', function () {
         it('ActivitiesPublicAlice', function (done) {
             client.activities()

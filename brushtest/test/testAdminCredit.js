@@ -4,17 +4,18 @@ var request = require('supertest');
 var async = require('async');
 var config = require('./configTest.js')();
 var debug = require('debug')('testAdminCredit');
-var TestMngr = require('./TestMngr');
+
 
 describe('Admin', function () {
     "use strict";
+    var TestMngr = require('./TestMngr');
     var testMngr = new TestMngr(config);
     var quote_currency = config.quote_currency;
     var snowBot = testMngr.bot();
     var snowChef = testMngr.chef();
     
     before(function(done) {
-        testMngr.dbConnect().then(done).fail(done);
+        testMngr.start().then(done).fail(done);
     });
     
     function createAndCancelBankCredit(client, bankCreditInfo, done) {

@@ -7,6 +7,7 @@ var num = require('num');
 var debug = require('debug')('testSession')
 var SnowBot = require('./snow-bot');
 var SnowChef = require('./snow-chef');
+var TestMngr = require('./TestMngr');
 
 describe('Session', function () {
     "use strict";
@@ -16,6 +17,11 @@ describe('Session', function () {
             "email" : "aa",
             "password" : "password"
     }
+    var testMngr = new TestMngr(config);
+    
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
     
     describe('Session', function () {
         it('SessionEmailOk', function(done) {

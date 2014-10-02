@@ -18,6 +18,11 @@ describe('Send', function () {
     var clientBobConfig = testMngr.clientConfig("bob");
     var marketName = "BTCEUR";
     var currency = "BTC";
+    
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('SendPublic', function () {
         it('SendPublicAlice', function (done) {
             client.post('v1/spend')

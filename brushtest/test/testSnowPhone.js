@@ -19,6 +19,10 @@ describe('SnowPhone', function () {
     var client = testMngr.client("alice");
     var clientConfig = testMngr.clientConfig("alice");
     
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('PhoneKo', function () {
         it('StartPhoneVerifyNotAuthenticated', function (done) {
             var postData = {
@@ -39,8 +43,7 @@ describe('SnowPhone', function () {
     describe('PhoneOk', function () {
         before(function(done) {
             debug("before");
-            testMngr.dbConnect()
-            .then(testMngr.login)
+            testMngr.login()
             .then(done)
             .fail(done);
         });

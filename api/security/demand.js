@@ -118,7 +118,7 @@ exports.extendRequestSession = function(req, res, next) {
 }
 
 exports.otp = function(inner, optional) {
-    debug('OTP optional %d', optional);
+    //debug('OTP optional %d', optional);
     return function(req, res, next) {
         inner(req, res, function() {
             var user = req.user;

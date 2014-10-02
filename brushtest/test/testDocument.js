@@ -16,9 +16,7 @@ describe('Document', function () {
     var clientBob = testMngr.client("bob");
     
     before(function(done) {
-        debug("before");
-        this.timeout(5 * 1000);
-        testMngr.login().then(done).fail(done);
+        testMngr.start().then(done).fail(done);
     });
     
     describe('UploadDoc', function () {
@@ -28,6 +26,9 @@ describe('Document', function () {
 //                done();
 //            });
 //        });
+        before(function(done) {
+            testMngr.login().then(done).fail(done);
+        });
         it('UploadDocOk', function (done) {
             var file = './data/a_style.jpg';
             client.uploadDocument(file).then(function(result){

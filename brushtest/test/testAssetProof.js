@@ -14,7 +14,7 @@ describe('AssetProof', function () {
     var clientAdmin = testMngr.client("admin");
     var client = testMngr.client("alice");
     before(function(done) {
-        testMngr.login().then(done).fail(done);
+        testMngr.start().then(testMngr.login).then(done).fail(done);
     });
     
     describe('UploadAsset', function () {

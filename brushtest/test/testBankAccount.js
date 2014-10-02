@@ -16,6 +16,10 @@ describe('BankAccount', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
     
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('BankAccountPublic', function () {
         it('BankAccountPublicAlice', function (done) {
             client.get('v1/bankAccounts')

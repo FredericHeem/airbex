@@ -16,6 +16,10 @@ describe('Orders', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
    
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('OrderNotAuthenticated', function () {
         it('OrdersNotAuthenticated', function (done) {
             client.orders().fail(function(error){

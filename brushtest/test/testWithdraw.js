@@ -15,7 +15,7 @@ describe('TestWithdraw', function () {
     var clientConfig = testMngr.clientConfig("alice");
     
     before(function(done) {
-        testMngr.dbConnect()
+        testMngr.start()
         .then(testMngr.login)
         .then(done)
         .fail(done);

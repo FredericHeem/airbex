@@ -16,6 +16,10 @@ describe('Markets', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
 
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('MarketPublic', function () {
         it('MarketPublic', function (done) {
             client.markets().then(function(markets) {

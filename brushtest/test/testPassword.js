@@ -16,6 +16,10 @@ describe('Password', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
     
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('PasswordPublic', function () {
         it('PasswordPublicAlice', function (done) {
             client.post('v1/changePassword')

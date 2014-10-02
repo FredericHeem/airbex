@@ -16,16 +16,13 @@ describe('Password', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
     
+    before(function(done) {
+        testMngr.start().then(done).fail(done);
+    });
+    
     describe('ResetPassword', function () {
         before(function(done) {
-            testMngr.dbConnect().then(function(){
-                return snowBot.db.restoreResetPassword(clientConfig.email)
-            })
-            .then(done)
-            .fail(function(err){
-                console.log(err)
-                done(err);
-            });
+            snowBot.db.restoreResetPassword(clientConfig.email).then(done, done)
         });
         
         it('ResetPasswordNoParam', function (done) {

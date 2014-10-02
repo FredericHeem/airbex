@@ -1,6 +1,5 @@
 var request = require('request')
 , _ = require('lodash')
-, config = require('konfu')
 , key = config.intercom_app_id + ':' + config.intercom_key
 , ep = 'https://' + key + '@api.intercom.io/v1/'
 

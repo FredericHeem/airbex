@@ -106,8 +106,6 @@ exports.resetPasswordContinue = function(req, res, next) {
     })
 }
 
-exports.callDelay = 10e3
-
 function resetEnd(req, res, next){
     var phone_code = req.body.code ? req.body.code : "0000";
     
@@ -126,15 +124,6 @@ function resetEnd(req, res, next){
             }
 
             return next(err)
-        }
-
-        var success = dr.rows[0].success
-
-        if (!success) {
-            return res.status(400).send({
-                name: 'WrongPhoneCode',
-                message: 'Wrong phone code supplied'
-            })
         }
 
         res.status(204).end()

@@ -41,7 +41,7 @@ module.exports = function (rootDir) {
     app.validate = require('./validate')
     app.validateWs = require('./validateWs')
     app.email = require('./email')(app)
-    app.ripple = require('./ripple')(app)
+    //app.ripple = require('./ripple')(app)
     //app.intercom = require('./intercom')
     app.segment = require('./segment')(app)
     app.security = require('./security')(app)
@@ -52,7 +52,7 @@ module.exports = function (rootDir) {
     app.enable('trust proxy');
 
     if (module.parent) {
-        app.ripple.remote = {}
+        //app.ripple.remote = {}
     } else {
         app.notify = require('./email/notify')(app)
         app.notifyUserPending = require('./email/notifyUserPending')(app)

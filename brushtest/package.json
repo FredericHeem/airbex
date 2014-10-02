@@ -22,10 +22,14 @@
     "pg-builder": "x",
     "sjcl" : "x",
     "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
-    "q": "1.0.1"
+    "q": "1.0.1",
+    "istanbul": "0.3.2",
+    "mocha-lcov-reporter": "0.0.1"
   },
   
   "scripts": {
-    "test": "NODE_ENV=local mocha"
+    "test": "NODE_ENV=local mocha",
+    "coverage": "NODE_ENV=local node node_modules/istanbul/lib/cli cover  --root ../api/ node_modules/mocha/bin/_mocha",
+    "coverage-text": "NODE_ENV=local node node_modules/istanbul/lib/cli cover --root ../api/ node_modules/mocha/bin/_mocha --report text"
   }
 }

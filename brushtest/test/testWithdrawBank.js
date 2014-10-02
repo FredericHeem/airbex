@@ -163,6 +163,50 @@ describe('WithdrawBank', function () {
                 done();
             }).fail(done)
         });
+        it('WithdrawBankAndProcess', function (done) {
+            var amount = "1000";
+            var param = {bankAccount:bankAccountId, amount:amount, currency:currencyFiat};
+            var balanceBefore;
+            var lastWithdraw;
+            var numWithdraw;
+            client.balance(currencyFiat).then(function(balance){
+                balanceBefore = balance;
+                return client.post("v1/withdraws/bank", param);
+            })
+            .then(function(){
+                return client.get("v1/withdraws")
+            }).then(function(withdraws){
+                assert(withdraws);
+                lastWithdraw = withdraws[0]
+                assert(lastWithdraw);
+                console.log(lastWithdraw)
+                assert.equal(lastWithdraw.currency, currencyFiat);
+                assert.equal(lastWithdraw.state, "requested");
+                assert(num(param.amount).eq(num(lastWithdraw.amount)))
+                return client.balance(currencyFiat)
+            }).then(function(balance){
+                assert(num(balance.available).eq(num(balanceBefore.available).sub(num(amount))));
+                assert(num(balance.hold).eq(num(balanceBefore.hold).add(num(amount))));
+                assert(num(balance.balance).eq(num(balanceBefore.balance)));
+                return clientAdmin.patch("admin/withdraws/" + lastWithdraw.id, {state:'processing'}); 
+            }).then(function(){
+                return clientAdmin.post("admin/withdraws/" + lastWithdraw.id + "/complete"); 
+            }).then(function(){
+                return client.balance(currencyFiat)
+            }).then(function(balance){
+                assert(num(balance.available).eq(num(balanceBefore.available).sub(num(amount))));
+                assert(num(balance.hold).eq(num(balanceBefore.hold)));
+                assert(num(balance.balance).eq(num(balanceBefore.balance).sub(num(amount))));
+                return client.get("v1/withdraws")
+            }).then(function(withdraws){
+                assert(withdraws);
+                lastWithdraw = withdraws[0]
+                assert(lastWithdraw);
+                console.log(lastWithdraw)
+                assert.equal(lastWithdraw.state, "completed");
+                done();
+            }).fail(done)
+        });
         it('WithdrawBankInvalidCurrency', function (done) {
             var param = {bankAccount:bankAccountId, amount:"1000", currency:"ABC"};
             client.post("v1/withdraws/bank", param)

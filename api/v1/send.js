@@ -1,6 +1,7 @@
 var async = require('async')
 , vouchers = require('./vouchers')
 , util = require('util')
+, num = require('num');
 
 module.exports = exports = function(app) {
     app.post('/v1/send', app.security.demand.otp(app.security.demand.withdraw(2), true), exports.send)
@@ -95,6 +96,8 @@ exports.sendVoucher = function(app, from, to, currency, amount, cb)
     var voucherId
     , sender
 
+    log.info("sendVoucher from %s, to %s amount: %s %s", from, to, amount, currency);
+    
     async.series([
         // Create voucher
         function(next) {
@@ -144,13 +147,47 @@ exports.sendVoucher = function(app, from, to, currency, amount, cb)
 exports.send = function(req, res, next) {
     if (!req.app.validate(req.body, 'v1/transfer', res)) return
 
-    if (req.app.cache.fiat[req.body.currency]) {
+    var currency = req.body.currency;
+    
+    if (!req.app.cache.currencies[currency]) {
+        return res.send(400, {
+            name: 'InvalidCurrency',
+            message: 'Invalid currency'
+        })
+    }
+    
+    if (req.app.cache.currencies[currency].fiat) {
         return res.send(400, {
             name: 'CannotSendFiat',
             message: 'Cannot send FIAT to other users at this time'
         })
     }
 
+    var withdraw_min = req.app.cache.currencies[currency].withdraw_min;
+    var withdraw_max = req.app.cache.currencies[currency].withdraw_max;
+    
+    var amount = req.app.cache.parseCurrency(req.body.amount, currency)
+    
+    if (num(amount).lt(withdraw_min)) {
+        return res.status(400).send({
+            name: 'AmountTooSmall',
+            message: 'Minimum amount is ' + req.app.cache.formatCurrency(withdraw_min, currency) + ' '  + currency
+        })
+    }
+    
+    if (num(amount).gt(withdraw_max)) {
+        return res.status(400).send({
+            name: 'AmountTooHigh',
+            message: 'Maximum amount is ' + req.app.cache.formatCurrency(withdraw_max, currency) + ' '  + currency
+        })
+    }
+    
+    if(req.user.email === req.body.email){
+        return res.status(400).send({
+            name: 'SendToItself',
+            message: 'Cannot send to yourself'
+        })
+    }
     exports.sendToEmail(req.app, req.user.id, req.body.email,
         req.body.currency, req.body.amount, req.body.allowNewUser,
         function(err) {

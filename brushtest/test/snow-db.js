@@ -6,6 +6,7 @@ var request = require('supertest');
 var async = require('async');
 var crypto = require('crypto');
 var Q = require("q");
+var num = require('num');
 
 module.exports = function (config) {
     var snowDb = {};
@@ -249,36 +250,24 @@ module.exports = function (config) {
         });
     };
     
-//    snowDb.depositAddress = function (account_id, address, done){
-//        debug("depositCrypto account_id: %s, address: %s", account_id, address);
-//        this.pgClient.query({
-//            text: [
-//                'INSERT INTO btc_deposit_address (account_id, address)',
-//                'VALUES ($1, $2)'
-//            ].join('\n'),
-//            values: [account_id, address]
-//        }, function(err) {
-//            //if (err) return done(err)
-//            done()
-//        })
-//    };
-    
     snowDb.creditCrypto = function (client, currency, amount){
         var me = this;
         var deferred = Q.defer();
         var hash = crypto.createHash('sha256')
         hash.update(crypto.randomBytes(8))
         var txid = hash.digest('hex')
+        console.log("creditCrypto amount: %s, txid: %s", amount, txid);
+        var amountSat = num(amount).mul(Math.pow(10, 8)).toString();
         client.getDepositAddress(currency)
         .then(function(result){
             assert(result.address);
             var address = result.address;
-            console.log("creditCrypto amount: %s, address: %s, txid: %s", amount, address, txid);
+            console.log("creditCrypto amount: %s, address: %s, txid: %s", amountSat, address, txid);
             me.pgClient.query({
                 text: [
                     'SELECT crypto_credit($1, $2, $3, $4);'
                 ].join('\n'),
-                values: [currency, txid, address, amount]
+                values: [currency, txid, address, amountSat]
             }, function(err) {
                 if (err) return deferred.reject(err)
                 deferred.resolve();

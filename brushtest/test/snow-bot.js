@@ -296,6 +296,24 @@ module.exports = function (config) {
         });
         
     };
+    snowBot.depositComplete = function(client, amount, currency){
+        
+        return client.balance(currency)
+        .then(function(balance){
+            //console.log("depositComplete B4: ", balance);
+            balanceBefore = balance;
+            return snowBot.db.creditCrypto(client, currency, amount)
+        })
+        .then(function(){
+            return client.balance(currency)
+        })
+        .then(function(balance){
+            //console.log("depositComplete After ", balance);
+            assert(num(balanceBefore.balance).add(num(amount)).eq(num(balance.balance)));
+            assert(num(balanceBefore.hold).eq(num(balance.hold)));
+            assert(num(balanceBefore.available).add(num(amount)).eq(num(balance.available)));
+        })
+    }
     
     snowBot.withdrawCryptoComplete = function(client, withdrawParam){
         var request_id;

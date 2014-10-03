@@ -48,25 +48,11 @@ describe('TestDeposit', function () {
         });
         it('TestDepositBTCOk', function (done) {
             var currency = 'BTC';
-            var amount = "100000000";
+            var amount = "1";
 
-            var balanceBefore;
-            client.balance(currency)
-            .then(function(balance){
-                console.log("balances: ", balance)
-                balanceBefore = balance
-                return snowChef.bot.db.creditCrypto(client, currency, amount)
-            })
-            .then(function(){
-                console.log("creditCrypto: ")
-                return client.balance(currency)
-            })
-            .then(function(balance){
-                console.log("balance after: ", balance)
-                balanceBefore = balance;
-                done();
-            })
-            .fail(done)
+            snowBot.depositComplete(client, amount, currency)
+            .then(done)
+            .fail(done);
         });
     });
 });

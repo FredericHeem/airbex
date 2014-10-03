@@ -3,6 +3,7 @@
   "url_admin" : "http://localhost:5071/",
   "pg_write_url" : "postgres://postgres:postgres@localhost:5432/snow",
   "userMax":"2", 
+  "currencies":["BTC","LTC"],
   "market" : "BTCEUR",
   "base_currency" : "BTC",
   "quote_currency": "EUR",

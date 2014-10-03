@@ -91,7 +91,6 @@ module.exports = function (rootDir) {
         var deferred = Q.defer();
         var cache = app.cache = require('./cache')
         
-        debug("start ", app.conn)
         cache(app, app.conn, function(err) {
             if (err) {
                 log.error(err);

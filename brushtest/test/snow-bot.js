@@ -296,8 +296,8 @@ module.exports = function (config) {
         });
         
     };
+    
     snowBot.depositComplete = function(client, amount, currency){
-        
         return client.balance(currency)
         .then(function(balance){
             //console.log("depositComplete B4: ", balance);

@@ -1,0 +1,15 @@
+{
+    "currency":"LTC",
+    "pg_url": {
+                "user":"postgres",
+                "host": "127.0.0.1",
+                "database" :"snow",
+                "ssl": false,
+                "password" : "postgres1234"
+    },
+    "host": "127.0.0.1",
+    "rpcuser": "frederic",
+    "port": "19332",
+    "rpcpass": "password",
+    "minconf": 6
+}

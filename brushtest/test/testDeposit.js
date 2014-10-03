@@ -1,8 +1,9 @@
 /*global describe, it, before, after*/
 var assert = require('assert');
 var request = require('supertest');
+var debug = require('debug')('testDeposit');
+var async = require('async');
 var config = require('./configTest.js')();
-var debug = require('debug')('testDeposit')
 var TestMngr = require('./TestMngr');
 
 describe('TestDeposit', function () {
@@ -37,7 +38,6 @@ describe('TestDeposit', function () {
         });
         it('TestDepositBTCAddress', function (done) {
             var currency = 'BTC';
-            var balanceBefore;
             client.getDepositAddress(currency)
             .then(function(result){
                 assert(result);
@@ -46,6 +46,22 @@ describe('TestDeposit', function () {
             })
             .fail(done)
         });
+        
+        it('TestDepositAddresses', function (done) {
+            async.forEach(config.currencies, function(currency, callback) {
+                client.getDepositAddress(currency)
+                .then(function(result){
+                    assert(result);
+                    assert(result.address)
+                    callback();
+                })
+                .fail(callback)
+            }, function(err) {
+                debug("TestDepositAddresses done: " + err ? err : "");
+                done(err);
+            });
+        });
+        
         it('TestDepositBTCOk', function (done) {
             var currency = 'BTC';
             var amount = "1";

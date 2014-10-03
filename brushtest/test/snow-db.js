@@ -1,6 +1,7 @@
 /*global require*/
 var debug = require('debug')('SnowDb');
 var pg = require('pg');
+var assert = require('assert');
 var request = require('supertest');
 var async = require('async');
 var crypto = require('crypto');
@@ -67,6 +68,54 @@ module.exports = function (config) {
         
         return deferred.promise;
     };
+    
+    snowDb.getWithdrawEmailCode = function (email, currency){
+        return snowDb.getAccountIdFromEmail(email, currency)
+        .then(function(result){
+            console.log("account_id", result.account_id)
+            return snowDb.query({
+                text:[
+                                "SELECT code",
+                                "FROM withdraw_request",
+                                "WHERE method = $1 AND account_id = $2 AND state = 'sendingEmail'",
+                                "ORDER BY request_id DESC LIMIT 1"
+                     ].join('\n'),
+                values: [currency, result.account_id]
+            })
+        })
+    }
+    
+    snowDb.getAccountIdFromEmail = function (email, currency){
+        return snowDb.query({
+            text:[
+                            "SELECT a.account_id",
+                            "FROM account a",
+                            "JOIN \"user\" u ON a.user_id = u.user_id",
+                            "WHERE u.email = $1 AND a.currency_id=$2"
+                 ].join('\n'),
+            values: [email, currency]
+        })
+    }
+    
+    snowDb.query = function(query){
+        var deferred = Q.defer();
+        console.log("query: %s", JSON.stringify(query));
+        this.pgClient.query(query, function(err, dres) {
+            if (err) {
+                console.error("query error: ", err)
+                deferred.reject(err);
+            } else if(!dres.rows.length){
+                console.error("NoResult")
+                deferred.reject({name:"NoResult"})
+            } else {
+                var row = dres.rows[0];
+                console.log("query result: %s", row);
+                deferred.resolve(row);
+            }
+        });
+        
+        return deferred.promise;
+    }
     
     snowDb.getResetPasswordCode = function (email){
         var deferred = Q.defer();
@@ -192,36 +241,42 @@ module.exports = function (config) {
         });
     };
     
-    snowDb.depositAddress = function (account_id, address, done){
-        debug("depositCrypto account_id: %s, address: %s", account_id, address);
-        this.pgClient.query({
-            text: [
-                'INSERT INTO btc_deposit_address (account_id, address)',
-                'VALUES ($1, $2)'
-            ].join('\n'),
-            values: [account_id, address]
-        }, function(err) {
-            //if (err) return done(err)
-            done()
-        })
-    };
+//    snowDb.depositAddress = function (account_id, address, done){
+//        debug("depositCrypto account_id: %s, address: %s", account_id, address);
+//        this.pgClient.query({
+//            text: [
+//                'INSERT INTO btc_deposit_address (account_id, address)',
+//                'VALUES ($1, $2)'
+//            ].join('\n'),
+//            values: [account_id, address]
+//        }, function(err) {
+//            //if (err) return done(err)
+//            done()
+//        })
+//    };
     
-    snowDb.creditCrypto = function (user, currency, deposit_address, amount){
+    snowDb.creditCrypto = function (client, currency, amount){
+        var me = this;
         var deferred = Q.defer();
         var hash = crypto.createHash('sha256')
         hash.update(crypto.randomBytes(8))
         var txid = hash.digest('hex')
-        
-        debug("creditCrypto amount: %s, address: %s, txid: %s", amount, deposit_address, txid);
-        this.pgClient.query({
-            text: [
-                'SELECT crypto_credit($1, $2, $3, $4);'
-            ].join('\n'),
-            values: [currency, txid, deposit_address, amount]
-        }, function(err) {
-            if (err) return deferred.reject(err)
-            deferred.resolve();
-        })
+        client.getDepositAddress(currency)
+        .then(function(result){
+            assert(result.address);
+            var address = result.address;
+            console.log("creditCrypto amount: %s, address: %s, txid: %s", amount, address, txid);
+            me.pgClient.query({
+                text: [
+                    'SELECT crypto_credit($1, $2, $3, $4);'
+                ].join('\n'),
+                values: [currency, txid, address, amount]
+            }, function(err) {
+                if (err) return deferred.reject(err)
+                deferred.resolve();
+            })
+        }).fail(deferred.reject)
+
         return deferred.promise;
     };
     

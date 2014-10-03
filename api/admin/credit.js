@@ -100,14 +100,14 @@ exports.approveBankCredit = function(req, res, next) {
 
 
         // Log segment activity
-        req.app.segment.track({
-            userId: row.user_id.toString(),
-            event: 'Bank credited',
-            properties: {
-                currency: row.currency_id,
-                amount: req.app.cache.formatCurrency(row.amount, row.currency_id)
-            }
-        })
+//        req.app.segment.track({
+//            userId: row.user_id.toString(),
+//            event: 'Bank credited',
+//            properties: {
+//                currency: row.currency_id,
+//                amount: req.app.cache.formatCurrency(row.amount, row.currency_id)
+//            }
+//        })
         res.send(201, { id: dr.rows[0].transaction_id })
     })
 }

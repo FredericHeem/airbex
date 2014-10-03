@@ -22,10 +22,7 @@ describe('SnowChef', function () {
     });
     
     describe('SnowChefFunding', function () {
-        this.timeout(120*1000);
-        it('SnowChefBtcAddress', function (done) {
-            snowChef.setDepositAddress(clients, done);
-        });
+        this.timeout(10e3);
         it('SnowChefCryptoCreditBTC', function (done) {
             snowChef.creditCrypto(clients, 'BTC', done);
         });

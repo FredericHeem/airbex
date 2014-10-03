@@ -28,7 +28,6 @@ describe('TestDeposit', function () {
                done();
            })
         });
-
     });
     describe('TestDepositBTCAuthenticated', function () {
         before(function(done) {
@@ -43,7 +42,6 @@ describe('TestDeposit', function () {
             .then(function(result){
                 assert(result);
                 assert(result.address)
-                console.log("result: ", result)
                 done();
             })
             .fail(done)
@@ -57,12 +55,7 @@ describe('TestDeposit', function () {
             .then(function(balance){
                 console.log("balances: ", balance)
                 balanceBefore = balance
-            })
-            .then(function(balance){
-                return client.getDepositAddress(currency)
-            })
-            .then(function(result){
-                return snowChef.bot.db.creditCrypto(client, currency, result.address, amount)
+                return snowChef.bot.db.creditCrypto(client, currency, amount)
             })
             .then(function(){
                 console.log("creditCrypto: ")

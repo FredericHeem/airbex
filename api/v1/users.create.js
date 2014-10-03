@@ -64,10 +64,10 @@ exports.endCreate = function(req, res, next) {
             return next(err)
         }
         
-        req.app.segment.track({
-            userId: dr.rows[0].user_id.toString(),
-            event: 'Signed up'
-        })
+//        req.app.segment.track({
+//            userId: dr.rows[0].user_id.toString(),
+//            event: 'Signed up'
+//        })
         var config = req.app.config;
         var company = config.company || 'AIRBEX';
         res.send('Your e-mail has been verified. You can login to ' + company + ' at <a href="' + config.website_url + '">' + config.website_url + '</a>.')

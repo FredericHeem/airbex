@@ -25,8 +25,9 @@ exports.withdrawVerifyCode = function(req, res, next) {
         values: [req.params.code]
     }, function(err, dr) {
         if (err) {
+            log.error("withdrawVerifyCode ", err.message);
             if (err.message == 'Unknown email verification code') {
-                return res.send(409, {
+                return res.status(409).send({
                     name: 'UnknownEmailVerifyCode',
                     message: 'The code is already verified or the code has been expired'
                 })
@@ -34,7 +35,7 @@ exports.withdrawVerifyCode = function(req, res, next) {
             return next(err)
         }
         
-        res.send(204)
+        res.status(204).end()
     })
 }
 
@@ -101,7 +102,7 @@ exports.withdraw = function(currencyId, req, res, next) {
         if (err) {
             log.error("withdraw error ", err.message);
             if (err.message.match(/non_negative_available/)) {
-                return res.send(500, {
+                return res.status.send({
                     name: 'NoFunds',
                     message: 'insufficient funds'
                 })
@@ -119,7 +120,7 @@ exports.withdraw = function(currencyId, req, res, next) {
         })
         var requestId = dr.rows[0].rid;
         log.info("withdraw requestId: ", requestId)
-        res.send(201, { id: requestId })
+        res.status(201).send({ id: requestId })
     })
 }
 
@@ -139,8 +140,8 @@ exports.address = function(currencyId, req, res, next) {
         if(!address){
             log.error("cannot retrieve %s address for user %s", currencyId, req.user.id)
         } else {
-            log.debug("%s %s for user %s", address, currencyId, req.user.id)
+            log.debug("address %s %s for user %s", address, currencyId, req.user.id)
         }
-        res.send(200, { address: address })
+        res.send({ address: address })
     })
 }

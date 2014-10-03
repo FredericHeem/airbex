@@ -5,7 +5,7 @@ var config = require('./configTest.js')();
 var debug = require('debug')('testWithdraw')
 var TestMngr = require('./TestMngr');
 
-describe('TestWithdraw', function () {
+describe('WithdrawCrypto', function () {
     "use strict";
     var testMngr = new TestMngr(config);
     var snowBot = testMngr.bot();
@@ -13,15 +13,38 @@ describe('TestWithdraw', function () {
     var clientAdmin = testMngr.client("admin");
     var client = testMngr.client("alice");
     var clientConfig = testMngr.clientConfig("alice");
+    var currency = 'BTC';
     
     before(function(done) {
-        testMngr.start()
-        .then(testMngr.login)
-        .then(done)
-        .fail(done);
+        testMngr.start().then(done).fail(done);
     });
-
+    
+    describe('WithdrawPublic', function () {
+        it('WithdrawPublicAlice', function (done) {
+            var withdrawParam = {
+                    currency:currency,
+                    address:clientConfig.btc_deposit_address,
+                    amount:'1'
+            };
+            client.post("v1/BTC/out", withdrawParam)
+            .fail(function(err){
+                assert.equal(err.name, "NotAuthenticated")
+                done()
+            }).fail(done)
+        });
+        it('WithdrawVerifyWrongCode', function (done) {
+            client.post("v1/withdraw/verify/6dc118b66468c783b530")
+            .fail(function(err){
+                assert.equal(err.name, "UnknownEmailVerifyCode")
+                done()
+            }).fail(done)
+        });
+    });
+    
     describe('TestWithdrawCrypto', function () {
+        before(function(done) {
+            testMngr.login().then(done).fail(done);
+        });
         it('TestWithdrawInvalidCurrency', function (done) {
             var withdrawParam = {
                     currency:'ABC',
@@ -35,7 +58,7 @@ describe('TestWithdraw', function () {
         });
         it('TestWithdrawCryptoBTCInvalidAddressChecksum', function (done) {
             var withdrawParam = {
-                    currency:'BTC',
+                    currency:currency,
                     address:"12BzXgPgq3scersJWG7c5ku7BFDGfsDdYa",
                     amount:'1'
             };
@@ -48,7 +71,7 @@ describe('TestWithdraw', function () {
         });
         it('TestWithdrawCryptoBTCInvalidAddressLength', function (done) {
             var withdrawParam = {
-                    currency:'BTC',
+                    currency:currency,
                     address:"Invalid",
                     amount:'1'
             };
@@ -59,22 +82,9 @@ describe('TestWithdraw', function () {
                 done()
             })
         });
-        it('TestWithdrawCryptoBTCOk', function (done) {
-            var withdrawParam = {
-                    currency:'BTC',
-                    address:clientConfig.btc_deposit_address,
-                    amount:'1'
-            };
-            client.withdrawCrypto(withdrawParam).then(function() {
-                done()
-            }).fail(function(err){
-                assert(err && err.name === "NoFunds")
-                done()
-            })
-        });
         it('TestWithdrawCryptoBTCNegative', function (done) {
             var withdrawParam = {
-                    currency:'BTC',
+                    currency:currency,
                     address:clientConfig.btc_deposit_address,
                     amount:'-100'
             };
@@ -86,7 +96,7 @@ describe('TestWithdraw', function () {
         });
         it('TestWithdrawCryptoBTCNull', function (done) {
             var withdrawParam = {
-                    currency:'BTC',
+                    currency:currency,
                     address:clientConfig.btc_deposit_address,
                     amount:'0'
             };
@@ -98,7 +108,7 @@ describe('TestWithdraw', function () {
         });
         it('TestWithdrawCryptoBTCTooHigh', function (done) {
             var withdrawParam = {
-                    currency:'BTC',
+                    currency:currency,
                     address:clientConfig.btc_deposit_address,
                     amount:'1000000'
             };
@@ -112,7 +122,7 @@ describe('TestWithdraw', function () {
         });
         it('TestWithdrawCryptoBTCKo', function (done) {
             var withdrawParam = {
-                    currency:'BTC',
+                    currency:currency,
                     address:clientConfig.btc_deposit_address,
                     amount:'1'
             };
@@ -151,5 +161,23 @@ describe('TestWithdraw', function () {
             })
             .fail(done);
         })
+        it('TestWithdrawCryptoBTCOk', function (done) {
+            var withdrawParam = {
+                    currency:currency,
+                    address:clientConfig.btc_deposit_address,
+                    amount:'1'
+            };
+            client.withdrawCrypto(withdrawParam)
+            .then(function(){
+                return snowBot.db.getWithdrawEmailCode(clientConfig.email, currency);
+            }).then(function(result){
+                assert(result);
+                assert(result.code);
+                console.log("result: ", result);
+                return client.post("v1/withdraw/verify/" + result.code);
+            }).then(function(){
+                done()
+            }).fail(done);
+        });
     });
 });

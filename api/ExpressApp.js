@@ -43,7 +43,7 @@ module.exports = function (rootDir) {
     app.email = require('./email')(app)
     //app.ripple = require('./ripple')(app)
     //app.intercom = require('./intercom')
-    app.segment = require('./segment')(app)
+    //app.segment = require('./segment')(app)
     app.security = require('./security')(app)
     app.phone = require('./phone')(app)
 

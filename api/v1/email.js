@@ -43,7 +43,7 @@ exports.verifySend = function(req, res, next) {
             return next(err)
         }
 
-        res.send(204)
+        res.status(204).end()
     })
 }
 

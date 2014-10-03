@@ -30,7 +30,7 @@ exports.remove = function(req, res, next) {
 
         req.app.security.session.update(req.cookies.session, req.session, function(err) {
             if (err) return next(err)
-            res.send(204)
+            res.status(204).end()
         })
     })
 }
@@ -81,7 +81,7 @@ exports.enable = function(req, res, next) {
 
         req.app.security.session.update(req.cookies.session, req.session, function(err) {
             if (err) return next(err)
-            res.send(204)
+            res.status(204).end()
         })
     })
 }
@@ -89,5 +89,5 @@ exports.enable = function(req, res, next) {
 exports.auth = function(req, res) {
     // The actual authentication is done by the demand.otp call
     debug('auth SHOULD NOT BE CALLED');
-    res.send(204)
+    res.status(204).end()
 }

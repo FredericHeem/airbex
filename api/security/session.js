@@ -52,7 +52,7 @@ exports.getUserAndSessionFromSessionKey = function(sessionKey, cb) {
                 })
             }
 
-            debug('session attached (user #%d)', user.id)
+            //debug('session attached (user #%d)', user.id)
             cb(null, {session: session, user: user});
         })
     })

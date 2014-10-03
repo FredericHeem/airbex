@@ -28,7 +28,7 @@ exports.index = function(req, res, next) {
 
     req.app.conn.read.get().query(q, function(err, dr) {
         if (err) return next(err)
-        res.send(dr.rowCount ? {
+        res.status(201).send(dr.rowCount ? {
             count: dr.rows[0].full_row_count,
             limit: limit,
             transactions: dr.rows.map(function(row) {

@@ -191,7 +191,7 @@ exports.send = function(req, res, next) {
     exports.sendToEmail(req.app, req.user.id, req.body.email,
         req.body.currency, req.body.amount, req.body.allowNewUser,
         function(err) {
-            if (!err) return res.send(204)
+            if (!err) return res.status(204).end()
 
             if (err.name == 'UserNotFound') {
                 return res.send(400, {

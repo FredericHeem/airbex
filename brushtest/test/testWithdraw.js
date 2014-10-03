@@ -168,7 +168,8 @@ describe('WithdrawCrypto', function () {
                     amount:'1'
             };
             client.withdrawCrypto(withdrawParam)
-            .then(function(){
+            .then(function(result){
+                console.log("withdrawCrypto result: ", JSON.stringify(result));
                 return snowBot.db.getWithdrawEmailCode(clientConfig.email, currency);
             }).then(function(result){
                 assert(result);

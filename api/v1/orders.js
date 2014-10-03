@@ -90,7 +90,7 @@ exports.cancel = function(req, res, next) {
                 message: 'The specified order does not exist or has been canceled'
             })
         }
-        res.send(204)
+        res.status(204).end()
         req.app.activity(req.user.id, 'CancelOrder', { id: +req.params.id })
     })
 }

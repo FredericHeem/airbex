@@ -136,8 +136,8 @@ module.exports = function (config) {
         debug("createAndValidateBankCredit for %s", email);
         async.waterfall([
         function(callback) {
-            snowBot.db.getUserIdFromEmail(email).then(function(user_id) {
-                bankCreditInfo.user_id = user_id;
+            snowBot.db.getUserIdFromEmail(email).then(function(user) {
+                bankCreditInfo.user_id = user.user_id;
                 callback(null);
             }).fail(callback);
         },

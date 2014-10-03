@@ -34,17 +34,17 @@ function getCompleteTreeFromDb(currency, app, next, cb){
     
     app.conn.read.get().query(query, function(err, dr) {
         if (err) {
-            debug("getCompleteTreeFromDb db error ", err);
+            log.error("getCompleteTreeFromDb db error ", err);
             next(err)
         } else if(dr.rowCount > 0){
             var completeTreeJson = dr.rows[0].tree;
             var create_at = dr.rows[0].created_at
-            debug("tree ", completeTreeJson);
+            //debug("tree ", completeTreeJson);
             var Tree = lproof.Tree;
             var completeTree = Tree.deserializeFromArray(JSON.stringify(completeTreeJson))
             cb(null, completeTree, create_at);
         } else {
-            debug("root: no tree found")
+            log.error("root: no tree found")
             cb({error:"NoCompleteTreeFound"})
         }
        
@@ -98,7 +98,7 @@ exports.liability = function(req, res, next) {
 }
 
 function insertSignature(app, asset_id, address, signature, cb){
-	debug("%s => %s", address, signature)
+	//debug("%s => %s", address, signature)
 	app.conn.write.get().query({
 		text: [
 		       'INSERT INTO signatures(asset_id, address, signature)',
@@ -116,9 +116,9 @@ function insertSignature(app, asset_id, address, signature, cb){
 }
 
 function insertSignatures(app, asset_id, signatures, cb){
-	debug("insertSignatures id %s, signature:", asset_id, JSON.stringify(signatures))
+	//debug("insertSignatures id %s, signature:", asset_id, JSON.stringify(signatures))
 	async.each(signatures, function (addressSignature, done) {
-    	debug("insertSignatures  ", JSON.stringify(addressSignature))
+    	//debug("insertSignatures  ", JSON.stringify(addressSignature))
     	insertSignature(app, asset_id, addressSignature.address, addressSignature.signature, done)
     }, cb);
 }
@@ -139,7 +139,7 @@ function getSignatures(app, asset_id, cb){
 		if(err) cb(err);
 		var signatures = [];
         dr.rows.map(function(row) {
-        	debug("getSignatures: %s => %s", row.address, row.signature)
+        	//debug("getSignatures: %s => %s", row.address, row.signature)
         	signatures.push({
         		address: row.address,
         		signature: row.signature,
@@ -166,7 +166,7 @@ exports.assetGet = function(req, res, next) {
     req.app.conn.read.get().query(query, function(err, dr) {
     	var asset_json = {}
         if (err) {
-            debug("asset db error ", err);
+            log.error("asset db error ", err);
             next(err)
         } else if(dr.rowCount > 0){
         	var row = dr.rows[0];
@@ -178,7 +178,7 @@ exports.assetGet = function(req, res, next) {
                 		message: row.message,
                 		blockhash: row.blockhash, 
                 		signatures: signatures}
-                debug("asset: ", JSON.stringify(asset_json));
+                //debug("asset: ", JSON.stringify(asset_json));
             	res.send(asset_json)
         	})
         } else {
@@ -199,7 +199,7 @@ exports.assetGetAll = function(req, res, next) {
     
     req.app.conn.read.get().query(query, function(err, dr) {
         if (err) {
-            debug("asset db error ", err);
+            log.error("asset db error ", err);
             next(err)
         } else {
         	res.send(dr.rows)
@@ -254,33 +254,4 @@ exports.assetPost = function(req, res, next) {
     form.parse(req, function(err, fields, files) {
         debug("form.parse files: ")
     });
-    
-//	if(!req.files || !req.files.asset){
-//		debug("assetPost no doc");
-//		return res.send(400, {
-//			name: 'BadRequest',
-//			message: 'Request is invalid'
-//		})
-//	}
-//
-//	var assetFile = req.files.asset;
-//
-//	var sizeKb = assetFile.size / 1024 | 0
-//
-//	if(sizeKb > 5* 1014){
-//		debug('assetPost , %s, size %s kB TOO BIG', assetFile.name, sizeKb);
-//		return res.send(400, {
-//			name: 'FileToBig',
-//			message: 'file is too big'
-//		})
-//	}
-//	debug('assetPost  %s, size %s kB',  assetFile.name, sizeKb);
-//	if(assetFile.size === 0){
-//		return res.send(400, {
-//			name: 'FileEmpty',
-//			message: 'Empty file'
-//		})		
-//	}
-//	
-
 }

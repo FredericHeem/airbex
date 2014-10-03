@@ -25,13 +25,13 @@ exports.panic = function(req, res, next) {
         ].join('\n'), function(err) {
             if (err) {
                 if (err.message.match(/terminating connection/)) {
-                    return res.send(204)
+                    return res.status(204).end()
                 }
 
                 return next(err)
             }
 
-            res.send(204)
+            res.status(204).end()
         })
     })
 }

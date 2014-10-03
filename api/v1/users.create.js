@@ -43,7 +43,7 @@ exports.beginCreate = function(req, res, next) {
             return next(err)
         }
 
-        res.send(204)
+        res.status(204).end()
     })
 }
 
@@ -71,6 +71,6 @@ exports.endCreate = function(req, res, next) {
         var config = req.app.config;
         var company = config.company || 'AIRBEX';
         res.send('Your e-mail has been verified. You can login to ' + company + ' at <a href="' + config.website_url + '">' + config.website_url + '</a>.')
-        //res.send(204)
+        //res.status(204).end()
     })
 }

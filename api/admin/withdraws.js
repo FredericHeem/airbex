@@ -58,10 +58,10 @@ exports.cancel = function(req, res, next) {
                 error: req.body.error || null
             })
 
-            return res.send(204)
+            return res.status(204).end()
         }
 
-        res.send(404, {
+        res.status(404).send({
             name: 'WithdrawRequestNotFound',
             message: 'The withdraw request was not found or ' +
                 'is already processing/processed'
@@ -83,10 +83,10 @@ exports.process = function(req, res, next) {
         if (dr.rowCount) {
             req.app.activity(req.user.id, 'AdminWithdrawProcess',
                 { id: req.params.id })
-            return res.send(204)
+            return res.status(204).end()
         }
 
-        res.send(404, {
+        res.status(404).send({
             name: 'WithdrawRequestNotFound',
             message: 'The withdraw request was not found or is not in the requested state'
         })
@@ -106,7 +106,7 @@ exports.complete = function(req, res, next) {
         if (err) return next(err)
 
         if (!dr.rowCount) {
-            return res.send(404, {
+            res.status(404).send({
                 name: 'WithdrawRequestNotFound',
                 message: 'The withdraw request was not found or ' +
                     'is not in the processing state'
@@ -134,7 +134,7 @@ exports.complete = function(req, res, next) {
                 fee: req.body.fee || '0'
             })
 
-            res.send(204)
+            res.status(204).end()
         })
     })
 }

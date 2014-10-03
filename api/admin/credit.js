@@ -138,6 +138,6 @@ exports.cancelBankCredit = function(req, res, next) {
             id: +req.params.id
         })
 
-        res.send(204)
+        res.status(204).end()
     })
 }

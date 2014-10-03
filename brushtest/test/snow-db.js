@@ -12,7 +12,14 @@ module.exports = function (config) {
     snowDb.config = config;
     snowDb.pgClient = new pg.Client(config.pg_write_url);
     
-    snowDb.getUserCount = function (done){
+    snowDb.getUserCount = function (){
+        return snowDb.query({
+            text:[
+                  'SELECT COUNT(*) FROM "user"'
+                  ].join('\n'),
+                  values: []
+        })
+        
         debug("getUserCount");
         this.pgClient.query({
             text: 'SELECT COUNT(*) FROM "user"',
@@ -31,26 +38,15 @@ module.exports = function (config) {
         });
     };
     snowDb.getUserIdFromEmail = function (email){
-        var deferred = Q.defer();
-        debug("getUserIdFromEmail email: %s", email);
-        this.pgClient.query({
-            text: 'SELECT user_id FROM "user" where email=$1',
-            values: [email]
-        }, function(err, dres) {
-            if (err) {
-                deferred.reject(err);
-            } else if(!dres.rows.length){
-                deferred.reject({name:"NoSuchUser"})
-            } else {
-                var row = dres.rows[0];
-                var user_id = row.user_id;
-                debug("getUserIdFromEmail: %s", user_id);
-                deferred.resolve(user_id);
-            }
-        });
-        
-        return deferred.promise;
-    };   
+        return snowDb.query({
+            text:[
+                  "SELECT user_id",
+                  'FROM "user"',
+                  "WHERE email=$1"
+                  ].join('\n'),
+                  values: [email]
+        })
+    };
    
     snowDb.restoreResetPassword = function (email){
         var deferred = Q.defer();
@@ -75,11 +71,11 @@ module.exports = function (config) {
             console.log("account_id", result.account_id)
             return snowDb.query({
                 text:[
-                                "SELECT code",
-                                "FROM withdraw_request",
-                                "WHERE method = $1 AND account_id = $2 AND state = 'sendingEmail'",
-                                "ORDER BY request_id DESC LIMIT 1"
-                     ].join('\n'),
+                      "SELECT code",
+                      "FROM withdraw_request",
+                      "WHERE method = $1 AND account_id = $2 AND state = 'sendingEmail'",
+                      "ORDER BY request_id DESC LIMIT 1"
+                      ].join('\n'),
                 values: [currency, result.account_id]
             })
         })
@@ -88,12 +84,12 @@ module.exports = function (config) {
     snowDb.getAccountIdFromEmail = function (email, currency){
         return snowDb.query({
             text:[
-                            "SELECT a.account_id",
-                            "FROM account a",
-                            "JOIN \"user\" u ON a.user_id = u.user_id",
-                            "WHERE u.email = $1 AND a.currency_id=$2"
-                 ].join('\n'),
-            values: [email, currency]
+                  "SELECT a.account_id",
+                  "FROM account a",
+                  "JOIN \"user\" u ON a.user_id = u.user_id",
+                  "WHERE u.email = $1 AND a.currency_id=$2"
+                  ].join('\n'),
+                  values: [email, currency]
         })
     }
     

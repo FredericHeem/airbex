@@ -47,10 +47,10 @@ describe('Users', function () {
     describe('UserCreate', function () {
         this.timeout(timeout);
         it('GetUserCount', function (done) {
-            snowBot.db.getUserCount(function(count){
-                debug("GetUserCount: %s", count)
+            snowBot.db.getUserCount().then(function(result){
+                debug("GetUserCount: %s", result.count)
                 done();
-            });
+            }).fail(done);
         });
         
         it('CreateAdmin', function (done) {
@@ -112,7 +112,7 @@ describe('Users', function () {
         it('PatchUsers', function (done) {
             async.forEachLimit(config.users, 1, function(client, callback) {
                 snowBot.db.getUserIdFromEmail(client.email)
-                .then(function(user_id){
+                .then(function(user){
                     console.log("client: ", JSON.stringify(client))
                     var param = {
                         first_name:client.first_name || client.name,
@@ -125,7 +125,7 @@ describe('Users', function () {
                         poa_approved:client.poa || false
                         };
                     console.log("param: ", JSON.stringify(param))
-                    return clientAdmin.adminUserPatch(user_id, param);
+                    return clientAdmin.adminUserPatch(user.user_id, param);
                 })
                 .then(callback)
                 .fail(function(err){

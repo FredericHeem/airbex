@@ -44,7 +44,7 @@ exports.forgivePasswordReset = function(req, res, next) {
             })
         }
 
-        res.send(204)
+        res.status(204).end()
     })
 }
 
@@ -62,7 +62,7 @@ exports.removeBankAccount = function(req, res, next) {
             })
         }
 
-        res.send(204)
+        res.status(204).end()
     })
 }
 
@@ -70,7 +70,7 @@ exports.sendVerificationEmail = function(req, res, next) {
     var email = require('../v1/email')
     email.sendVerificationEmail(req.app, +req.params.user, function(err) {
         if (err) return next(err)
-        res.send(204)
+        res.status(204).end()
     })
 }
 
@@ -91,7 +91,7 @@ exports.addBankAccount = function(req, res, next) {
 
     req.app.conn.write.get().query(query, function(err) {
         if (err) return next(err)
-        res.send(204)
+        res.status(204).end()
     })
 }
 
@@ -177,7 +177,7 @@ exports.patch = function(req, res, next) {
             req.app.activity(req.params.id, 'KycCompleted', {})
         }
 
-        res.send(204)
+        res.status(204).end()
     })
 }
 

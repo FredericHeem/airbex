@@ -164,7 +164,7 @@
 //        	debug("cancel error: ", error.name)
 //            return res.send(404, error)
 //        }
-//        res.send(204)
+//        res.status(204).end()
 //        req.app.activity(req.user.id, 'PurchaseOrderCancel', { id: +req.params.id })
 //    })
 //}

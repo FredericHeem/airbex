@@ -43,7 +43,7 @@ describe('WithdrawBank', function () {
             .then(function(bankAccounts) {
                 assert(bankAccounts);
                 bankAccountId = bankAccounts[0].id;
-                console.log("bankAccountId: ", bankAccountId)
+                //console.log("bankAccountId: ", bankAccountId)
                 //console.log(bankAccounts)
                 done()
             }).fail(done);
@@ -52,7 +52,7 @@ describe('WithdrawBank', function () {
             client.get("v1/withdraws")
             .then(function(withdraws) {
                 assert(withdraws)
-                console.log(withdraws)
+                //console.log(withdraws)
                 done()
             }).fail(done);
         });
@@ -61,60 +61,60 @@ describe('WithdrawBank', function () {
             client.post("v1/withdraws/bank", param)
             .fail(function(err){
                 assert(err)
-                console.log(err);
                 assert.equal(err.name, "BadRequest")
                 done()
-            });
+            })
+            .fail(done);
         });
         it('WithdrawBankNegativeAmount', function (done) {
             var param = {bankAccount:bankAccountId, amount:"-1", currency:currencyFiat};
             client.post("v1/withdraws/bank", param)
             .fail(function(err){
                 assert(err)
-                console.log(err);
                 assert.equal(err.name, "BadRequest")
                 done()
-            });
+            })
+            .fail(done);
         });
         it('WithdrawBankNullAmount', function (done) {
             var param = {bankAccount:bankAccountId, amount:"0", currency:currencyFiat};
             client.post("v1/withdraws/bank", param)
             .fail(function(err){
                 assert(err)
-                console.log(err);
                 assert.equal(err.name, "AmountTooSmall")
                 done()
-            });
+            })
+            .fail(done);
         });
         it('WithdrawBankAmountTooHigh', function (done) {
             var param = {bankAccount:bankAccountId, amount:"10000000", currency:currencyFiat};
             client.post("v1/withdraws/bank", param)
             .fail(function(err){
                 assert(err)
-                console.log(err);
                 assert.equal(err.name, "AmountTooHigh")
                 done()
-            });
+            })
+            .fail(done);
         });
         it('WithdrawBankAmountNoFunds', function (done) {
             var param = {bankAccount:bankAccountId, amount:"50000", currency:"CZK"};
             client.post("v1/withdraws/bank", param)
             .fail(function(err){
                 assert(err)
-                console.log(err);
                 assert.equal(err.name, "NoFunds")
                 done()
-            });
+            })
+            .fail(done);
         });
         it('WithdrawBankInvalidBankAccount', function (done) {
             var param = {bankAccount:99999, amount:"1000", currency:currencyFiat};
             client.post("v1/withdraws/bank", param)
             .fail(function(err){
                 assert(err)
-                console.log(err);
                 assert.equal(err.name, "BankAccountNotFound")
                 done()
-            });
+            })
+            .fail(done);
         });
         it('WithdrawBankOkSimple', function (done) {
             var param = {bankAccount:bankAccountId, amount:"1000", currency:currencyFiat};
@@ -125,12 +125,13 @@ describe('WithdrawBank', function () {
                 assert(withdraws);
                 var lastWithdraw = withdraws[0]
                 assert(lastWithdraw);
-                console.log(lastWithdraw)
+                //console.log(lastWithdraw)
                 assert.equal(lastWithdraw.currency, currencyFiat);
                 assert.equal(lastWithdraw.state, "requested");
                 assert(num(param.amount).eq(num(lastWithdraw.amount)))
                 done()
-            }).fail(done)
+            })
+            .fail(done)
         });
         it('WithdrawBankAndCancel', function (done) {
             var amount = "1000";
@@ -148,7 +149,7 @@ describe('WithdrawBank', function () {
                 assert(withdraws);
                 lastWithdraw = withdraws[0]
                 assert(lastWithdraw);
-                console.log(lastWithdraw)
+                //console.log(lastWithdraw)
                 assert.equal(lastWithdraw.currency, currencyFiat);
                 assert.equal(lastWithdraw.state, "requested");
                 assert(num(param.amount).eq(num(lastWithdraw.amount)))
@@ -165,7 +166,8 @@ describe('WithdrawBank', function () {
                 assert(num(balance.hold).eq(num(balanceBefore.hold)));
                 assert(num(balance.balance).eq(num(balanceBefore.balance)));
                 done();
-            }).fail(done)
+            })
+            .fail(done)
         });
         it('WithdrawBankAndProcess', function (done) {
             var amount = "1000";
@@ -183,7 +185,7 @@ describe('WithdrawBank', function () {
                 assert(withdraws);
                 lastWithdraw = withdraws[0]
                 assert(lastWithdraw);
-                console.log(lastWithdraw)
+                //console.log(lastWithdraw)
                 assert.equal(lastWithdraw.currency, currencyFiat);
                 assert.equal(lastWithdraw.state, "requested");
                 assert(num(param.amount).eq(num(lastWithdraw.amount)))
@@ -206,30 +208,31 @@ describe('WithdrawBank', function () {
                 assert(withdraws);
                 lastWithdraw = withdraws[0]
                 assert(lastWithdraw);
-                console.log(lastWithdraw)
+                //console.log(lastWithdraw)
                 assert.equal(lastWithdraw.state, "completed");
                 done();
-            }).fail(done)
+            })
+            .fail(done)
         });
         it('WithdrawBankInvalidCurrency', function (done) {
             var param = {bankAccount:bankAccountId, amount:"1000", currency:"ABC"};
             client.post("v1/withdraws/bank", param)
             .fail(function(err){
                 assert(err)
-                console.log(err);
                 assert.equal(err.name, "InvalidCurrency")
                 done()
-            });
+            })
+            .fail(done);
         });
         it('WithdrawBankCryptoCurrency', function (done) {
             var param = {bankAccount:bankAccountId, amount:"1", currency:"BTC"};
             client.post("v1/withdraws/bank", param)
             .fail(function(err){
                 assert(err)
-                console.log(err);
                 assert.equal(err.name, "CannotWithdrawNonFiatToBank")
                 done()
-            });
+            })
+            .fail(done);
         });
     });
    

@@ -59,7 +59,7 @@ exports.patch = function(req, res, next) {
         if (!dr.rowCount) {
             return next(new Error('User ' + req.user.id + ' not found'))
         }
-        res.send(204)
+        res.status(204).end()
     })
 }
 var whoami = function(app, user, cb) {
@@ -180,7 +180,7 @@ exports.identity = function(req, res, next) {
         req.app.activity(req.user.id, 'IdentitySet', _.pick(req.body,
             'firstName', 'lastName', 'address', 'country', 'city', 'postalArea'))
 
-        return res.send(204)
+        return res.status(204).end()
     })
 }
 
@@ -237,7 +237,7 @@ exports.verifyPhone = function(req, res, next) {
             req.app.intercom.setUserPhoneVerified(req.user.id, dr.rows[0].phone_number)
         })
 
-        res.send(204)
+        res.status(204).end()
     })
 }
 
@@ -278,7 +278,7 @@ exports.voiceFallback = function(req, res, next) {
 
     req.app.phone.call(item.number, msg, function(err) {
         if (err) return next(err)
-        res.send(204)
+        res.status(204).end()
     })
 }
 
@@ -377,6 +377,6 @@ exports.changePassword = function(req, res, next) {
         }
         
         req.app.activity(req.user.id, 'ChangePassword', {})
-        res.send(204)
+        res.status(204).end()
     })
 }

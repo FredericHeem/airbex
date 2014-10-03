@@ -24,7 +24,7 @@ exports.handler = function() {
 }
 
 exports.demand = function(type, level, req, res, next) {
-    debug('demanding type %s and level %s', type, level)
+    //debug('demanding type %s and level %s', type, level)
     if (!req.user) {
         debug('user is not set, demand has failed, req: ', req.url)
         return res.status(401).send({
@@ -129,14 +129,14 @@ exports.otp = function(inner, optional) {
             }
             
             if (!req.user.tfaSecret) {
-                debug('Password required');
+                //debug('Password required');
                 var token = req.app.userToken[req.user.id];
                 if(req.body.sessionKey){
                     
-                    debug('otp: has token %s', token)
+                    //debug('otp: has token %s', token)
                     if(token){
                         var sessionKey = exports.app.security.session.getSessionKey(token, user.primaryKey)
-                        debug('otp: got key %s, should match %s', req.body.sessionKey, sessionKey)
+                        //debug('otp: got key %s, should match %s', req.body.sessionKey, sessionKey)
                         if(req.body.sessionKey === sessionKey){
                             req.app.userToken[req.user.id] = undefined
                             return next()
@@ -145,7 +145,7 @@ exports.otp = function(inner, optional) {
                 } 
                 var token = exports.app.security.session.randomSha256();
                 req.app.userToken[req.user.id] = token
-                debug("otp create token: %s", token)
+                //debug("otp create token: %s", token)
                 var errorName = req.body.sessionKey ? 'PasswordInvalid' : 'PasswordRequired'
                 return res.status(401).send({
                     name: errorName,

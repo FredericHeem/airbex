@@ -74,7 +74,7 @@ exports.withdrawBank = function(req, res, next) {
     }, function(err, dr) {
         if (err) {
             if (err.message.match(/non_negative_available/)) {
-                return res.send(500, {
+                return res.status(500).send({
                     name: 'NoFunds',
                     message: 'Insufficient funds.'
                 })
@@ -83,7 +83,7 @@ exports.withdrawBank = function(req, res, next) {
         }
 
         if (!dr.rowCount) {
-            return res.send(400, {
+            return res.status(400).send({
                 name: 'BankAccountNotFound',
                 message: 'Bank account not found for this user'
             })
@@ -91,7 +91,7 @@ exports.withdrawBank = function(req, res, next) {
         var withdrawRequestParam = req.body;
         withdrawRequestParam.method = "bank";
         req.app.activity(req.user.id, 'WithdrawRequest', withdrawRequestParam)
-        return res.send(204)
+        return res.status(204).end()
     })
 }
 
@@ -130,6 +130,6 @@ exports.cancel = function(req, res, next) {
 
         req.app.activity(req.user.id, 'CancelWithdrawRequest', { id: +req.params.id })
 
-        res.send(204)
+        res.status(204).end()
     })
 }

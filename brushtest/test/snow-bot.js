@@ -3,6 +3,7 @@ var debug = require('debug')('snowBot');
 var request = require('supertest');
 var async = require('async');
 var SnowDb = require('./snow-db');
+var assert = require('assert');
 
 module.exports = function (config) {
     var snowBot = {};
@@ -295,5 +296,39 @@ module.exports = function (config) {
         
     };
     
+    snowBot.withdrawCryptoComplete = function(client, withdrawParam){
+        var request_id;
+        var currency = withdrawParam.currency;
+        return client.withdrawCrypto(withdrawParam)
+        .then(function(result){
+            //console.log("withdrawCrypto result: ", JSON.stringify(result));
+            request_id = result.id;
+            return snowBot.db.getWithdrawRequest(request_id);
+        })
+        .then(function(result){
+            //console.log("getWithdrawRequest result: ", JSON.stringify(result));
+            assert.equal(result.method, currency)
+            assert.equal(result.state, "sendingEmail")
+            assert(result.code)
+            assert(!result.completed_at)
+            assert(result.hold_id)
+            return client.post("v1/withdraw/verify/" + result.code);
+        }).then(function(){
+            return snowBot.db.getWithdrawRequest(request_id);
+        })
+        .then(function(result){
+            //console.log("getWithdrawRequest result: ", JSON.stringify(result));
+            assert.equal(result.state, "requested")
+            assert(!result.completed_at)
+            return snowBot.db.confirmWithdraw(request_id);
+        }).then(function(){
+            return snowBot.db.getWithdrawRequest(request_id);
+        }).then(function(result){
+            //console.log("getWithdrawRequest result: ", JSON.stringify(result));
+            assert.equal(result.state, "completed")
+            assert(result.completed_at)
+            assert(!result.hold_id)
+        })
+    }
     return snowBot;
 };

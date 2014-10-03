@@ -19,23 +19,6 @@ module.exports = function (config) {
                   ].join('\n'),
                   values: []
         })
-        
-        debug("getUserCount");
-        this.pgClient.query({
-            text: 'SELECT COUNT(*) FROM "user"',
-            values: []
-        }, function(err, dres) {
-            if (err) {
-                done(null, err);
-            } else if(!dres.rows.length){
-                done(null, "getUserCount empty length");
-            } else {
-                var row = dres.rows[0];
-                var count = row.count;
-                debug("getUserCount: %s", count);
-                done(count);
-            }
-        });
     };
     snowDb.getUserIdFromEmail = function (email){
         return snowDb.query({
@@ -49,20 +32,23 @@ module.exports = function (config) {
     };
    
     snowDb.restoreResetPassword = function (email){
-        var deferred = Q.defer();
-        console.log("getResetPasswordCode email: %s", email);
-        this.pgClient.query({
-            text: 'UPDATE "user" set reset_email_code=NULL, reset_started_at=NULL, reset_phone_code=NULL where email=$1',
-            values: [email]
-        }, function(err, dres) {
-            if (err) {
-                deferred.reject(err);
-            } else {
-                deferred.resolve();
-            }
-        });
-        
-        return deferred.promise;
+        return snowDb.queryNoResult({
+            text:[
+                  'UPDATE "user"',
+                  'set reset_email_code=NULL, reset_started_at=NULL, reset_phone_code=NULL',
+                  "WHERE email=$1"
+                  ].join('\n'),
+                  values: [email]
+        })
+    };
+    
+    snowDb.confirmWithdraw = function (request_id){
+        return snowDb.queryNoResult({
+            text:[
+                  'SELECT confirm_withdraw($1)'
+                  ].join('\n'),
+                  values: [request_id]
+        })
     };
     
     snowDb.getWithdrawEmailCode = function (email, currency){
@@ -91,6 +77,32 @@ module.exports = function (config) {
                   ].join('\n'),
                   values: [email, currency]
         })
+    }
+    
+    snowDb.getWithdrawRequest = function (request_id){
+        return snowDb.query({
+            text:[
+                  "SELECT *",
+                  "FROM withdraw_request",
+                  "WHERE request_id = $1"
+                  ].join('\n'),
+                  values: [request_id]
+        })
+    }
+    
+    snowDb.queryNoResult = function(query){
+        var deferred = Q.defer();
+        console.log("queryNoResult: %s", JSON.stringify(query));
+        this.pgClient.query(query, function(err, dres) {
+            if (err) {
+                console.error("query error: ", err)
+                deferred.reject(err);
+            }  else {
+                deferred.resolve();
+            }
+        });
+        
+        return deferred.promise;
     }
     
     snowDb.query = function(query){

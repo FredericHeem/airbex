@@ -161,24 +161,32 @@ describe('WithdrawCrypto', function () {
             })
             .fail(done);
         })
-        it('TestWithdrawCryptoBTCOk', function (done) {
+        it('TestWithdrawCryptoComplete', function (done) {
+            this.timeout(10e3)
             var withdrawParam = {
                     currency:currency,
                     address:clientConfig.btc_deposit_address,
                     amount:'1'
             };
-            client.withdrawCrypto(withdrawParam)
-            .then(function(result){
-                console.log("withdrawCrypto result: ", JSON.stringify(result));
-                return snowBot.db.getWithdrawEmailCode(clientConfig.email, currency);
-            }).then(function(result){
-                assert(result);
-                assert(result.code);
-                console.log("result: ", result);
-                return client.post("v1/withdraw/verify/" + result.code);
-            }).then(function(){
-                done()
-            }).fail(done);
-        });
+            client.balance(currency)
+            .then(function(balance){
+                console.log(balance);
+                return snowBot.withdrawCryptoComplete(client, withdrawParam);
+            })
+            .then(function(){
+                return client.balance(currency)
+            })
+            .then(function(balance){
+                console.log(balance);
+                return client.activities();
+            })
+            .then(function(activities){
+                //console.log(activities);
+                done();
+            })
+            .fail(done);
+           
+        })
+        
     });
 });

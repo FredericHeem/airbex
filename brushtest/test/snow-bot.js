@@ -4,6 +4,7 @@ var request = require('supertest');
 var async = require('async');
 var SnowDb = require('./snow-db');
 var assert = require('assert');
+var num = require('num');
 
 module.exports = function (config) {
     var snowBot = {};
@@ -299,10 +300,23 @@ module.exports = function (config) {
     snowBot.withdrawCryptoComplete = function(client, withdrawParam){
         var request_id;
         var currency = withdrawParam.currency;
-        return client.withdrawCrypto(withdrawParam)
+        var balanceBefore;
+        return client.balance(currency)
+        .then(function(balance){
+            //console.log("B4: ", balance);
+            balanceBefore = balance;
+            return client.withdrawCrypto(withdrawParam)
+        })
         .then(function(result){
             //console.log("withdrawCrypto result: ", JSON.stringify(result));
             request_id = result.id;
+            return client.balance(currency)
+        })
+        .then(function(balance){
+            //console.log("After ", balance);
+            assert(num(balanceBefore.balance).eq(num(balance.balance)));
+            assert(num(balanceBefore.hold).add(num(withdrawParam.amount)).lt(num(balance.hold)));
+            assert(num(balanceBefore.available).sub(num(withdrawParam.amount)).gt(num(balance.available)));
             return snowBot.db.getWithdrawRequest(request_id);
         })
         .then(function(result){
@@ -328,6 +342,13 @@ module.exports = function (config) {
             assert.equal(result.state, "completed")
             assert(result.completed_at)
             assert(!result.hold_id)
+            return client.balance(currency)
+        })
+        .then(function(balance){
+            //console.log("After confirm", balance);
+            assert(num(balanceBefore.balance).sub(num(withdrawParam.amount)).gt(num(balance.balance)));
+            assert(num(balanceBefore.hold).eq(num(balance.hold)));
+            assert(num(balanceBefore.available).sub(num(withdrawParam.amount)).gt(num(balance.available)));
         })
     }
     return snowBot;

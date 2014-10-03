@@ -30,14 +30,16 @@ describe('WithdrawCrypto', function () {
             .fail(function(err){
                 assert.equal(err.name, "NotAuthenticated")
                 done()
-            }).fail(done)
+            })
+            .fail(done)
         });
         it('WithdrawVerifyWrongCode', function (done) {
             client.post("v1/withdraw/verify/6dc118b66468c783b530")
             .fail(function(err){
                 assert.equal(err.name, "UnknownEmailVerifyCode")
                 done()
-            }).fail(done)
+            })
+            .fail(done)
         });
     });
     
@@ -68,6 +70,7 @@ describe('WithdrawCrypto', function () {
                 assert(err && err.name === "InvalidAddress")
                 done()
             })
+            .fail(done);
         });
         it('TestWithdrawCryptoBTCInvalidAddressLength', function (done) {
             var withdrawParam = {
@@ -75,12 +78,12 @@ describe('WithdrawCrypto', function () {
                     address:"Invalid",
                     amount:'1'
             };
-            client.withdrawCrypto(withdrawParam).then(function() {
-                done()
-            }).fail(function(err){
-                assert(err && err.name === "BadRequest")
+            client.withdrawCrypto(withdrawParam)
+            .fail(function(err){
+                assert.equal(err.name, 'BadRequest')
                 done()
             })
+            .fail(done);
         });
         it('TestWithdrawCryptoBTCNegative', function (done) {
             var withdrawParam = {
@@ -88,11 +91,13 @@ describe('WithdrawCrypto', function () {
                     address:clientConfig.btc_deposit_address,
                     amount:'-100'
             };
-            client.withdrawCrypto(withdrawParam).then(done).fail(function(err){
+            client.withdrawCrypto(withdrawParam)
+            .fail(function(err){
                 assert(err);
                 assert.equal(err.name, 'BadRequest')
                 done()
             })
+            .fail(done);
         });
         it('TestWithdrawCryptoBTCNull', function (done) {
             var withdrawParam = {
@@ -100,11 +105,13 @@ describe('WithdrawCrypto', function () {
                     address:clientConfig.btc_deposit_address,
                     amount:'0'
             };
-            client.withdrawCrypto(withdrawParam).then(done).fail(function(err){
+            client.withdrawCrypto(withdrawParam)
+            .fail(function(err){
                 assert(err);
                 assert.equal(err.name, 'AmountTooSmall')
                 done()
             })
+            .fail(done);
         });
         it('TestWithdrawCryptoBTCTooHigh', function (done) {
             var withdrawParam = {
@@ -115,10 +122,10 @@ describe('WithdrawCrypto', function () {
             client.withdrawCrypto(withdrawParam)
             .fail(function(err){
                 assert(err);
-                console.log(err)
                 assert.equal(err.name, 'AmountTooHigh')
                 done()
             })
+            .fail(done);
         });
         it('TestWithdrawCryptoBTCKo', function (done) {
             var withdrawParam = {
@@ -153,8 +160,8 @@ describe('WithdrawCrypto', function () {
                 .then(function(result) {
                     var body = result.body;
                     var res = result.res;
-                    console.log("res ", res.statusCode);
-                    console.log("body ", body)
+                    //console.log("res ", res.statusCode);
+                    //console.log("body ", body)
                     done()
                 })
                 .fail(done)
@@ -168,22 +175,8 @@ describe('WithdrawCrypto', function () {
                     address:clientConfig.btc_deposit_address,
                     amount:'1'
             };
-            client.balance(currency)
-            .then(function(balance){
-                console.log(balance);
-                return snowBot.withdrawCryptoComplete(client, withdrawParam);
-            })
-            .then(function(){
-                return client.balance(currency)
-            })
-            .then(function(balance){
-                console.log(balance);
-                return client.activities();
-            })
-            .then(function(activities){
-                //console.log(activities);
-                done();
-            })
+            snowBot.withdrawCryptoComplete(client, withdrawParam)
+            .then(done)
             .fail(done);
            
         })

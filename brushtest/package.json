@@ -29,7 +29,7 @@
   
   "scripts": {
     "test": "NODE_ENV=local mocha",
-    "coverage": "NODE_ENV=local node node_modules/istanbul/lib/cli cover  --root ../api/ node_modules/mocha/bin/_mocha",
-    "coverage-text": "NODE_ENV=local node node_modules/istanbul/lib/cli cover --root ../api/ node_modules/mocha/bin/_mocha --report text"
+    "coverage": "NODE_ENV=local node node_modules/istanbul/lib/cli cover  --root ../api/ -x 'admin/**' node_modules/mocha/bin/_mocha",
+    "coverage-text": "NODE_ENV=local node node_modules/istanbul/lib/cli cover --root ../api/ -x 'admin/**' node_modules/mocha/bin/_mocha --report text"
   }
 }

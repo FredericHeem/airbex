@@ -31,7 +31,8 @@
     "cryptoaddress": "DEBUG=* NODE_ENV=brush node bin/cryptoaddress.js",
     "cryptoaddressltc": "DEBUG=* NODE_ENV=ltc node bin/cryptoaddress.js",
     "cryptoasset": "DEBUG=* NODE_ENV=brush node bin/cryptoasset.js",
-    "cryptoliability": "DEBUG=* NODE_ENV=brush node bin/cryptoliability.js"
+    "cryptoliability": "DEBUG=* NODE_ENV=brush node bin/cryptoliability.js",
+    "cryptoliabilityltc": "DEBUG=* NODE_ENV=ltc node bin/cryptoliability.js"
   },
   "devDependencies": {
     "mocha": "1.7.0",

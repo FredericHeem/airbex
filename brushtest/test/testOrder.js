@@ -27,6 +27,7 @@ describe('Orders', function () {
                 assert.equal(error.name, 'NotAuthenticated');
                 done();  
             })
+            .fail(done)
         });
         it('CancelOrderNotAuthenticated', function (done) {
             client.cancel(0).fail(function(error){
@@ -34,6 +35,7 @@ describe('Orders', function () {
                 assert.equal(error.name, 'NotAuthenticated');
                 done(); 
             })
+            .fail(done)
         });
         it('aliceBidNotAuthenticated', function (done) {
             client.order({
@@ -46,6 +48,7 @@ describe('Orders', function () {
                 assert(err);
                 done()
             })
+            .fail(done)
         });
     });
     
@@ -68,6 +71,7 @@ describe('Orders', function () {
                 assert.equal(err.name, 'OrderNotFound')
                 done();
             })
+            .fail(done)
         });
         it('CancelAll', function (done) {
             this.timeout(10e3);
@@ -92,6 +96,7 @@ describe('Orders', function () {
                     done(err)
                 }
             })
+            .fail(done)
         });
         it('bobAsk', function (done) {
             clientBob.order({
@@ -112,6 +117,7 @@ describe('Orders', function () {
                     done(err)
                 }
             })
+            .fail(done)
         });
         it('OrderWrongMarket', function (done) {
             client.order({
@@ -125,6 +131,7 @@ describe('Orders', function () {
                 assert.equal(err.message, 'Market is invalid')
                 done()
             })
+            .fail(done)
         });
         it('OrderPriceIsInvalid', function (done) {
             client.order({
@@ -138,6 +145,7 @@ describe('Orders', function () {
                 assert.equal(err.message, 'Price is invalid')
                 done()
             })
+            .fail(done)
         });
         it('OrderPriceIsNegative', function (done) {
             client.order({
@@ -151,6 +159,7 @@ describe('Orders', function () {
                 assert.equal(err.message, 'Price is invalid')
                 done()
             })
+            .fail(done)
         });
         it('OrderAmountBidNegative', function (done) {
             client.order({
@@ -164,6 +173,7 @@ describe('Orders', function () {
                 assert.equal(err.message, 'Request is invalid')
                 done()
             })
+            .fail(done)
         });
         it('OrderAmountBid0', function (done) {
             client.order({
@@ -177,6 +187,7 @@ describe('Orders', function () {
                 assert.equal(err.message, 'Volume too low')
                 done()
             })
+            .fail(done)
         });
         it('OrderAmountBidTooLow', function (done) {
             client.order({
@@ -184,12 +195,16 @@ describe('Orders', function () {
                 type: "bid",
                 price: config.bid_price,
                 amount: "0.00001"
-            }).fail(function(err){
+            }).then(function(result){
+                assert(false)
+            })
+            .fail(function(err){
                 assert(err)
                 assert.equal(err.name, 'BadRequest')
                 assert.equal(err.message, 'Volume too low')
                 done()
             })
+            .fail(done)
         });
         it('OrderPriceBidTooLow', function (done) {
             client.order({
@@ -203,6 +218,7 @@ describe('Orders', function () {
                 assert.equal(err.message, 'Price too low')
                 done()
             })
+            .fail(done)
         });
         it('OrderAmountBidTooHigh', function (done) {
             client.order({
@@ -216,6 +232,7 @@ describe('Orders', function () {
                 //assert.equal(err.message, 'Volume too high')
                 done()
             })
+            .fail(done)
         });
         it('OrderAmountAsk0', function (done) {
             client.order({
@@ -229,6 +246,7 @@ describe('Orders', function () {
                 assert.equal(err.message, 'Volume too low')
                 done()
             })
+            .fail(done)
         });
         it('OrderAmountAskTooLow', function (done) {
             client.order({
@@ -242,6 +260,7 @@ describe('Orders', function () {
                 assert.equal(err.message, 'Volume too low')
                 done()
             })
+            .fail(done)
         });
         it('OrderPriceAskTooHigh', function (done) {
             client.order({
@@ -255,6 +274,7 @@ describe('Orders', function () {
                 //assert.equal(err.message, 'Price too high')
                 done()
             })
+            .fail(done)
         });
     });
     

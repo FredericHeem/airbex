@@ -16,6 +16,9 @@ describe('Spend', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
     var marketName = "BTCEUR";
+    var currency = "BTC";
+    var qc = "EUR"
+    var amount = "2";
     
     before(function(done) {
         testMngr.start().then(done).fail(done);
@@ -34,8 +37,12 @@ describe('Spend', function () {
     describe('SpendAuth', function () {
         before(function(done) {
             debug("before");
+            var withdrawAddress = config.btc_depsosit_address
             this.timeout(5 * 1000);
             testMngr.login()
+            .then(function(){
+                return snowBot.setBalance(clientBob, amount, currency, withdrawAddress)
+            })
             .then(function(){
                 return clientBob.order({
                     market: marketName,

@@ -26,7 +26,12 @@ module.exports = function (bot, config) {
         debug("balances #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
             debug("balances ", JSON.stringify(client))
-            client.balances().then(function(){callback()}).fail(callback);
+            client.balances()
+            .then(function(balance){
+                debug("balances ", balance);
+                callback()
+            })
+            .fail(callback);
         }, function(err) {
             debug("balances done: " + err ? err : "");
             done(err);
@@ -94,7 +99,7 @@ module.exports = function (bot, config) {
     snowChef.creditCrypto = function(clients, currency, done) {
         debug("creditCrypto #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
-            var amount = "1000000000";
+            var amount = "1";
            snowChef.bot.db.creditCrypto(client, currency, amount)
            .then(callback)
            .fail(callback)

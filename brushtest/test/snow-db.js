@@ -256,8 +256,8 @@ module.exports = function (config) {
         var hash = crypto.createHash('sha256')
         hash.update(crypto.randomBytes(8))
         var txid = hash.digest('hex')
-        console.log("creditCrypto amount: %s, txid: %s", amount, txid);
-        var amountSat = num(amount).mul(Math.pow(10, 8)).toString();
+        console.log("creditCrypto currency %s, amount: %s, txid: %s", currency, amount, txid);
+        var amountSat = num(amount).mul(Math.pow(10, 8)).set_precision(0).toString();
         client.getDepositAddress(currency)
         .then(function(result){
             assert(result.address);

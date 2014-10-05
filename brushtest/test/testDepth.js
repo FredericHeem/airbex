@@ -38,6 +38,9 @@ describe('Depth', function () {
         it('DepthAuthAlice', function (done) {
             client.depth("BTCEUR").then(function(depth) {
                 assert(depth)
+                console.log(depth)
+                assert(depth.bids)
+                assert(depth.asks)
                 done()
             }).fail(done);
         });

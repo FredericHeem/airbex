@@ -57,18 +57,29 @@ describe('TestDeposit', function () {
                 })
                 .fail(callback)
             }, function(err) {
-                debug("TestDepositAddresses done: " + err ? err : "");
+                //debug("TestDepositAddresses done: " + err ? err : "");
                 done(err);
             });
         });
         
-        it('TestDepositBTCOk', function (done) {
-            var currency = 'BTC';
+//        it('TestDepositBTCOk', function (done) {
+//            var currency = 'BTC';
+//            var amount = "1";
+//
+//            snowBot.depositComplete(client, amount, currency)
+//            .then(done)
+//            .fail(done);
+//        });
+        it('TestDepositAllOk', function (done) {
             var amount = "1";
-
-            snowBot.depositComplete(client, amount, currency)
-            .then(done)
-            .fail(done);
+            async.forEach(config.currencies, function(currency, callback) {
+                snowBot.depositComplete(client, amount, currency)
+                .then(callback)
+                .fail(callback);
+            }, function(err) {
+                //debug("TestDepositOk done: " + err ? err : "");
+                done(err);
+            });
         });
     });
 });

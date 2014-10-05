@@ -78,7 +78,8 @@ exports.liability = function(req, res, next) {
     debug("liability, id: %s, email %s, currency %s", id, email, currency);
     getCompleteTreeFromDb(currency, req.app, next, function(err, completeTree){
         if(err){
-            res.send(400, {error:err})
+            log.error("liability ", err)
+            res.status(400).send({error:err})
         } else {
             try {
                 var partialTree = lproof.extractPartialTree(completeTree, email);
@@ -86,12 +87,12 @@ exports.liability = function(req, res, next) {
                 var response = {"id":id, "partial_tree": JSON.parse(partialTree.serialize())}
                 //Double check
                 var root = completeTree.root()
-                //console.log("Root: ", root.data);
+                console.log("Root: ", root.data);
                 //console.log("verified: ", lproof.verifyTree(partialTree, root.data));
                 res.send(response);
             } catch(e){
-                console.log("", e)
-                res.send(400, {error:e})
+                log.error("liability ", e)
+                res.status(400).send({error:e})
             }
         }
     })

@@ -297,7 +297,30 @@ module.exports = function (config) {
         
     };
     
+    snowBot.setBalance = function(client, amount, currency, withdrawAddress){
+        var balanceBefore;
+        return client.balance(currency)
+        .then(function(balance){
+            console.log("setBalance B4: ", balance);
+            balanceBefore = balance;
+            var diff = num(amount).sub(num(balance.balance));
+            if(diff.gt(num(0))){
+                return snowBot.db.creditCrypto(client, currency, diff.toString())
+            } else if(diff.lt(num(0))){
+                var withdrawParam = {
+                        currency:currency,
+                        address:withdrawAddress,
+                        amount:num(balance.balance).sub(amount).toString()
+                };
+                return snowBot.withdrawCryptoComplete(client, withdrawParam)
+            }
+            
+        })
+        
+    }
+    
     snowBot.depositComplete = function(client, amount, currency){
+        var balanceBefore;
         return client.balance(currency)
         .then(function(balance){
             //console.log("depositComplete B4: ", balance);
@@ -305,6 +328,7 @@ module.exports = function (config) {
             return snowBot.db.creditCrypto(client, currency, amount)
         })
         .then(function(){
+            //console.log("depositComplete currency: ", currency);
             return client.balance(currency)
         })
         .then(function(balance){

@@ -1,11 +1,11 @@
 /*global describe, it, before, after*/
 var assert = require('assert');
 var request = require('supertest');
-var debug = require('debug')('testBalances')
+var debug = require('debug')('testTransactions')
 var config = require('./configTest.js')();
 var TestMngr = require('./TestMngr');
 
-describe('Balances', function () {
+describe('Transactions', function () {
     "use strict";
     
     var testMngr = new TestMngr(config);
@@ -20,31 +20,40 @@ describe('Balances', function () {
         testMngr.start().then(done).fail(done);
     });
     
-    describe('BalancesPublic', function () {
-        it('BalancesPublicAlice', function (done) {
-            client.balances()
+    describe('TransactionPublic', function () {
+        it('TransactionPublicAlice', function (done) {
+            client.post('v1/transactions')
             .fail(function(err){
+                assert(err)
+                assert.equal(err.name, "NotAuthenticated")
+                done()
+            });
+        });
+        it('TransactionPublicCsvAlice', function (done) {
+            client.get('v1/transactions/csv')
+            .fail(function(err){
+                assert(err)
                 assert.equal(err.name, "NotAuthenticated")
                 done()
             });
         });
     });
     
-    describe('BalancesAuth', function () {
+    describe('TransactionAuth', function () {
         before(function(done) {
-            debug("before");
-            this.timeout(5 * 1000);
             testMngr.login().then(done).fail(done);
         });
-        it('BalancesAuthAlice', function (done) {
-            client.balances().then(function(balances) {
-                console.log(client.createTableBalances(balances).toString())
+        it('TransactionAuthRead', function (done) {
+            client.post('v1/transactions').then(function(transactions) {
+                console.log(transactions)
+                assert(transactions)
                 done()
             }).fail(done);
         });
-        it('BalancesAuthBob', function (done) {
-            clientBob.balances().then(function(balances) {
-                console.log(clientBob.createTableBalances(balances).toString())
+        it('TransactionAuthCsv', function (done) {
+            client.get('v1/transactions/csv').then(function(csv) {
+                console.log(csv)
+                assert(csv)
                 done()
             }).fail(done);
         });

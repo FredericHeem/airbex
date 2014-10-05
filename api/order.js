@@ -221,14 +221,14 @@ exports.create = function(userId, req, res, next) {
         var row = dr.rows[0]
 
         if (!row) {
-            return res.send(404, {
+            return res.status(404).send({
                 name: 'MarketNotFound',
                 message: 'Market not found'
             })
         }
 
         if (row.oid === null) {
-            return res.send(409, {
+            return res.status(409).send({
                 name: 'FailedToMatchEntireOrder',
                 message: 'Failed to match entire all-or-nothing order'
             })
@@ -243,7 +243,7 @@ exports.create = function(userId, req, res, next) {
             aon: req.body.aon || false
         })
 
-        res.send(201, { id: row.oid })
+        res.status(201).send({ id: row.oid })
     })
 }
 

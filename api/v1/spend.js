@@ -48,7 +48,7 @@ exports.spend = function(req, res, next) {
         ]
     }, function(err, dr) {
         if (err) {
-            debug("spend error: %s", err.message);
+            log.error("spend error: %s", err.message);
             if (err.message.match(/not enough liquidity/)) {
                 return res.status(400).send({
                     name: 'AmountTooHigh',
@@ -78,9 +78,11 @@ exports.spend = function(req, res, next) {
                 message: 'Market not found'
             })
         }
-
-        res.send(201, {
-            id: dr.rows[0].oid
+        
+        var oid = dr.rows[0].oid;
+        debug("spend oid: ", oid)
+        res.status(201).send({
+            id: oid
         })
     })
 }

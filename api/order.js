@@ -30,14 +30,14 @@ exports.createInstantBuy = function(userId, req, res, next) {
 		if (err) {
 			debug("spend error: %s", err.message);
 			if (err.message.match(/non_negative_available/)) {
-				return res.send(400, {
+				return res.status(400).send({
 					name: 'NoFunds',
 					message: 'Insufficient funds'
 				})
 			}
 
 			if (err.message.match(/inserted with zero volume/)) {
-				return res.send(400, {
+				return res.status(400).send({
 					name: 'AmountTooSmall',
 					message: 'Spend amount is too small'
 				})
@@ -104,14 +104,14 @@ exports.create = function(userId, req, res, next) {
 
     if(req.body.type === "bid"){
         if(num(amount).lt(req.app.cache.markets[market].bidminvolume)){
-            return res.send(400, {
+            return res.status(400).send({
                 name: 'BadRequest',
                 message: 'Volume too low'
             })
         }
     } else {
         if(num(amount).lt(req.app.cache.markets[market].askminvolume)){
-            return res.send(400, {
+            return res.status(400).send({
                 name: 'BadRequest',
                 message: 'Volume too low'
             })
@@ -130,7 +130,7 @@ exports.create = function(userId, req, res, next) {
         
         if(req.body.type === "bid"){
             if(num(price).lt(req.app.cache.markets[market].bidminprice)){
-                return res.send(400, {
+                return res.status(400).send({
                     name: 'BadRequest',
                     message: 'Price too low'
                 })
@@ -188,28 +188,28 @@ exports.create = function(userId, req, res, next) {
             log.error("create order error: %s", err.message);
             
             if (err.message.match(/transaction_amount_check/)) {
-                return res.send(400, {
+                return res.status(400).send({
                     name: 'InvalidAmount',
                     message: 'The requested transfer amount is invalid/out of range'
                 })
             }
 
             if (err.message.match(/non_negative_available/)) {
-                return res.send(400, {
+                return res.status(400).send({
                     name: 'InsufficientFunds',
                     message: 'insufficient funds'
                 })
             }
 
             if (/^price.*has too high accuracy$/.test(err.message)) {
-                return res.send(400, {
+                return res.status(400).send({
                     name: 'TooHighPriceAccuracy',
                     message: 'Too many decimal places in price ' + req.body.price
                 })
             }
 
             if (/^volume.*has too high accuracy$/.test(err.message)) {
-                return res.send(400, {
+                return res.status(400).send({
                     name: 'TooHighVolumeAccuracy',
                     message: 'Too many decimal places in amount ' + req.body.amount
                 })

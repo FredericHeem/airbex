@@ -38,13 +38,19 @@ describe('SnowChef', function () {
         });
         it('BalancesAll', function (done) {
             snowChef.balances(clients, done);
-        });   
+        });
         it('OrdersAll', function (done) {
             snowChef.orders(clients, done);
         });   
         it('CancelAllOrders', function (done) {
             snowChef.cancellAllOrders(clients, done)
-        });        
+        });
+        it('WithdrawsListAll', function (done) {
+            snowChef.withdraws(clients, done)
+        });
+        it('WithdrawsRequestCancelAll', function (done) {
+            snowChef.withdrawRequestCancel(clients, done)
+        });
     });
     
     describe('SnowChefTrade', function () {

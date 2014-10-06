@@ -112,7 +112,7 @@ exports.cancel = function(req, res, next) {
         if (err) {
             debug("cancel error: %s", err.message)
             if (err.message.match(/does not exist or has no hold/)) {
-                return res.send(404, {
+                return res.status(404).send({
                     name: 'WithdrawRequestNotFound',
                     message: 'The withdraw request was not found, ' +
                         'does not belong to the user, or is already processing/processed'
@@ -121,7 +121,7 @@ exports.cancel = function(req, res, next) {
             return next(err)
         }
         if (!dr.rowCount) {
-            return res.send(404, {
+            return res.status(404).send({
                 name: 'WithdrawRequestNotFound',
                 message: 'The withdraw request was not found, ' +
                     'does not belong to the user, or is already processing/processed'

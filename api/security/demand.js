@@ -37,7 +37,7 @@ exports.demand = function(type, level, req, res, next) {
     assert.equal(typeof req.user, 'object')
 
     if (req.user.suspended) {
-        return res.send(401, {
+        return res.status(401).send({
             name: 'UserSuspended',
             message: 'The user is suspended. Contact support'
         })
@@ -47,7 +47,7 @@ exports.demand = function(type, level, req, res, next) {
         req.path != '/v1/twoFactor/auth')
     {
         debug('session is primary, user has 2fa enabled, but 2fa is not passed')
-        return res.send(401, {
+        return res.status(401).send({
             name: 'OtpRequired',
             message: 'Two-factor authentication is required for this account'
         })
@@ -56,7 +56,7 @@ exports.demand = function(type, level, req, res, next) {
     if ((type == 'primary' || type == 'admin') && !req.session) {
         debug('required type is primary, but request uses api key')
 
-        return res.send(401, {
+        return res.status(401).send({
             name: 'SessionRequired',
             message: 'The action requires an interactive session'
         })
@@ -74,7 +74,7 @@ exports.demand = function(type, level, req, res, next) {
     }
 
     if (type == 'admin' && !req.user.admin) {
-        return res.send(401, {
+        return res.status(401).send({
             name: 'UserNotAdmin',
             message: 'User is not admin'
         })
@@ -92,7 +92,7 @@ exports.demand = function(type, level, req, res, next) {
         if (!req.apikey[mapping]) {
             debug('apikey %j is missing required permission %s (%s)', req.apikey, type, mapping)
 
-            return res.send(401, {
+            return res.status(401).send({
                 name: 'PermissionRequired',
                 message: format('The API key does not have the %s permission', type)
             })
@@ -155,7 +155,7 @@ exports.otp = function(inner, optional) {
             }
 
             if (!req.body.otp) {
-                return res.send(401, {
+                return res.status(401).send({
                     name: 'OtpRequired',
                     message: 'One-time password required for this request'
                 })
@@ -165,14 +165,14 @@ exports.otp = function(inner, optional) {
                 if (err) return next(err)
 
                 if (correct === null) {
-                    return res.send(403, {
+                    return res.status(403).send({
                         name: 'BlockedOtp',
                         message: 'Time-based one-time password has been consumed. Try again in 30 seconds'
                     })
                 }
 
                 if (!correct) {
-                    return res.send(403, {
+                    return res.status(403).send({
                         name: 'WrongOtp',
                         message: 'Wrong one-time password'
                     })

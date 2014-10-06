@@ -102,7 +102,7 @@ exports.withdraw = function(currencyId, req, res, next) {
         if (err) {
             log.error("withdraw error ", err.message);
             if (err.message.match(/non_negative_available/)) {
-                return res.status.send({
+                return res.status(400).send({
                     name: 'NoFunds',
                     message: 'insufficient funds'
                 })

@@ -180,6 +180,10 @@ describe('WithdrawCrypto', function () {
             .fail(done);
            
         })
-        
+        it('TestWithdrawCryptoCancelAll', function (done) {
+            snowBot.withdrawRequestCancel(client)
+            .then(done)
+            .fail(done);
+        })
     });
 });

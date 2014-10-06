@@ -5,6 +5,7 @@ var async = require('async');
 var SnowDb = require('./snow-db');
 var assert = require('assert');
 var num = require('num');
+var Q = require('Q');
 
 module.exports = function (config) {
     var snowBot = {};
@@ -338,7 +339,28 @@ module.exports = function (config) {
             assert(num(balanceBefore.available).add(num(amount)).eq(num(balance.available)));
         })
     }
-    
+    snowBot.withdrawRequestCancel = function(client){
+        var me = this;
+        var deferred = Q.defer();
+        client.get('v1/withdraws')
+        .then(function(withdraws){
+            assert(withdraws);
+            console.log("#withdraws ", withdraws.length);
+            async.forEach(withdraws, function(withdraw, callback) {
+                console.log("#withdraws id ",  withdraw);
+                if(withdraw.state === 'requested' || withdraw.state === 'sendingEmail'){
+                    client.delete("v1/withdraws/" + withdraw.id).then(callback).fail(callback);
+                } else {
+                    callback();
+                }
+                
+            }, function(err) {
+                if(err) return deferred.reject(err);
+                deferred.resolve();
+            });
+        })
+        return deferred.promise;
+    }
     snowBot.withdrawCryptoComplete = function(client, withdrawParam){
         var request_id;
         var currency = withdrawParam.currency;

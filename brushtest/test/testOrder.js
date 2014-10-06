@@ -280,6 +280,15 @@ describe('Orders', function () {
     
     describe('Trade', function () {
         this.timeout(10e3);
+        before(function(done) {
+            this.timeout(5 * 1000);
+            testMngr.login().then(done).fail(done);
+        });
+        after(function(done) {
+            this.timeout(5 * 1000);
+            var clients = testMngr.clients();
+            snowChef.cancellAllOrders(clients, done)
+        });
         it('BuyUntilNoFund', function(done) {
             var order = {
                 market: config.market,

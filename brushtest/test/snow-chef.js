@@ -48,6 +48,21 @@ module.exports = function (bot, config) {
         });
     }  
     
+    snowChef.withdraws = function(clients, done) {
+        debug("withdraws #clients %s", clients.length);
+        async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
+            client.get("v1/withdraws")
+            .then(function(withdraws){
+                console.log(withdraws)
+                callback()
+            })
+            .fail(callback);  
+        }, function(err) {
+            debug("withdraws done: " + err);
+            done(err);
+        });
+    }  
+    
     snowChef.whoami = function(clients, done) {
         debug("whoami #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
@@ -75,6 +90,17 @@ module.exports = function (bot, config) {
             done(err);
         });
     }
+    
+    snowChef.withdrawRequestCancel = function(clients, done) {
+        debug("withdrawRequestCancel #clients %s", clients.length);
+        async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
+            bot.withdrawRequestCancel(client).then(callback).fail(callback);
+           //client.cancelAll().then(callback).fail(callback);
+        }, function(err) {
+            debug("withdrawRequestCancel done: " + err ? err : "");
+            done(err);
+        });
+    } 
     
     snowChef.cancellAllOrders = function(clients, done) {
         debug("cancellAllOrders #clients %s", clients.length);

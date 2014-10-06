@@ -1,7 +1,9 @@
 var async = require('async')
 , vouchers = require('./vouchers')
 , util = require('util')
-, num = require('num');
+, num = require('num')
+, log = require('../log')(__filename)
+, debug = log.debug
 
 module.exports = exports = function(app) {
     app.post('/v1/send', app.security.demand.otp(app.security.demand.withdraw(2), true), exports.send)
@@ -150,14 +152,14 @@ exports.send = function(req, res, next) {
     var currency = req.body.currency;
     
     if (!req.app.cache.currencies[currency]) {
-        return res.send(400, {
+        return res.status(400).send({
             name: 'InvalidCurrency',
             message: 'Invalid currency'
         })
     }
     
     if (req.app.cache.currencies[currency].fiat) {
-        return res.send(400, {
+        return res.status(400).send({
             name: 'CannotSendFiat',
             message: 'Cannot send FIAT to other users at this time'
         })
@@ -194,7 +196,7 @@ exports.send = function(req, res, next) {
             if (!err) return res.status(204).end()
 
             if (err.name == 'UserNotFound') {
-                return res.send(400, {
+                return res.status(400).send({
                     name: 'UserNotFound',
                     message: 'User not found'
                 })

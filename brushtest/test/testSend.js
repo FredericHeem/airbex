@@ -143,6 +143,38 @@ describe('Send', function () {
             })
             .fail(done)
         });
+        it('SendToUnknownEmail', function (done) {
+            var amount = "0.1";
+            var param = {
+                    email:"newuser@mail.com",
+                    currency:currency,
+                    amount:amount,
+                    allowNewUser:true
+            }
+            var balanceAliceB4;
+            client.balance(currency)
+            .then(function (balance) {
+                balanceAliceB4 = balance;
+                
+                console.log("B4 Alice : ", balance)
+                return client.postPasswordRequired('v1/send', param)
+            })
+            .then(function(result){
+                console.log("result: ", result)
+                return client.balance(currency)
+            })
+            .then(function(balanceAlice){
+                console.log("AF Alice : ", balanceAlice);
+                assert(num(balanceAliceB4.balance).eq(num(balanceAlice.balance)))
+                assert(num(balanceAliceB4.available).sub(num(amount)).eq(num(balanceAlice.available)))
+                return client.get('v1/vouchers')
+            })
+            .then(function(vouchers){
+                console.log(vouchers);
+                done();
+            })
+            .fail(done)
+        });
         it('SendToBob', function (done) {
             var amount = "0.1";
             var param = {

@@ -1,5 +1,7 @@
 var crypto = require('crypto')
 , async = require('async')
+, log = require('../log')(__filename)
+, debug = log.debug;
 
 module.exports = exports = function(app) {
     app.post('/v1/vouchers', app.security.demand.otp(app.security.demand.withdraw(2), true),
@@ -14,19 +16,21 @@ module.exports = exports = function(app) {
             req.body.amount,
             function(err, code) {
                 if (err) return next(err)
-                res.send(201, { voucher: code })
+                res.status(201).send({ voucher: code })
             }
         )
     })
 
     app.post('/v1/vouchers/:id/redeem', app.security.demand.deposit(3), function(req, res, next) {
+        log.debug('redeem ', req.params.id)
         exports.redeem(req.app, req.user.id, req.params.id, function(err, details) {
             if (!err) {
                 return res.send(details)
             }
 
             if (err.name == 'VoucherNotFound') {
-                return res.send(400, {
+                log.error('Voucher not found ', req.params.id)
+                return res.status(400).send({
                     name: 'VoucherNotFound',
                     message: 'Voucher not found'
                 })

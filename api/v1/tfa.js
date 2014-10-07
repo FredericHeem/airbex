@@ -19,6 +19,7 @@ exports.remove = function(req, res, next) {
         if (err) return next(err)
 
         if (!dr.rowCount) {
+            log.error("remove 2fa not set")
             return res.send(400, {
                 name: 'TwoFactorNotEnabled',
                 message: 'Two-factor authentication is not set for this user'

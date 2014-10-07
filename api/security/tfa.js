@@ -9,12 +9,12 @@ module.exports = exports = function(app) {
 }
 
 exports.validate = function(secret, guess, minCounter) {
-    debug('checking guess %s', guess)
+    debug('validate guess %s, minCounter %s', guess, minCounter)
 
     for (var offset = -3; offset <= 3; offset++) {
         var counter = Math.floor(+new Date() / 30e3) - offset
 
-        if (minCounter && counter <= minCounter) {
+        if (minCounter && counter < minCounter) {
             debug('cannot use offset %s (%s >= %s)', offset, counter, minCounter)
             continue
         }

@@ -82,7 +82,7 @@ Snow.prototype.keyFromCredentials = function(sid, email, password) {
     return skey
 }
 
-Snow.prototype._ops = function(ops, action, resCode, param) {
+Snow.prototype._ops = function(ops, action, resCodes, param) {
     var me = this;
     var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});
@@ -93,59 +93,69 @@ Snow.prototype._ops = function(ops, action, resCode, param) {
     console.log("_ops ", JSON.stringify(data));
     request(this.url + action, data, function(err, res, body) {
         //onResult(err, res, body, deferred, resCode)
-        if(res.statusCode == 401 && body && body.name === 'OtpRequired'){
-            param = param || {};
-            param.otp = me.getOtp(me.config.twoFaSecret);
-            console.log("_otp ", param.otp);
-            return me._ops(ops, action, resCode, param);
-        }
-        
+        console.log("onResult statusCode: %s, body: %s", res.statusCode, JSON.stringify(body))
         if (err) {
             console.log("onResult err: ", err)
             return deferred.reject(err)
         }
-        if (res.statusCode != resCode){
-            console.log("onResult statusCode: %s != %s, body: %s", res.statusCode, resCode, body)
+        if(res.statusCode == 401 && body && body.name === 'OtpRequired'){
+            var otp = me.getOtp(me.config.twoFaSecret);
+            console.log("_otp ", otp);
+            
+            me.post('v1/twoFactor/auth', {otp:otp})
+            .then(function(){
+                return me._ops(ops, action, resCodes, param)
+            })
+            .then(function(body){
+                return deferred.resolve(body);
+            }).fail(deferred.reject);
+        } else if (resCodes.indexOf(res.statusCode) == -1){
+            console.log("onResult statusCode: %s != %s, body: %s", res.statusCode, resCodes, body)
             return deferred.reject(bodyToError(body))
+        } else {
+            deferred.resolve(body);
         }
-        deferred.resolve(body);
     })
     return deferred.promise;
 }
 
 Snow.prototype.get = function(action, param) {
-    return this._ops("GET", action, 200, param);
+    return this._ops("GET", action, [200], param);
 }
 
 Snow.prototype.patch = function(action, param) {
     console.log("patch action: %s, param ", action, JSON.stringify(param))
-    return this._ops("PATCH", action, 204, param);
+    return this._ops("PATCH", action, [204], param);
 }
 
 Snow.prototype.delete = function(action, param) {
-    return this._ops("DELETE", action, 204, param);
+    return this._ops("DELETE", action, [204], param);
 }
 
 Snow.prototype.post = function(action, param) {
-    var deferred = Q.defer();
-    var data = updateRequestWithKey(this, {});
-    if(param){
-        data.json = param;
-    }
-    data.method = "POST";
-    request(this.url + action, data, function(err, res, body) {
-        if (err) {
-            debug("post err: ", err)
-            return deferred.reject(err)
-        }
-        if (res.statusCode == 201 || res.statusCode == 204){
-            deferred.resolve(body);
-        } else {
-            return deferred.reject(bodyToError(body))
-        }
-    })
-    return deferred.promise;
+    return this._ops("POST", action, [201, 204], param);
 }
+
+//Snow.prototype.post = function(action, param) {
+//    var deferred = Q.defer();
+//    var data = updateRequestWithKey(this, {});
+//    if(param){
+//        data.json = param;
+//    }
+//    data.method = "POST";
+//    request(this.url + action, data, function(err, res, body) {
+//        if (err) {
+//            debug("post err: ", err)
+//            return deferred.reject(err)
+//        }
+//        if (res.statusCode == 201 || res.statusCode == 204){
+//            deferred.resolve(body);
+//        } else {
+//            return deferred.reject(bodyToError(body))
+//        }
+//    })
+//    return deferred.promise;
+//}
 
 Snow.prototype.postRaw = function(action, session, param) {
     var me = this;
@@ -228,6 +238,8 @@ Snow.prototype.postPasswordRequired = function(action, param) {
                 counter: counter
             })
             return {otp:otp};
+            
+            
         } else if(body.name === "PasswordRequired"){
             assert(body.token);
             var sessionKey = me.keyFromCredentials(body.token, me.config.email, me.config.password);

@@ -24,7 +24,7 @@ exports.handler = function() {
 }
 
 exports.demand = function(type, level, req, res, next) {
-    //debug('demanding type %s and level %s', type, level)
+    debug('demanding type %s and level %s, url: %s', type, level, req.url)
     if (!req.user) {
         debug('user is not set, demand has failed, req: ', req.url)
         return res.status(401).send({
@@ -118,10 +118,11 @@ exports.extendRequestSession = function(req, res, next) {
 }
 
 exports.otp = function(inner, optional) {
-    //debug('OTP optional %d', optional);
     return function(req, res, next) {
+        debug('OTP optional %d', optional);
         inner(req, res, function() {
             var user = req.user;
+            debug('OTP user %d', user.id);
             assert(user)
             if (!req.session) {
                 debug('OTP check skipped for non-primary key (API)')
@@ -153,7 +154,9 @@ exports.otp = function(inner, optional) {
                     token:token
                 })
             }
-
+            
+            debug("body ", JSON.stringify(req.body));
+            
             if (!req.body.otp) {
                 return res.status(401).send({
                     name: 'OtpRequired',

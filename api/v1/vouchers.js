@@ -90,7 +90,7 @@ exports.index = function(req, res, next) {
         values: [req.user.id]
     }, function(err, dr) {
         if (err) return next(err)
-        res.send(201, dr.rows.map(function(row) {
+        res.status(200).send(dr.rows.map(function(row) {
             return {
                 code: row.voucher_id,
                 currency: row.currency_id,

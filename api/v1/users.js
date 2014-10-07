@@ -175,8 +175,6 @@ exports.identity = function(req, res, next) {
             })
         }
 
-        req.app.intercom.setIdentity(req.user.id, req.body)
-
         req.app.activity(req.user.id, 'IdentitySet', _.pick(req.body,
             'firstName', 'lastName', 'address', 'country', 'city', 'postalArea'))
 
@@ -234,7 +232,6 @@ exports.verifyPhone = function(req, res, next) {
                 debug("%s", err)
                 return console.error(err)
             }
-            req.app.intercom.setUserPhoneVerified(req.user.id, dr.rows[0].phone_number)
         })
 
         res.status(204).end()

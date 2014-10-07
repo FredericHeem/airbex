@@ -36,8 +36,10 @@ exports.remove = function(req, res, next) {
 }
 
 exports.enable = function(req, res, next) {
-    if (!req.app.validate(req.body, 'v1/twofactor_enable', res)) return
-
+    if (!req.app.validate(req.body, 'v1/twofactor_enable', res)) {
+        log.error("enable BadRequest: ", req.body);
+        return
+    }
     var twoFactor = req.body.key
 
     debug('two factor key(secret) %s', twoFactor)

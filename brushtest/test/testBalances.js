@@ -26,7 +26,8 @@ describe('Balances', function () {
             .fail(function(err){
                 assert.equal(err.name, "NotAuthenticated")
                 done()
-            });
+            })
+            .fail(done)
         });
     });
     

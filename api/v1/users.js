@@ -41,7 +41,7 @@ exports.patch = function(req, res, next) {
     })
 
     if (values.length == 1) {
-        return res.send(400, {
+        return res.status(400).send({
             name: 'NoUpdates',
             message: 'No updates were provided'
         })
@@ -169,7 +169,7 @@ exports.identity = function(req, res, next) {
 
         if (!dr.rowCount) {
             // 404 or other ?
-            return res.send(404, {
+            return res.status(404).send({
                 name: 'IdentityAlreadySet',
                 message: 'The identity for the user has already been set.'
             })
@@ -197,14 +197,14 @@ exports.verifyPhone = function(req, res, next) {
         if (err) {
             debug("verifyPhone error %s", err.message)
             if (err.message == 'User already has a verified phone number.') {
-                return res.send(400, {
+                return res.status(400).send({
                     name: 'AlreadyVerified',
                     message: 'A phone number has already been verified for this user'
                 })
             }
 
             if (err.message == 'User has not started phone verification') {
-                return res.send(400, {
+                return res.status(400).send({
                     name: 'NotInPhoneVerify',
                     message: 'The user has not begun phone verification'
                 })
@@ -214,7 +214,7 @@ exports.verifyPhone = function(req, res, next) {
         }
 
         if (!dr.rows[0].success) {
-            return res.send(403, {
+            return res.status(403).send({
                 name: 'VerificationFailed',
                 message: 'Verification failed. The code is wrong.'
             })
@@ -244,7 +244,7 @@ exports.voiceFallback = function(req, res, next) {
     var item = exports.allowedVoiceFallback[req.user.id]
 
     if (!item) {
-        return res.send(400, {
+        return res.status(400).send({
             name: 'CallFallbackNotAllowed',
             message: 'User is not in a situation where he can fallback to voice'
         })
@@ -292,7 +292,7 @@ exports.startPhoneVerify = function(req, res, next) {
         debug('failed to parse %s (%s): %s', req.body.country, req.body.number,
             e.message || e)
 
-        return res.send(400, {
+        return res.status(400).send({
             name: 'InvalidPhoneNumber',
             message: 'The number is not a valid phone number'
         })
@@ -305,21 +305,21 @@ exports.startPhoneVerify = function(req, res, next) {
         if (err) {
             debug("startPhoneVerify error: %s", err.message);
             if ((/^User is locked out/i).exec(err.message)) {
-                return res.send(403, {
+                return res.status(403).send({
                     name: 'LockedOut',
                     message: err.message
                 })
             }
 
             if (err.message.match(/User already has a verified phone number/)) {
-                return res.send(400, {
+                return res.status(400).send({
                     name: 'PhoneAlreadyVerified',
                     message: 'User already has a verified phone number'
                 })
             }
 
             if (err.message == 'Another user has already verified that phone number.') {
-                return res.send(403, {
+                return res.status(403).send({
                     name: 'PhoneNumberInUse',
                     message: err.message
                 })

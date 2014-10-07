@@ -68,7 +68,7 @@ module.exports = function (app, server) {
     var router = new Router(io);
     
     function demand(client, eventName, data, next){
-        //debug("demand");
+        //debug("demand ", client.session);
         var user = client.user;
         if(!user){
             return next({name:"NotAuthenticated", message:'Not Authenticated'})
@@ -85,25 +85,34 @@ module.exports = function (app, server) {
     }
     
     function attachUserFromSessionKey(client, eventName, data, next){
-        if(data && data.header && data.header.sessionKey){
+        if(data && data.header && data.header.sessionKey && !client.user){
             //log.debug("attachUserFromSessionKey eventName %s, data: %s", eventName, JSON.stringify(data))
             var sessionKey = data.header.sessionKey;
             app.security.session.getUserAndSessionFromSessionKey(sessionKey,function(err, response){
                 if(err) {
                     return next(err);
                 } else if(response){
-                    var hasUser = client.user ? true:false;
+                    client.sessionKey = sessionKey;
                     client.session = response.session
                     client.user = response.user;
-                    if(!hasUser){
-                        //log.debug("attachUserFromSessionKey: %s", client.user);
-                        app.security.sessionWs.create(response.user.id, client.id,function(err){
-                            if(err) return next(err);
-                            next();
-                        });
-                    } else {
+                    
+                    //log.debug("attachUserFromSessionKey: %s", client.user);
+                    app.security.sessionWs.create(response.user.id, client.id,function(err){
+                        if(err) return next(err);
                         next();
-                    }
+                    });
+                   
+                } else {
+                    next();
+                }
+            })
+        } else if(client.sessionKey){
+            app.security.session.getUserAndSessionFromSessionKey(client.sessionKey, function(err, response){
+                if(err) {
+                    return next(err);
+                } else if(response){
+                    client.session = response.session;
+                    next();
                 } else {
                     next();
                 }

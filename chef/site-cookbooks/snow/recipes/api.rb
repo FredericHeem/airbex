@@ -59,7 +59,7 @@ deploy_revision node[:snow][:api][:app_directory] do
     notifies :restart, "service[snow-api]"
     keep_releases 2
     symlinks({
-         "config/api.json" => "api/config/#{node.chef_environment}.json"
+         "config/config.#{node.chef_environment}.json" => "api/config/config.#{node.chef_environment}.json"
     })
     before_symlink do
       bash "npm install" do
@@ -120,7 +120,7 @@ execute "pg-migrate-custom" do
     only_if { ::File.directory?(db_migration) }
 end
 
-template "#{node[:snow][:api][:app_directory]}/shared/config/api.json" do
+template "#{node[:snow][:api][:app_directory]}/shared/config/config.#{node.chef_environment}.json" do
     source 'api/api.json.erb'
     variables({
         :pgm_ip => pgm_ip || '127.0.0.1',

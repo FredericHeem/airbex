@@ -11,7 +11,7 @@ module.exports = function(router, master, authorize) {
         master(require('./funds')(), 'account')
     })
     .add(/^account\/vouchers$/, function() {
-        if (!authorize.user(3)) return
+        if (!authorize.user()) return
         master(require('./vouchers')(), 'account')
     })
     .add(/^account\/activity$/, function() {

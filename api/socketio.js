@@ -85,20 +85,25 @@ module.exports = function (app, server) {
     }
     
     function attachUserFromSessionKey(client, eventName, data, next){
-        if(data && data.header && data.header.sessionKey && !client.user){
+        if(data && data.header && data.header.sessionKey){
             //log.debug("attachUserFromSessionKey eventName %s, data: %s", eventName, JSON.stringify(data))
             var sessionKey = data.header.sessionKey;
             app.security.session.getUserAndSessionFromSessionKey(sessionKey,function(err, response){
                 if(err) {
                     return next(err);
                 } else if(response){
+                    var hasUser = client.user ? true:false;
                     client.session = response.session
                     client.user = response.user;
-                    //log.debug("attachUserFromSessionKey: %s", client.user);
-                    app.security.sessionWs.create(response.user.id, client.id,function(err){
-                        if(err) return next(err);
+                    if(!hasUser){
+                        //log.debug("attachUserFromSessionKey: %s", client.user);
+                        app.security.sessionWs.create(response.user.id, client.id,function(err){
+                            if(err) return next(err);
+                            next();
+                        });
+                    } else {
                         next();
-                    });
+                    }
                 } else {
                     next();
                 }

@@ -24,7 +24,8 @@
     "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
     "q": "1.0.1",
     "istanbul": "0.3.2",
-    "mocha-lcov-reporter": "0.0.1"
+    "mocha-lcov-reporter": "0.0.1",
+    "speakeasy": "1.0.3"
   },
   
   "scripts": {

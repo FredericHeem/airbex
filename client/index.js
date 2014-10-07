@@ -9,6 +9,8 @@ var debug = require('debug')('snow')
 , debug = require('debug')('Client')
 , Q = require("q")
 , _ = require('lodash')
+, speakeasy = require('speakeasy')
+
 , Snow = module.exports = function(config) {
     this.url = config.url;
     this.config = config;
@@ -48,6 +50,7 @@ function updateRequestWithKey(client, data){
 }
 
 function onResult(err, res, body, deferred, statusCode){
+    
     if (err) {
         debug("onResult err: ", err)
         return deferred.reject(err)
@@ -57,6 +60,16 @@ function onResult(err, res, body, deferred, statusCode){
         return deferred.reject(bodyToError(body))
     }
     deferred.resolve(body);
+}
+
+Snow.prototype.getOtp = function(secret) {
+    var counter = Math.floor(+new Date() / 30e3);
+    var otp = speakeasy.hotp({
+        key: secret,
+        encoding: 'base32',
+        counter: counter
+    })
+    return otp;
 }
 
 Snow.prototype.getUserKey = function(email, password) {
@@ -70,15 +83,32 @@ Snow.prototype.keyFromCredentials = function(sid, email, password) {
 }
 
 Snow.prototype._ops = function(ops, action, resCode, param) {
-    
+    var me = this;
     var deferred = Q.defer();
     var data = updateRequestWithKey(this, {});
     if(param){
         data.json = param;
     }
     data.method = ops;
+    console.log("_ops ", JSON.stringify(data));
     request(this.url + action, data, function(err, res, body) {
-        onResult(err, res, body, deferred, resCode)
+        //onResult(err, res, body, deferred, resCode)
+        if(res.statusCode == 401 && body && body.name === 'OtpRequired'){
+            param = param || {};
+            param.otp = me.getOtp(me.config.twoFaSecret);
+            console.log("_otp ", param.otp);
+            return me._ops(ops, action, resCode, param);
+        }
+        
+        if (err) {
+            console.log("onResult err: ", err)
+            return deferred.reject(err)
+        }
+        if (res.statusCode != resCode){
+            console.log("onResult statusCode: %s != %s, body: %s", res.statusCode, resCode, body)
+            return deferred.reject(bodyToError(body))
+        }
+        deferred.resolve(body);
     })
     return deferred.promise;
 }
@@ -117,7 +147,7 @@ Snow.prototype.post = function(action, param) {
     return deferred.promise;
 }
 
-Snow.prototype.postRaw = function(action, sessionKey, param) {
+Snow.prototype.postRaw = function(action, session, param) {
     var me = this;
     var deferred = Q.defer();
     var uri = this.url + action
@@ -126,12 +156,13 @@ Snow.prototype.postRaw = function(action, sessionKey, param) {
         data.json = param;
     }
     
-    if(sessionKey){
-        data.json.sessionKey = sessionKey;
+    if(session){
+        data.json = data.json || {};
+        _.extend(data.json, session)
     }
 
-    console.log("postRaw action: %s, sessionKey %s, data: %s", 
-            action, sessionKey, JSON.stringify(data.json))
+    console.log("postRaw action: %s, session %s, data: %s", 
+            action, JSON.stringify(session), JSON.stringify(data.json))
     request.post(data , function(err, res, body){
         if (err) return deferred.reject(err)
         console.log(res.statusCode)
@@ -140,10 +171,48 @@ Snow.prototype.postRaw = function(action, sessionKey, param) {
     return deferred.promise;
 }
 
-Snow.prototype.postPasswordRequired = function(action, withdrawParam) {
+//Snow.prototype.postPasswordRequired = function(action, withdrawParam) {
+//    var me = this;
+//    var deferred = Q.defer();
+//    this.postRaw(action, null, withdrawParam)
+//    .then(function(result){
+//        var body = result.body;
+//        var res = result.res;
+//        console.log("body ", JSON.stringify(body))
+//        console.log("res.statusCode  ", res.statusCode )
+//        if (res.statusCode != 401) return deferred.reject(bodyToError(body))
+//        console.log("body.name ", body.name)
+//        assert.equal(body.name, "PasswordRequired")
+//        assert(body.token);
+//        var sessionKey = me.keyFromCredentials(body.token, me.config.email, me.config.password);
+//        console.log("sessionKey", sessionKey)
+//        return sessionKey;
+//    }).then(function(sessionKey){
+//        console.log("sessionKey", sessionKey)
+//        me.postRaw(action, sessionKey, withdrawParam)
+//        .then(function(param){
+//            if (param.res.statusCode == 201 || param.res.statusCode == 204) {
+//                deferred.resolve(param.body)
+//            } else {
+//                return deferred.reject(bodyToError(param.body))
+//            }
+//        })
+//        .fail(function(err){
+//            deferred.reject(err)
+//        });
+//        
+//    })
+//    .fail(function(err){
+//        deferred.reject(err)
+//    });
+//    
+//    return deferred.promise;
+//}
+
+Snow.prototype.postPasswordRequired = function(action, param) {
     var me = this;
     var deferred = Q.defer();
-    this.postRaw(action, null, withdrawParam)
+    this.postRaw(action, null, param)
     .then(function(result){
         var body = result.body;
         var res = result.res;
@@ -151,14 +220,24 @@ Snow.prototype.postPasswordRequired = function(action, withdrawParam) {
         console.log("res.statusCode  ", res.statusCode )
         if (res.statusCode != 401) return deferred.reject(bodyToError(body))
         console.log("body.name ", body.name)
-        assert.equal(body.name, "PasswordRequired")
-        assert(body.token);
-        var sessionKey = me.keyFromCredentials(body.token, me.config.email, me.config.password);
-        console.log("sessionKey", sessionKey)
-        return sessionKey;
-    }).then(function(sessionKey){
-        console.log("sessionKey", sessionKey)
-        me.postRaw(action, sessionKey, withdrawParam)
+        if(body.name === "OtpRequired"){
+            var counter = Math.floor(+new Date() / 30e3)
+            var otp = speakeasy.hotp({
+                key: me.config.twoFaSecret,
+                encoding: 'base32',
+                counter: counter
+            })
+            return {otp:otp};
+        } else if(body.name === "PasswordRequired"){
+            assert(body.token);
+            var sessionKey = me.keyFromCredentials(body.token, me.config.email, me.config.password);
+            console.log("sessionKey", sessionKey)
+            return {sessionKey:sessionKey};
+        }
+
+    }).then(function(session){
+        console.log("session ", session)
+        me.postRaw(action, session, param)
         .then(function(param){
             if (param.res.statusCode == 201 || param.res.statusCode == 204) {
                 deferred.resolve(param.body)
@@ -177,7 +256,6 @@ Snow.prototype.postPasswordRequired = function(action, withdrawParam) {
     
     return deferred.promise;
 }
-
 Snow.prototype.activities = function() {
     return this.get('v1/activities');
 }
@@ -342,7 +420,7 @@ Snow.prototype.bankCreditCancel = function(bankCancelInfo, cb) {
 
 Snow.prototype.withdrawCryptoRaw = function(sessionKey, withdrawParam) {
     var action = 'v1/' + withdrawParam.currency + '/out';
-    return this.postRaw(action, sessionKey, withdrawParam);
+    return this.postRaw(action, {sessionKey:sessionKey}, withdrawParam);
 }
 
 Snow.prototype.withdrawCrypto = function(withdrawParam) {

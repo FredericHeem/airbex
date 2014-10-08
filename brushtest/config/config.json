@@ -38,7 +38,8 @@
     "poi":true,
     "poa":true,
     "btc_deposit_address":"mvRZcE4GkHsDPtW8fSGLi8VaXe9D5iKpaR",
-    "twoFaSecret": "NNDHG3TQGFYTKRDFNVRXCOCMG5WGESZV"
+    "twoFaSecret": "NNDHG3TQGFYTKRDFNVRXCOCMG5WGESZV",
+    "apiKey":"d3fef1fe329a4bd6c6d8e7c1411f565e607cd8212352bdedae65b6a3c6fa4116"
 }
 ,
 {

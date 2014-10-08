@@ -13,13 +13,6 @@ module.exports = exports = function(app) {
     app.get('/v1/users/documents', app.security.demand.primary(1), exports.getIds)
 }
 
-function deleteFiles (files) {
-    // Delete temporary files
-    for (var f in files) {
-        fs.unlink(files[f].path);
-    }
-};
-
 function saveDocument(file, req, res, next){
     fs.readFile(file.path, "binary", function (err, data) {
         fs.unlink(file.path);
@@ -65,55 +58,6 @@ exports.uploadId = function(req, res, next) {
     form.parse(req, function(err, fields, files) {
         debug("saveDocument form.parse files: ")
     });
-    
-
-//    var now = new Date();
-//    if(!req.files || !req.files.document){
-//        debug("uploadId no doc");
-//        return res.send(400, {
-//            name: 'BadRequest',
-//            message: 'Request is invalid'
-//        })
-//    }
-//    var document = req.files.document;
-//    
-//    var upload_path = req.user.id + "-" + now.getFullYear() + "-" 
-//    + now.getMonth() + "-" + now.getDate() + "-"
-//    + now.getHours() + "-" + now.getMinutes() + "-" + now.getSeconds() + "-";
-//    var sizeKb = document.size / 1024 | 0
-//    
-//    if(sizeKb > 5* 1014){
-//        debug('uploadId user id: %s, %s, size %s kB TOO BIG', req.user.id, document.name, sizeKb);
-//        return res.send(400, {
-//            name: 'BadRequest',
-//            message: 'file is too big'
-//        })
-//    }
-//    
-//    debug('uploadId user id: %s, %s, size %s kB', req.user.id, document.name, sizeKb);
-//    
-//    //fs.rename(document.path, "document/" + upload_path + document.name);
-//    
-//    fs.readFile(document.path, "binary", function (err, data) {
-//        if (err) throw err;
-//        var status = "Pending";
-//        var type = "";
-//        var data64 = new Buffer(data, 'binary').toString('base64');
-//        debug('uploadId base 64 length %s',data64.length)
-//        req.app.conn.write.get().query({
-//            text: [
-//                'INSERT INTO document (user_id, name, type, status, image, size)',
-//                'VALUES ($1, $2, $3, $4, $5, $6)'
-//            ].join('\n'),
-//            values: [req.user.id, document.name, type, status, data64, document.size]
-//        }, function(err) {
-//            if (err) return next(err)
-//            req.app.activity(req.user.id, 'UploadId', {"name" : document.name})
-//            res.send({result : format('\nuploaded %s (%d Kb) '
-//                    , document.name
-//                    , sizeKb )});
-//        })
-//      });
 }
 
 exports.getIds = function(req, res, next) {

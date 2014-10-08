@@ -25,7 +25,8 @@
     "q": "1.0.1",
     "istanbul": "0.3.2",
     "mocha-lcov-reporter": "0.0.1",
-    "speakeasy": "1.0.3"
+    "speakeasy": "1.0.3",
+    "airbex-client":"git://github.com/FredericHeem/airbex-client.git#6327f60b17984043832a4fb84a2aff4d7fb01d5c"
   },
   
   "scripts": {

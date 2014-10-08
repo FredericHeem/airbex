@@ -15,10 +15,8 @@ describe('Voucher', function () {
     var client = testMngr.client("alice");
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
-    var marketName = "BTCEUR";
     var currency = "BTC";
-    var qc = "EUR"
-    var amount = "2";
+    var amount = "0.1";
     
     before(function(done) {
         testMngr.start().then(done).fail(done);
@@ -30,7 +28,8 @@ describe('Voucher', function () {
             .fail(function(err){
                 assert.equal(err.name, "NotAuthenticated")
                 done()
-            });
+            })
+            .fail(done)
         });
     });
     
@@ -50,7 +49,30 @@ describe('Voucher', function () {
             })
             .fail(done)
         });
-
+        it('VoucherCreateBadRequest', function (done) {
+            client.postPasswordRequired('v1/vouchers/')
+            .fail(function(err){
+                assert.equal(err.name, "BadRequest")
+                done();
+            })
+            .fail(done)
+        });
+        it('VoucherCreateOk', function (done) {
+            var param = {
+                    amount: amount,
+                    currency: currency
+            }
+            client.postPasswordRequired('v1/vouchers/', param)
+            .then(function(result){
+                console.log("vouchers ", result)
+                assert(result.voucher);
+                clientBob.post('v1/vouchers/' + result.voucher + '/redeem')
+            })
+            .then(function(){
+                done();
+            })
+            .fail(done)
+        });
        
     });
    

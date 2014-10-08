@@ -13,8 +13,9 @@
 </p>
 
 <p>
-    To claim the funds, follow the link below:<br />
-    <%= websiteUrl %>/client/#<%= code %>
+    To claim the funds, first register an account on <%= websiteUrl %>/client/#auth/register<br />
 </p>
-
+<p>
+    When the account is registered, visit the link <%= websiteUrl %>/client/#deposit/voucher to redeem the voucher number: <%= code %>
+</p>
 <% include signature.html %>

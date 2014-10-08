@@ -51,13 +51,8 @@ module.exports = function (rootDir) {
     // set req.ip and req.ips properly
     app.enable('trust proxy');
 
-    if (module.parent) {
-        //app.ripple.remote = {}
-    } else {
-        app.notify = require('./email/notify')(app)
-        app.notifyUserPending = require('./email/notifyUserPending')(app)
-        //app.ripple.connect()
-    }
+    app.notify = require('./email/notify')(app)
+    app.notifyUserPending = require('./email/notifyUserPending')(app)
 
     var routes = ['bitcoincharts', 'v1', 'admin']
     routes.forEach(function(name) {

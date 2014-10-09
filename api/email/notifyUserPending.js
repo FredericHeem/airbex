@@ -34,7 +34,7 @@ exports.processUserPending = function(row, cb) {
         exports.app.email.send(row.email, language, 'verify-email', { code: row.code }, function(err) {
             debug("email sent")
             if (err)  {
-                debug("ERROR sending email")
+                log.error("ERROR sending email")
                 return cb(err)
             } else {
                 exports.app.conn.write.get().query({

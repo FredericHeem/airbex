@@ -4,6 +4,7 @@ var log = require('../log')(__filename)
 
 
 module.exports = exports = function(app) {
+    app.delete('/v1/orders', app.security.demand.trade, exports.cancelAll)
     app.delete('/v1/orders/:id', app.security.demand.trade, exports.cancel)
     app.post('/v1/orders', app.security.demand.trade(2), exports.create)
     app.get('/v1/orders', app.security.demand.any, exports.index)
@@ -70,6 +71,29 @@ exports.history = function(req, res, next) {
     })
 }
 
+exports.cancelAll = function(req, res, next) {
+    var market = req.body.market;
+    debug("cancelAll market:", market);
+    req.app.conn.write.get().query({
+        text: [
+            'UPDATE "order" o',
+            'SET',
+            '   cancelled = volume,',
+            '   volume = 0',
+            'FROM market ',
+            'WHERE',
+            '   o.market_id = market.market_id AND',
+            '   market.name = $2 AND',
+            '   user_id = $1 AND volume > 0'
+        ].join('\n'),
+        values: [req.user.id, market]
+    }, function(err, dr) {
+        if (err) return next(err)
+        res.status(204).end()
+        req.app.activity(req.user.id, 'CancelOrderMarket', { market: market })
+    })
+}
+
 exports.cancel = function(req, res, next) {
     req.app.conn.write.get().query({
         text: [
@@ -85,7 +109,7 @@ exports.cancel = function(req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         if (!dr.rowCount) {
-            return res.send(404, {
+            return res.status(404).send({
                 name: 'OrderNotFound',
                 message: 'The specified order does not exist or has been canceled'
             })

@@ -1,7 +1,7 @@
 var _ = require('lodash')
 
 module.exports = exports = function(app) {
-    app.get('/v1/activities', app.security.demand.primary, exports.index)
+    app.get('/v1/activities', app.security.demand.any, exports.index)
 }
 
 var detailWhitelist = {

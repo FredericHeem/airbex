@@ -98,6 +98,10 @@ describe('Orders', function () {
             })
             .fail(done)
         });
+        it('CancelAllForMarket', function (done) {
+            client.delete('v1/orders', {market:config.market})
+            .then(done).fail(done)
+        });
         it('bobAsk', function (done) {
             clientBob.order({
                 market: config.market,

@@ -62,7 +62,7 @@ exports.createBankCredit = function(req, res, next) {
         req.body.bank_credit_id = bank_credit_id;
         req.app.activity(req.user.id, 'AdminAddBankCredit', req.body)
 
-        res.send(201, { id: bank_credit_id })
+        res.status(201).send({ id: bank_credit_id })
 
     })
 }
@@ -87,7 +87,7 @@ exports.approveBankCredit = function(req, res, next) {
         var row = dr.rows[0]
 
         if (!dr.rowCount) {
-            return res.send(404, {
+            return res.status(404).send({
                 name: 'BankCreditNotFound',
                 message: 'The specified bank credit was not found or is not under review'
             })
@@ -127,7 +127,7 @@ exports.cancelBankCredit = function(req, res, next) {
     req.app.conn.write.get().query(query, function(err, dr) {
         if (err) return next(err)
         if (!dr.rowCount) {
-            return res.send(404, {
+            return res.status(404).send({
                 name: 'BankCreditNotFound',
                 message: 'The specified bank credit was not found or is not under review'
             })

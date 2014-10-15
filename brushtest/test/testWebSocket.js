@@ -39,6 +39,7 @@ describe('WebSocket', function () {
             done();
         });
         it('MarketsPublicOk', function (done) {
+
             apiws.getMarkets()
             .done(function(markets){
                 assert(markets)
@@ -109,6 +110,26 @@ describe('WebSocket', function () {
                assert(balances)
            })
            .then(done, done);
+        });
+        it('MarketsChangeOk', function (done) {
+            this.timeout(10e3);
+            
+            apiws.on('/v1/markets', function(error, marketsSummary){
+                assert(marketsSummary)
+                done();
+            })
+            
+            var param = {
+                    amount:"10",
+                    market:config.market
+            }
+            client.login().then(function(){
+                return client.post('v1/spend', param)
+            })
+            .then(function(oid) {
+            })
+            .fail(done);
+
         });
     });
     describe('WebSocketSessionKey', function () {

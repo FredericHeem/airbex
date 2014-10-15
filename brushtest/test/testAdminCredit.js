@@ -65,14 +65,19 @@ describe('Admin', function () {
             .fail(done)
         });
         it('AdminBankCreditsCreateAll', function (done) {
-            var bankCreditInfo = {
-                    "amount" : "10000",
-                    "currency_id" : quote_currency,
-                    "reference" : "my first deposit for 1000"
-            }
-            snowChef.createAndValidateBankCredit(config.users, adminClient, bankCreditInfo, done)
-        });         
-      
+            async.forEach(config.currenciesFiat, function(fiats, callback){
+                var bankCreditInfo = {
+                        "amount" : "1000",
+                        "currency_id" : fiats,
+                        "reference" : "my first deposit for 1000"
+                }
+                snowChef.createAndValidateBankCredit(config.users, adminClient, bankCreditInfo, callback)
+            }, function(err) {
+                debug("securitySession done: " + err ? err : "");
+                done(err);
+            });
+        });
+        
         it('AdminBankCreditsCreateAndValidateOk', function (done) {
             var bankCreditInfo = {
                     "amount" : "1000",

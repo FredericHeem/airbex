@@ -16,8 +16,8 @@ module.exports = exports = function(app) {
     app.socketio.router.on(wsMessages.marketDepth, exports.depthWs);
 }
 
-var marketsGet = function(app, user, cb){
-    
+exports.marketsGet = function(app, user, cb){
+    //debug("marketGet");
     function formatPriceOrNull(p, m) {
         if (p === null) return null
         return app.cache.formatOrderPrice(p, m)
@@ -83,10 +83,10 @@ var marketsGet = function(app, user, cb){
             }))
         })
     } else {
-        debug("markets public");
+        //debug("markets public");
         var query = 'SELECT * FROM market_summary_view';
         app.conn.read.get().query(query, function(err, dr) {
-            debug("getting markets done")
+            //debug("getting markets done")
             if (err) {
                 log.error(JSON.stringify(err))
                 return cb(err);
@@ -112,14 +112,14 @@ var marketsGet = function(app, user, cb){
 exports.marketsWs = function(client, eventName, data, next) {
     var callbackId = exports.app.socketio.callbackId(data);
     debug("marketsWs callbackId: %s", callbackId);
-    marketsGet(exports.app, client.user, function(err, response){
+    exports.marketsGet(exports.app, client.user, function(err, response){
         if(err) return next({name:"DbError", message:JSON.stringify(err)})
         client.emit(wsMessages.markets, {callbackId: callbackId, data:response})
     })
 }
 
 exports.index = function(req, res, next) {
-    marketsGet(req.app, req.user, function(err, response){
+    exports.marketsGet(req.app, req.user, function(err, response){
         if(err) return next(err);
         res.send(response);
     })

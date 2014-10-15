@@ -51,8 +51,8 @@ module.exports = function (rootDir) {
     // set req.ip and req.ips properly
     app.enable('trust proxy');
 
-    app.notify = require('./email/notify')(app)
-    app.notifyUserPending = require('./email/notifyUserPending')(app)
+
+    
 
     var routes = ['bitcoincharts', 'v1', 'admin']
     routes.forEach(function(name) {
@@ -100,6 +100,11 @@ module.exports = function (rootDir) {
             debug("listening on port %s", config.port)
             server.listen(config.port, function () {
                 log.info("Express server started");
+                
+                app.notify = require('./email/notify')(app)
+                app.notifyUserPending = require('./email/notifyUserPending')(app)
+                app.notifyWebSocket = require('./email/notifyWebSocket')(app)
+                
                 deferred.resolve();
             });
         })

@@ -1,9 +1,11 @@
 /*global describe, it, before, after*/
 var assert = require('assert');
+var Q = require('Q');
 var request = require('supertest');
 var debug = require('debug')('testSpend')
 var config = require('./configTest.js')();
 var TestMngr = require('./TestMngr');
+var num = require('num');
 
 describe('Spend', function () {
     "use strict";
@@ -16,7 +18,7 @@ describe('Spend', function () {
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
     var marketName = "BTCEUR";
-    var currency = "BTC";
+    var bc = "BTC";
     var qc = "EUR"
     var amount = "2";
     
@@ -36,12 +38,17 @@ describe('Spend', function () {
     
     describe('SpendAuth', function () {
         before(function(done) {
-            debug("before");
             var withdrawAddress = config.btc_depsosit_address
             this.timeout(5 * 1000);
             testMngr.login()
             .then(function(){
-                return snowBot.setBalance(clientBob, amount, currency, withdrawAddress)
+                return snowBot.setBalance(clientBob, amount, bc, withdrawAddress)
+            })
+            .then(function(){
+                return client.delete('v1/orders/', {market:marketName})
+            })
+            .then(function(){
+                return clientBob.delete('v1/orders/', {market:marketName})
             })
             .then(function(){
                 return clientBob.order({
@@ -112,9 +119,29 @@ describe('Spend', function () {
                     amount:"50",
                     market:marketName
             }
-            client.post('v1/spend', param).then(function(oid) {
-                done()
-            }).fail(done);
+            var balanceAliceB4,balanceBobB4;
+            Q.all([client.balances(), clientBob.balances()])
+            .spread(function (balanceAlice, balanceBob) {
+                balanceAliceB4 = balanceAlice;
+                balanceBobB4 = balanceBob;
+                
+                console.log("B4 Alice : ", balanceAlice)
+                console.log("B4 Bob: ", balanceBob)
+                return client.post('v1/spend', param) 
+            })
+            .then(function(oid) {
+                return Q.all([client.balances(), clientBob.balances()])
+                .spread(function (balanceAlice, balanceBob) {
+                    console.log("AF Alice : ", balanceAlice)
+                    console.log("AF Bob: ", balanceBob)
+                    assert(num(balanceAlice[bc].balance).gt(num(balanceAliceB4[bc].balance)))
+                    //assert(num(balanceAliceB4.balance).sub(num(amount)).eq(num(balanceAlice.balance)))
+                    //assert(num(balanceBobB4.balance).add(num(amount)).eq(num(balanceBob.balance)))
+                    
+                })
+            })
+            .then(done)
+            .fail(done);
         });
     });
    

@@ -270,19 +270,23 @@ Snow.prototype.whoami = function() {
 
 Snow.prototype.balance = function(currency) {
     return this.balances().then(function(balances){
-        var itemToFound;
-        _.each(balances, function(item) {
-            if(item.currency === currency){
-                itemToFound = item;
-                return;
-            }
-        })
-        return itemToFound;
+        return balances[currency];
     })
 }
 
 Snow.prototype.balances = function() {
-    return this.get('v1/balances');
+    var balancesMap = {}
+    return this.get('v1/balances').then(function(balances){
+        _.each(balances, function(item) {
+            balancesMap[item.currency] = {
+                    currency:item.currency,
+                    balance: item.balance,
+                    available: item.available,
+                    hold: item.hold
+            }
+        })
+        return balancesMap;
+    });
 }
 
 Snow.prototype.getDepositAddress = function(currency) {
@@ -421,7 +425,7 @@ Snow.prototype.createTableBalances = function(balances){
         colWidths: [12, 12, 12, 12]
     })
 
-	balances.forEach(function(balance) {
+    _.each(balances,function(balance) {
         table.push([
             balance.currency,
             balance.balance,

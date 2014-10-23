@@ -4,6 +4,9 @@ var request = require('supertest');
 var debug = require('debug')('testOrders')
 var config = require('./configTest.js')();
 var TestMngr = require('./TestMngr');
+var num = require('num');
+var _ = require('lodash');
+
 
 describe('Orders', function () {
     "use strict";
@@ -279,6 +282,50 @@ describe('Orders', function () {
                 done()
             })
             .fail(done)
+        });
+        it('AskCancelBalance', function (done) {
+            this.timeout(60e3);
+            function askCancelBalance(done){
+                var balancesB4;
+                client.balances()
+                .then(function(balances){
+                    //console.log("balances b4   ", JSON.stringify(balances[config.base_currency]))
+                    balancesB4 = balances;
+                    return client.order({
+                        market: config.market,
+                        type: "bid",
+                        price: config.bid_price,
+                        amount: balances[config.base_currency].available
+                    });
+                })
+                .then(function(res) {
+                    assert(res)
+                    assert(res.id)
+                    return client.cancel(res.id)
+                })
+                .then(function(){
+                    return client.balances();
+                })
+                .then(function(balances){
+                    //console.log("balances after ", JSON.stringify(balances[config.base_currency]))
+                    assert(_.isEqual(balances, balancesB4))
+                })
+                .then(done)
+                .fail(done)
+            }
+            var step = 0;
+            var maxStep = 100;
+            function askCancelBalanceCall(){
+                askCancelBalance(function(){
+                    step++;
+                    if(step > maxStep){
+                        done()
+                    } else {
+                        askCancelBalanceCall(); 
+                    }
+                })
+            }
+            askCancelBalanceCall();
         });
     });
     

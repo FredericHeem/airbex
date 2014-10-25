@@ -45,14 +45,14 @@ describe('Transactions', function () {
         });
         it('TransactionAuthRead', function (done) {
             client.post('v1/transactions').then(function(transactions) {
-                console.log(transactions)
+                //console.log(transactions)
                 assert(transactions)
                 done()
             }).fail(done);
         });
         it('TransactionAuthCsv', function (done) {
             client.get('v1/transactions/csv').then(function(csv) {
-                console.log(csv)
+                //console.log(csv)
                 assert(csv)
                 done()
             }).fail(done);

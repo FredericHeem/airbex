@@ -40,7 +40,7 @@ describe('Whoami', function () {
         it('WhoamiAuthAlice', function (done) {
             client.whoami()
             .then(function(user) {
-                console.log(client.createTableUser(user).toString())
+                //console.log(client.createTableUser(user).toString())
                 done()
             })
             .fail(done)

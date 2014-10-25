@@ -68,7 +68,7 @@ describe('Send', function () {
             }
             client.postPasswordRequired('v1/send', param)
             .fail(function(err){
-                console.log(err)
+                //console.log(err)
                 assert.equal(err.name, "CannotSendFiat")
                 done();
             })
@@ -95,7 +95,6 @@ describe('Send', function () {
             }
             client.postPasswordRequired('v1/send', param)
             .fail(function(err){
-                console.log(err);
                 assert.equal(err.name, "AmountTooSmall")
                 done();
             })
@@ -109,7 +108,6 @@ describe('Send', function () {
             }
             client.postPasswordRequired('v1/send', param)
             .fail(function(err){
-                console.log(err);
                 assert.equal(err.name, "AmountTooSmall")
                 done();
             })
@@ -123,7 +121,6 @@ describe('Send', function () {
             }
             client.postPasswordRequired('v1/send', param)
             .fail(function(err){
-                console.log(err);
                 assert.equal(err.name, "AmountTooHigh")
                 done();
             })
@@ -137,7 +134,6 @@ describe('Send', function () {
             }
             client.postPasswordRequired('v1/send', param)
             .fail(function(err){
-                console.log(err);
                 assert.equal(err.name, "SendToItself")
                 done();
             })
@@ -156,21 +152,21 @@ describe('Send', function () {
             .then(function (balance) {
                 balanceAliceB4 = balance;
                 
-                console.log("B4 Alice : ", balance)
+                //console.log("B4 Alice : ", balance)
                 return client.postPasswordRequired('v1/send', param)
             })
             .then(function(result){
-                console.log("result: ", result)
+                //console.log("result: ", result)
                 return client.balance(currency)
             })
             .then(function(balanceAlice){
-                console.log("AF Alice : ", balanceAlice);
+                //console.log("AF Alice : ", balanceAlice);
                 assert(num(balanceAliceB4.balance).eq(num(balanceAlice.balance)))
                 assert(num(balanceAliceB4.available).sub(num(amount)).eq(num(balanceAlice.available)))
                 return client.get('v1/vouchers')
             })
             .then(function(vouchers){
-                console.log(vouchers);
+                //console.log(vouchers);
                 
                 done();
             })
@@ -189,16 +185,16 @@ describe('Send', function () {
                 balanceAliceB4 = balanceAlice;
                 balanceBobB4 = balanceBob;
                 
-                console.log("B4 Alice : ", balanceAlice)
-                console.log("B4 Bob: ", balanceBob)
+                //console.log("B4 Alice : ", balanceAlice)
+                //console.log("B4 Bob: ", balanceBob)
                 return client.postPasswordRequired('v1/send', param)
             })
             .then(function(result){
-                console.log("result: ", result)
+                //console.log("result: ", result)
                 Q.all([client.balance(currency), clientBob.balance(currency)])
                 .spread(function (balanceAlice, balanceBob) {
-                    console.log("AD Alice : ", balanceAlice)
-                    console.log("AF Bob: ", balanceBob)
+                    //console.log("AD Alice : ", balanceAlice)
+                    //console.log("AF Bob: ", balanceBob)
                     assert(num(balanceAliceB4.balance).sub(num(amount)).eq(num(balanceAlice.balance)))
                     assert(num(balanceBobB4.balance).add(num(amount)).eq(num(balanceBob.balance)))
                     

@@ -39,13 +39,13 @@ describe('Balances', function () {
         });
         it('BalancesAuthAlice', function (done) {
             client.balances().then(function(balances) {
-                console.log(client.createTableBalances(balances).toString())
+                //console.log(client.createTableBalances(balances).toString())
                 done()
             }).fail(done);
         });
         it('BalancesAuthBob', function (done) {
             clientBob.balances().then(function(balances) {
-                console.log(clientBob.createTableBalances(balances).toString())
+                //console.log(clientBob.createTableBalances(balances).toString())
                 done()
             }).fail(done);
         });

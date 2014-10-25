@@ -99,7 +99,7 @@ exports.send = function(user, language, templateName, locals, cb) {
     if(exports.app.smtp.sendMail){
         exports.app.smtp.sendMail(mail, cb)
     } else {
-        log.error("no smtp configured")
+        log.info("no smtp configured")
         cb()
     }
 }

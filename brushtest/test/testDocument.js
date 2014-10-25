@@ -33,14 +33,14 @@ describe('Document', function () {
         it('DownloadDocOk', function (done) {
             var file = './data/a_style.jpg';
             client.uploadDocument(file).then(function(result){
-                console.log("result: ", result)
+                //console.log("result: ", result)
                 assert(result);
             }).then(done).fail(done);
         });
         it('DownloadDocOk', function (done) {
             client.get('v1/users/documents')
             .then(function(documents){
-                console.log("documents: ", documents)
+                //console.log("documents: ", documents)
                 assert(documents);
                 done();
             })

@@ -74,7 +74,7 @@ describe('TwoFA', function () {
             client.get('v1/whoami')
             .then(function(result) {
                 assert(result)
-                console.log(result)
+                //console.log(result)
                 done()
             })
             .fail(done);

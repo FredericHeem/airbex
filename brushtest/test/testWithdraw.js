@@ -155,7 +155,7 @@ describe('WithdrawCrypto', function () {
             })
             .then(function(token){
                 var session = client.keyFromCredentials(token, clientConfig.email, clientConfig.password);
-                console.log("session ", session)
+                //console.log("session ", session)
                 client.withdrawCryptoRaw(session, withdrawParam)
                 .then(function(result) {
                     var body = result.body;

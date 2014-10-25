@@ -69,11 +69,11 @@ describe('Password', function () {
                 return client.post('v1/resetPassword/end', end)
             })
             .then(function(){
-                console.log("ResetPasswordMustConfirmEmailFirst error");
+                //console.log("ResetPasswordMustConfirmEmailFirst error");
                 assert(false);
             })
             .fail(function(err){
-                console.log(err)
+                //console.log(err)
                 assert.equal(err.name,"MustConfirmEmailFirst");
                 done();
             })
@@ -129,7 +129,7 @@ describe('Password', function () {
             };
             client.post('v1/resetPassword/end', param)
             .fail(function(err){
-                console.error(err)
+                //console.error(err)
                 assert.equal(err.name,"MustConfirmEmailFirst");
                 done()
             })

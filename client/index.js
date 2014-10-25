@@ -90,17 +90,17 @@ Snow.prototype._ops = function(ops, action, resCodes, param) {
         data.json = param;
     }
     data.method = ops;
-    console.log("_ops ", JSON.stringify(data));
+    //console.log("_ops ", JSON.stringify(data));
     request(this.url + action, data, function(err, res, body) {
         //onResult(err, res, body, deferred, resCode)
-        console.log("onResult statusCode: %s, body: %s", res.statusCode, JSON.stringify(body))
+        //console.log("onResult statusCode: %s, body: %s", res.statusCode, JSON.stringify(body))
         if (err) {
-            console.log("onResult err: ", err)
+            //console.log("onResult err: ", err)
             return deferred.reject(err)
         }
         if(res.statusCode == 401 && body && body.name === 'OtpRequired'){
             var otp = me.getOtp(me.config.twoFaSecret);
-            console.log("_otp ", otp);
+            //console.log("_otp ", otp);
             
             me.post('v1/twoFactor/auth', {otp:otp})
             .then(function(){
@@ -110,7 +110,7 @@ Snow.prototype._ops = function(ops, action, resCodes, param) {
                 return deferred.resolve(body);
             }).fail(deferred.reject);
         } else if (resCodes.indexOf(res.statusCode) == -1){
-            console.log("onResult statusCode: %s != %s, body: %s", res.statusCode, resCodes, body)
+            //console.log("onResult statusCode: %s != %s, body: %s", res.statusCode, resCodes, body)
             return deferred.reject(bodyToError(body))
         } else {
             deferred.resolve(body);
@@ -124,7 +124,7 @@ Snow.prototype.get = function(action, param) {
 }
 
 Snow.prototype.patch = function(action, param) {
-    console.log("patch action: %s, param ", action, JSON.stringify(param))
+    //console.log("patch action: %s, param ", action, JSON.stringify(param))
     return this._ops("PATCH", action, [204], param);
 }
 
@@ -150,11 +150,11 @@ Snow.prototype.postRaw = function(action, session, param) {
         _.extend(data.json, session)
     }
 
-    console.log("postRaw action: %s, session %s, data: %s", 
-            action, JSON.stringify(session), JSON.stringify(data.json))
+    //console.log("postRaw action: %s, session %s, data: %s", 
+    //        action, JSON.stringify(session), JSON.stringify(data.json))
     request.post(data , function(err, res, body){
         if (err) return deferred.reject(err)
-        console.log(res.statusCode)
+        //console.log(res.statusCode)
         deferred.resolve({res:res, body:body});
     })
     return deferred.promise;
@@ -167,10 +167,10 @@ Snow.prototype.postPasswordRequired = function(action, param) {
     .then(function(result){
         var body = result.body;
         var res = result.res;
-        console.log("body ", JSON.stringify(body))
-        console.log("res.statusCode  ", res.statusCode )
+        //console.log("body ", JSON.stringify(body))
+        //console.log("res.statusCode  ", res.statusCode )
         if (res.statusCode != 401) return deferred.reject(bodyToError(body))
-        console.log("body.name ", body.name)
+        //console.log("body.name ", body.name)
         if(body.name === "OtpRequired"){
             var counter = Math.floor(+new Date() / 30e3)
             var otp = speakeasy.hotp({
@@ -184,12 +184,12 @@ Snow.prototype.postPasswordRequired = function(action, param) {
         } else if(body.name === "PasswordRequired"){
             assert(body.token);
             var sessionKey = me.keyFromCredentials(body.token, me.config.email, me.config.password);
-            console.log("sessionKey", sessionKey)
+            //console.log("sessionKey", sessionKey)
             return {sessionKey:sessionKey};
         }
 
     }).then(function(session){
-        console.log("session ", session)
+        //console.log("session ", session)
         me.postRaw(action, session, param)
         .then(function(param){
             if (param.res.statusCode == 201 || param.res.statusCode == 204) {
@@ -457,7 +457,7 @@ Snow.prototype.createTableMarkets = function(markets){
         colWidths: [8, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]
     })
     markets.forEach(function(market) {
-    	console.log(JSON.stringify(market));
+    	//console.log(JSON.stringify(market));
         table.push([
             market.id,
             market.bid || '',

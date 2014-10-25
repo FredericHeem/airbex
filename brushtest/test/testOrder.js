@@ -6,7 +6,7 @@ var config = require('./configTest.js')();
 var TestMngr = require('./TestMngr');
 var num = require('num');
 var _ = require('lodash');
-
+var Airbex = require('airbex-client');
 
 describe('Orders', function () {
     "use strict";
@@ -56,20 +56,34 @@ describe('Orders', function () {
     });
     
     describe('OrdersAuthenticated', function () {
+        var apiwsBob = new Airbex.WebSocketClient({
+            url:config.url,
+            apiKey:clientBob.config.apiKey
+        });
         before(function(done) {
             debug("before");
             this.timeout(5 * 1000);
-            testMngr.login().then(done).fail(done);
+            testMngr.login()
+            .then(function(){
+                return apiwsBob.start();
+            })
+            .then(function(){
+                return apiwsBob.login(clientBob.config.email, clientBob.config.password);
+            })
+            .then(function(){
+            })
+            .then(done)
+            .fail(done);
         });
         it('aliceOrders', function (done) {
             client.orders().then(function(orders) {
-                console.log(client.createTableOrders(orders).toString())
+                //console.log(client.createTableOrders(orders).toString())
                 done()
             }).fail(done)
         });
         it('CancelOrderNotFound', function (done) {
             client.cancel(99999999).fail(function(err){
-                console.log("CancelOrderNotFound ", JSON.stringify(err))
+                //console.log("CancelOrderNotFound ", JSON.stringify(err))
                 assert(err)
                 assert.equal(err.name, 'OrderNotFound')
                 done();
@@ -98,6 +112,32 @@ describe('Orders', function () {
                 } else {
                     done(err)
                 }
+            })
+            .fail(done)
+        });
+        it('OrderActivity', function (done) {
+            apiwsBob.getIo().once('activity', function(activities){
+                //console.log("ACT", activities);
+                assert(activities)
+                done();
+            })
+            
+            clientBob.order({
+                market: config.market,
+                type: "ask",
+                price: "1000",
+                amount: "0.001"
+            }).then(function(res) {
+                assert(res.id)
+                return client.order({
+                    market: config.market,
+                    type: "bid",
+                    price: "1000",
+                    amount: "0.001"
+                })
+            }).then(function(res) {
+                assert(res.id)
+                //console.log('Order bid #%s placed', res.id)
             })
             .fail(done)
         });
@@ -284,7 +324,7 @@ describe('Orders', function () {
             .fail(done)
         });
         it('AskCancelBalance', function (done) {
-            this.timeout(60e3);
+            this.timeout(200e3);
             function askCancelBalance(done){
                 var balancesB4;
                 client.balances()
@@ -293,7 +333,21 @@ describe('Orders', function () {
                     balancesB4 = balances;
                     return client.order({
                         market: config.market,
-                        type: "bid",
+                        type: "ask",
+                        price: config.bid_price,
+                        amount: balances[config.base_currency].available
+                    });
+                })
+                .then(function(res) {
+                    assert(res)
+                    assert(res.id)
+                    return client.cancel(res.id)
+                })
+                .then(function(){
+                    //console.log("balances b4   ", JSON.stringify(balances[config.base_currency]))
+                    return client.order({
+                        market: config.market,
+                        type: "ask",
                         price: config.bid_price,
                         amount: balances[config.base_currency].available
                     });
@@ -314,7 +368,7 @@ describe('Orders', function () {
                 .fail(done)
             }
             var step = 0;
-            var maxStep = 100;
+            var maxStep = 5;
             function askCancelBalanceCall(){
                 askCancelBalance(function(){
                     step++;

@@ -23,10 +23,13 @@ module.exports = function(filename) {
         container.add(label, {
             console: {
                 handleExceptions: false,
-                level: 'debug',
+                level: 'error',
                 timestamp: true,
                 label: label,
                 colorize: true
+            },
+            file:{
+                filename:"log.txt"
             }
         });
         keys.push(label);

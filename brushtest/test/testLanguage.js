@@ -26,7 +26,7 @@ describe('Language', function () {
             client.get('v1/language')
             .then(function(result){
                 assert(result)
-                console.log(result)
+                //console.log(result)
                 assert(!result.language)
                 done()
             }).fail(done);
@@ -35,7 +35,7 @@ describe('Language', function () {
             request.get(config.url + 'v1/language', 
                     {headers:{'Accept-Language':''}}, function(err, res, body) {
                 assert(!err)
-                console.log(body)
+                //console.log(body)
                 assert(!body.language)
                 done();
             })
@@ -44,7 +44,6 @@ describe('Language', function () {
             request.get(config.url + 'v1/language', 
                     {headers:{'Accept-Language':'aaaaaaaaaaaaaaaaaaaaa'}}, function(err, res, body) {
                 assert(!err)
-                console.log(body)
                 assert(!body.language)
                 done();
             })
@@ -53,7 +52,7 @@ describe('Language', function () {
             request.get(config.url + 'v1/language', 
                     {headers:{'Accept-Language':'a'}}, function(err, res, body) {
                 assert(!err)
-                console.log(body)
+                //console.log(body)
                 done();
             })
         });
@@ -62,7 +61,7 @@ describe('Language', function () {
             request.get(config.url + 'v1/language', 
                     {headers:{'Accept-Language':'fr'}}, function(err, res, body) {
                 assert(!err)
-                console.log(body)
+                //console.log(body)
                 done();
             })
         });
@@ -70,7 +69,7 @@ describe('Language', function () {
             request.get(config.url + 'v1/language', 
                     {headers:{'Accept-Language':'fr,it-IT;q=0.8,it;q=0.6,en-US;q=0.4,en;q=0.2'}}, function(err, res, body) {
                 assert(!err)
-                console.log(body)
+                //console.log(body)
                 done();
             })
         });

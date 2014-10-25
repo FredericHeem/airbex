@@ -253,7 +253,7 @@ module.exports = function (config) {
               console.log("error ", err)
               done(err);
           } else {
-              console.log("getAsset: ", JSON.stringify(res.body));
+              //console.log("getAsset: ", JSON.stringify(res.body));
               done(null, res.body);
           }
       });  
@@ -269,7 +269,7 @@ module.exports = function (config) {
               console.log("error ", err)
               done(err);
           } else {
-              console.log("getAssetsAll: ", JSON.stringify(res.body));
+              //console.log("getAssetsAll: ", JSON.stringify(res.body));
               done(null, res.body);
           }
       });  
@@ -302,7 +302,7 @@ module.exports = function (config) {
         var balanceBefore;
         return client.balance(currency)
         .then(function(balance){
-            console.log("setBalance B4: ", balance);
+            //console.log("setBalance B4: ", balance);
             balanceBefore = balance;
             var diff = num(amount).sub(num(balance.balance));
             if(diff.gt(num(0))){
@@ -345,9 +345,9 @@ module.exports = function (config) {
         client.get('v1/withdraws')
         .then(function(withdraws){
             assert(withdraws);
-            console.log("#withdraws ", withdraws.length);
+            //console.log("#withdraws ", withdraws.length);
             async.forEach(withdraws, function(withdraw, callback) {
-                console.log("#withdraws id ",  withdraw);
+                //console.log("#withdraws id ",  withdraw);
                 if(withdraw.state === 'requested' || withdraw.state === 'sendingEmail'){
                     client.delete("v1/withdraws/" + withdraw.id).then(callback).fail(callback);
                 } else {

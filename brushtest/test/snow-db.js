@@ -55,7 +55,7 @@ module.exports = function (config) {
     snowDb.getWithdrawEmailCode = function (email, currency){
         return snowDb.getAccountIdFromEmail(email, currency)
         .then(function(result){
-            console.log("account_id", result.account_id)
+            //console.log("account_id", result.account_id)
             return snowDb.query({
                 text:[
                       "SELECT code",
@@ -93,7 +93,7 @@ module.exports = function (config) {
     
     snowDb.queryNoResult = function(query){
         var deferred = Q.defer();
-        console.log("queryNoResult: %s", JSON.stringify(query));
+        //console.log("queryNoResult: %s", JSON.stringify(query));
         this.pgClient.query(query, function(err, dres) {
             if (err) {
                 console.error("query error: ", err)
@@ -108,17 +108,17 @@ module.exports = function (config) {
     
     snowDb.query = function(query){
         var deferred = Q.defer();
-        console.log("query: %s", JSON.stringify(query));
+        //console.log("query: %s", JSON.stringify(query));
         this.pgClient.query(query, function(err, dres) {
             if (err) {
-                console.error("query error: ", err)
+                //console.error("query error: ", err)
                 deferred.reject(err);
             } else if(!dres.rows.length){
-                console.error("NoResult")
+                //console.error("NoResult")
                 deferred.reject({name:"NoResult"})
             } else {
                 var row = dres.rows[0];
-                console.log("query result: %s", row);
+                //console.log("query result: %s", row);
                 deferred.resolve(row);
             }
         });
@@ -256,13 +256,13 @@ module.exports = function (config) {
         var hash = crypto.createHash('sha256')
         hash.update(crypto.randomBytes(8))
         var txid = hash.digest('hex')
-        console.log("creditCrypto currency %s, amount: %s, txid: %s", currency, amount, txid);
+        //console.log("creditCrypto currency %s, amount: %s, txid: %s", currency, amount, txid);
         var amountSat = num(amount).mul(Math.pow(10, 8)).set_precision(0).toString();
         client.getDepositAddress(currency)
         .then(function(result){
             assert(result.address);
             var address = result.address;
-            console.log("creditCrypto amount: %s, address: %s, txid: %s", amountSat, address, txid);
+            //console.log("creditCrypto amount: %s, address: %s, txid: %s", amountSat, address, txid);
             me.pgClient.query({
                 text: [
                     'SELECT crypto_credit($1, $2, $3, $4);'
@@ -279,7 +279,7 @@ module.exports = function (config) {
     
     snowDb.setDepositAddress = function(user, currency, done) {
         var email = user.email;
-        debug("setDepositAddress email:%s", email);
+        //debug("setDepositAddress email:%s", email);
         async.waterfall(
                 [
                  function(callback) {

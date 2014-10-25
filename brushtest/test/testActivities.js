@@ -39,7 +39,7 @@ describe('Activities', function () {
         it('ActivitiesAuthAlice', function (done) {
             client.activities().then(function(activities) {
                 assert(activities);
-                console.log(activities);
+                //console.log(activities);
                 //console.log(client.createTableActivities(balances).toString())
                 done()
             }).fail(done);

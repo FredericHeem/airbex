@@ -85,10 +85,10 @@ describe('ApiKeys', function () {
                 return client.get('v1/keys')
             })
             .then(function(apiKeys){
-                console.log("apiKeys: ", apiKeys);
+                //console.log("apiKeys: ", apiKeys);
                 numApiKeysAfter = apiKeys.length;
                 assert((numApiKeysBefore + 1) === numApiKeysAfter);
-                console.log("delete key: ", apiKeyCreated)
+                //console.log("delete key: ", apiKeyCreated)
                 return client.delete('v1/keys/' + apiKeyCreated)
             })
             .then(function(){

@@ -23,7 +23,7 @@ describe('Markets', function () {
     describe('MarketPublic', function () {
         it('MarketPublic', function (done) {
             client.markets().then(function(markets) {
-                console.log(client.createTableMarkets(markets).toString())
+                //console.log(client.createTableMarkets(markets).toString())
                 done();
             }).fail(done)
         });
@@ -37,7 +37,7 @@ describe('Markets', function () {
         });
         it('MarketAuthenticated', function (done) {
             client.markets().then(function(markets) {
-                console.log(client.createTableMarkets(markets).toString())
+                //console.log(client.createTableMarkets(markets).toString())
                 done();
             }).fail(done)
         });

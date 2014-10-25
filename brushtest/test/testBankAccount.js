@@ -39,7 +39,7 @@ describe('BankAccount', function () {
         it('BankAccountAuthList', function (done) {
             client.get('v1/bankAccounts').then(function(bankAccounts) {
                 assert(bankAccounts)
-                console.log(bankAccounts)
+                //console.log(bankAccounts)
                 done()
             }).fail(done);
         });

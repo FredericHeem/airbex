@@ -64,7 +64,7 @@ describe('Voucher', function () {
             }
             client.postPasswordRequired('v1/vouchers/', param)
             .then(function(result){
-                console.log("vouchers ", result)
+                //console.log("vouchers ", result)
                 assert(result.voucher);
                 clientBob.post('v1/vouchers/' + result.voucher + '/redeem')
             })

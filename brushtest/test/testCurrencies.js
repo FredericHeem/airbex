@@ -37,7 +37,7 @@ describe('Currencies', function () {
         });
         it('CurrenciesAuthAlice', function (done) {
             client.currencies().then(function(currencies) {
-                console.log(currencies);
+                //console.log(currencies);
                 assert(currencies)
                 done()
             }).fail(done);

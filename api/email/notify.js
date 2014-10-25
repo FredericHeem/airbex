@@ -113,7 +113,7 @@ exports.process = function(row, cb) {
     
     if (!template) {
         // TODO: Raven
-        log.error('Not sure how to send activity of type %s', row.type)
+        log.debug('Not sure how to send activity of type %s', row.type)
         return cb()
     }
 
@@ -136,7 +136,7 @@ function onActivityWebSocket(userId, activity){
 }
 
 exports.tick = function(cb) {
-
+    log.verbose("tick");
     var query = 'SELECT * FROM pending_email_notify'
 
     exports.app.conn.read.get().query(query, function(err, dr) {

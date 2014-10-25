@@ -53,7 +53,7 @@ module.exports = function (bot, config) {
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
             client.get("v1/withdraws")
             .then(function(withdraws){
-                console.log(withdraws)
+                //console.log(withdraws)
                 callback()
             })
             .fail(callback);  
@@ -67,7 +67,7 @@ module.exports = function (bot, config) {
         debug("whoami #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
             client.whoami().then(function(user) {
-                console.log(client.createTableUser(user).toString())
+                //console.log(client.createTableUser(user).toString())
                 callback()
             })
             .fail(callback);
@@ -81,7 +81,7 @@ module.exports = function (bot, config) {
         debug("markets #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
             client.markets().then(function(markets) {
-                console.log(client.createTableMarkets(markets).toString())
+                //console.log(client.createTableMarkets(markets).toString())
                 callback()
             })
             .fail(callback)

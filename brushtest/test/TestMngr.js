@@ -5,7 +5,7 @@ var SnowBot = require('./snow-bot');
 var SnowChef = require('./snow-chef');
 var SnowClient = require('../../client/index');
 var App = require('../../api/ExpressApp');
-//var app = new App();
+var app = new App();
 
 
 
@@ -27,14 +27,14 @@ var TestMngr = function(config){
     })
     
     this.start = function(){
-        console.log("TestMngr start");
+        //console.log("TestMngr start");
         var deferred = Q.defer();
         if(started){
             console.log("TestMngr already started");
             debug("already started")
             deferred.resolve();
         } else {
-            this.dbConnect()
+            Q.all([this.dbConnect()/*, app.start()*/])
             .then(function(){
                 started = true;
                 deferred.resolve()

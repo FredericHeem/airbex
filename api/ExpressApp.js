@@ -82,7 +82,7 @@ module.exports = function (rootDir) {
     
 
     app.start = function () {
-        debug("start")
+        //console.log("START")
         var deferred = Q.defer();
         var cache = app.cache = require('./cache')
         
@@ -100,7 +100,7 @@ module.exports = function (rootDir) {
             debug("listening on port %s", config.port)
             server.listen(config.port, function () {
                 log.info("Express server started");
-                
+                //console.log("Express server started")
                 app.notify = require('./email/notify')(app)
                 app.notifyUserPending = require('./email/notifyUserPending')(app)
                 app.notifyWebSocket = require('./email/notifyWebSocket')(app)

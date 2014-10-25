@@ -82,7 +82,6 @@ describe('Spend', function () {
             }
             client.post('v1/spend', param)
             .fail(function(err){
-                console.log(err);
                 assert.equal(err.name, "BadRequest")
                 done();
             })
@@ -95,7 +94,6 @@ describe('Spend', function () {
             }
             client.post('v1/spend', param)
             .fail(function(err){
-                console.log(err);
                 assert.equal(err.name, "VolumeTooLow")
                 done();
             })
@@ -126,29 +124,29 @@ describe('Spend', function () {
                 balanceAliceB4 = balanceAlice;
                 balanceBobB4 = balanceBob;
                 
-                console.log("B4 Alice : ", balanceAlice)
-                console.log("B4 Bob: ", balanceBob)
+                //console.log("B4 Alice : ", balanceAlice)
+                //console.log("B4 Bob: ", balanceBob)
                 return client.post('v1/spend', param) 
             })
             .then(function(oid) {
                 return Q.all([client.balances(), clientBob.balances()])
                 .spread(function (balanceAlice, balanceBob) {
-                    console.log("AF Alice : ", balanceAlice)
-                    console.log("AF Bob: ", balanceBob)
+                    //console.log("AF Alice : ", balanceAlice)
+                    //console.log("AF Bob: ", balanceBob)
                     assert(num(balanceAlice[bc].balance).gt(num(balanceAliceB4[bc].balance)))
-                    console.log("DIFF ALICE QC" + num(balanceAliceB4[qc].balance)
+                    /*console.log("DIFF ALICE QC" + num(balanceAliceB4[qc].balance)
                             .sub(num(balanceAlice[qc].balance))
                             .sub(num(amount)).toString());
                     console.log("DIFF BOB QC" + num(balanceBob[qc].balance)
                             .sub(num(balanceBobB4[qc].balance))
-                            .sub(num(amount)).toString());
+                            .sub(num(amount)).toString());*/
                     
                     assert(num(balanceBob[qc].balance)
                     .sub(num(balanceBobB4[qc].balance))
                     .sub(num(amount)).eq(num(0)))
                     
-                    console.log("DIFF BC ALICE" + num(balanceAlice[bc].balance).sub(num(balanceAliceB4[bc].balance)).toString());
-                    console.log("DIFF BC BOB" + num(balanceBob[bc].balance).sub(num(balanceBobB4[bc].balance)).toString());
+                    //console.log("DIFF BC ALICE" + num(balanceAlice[bc].balance).sub(num(balanceAliceB4[bc].balance)).toString());
+                    //console.log("DIFF BC BOB" + num(balanceBob[bc].balance).sub(num(balanceBobB4[bc].balance)).toString());
                     
                     
                     assert(num(balanceAlice[bc].balance)

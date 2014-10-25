@@ -19,6 +19,7 @@ describe('WebSocket', function () {
     });
     
     describe('WebSocketKo', function () {
+        this.timeout(5e3);
         it('ConnectKo', function (done) {
             var apiwsKo = new Airbex.WebSocketClient({url:"http://localhost:1234"});
             apiwsKo.start().fail(done);
@@ -39,7 +40,7 @@ describe('WebSocket', function () {
             done();
         });
         it('MarketsPublicOk', function (done) {
-
+            this.timeout(5e3);
             apiws.getMarkets()
             .done(function(markets){
                 assert(markets)
@@ -47,6 +48,7 @@ describe('WebSocket', function () {
             });
         });
         it('DepthPublicOk', function (done) {
+            this.timeout(10e3);
             apiws.getMarkets()
            .done(function(markets){
                _.each(markets, function(market, index){

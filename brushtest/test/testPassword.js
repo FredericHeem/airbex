@@ -40,7 +40,6 @@ describe('Password', function () {
         it('PasswordAuthNoKey', function (done) {
             client.postPasswordRequired('v1/changePassword')
             .fail(function(err){
-                console.log("Err:", err);
                 assert(err)
                 assert.equal(err.name, "BadRequest")
                 done()
@@ -50,7 +49,6 @@ describe('Password', function () {
             var param = {key:"aa"};
             client.postPasswordRequired('v1/changePassword', param)
             .fail(function(err){
-                console.log("Err:", err);
                 assert(err)
                 assert.equal(err.name, "BadRequest")
                 done()
@@ -65,7 +63,6 @@ describe('Password', function () {
                 return client.postPasswordRequired('v1/changePassword', param)
             })
             .fail(function(err){
-                console.log("Err:", err);
                 assert(err)
                 assert.equal(err.name, "DuplicatedKey")
                 done()

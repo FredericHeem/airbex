@@ -113,7 +113,7 @@ describe('Users', function () {
             async.forEachLimit(config.users, 1, function(client, callback) {
                 snowBot.db.getUserIdFromEmail(client.email)
                 .then(function(user){
-                    console.log("client: ", JSON.stringify(client))
+                    //console.log("client: ", JSON.stringify(client))
                     var param = {
                         first_name:client.first_name || client.name,
                         last_name:client.last_name || " ",
@@ -124,7 +124,7 @@ describe('Users', function () {
                         poi_approved:client.poi || false, 
                         poa_approved:client.poa || false
                         };
-                    console.log("param: ", JSON.stringify(param))
+                    //console.log("param: ", JSON.stringify(param))
                     return clientAdmin.adminUserPatch(user.user_id, param);
                 })
                 .then(callback)
@@ -133,7 +133,7 @@ describe('Users', function () {
                     callback(err)
                 })
               }, function(err){
-                 debug("CreateUsers done: " + err);
+                 //debug("CreateUsers done: " + err);
                  assert(!err);
                  done();
             });

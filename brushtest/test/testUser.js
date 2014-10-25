@@ -83,7 +83,7 @@ describe('User', function () {
                         poi_approved:false, 
                         poa_approved:false
                 };
-                console.log("param: ", JSON.stringify(param))
+                //console.log("param: ", JSON.stringify(param))
                 clientAdmin.adminUserPatch(user_id, param)
             })
             .then(function(){
@@ -108,7 +108,7 @@ describe('User', function () {
                         poi_approved:true, 
                         poa_approved:true
                 };
-                console.log("param: ", JSON.stringify(param))
+                //console.log("param: ", JSON.stringify(param))
                 clientAdmin.adminUserPatch(user_id, param)
             })
             .then(function(){

@@ -26,7 +26,7 @@ describe('Charts', function () {
             client.get('bitcoincharts/' + currency + '/trades.json')
             .then(function(result){
                 assert(result)
-                console.log(result)
+                //console.log(result)
                 done()
             });
         });
@@ -34,7 +34,7 @@ describe('Charts', function () {
             client.get('bitcoincharts/' + currency + '/orderbook.json')
             .then(function(result){
                 assert(result)
-                console.log(result)
+                //console.log(result)
                 done()
             });
         });

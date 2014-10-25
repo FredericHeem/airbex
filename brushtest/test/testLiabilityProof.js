@@ -44,8 +44,8 @@ describe('LiabilityProof', function () {
                 assert(!err);
                 assert(root);
                 assert(partialTree);
-                console.log("root: ", JSON.stringify(root));
-                console.log("partialTree: ", JSON.stringify(partialTree));
+                //console.log("root: ", JSON.stringify(root));
+                //console.log("partialTree: ", JSON.stringify(partialTree));
                 verify_liability(root, partialTree)
                 done();
             })
@@ -60,8 +60,8 @@ describe('LiabilityProof', function () {
                      },
                      function(rootFirst, callback) {
                          snowBot.liabilityGetRoot(client, currency, function(err, rootSecond){
-                             console.log("Root 1: ", rootFirst);
-                             console.log("Root 2: ", rootSecond);
+                             //console.log("Root 1: ", rootFirst);
+                             //console.log("Root 2: ", rootSecond);
                              callback(err)
                          })
                      },

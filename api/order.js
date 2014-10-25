@@ -144,7 +144,7 @@ exports.create = function(userId, req, res, next) {
                         askmaxprice: req.app.cache.markets[market].askmaxprice
                 }
                 log.error(error)
-                return res.send(400, error)
+                return res.status(400).send(error)
             }
         }
     }

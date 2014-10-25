@@ -53,7 +53,7 @@ var Router = function(io){
         
         io.on('connection', function (socket) {
             socket.on(eventName, function (data) {
-                console.log(data);
+                //console.log(data);
                 onEvent(socket, 0, functions, eventName, data);
             });
         });

@@ -23,7 +23,7 @@ module.exports = function(filename) {
         container.add(label, {
             console: {
                 handleExceptions: false,
-                level: 'error',
+                level: 'debug',
                 timestamp: true,
                 label: label,
                 colorize: true

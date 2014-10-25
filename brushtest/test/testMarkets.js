@@ -41,5 +41,13 @@ describe('Markets', function () {
                 done();
             }).fail(done)
         });
+        it('MarketInfo', function (done) {
+            client.get('v1/markets/info').then(function(marketsInfo) {
+                console.log(marketsInfo)
+                assert(marketsInfo);
+                done();
+            })
+            .fail(done)
+        });
     });
 });

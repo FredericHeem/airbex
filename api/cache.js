@@ -26,6 +26,7 @@ var async = require('async')
 }
 , log = require('./log')(__filename)
 , debug = log.debug
+, assert = require('assert')
 
 module.exports = exports = function(app, conn, cb) {
     exports.markets = {};
@@ -139,13 +140,15 @@ exports.formatOrderVolume = function(value, marketId) {
 }
 
 exports.getMarket = function (market_id){
-	//debug("market %s, %s", market_id, JSON.stringify(exports.markets[market_id]));
-	return exports.markets[market_id];
+    //debug("market %s, %s", market_id, JSON.stringify(exports.markets[market_id]));
+    return exports.markets[market_id];
 }
 
 exports.getBaseCurrency = function (market){
-	//debug("market %s, %s", market, JSON.stringify(exports.markets[market]))
-	return exports.markets[market].base_currency_id
+    //debug("market %s, %s", market, JSON.stringify(exports.markets[market]))
+    assert(market);
+    assert(exports.markets[market]);
+    return exports.markets[market].base_currency_id
 }
 
 exports.getQuoteCurrency = function (market){

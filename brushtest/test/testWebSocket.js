@@ -47,6 +47,14 @@ describe('WebSocket', function () {
                 done()
             });
         });
+        it('MarketsInfoNotAuthenticated', function (done) {
+            apiws.getMarketsInfo()
+           .fail(function(error){
+               assert(error)
+               assert.equal(error.name, "NotAuthenticated")
+           })
+           .then(done, done);
+        });
         it('DepthPublicOk', function (done) {
             this.timeout(10e3);
             apiws.getMarkets()
@@ -96,6 +104,13 @@ describe('WebSocket', function () {
             apiws.getMarkets()
            .then(function(markets){
                assert(markets)
+           })
+           .then(done, done);
+        });
+        it('MarketsInfoAuthenticatedOk', function (done) {
+            apiws.getMarketsInfo()
+           .then(function(marketsInfo){
+               assert(marketsInfo)
            })
            .then(done, done);
         });
@@ -171,10 +186,11 @@ describe('WebSocket', function () {
             .then(function(response){
                 assert(response.user);
                 assert(response.balances);
-                assert(response.markets);
+                assert(response.marketsInfo);
                 assert(response.sessionKey);
                 done()
-            }, done)
+            })
+            .fail(done)
         });
     });
 });

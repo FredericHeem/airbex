@@ -43,8 +43,9 @@ describe('Markets', function () {
         });
         it('MarketInfo', function (done) {
             client.get('v1/markets/info').then(function(marketsInfo) {
-                console.log(marketsInfo)
+                //console.log(marketsInfo)
                 assert(marketsInfo);
+                assert(marketsInfo[0].bidminvolume)
                 done();
             })
             .fail(done)

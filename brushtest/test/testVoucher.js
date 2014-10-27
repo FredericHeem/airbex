@@ -4,6 +4,7 @@ var request = require('supertest');
 var debug = require('debug')('testVoucher')
 var config = require('./configTest.js')();
 var TestMngr = require('./TestMngr');
+var async = require('async');
 
 describe('Voucher', function () {
     "use strict";
@@ -70,6 +71,44 @@ describe('Voucher', function () {
             })
             .then(function(){
                 done();
+            })
+            .fail(done)
+        });
+        it('VoucherAuthList', function (done) {
+            var param = {
+                    amount: amount,
+                    currency: currency
+            }
+            client.postPasswordRequired('v1/vouchers/', param)
+            .then(function(){
+                return client.get('v1/vouchers')
+            })
+            .then(function(vouchers){
+                //console.log(vouchers)
+                assert(vouchers)
+                assert(vouchers.length > 0)
+                async.forEach(vouchers, function(voucher, callback) {
+                    client.post('v1/vouchers/' + voucher.code + '/redeem')
+                    .then(function(result){
+                        assert(result)
+                        assert(result.cancelled)
+                        callback()
+                    })
+                    .fail(callback);
+                }, function(err) {
+                    //console.log("redeem voucher done: " + err ? err : "");
+                    //if(err) return done(err)
+                    
+                });
+            })
+            .then(function(){
+                return client.get('v1/vouchers')
+            })
+            .then(function(vouchers){
+                //console.log(vouchers)
+                assert(vouchers)
+                assert.equal(vouchers.length, 0)
+                done()
             })
             .fail(done)
         });

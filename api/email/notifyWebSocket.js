@@ -5,9 +5,11 @@ var log = require('../log')(__filename)
 , num = require('num')
 , dq = require('deferred-queue')
 , pg = require('../pg')
-, market = require('../v1/markets')
+, marketOps = require('../v1/markets')
+, Q = require('Q')
 
 var _marketsSummary;
+var _depths = {};
 
 module.exports = exports = function(app) {
     exports.app = app
@@ -20,28 +22,62 @@ module.exports = exports = function(app) {
     exports.tick();
 }
 
-var marketsGet = function(cb) {
+var marketsGet = function() {
     //debug("marketGet");
-    market.marketsGet(exports.app, null, function(err, marketsSummary){
+    var deferred = Q.defer();
+    marketOps.marketsGet(exports.app, null, function(err, marketsSummary){
         if(err) {
-        log.error("Cannot get markets", err);
-            return cb(err);
+            log.error("Cannot get markets", err);
+            return deferred.reject(err);
         }
-        
+
         if(!_.isEqual(_marketsSummary, marketsSummary)){
             debug(JSON.stringify(marketsSummary));
             _marketsSummary = marketsSummary;
             exports.app.socketio.io.emit('/v1/markets', {data:marketsSummary});
         }
-        
-        cb()
+
+        deferred.resolve();
     })
+    return deferred.promise;
+}
+
+var depthGet = function(market) {
+    //debug("depthGet ", market.name);
+    var marketName = market.name;
+    
+    var deferred = Q.defer();
+    marketOps.depthGet(exports.app, {marketId:marketName}, function(err, depth){
+        if(err) {
+            log.error("Cannot get depth", err);
+            return deferred.reject(err);
+        }
+        
+        if(!_.isEqual(_depths[marketName], depth)){
+            debug(JSON.stringify(depth));
+            _depths[marketName] = depth;
+            exports.app.socketio.io.emit('/v1/markets/' + marketName + '/depth', {data:depth});
+        }
+        
+        deferred.resolve();
+    })
+    return deferred.promise;
+}
+
+var depthsGet = function() {
+    //debug("depthGet");
+    return Q.all(_.map(exports.app.cache.markets, function(market){
+        return depthGet(market);
+    }))
 }
 
 exports.tick = function(cb) {
-    //debug("market tick");
-    
-    marketsGet(function(err){
+    //debug("tick");
+    Q.all([marketsGet(), depthsGet()])
+    .then(function(){
+    })
+    .fin(function(){
+        //debug("tick done");
         setTimeout(exports.tick, 5e3);
     })
 }

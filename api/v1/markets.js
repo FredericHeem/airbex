@@ -131,7 +131,7 @@ exports.index = function(req, res, next) {
 exports.depthWs = function(client, eventName, data, next) {
     var inputs = data ? data.inputs : undefined;
     var callbackId = exports.app.socketio.callbackId(data);
-    depthGet(exports.app, inputs, function(err, response){
+    exports.depthGet(exports.app, inputs, function(err, response){
         if(err) return next({name:"DbError", message:JSON.stringify(err)})
         //debug("depthGet for ", JSON.stringify(response));
         client.emit(wsMessages.marketDepth, {callbackId: callbackId, data:response})
@@ -139,14 +139,14 @@ exports.depthWs = function(client, eventName, data, next) {
 }
 
 exports.depthRest = function(req, res, next) {
-    depthGet(exports.app, req.params, function(err, response){
+    exports.depthGet(exports.app, req.params, function(err, response){
         if(err) return next(err)
         res.setHeader('Cache-Control', 'public, max-age=10');
         res.send(response);
     })
 }
 
-var depthGet = function(app, params, cb) {
+exports.depthGet = function(app, params, cb) {
     if(!params || !params.marketId){
         return cb({name:"BadRequest", message:"Invalid parameter"})
     }

@@ -6,7 +6,7 @@ var log = require('../log')(__filename)
 , dq = require('deferred-queue')
 , pg = require('../pg')
 , marketOps = require('../v1/markets')
-, Q = require('Q')
+, Q = require('q')
 
 var _marketsSummary;
 var _depths = {};

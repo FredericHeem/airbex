@@ -16,6 +16,7 @@ describe('WithdrawBank', function () {
     var client = testMngr.client("alice");
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
+    var clientNoMoney = testMngr.client("nomoney");
     
     before(function(done) {
         testMngr.start().then(done).fail(done);
@@ -97,8 +98,14 @@ describe('WithdrawBank', function () {
             .fail(done);
         });
         it('WithdrawBankAmountNoFunds', function (done) {
-            var param = {bankAccount:bankAccountId, amount:"50000", currency:"CZK"};
-            client.post("v1/withdraws/bank", param)
+            clientNoMoney.get('v1/bankAccounts')
+            .then(function(accounts){
+                assert(accounts)
+                var bid = accounts[0].id;
+                console.log()
+                var param = {bankAccount:bid, amount:"10000", currency:"EUR"};
+                return clientNoMoney.post("v1/withdraws/bank", param)
+            })
             .fail(function(err){
                 assert(err)
                 assert.equal(err.name, "NoFunds")

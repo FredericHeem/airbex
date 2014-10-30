@@ -46,7 +46,8 @@ exports.marketsInfoGet = function(app, user, cb){
         "(SELECT fee_bid_maker_ratio($1, m.market_id)) AS fee_bid_maker,",
         "(SELECT fee_ask_taker_ratio($1, m.market_id)) AS fee_ask_taker,",
         "(SELECT fee_ask_maker_ratio($1, m.market_id)) AS fee_ask_maker ",
-        "FROM market m ORDER BY m.base_currency_id, m.quote_currency_id"
+        "FROM market_active_view m",
+        "ORDER BY m.base_currency_id, m.quote_currency_id"
         ].join('\n'),
         values: [user.id]
     }, function(err, dr) {
@@ -96,6 +97,7 @@ exports.marketsGet = function(app, user, cb){
             return cb(err);
         }
         return cb(null, dr.rows.map(function(row) {
+            //debug("market: ", row)
             var name = row.name || (row.base_currency_id + row.quote_currency_id)
             return {
                 id: name,

@@ -115,7 +115,11 @@ module.exports = function (bot, config) {
     snowChef.createAndValidateBankCredit = function(clients, admin, bankCreditInfo, done) {
         debug("createAndValidateBankCredit #clients %s", clients.length);
         async.forEachLimit(clients, maxOpsParallel, function(client, callback) {
-           snowChef.bot.createAndValidateBankCredit(admin, client.email, bankCreditInfo, callback) 
+            if(client.noFunds){
+                callback()
+            } else {
+                snowChef.bot.createAndValidateBankCredit(admin, client.email, bankCreditInfo, callback)
+            }
         }, function(err) {
             debug("createAndValidateBankCredit done: " + err ? err : "");
             done(err);

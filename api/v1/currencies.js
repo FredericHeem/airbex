@@ -18,7 +18,7 @@ exports.currenciesWs = function(client, eventName, data, next) {
 var currenciesGet = function(app, cb){
     var query = [
                  'SELECT *',
-                 'FROM currency',
+                 'FROM currency_active_view',
                  'ORDER BY currency_id'
                  ].join('\n');
 

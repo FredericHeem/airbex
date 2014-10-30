@@ -44,7 +44,7 @@ module.exports = exports = function(app, conn, cb) {
     async.parallel({
         currencies: function(cb) {
             conn.read.get().query({
-                text: 'SELECT * FROM currency'
+                text: 'SELECT * FROM currency_active_view'
             }, function(err, res) {
                 debug("query currencies done")
                 if (err) return cb(err)
@@ -54,7 +54,7 @@ module.exports = exports = function(app, conn, cb) {
         markets: function(cb) {
             conn.read.get().query([
                 'SELECT *',
-                'FROM market'
+                'FROM market_active_view'
             ].join('\n'), function(err, res) {
                 //debug("query markets done")
                 if (err) return cb(err)
@@ -66,7 +66,7 @@ module.exports = exports = function(app, conn, cb) {
 
         debug("#markets %s", res.markets.length)
         res.markets.forEach(function(x) {
-            //debug("market: %s", JSON.stringify(x, null, 4))
+            debug("market: %s", JSON.stringify(x, null, 4))
             var marketName = x.name || (x.base_currency_id + x.quote_currency_id);
             exports.markets[marketName] = x
         })
@@ -75,7 +75,7 @@ module.exports = exports = function(app, conn, cb) {
 
         debug("#currencies %s", res.currencies.length)
         res.currencies.forEach(function(x) {
-            //debug("currency: %s", JSON.stringify(x, null, 4))
+            debug("currency: %s", JSON.stringify(x, null, 4))
             exports.currencies[x.currency_id] = x
             
             if(x.fiat == false){

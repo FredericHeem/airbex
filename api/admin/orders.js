@@ -35,10 +35,10 @@ exports.query = function(app, query, cb) {
 
     var text = [
         'SELECT o.*,',
-        'm.base_currency_id || m.quote_currency_id market,',
+        'm.name market,',
         'u.email_lower',
         'FROM "order" o',
-        'INNER JOIN market m ON m.market_id = o.market_id',
+        'INNER JOIN market_active_view m ON m.market_id = o.market_id',
         'INNER JOIN "user" u ON u.user_id = o.user_id'
     ]
     , values = []

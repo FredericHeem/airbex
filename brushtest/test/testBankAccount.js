@@ -15,6 +15,7 @@ describe('BankAccount', function () {
     var client = testMngr.client("alice");
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
+    var clientNoMoney = testMngr.client("nomoney");
     
     before(function(done) {
         testMngr.start().then(done).fail(done);
@@ -58,6 +59,17 @@ describe('BankAccount', function () {
                     swiftbic:"DABAIE2D"
             }
             client.post('v1/bankAccounts', param)
+            .then(function(result) {
+                //assert(result)
+                done()
+            }).fail(done);
+        });
+        it('BankAccountAuthNoMoney', function (done) {
+            var param = {
+                    iban:"FR29AIBK93115212345678",
+                    swiftbic:"DABAIE2D"
+            }
+            clientNoMoney.post('v1/bankAccounts', param)
             .then(function(result) {
                 //assert(result)
                 done()

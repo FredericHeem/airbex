@@ -149,26 +149,22 @@ CryptoOut.prototype.sendBatch = function(requests, cb) {
                 cb(err)
             })
         }
+        
+        log.error("cannot send, try requeing: ", err.message);
+        
+        console.error('request failed because wallet is lacking funds. trying to re-queue requests')
 
-        if (err.message == 'Account has insufficient funds') {
-            console.error('request failed because wallet is lacking funds. trying to re-queue requests')
-
-            return out.reQueue(that.client, requests, function(err) {
-                if (!err) {
-                    console.log('succeeded in requeing the requests')
-                    return cb()
-                }
-
-                console.error('%s failed to requeue the requests', prefix)
-                console.error('%s', prefix, err)
+        return out.reQueue(that.client, requests, function(err) {
+            if (!err) {
+                debug('succeeded in requeing the requests')
                 return cb()
-            })
-        }
+            }
 
-        console.error('%s not sure why the request failed. ' +
-            'requests will remain uncertain', prefix)
+            log.error('%s failed to requeue the requests', prefix)
+            log.error('%s', err)
+            return cb()
+        })
 
-        console.error(prefix, err)
-        cb()
+       
     })
 }

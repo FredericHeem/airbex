@@ -27,7 +27,7 @@
     "redis": "0.12.1",
     "lproof": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
     "winston": "0.8.x",
-    "socket.io": "1.1.0",
+    "socket.io": "1.2.0",
     "deferred-queue":"0.5.1",
     "bitcore": "git://github.com/FredericHeem/bitcore.git",
     "q": "1.0.1",

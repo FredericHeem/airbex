@@ -20,7 +20,7 @@ describe('Spend', function () {
     var marketName = "BTCEUR";
     var bc = "BTC";
     var qc = "EUR"
-    var amount = "2";
+    var amount = "6";
     
     before(function(done) {
         testMngr.start().then(done).fail(done);

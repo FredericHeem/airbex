@@ -24,7 +24,6 @@ exports.handler = function() {
 }
 
 exports.demand = function(type, level, req, res, next) {
-    debug('demanding type %s and level %s, url: %s', type, level, req.url)
     if (!req.user) {
         debug('user is not set, demand has failed, req: ', req.url)
         return res.status(401).send({
@@ -33,6 +32,8 @@ exports.demand = function(type, level, req, res, next) {
         })
     }
 
+    debug('demanding type %s and level %s, user: %s, url: %s', type, level, req.user.id, req.url)
+    
     assert((req.apikey && !req.session) || (!req.apikey && req.session))
     assert.equal(typeof req.user, 'object')
 

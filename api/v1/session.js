@@ -20,7 +20,7 @@ var _create = function(app, sessionParam, ip, cb) {
     
     exports.app.security.session.create(email, ip, function(err, sid) {
         if (err) return cb(err)
-        debug("create session from email: %s, sid: %s", email, sid)
+        //debug("create session from email: %s, sid: %s", email, sid)
         cb(null, {id: sid})
     })
 }

@@ -22,7 +22,7 @@ module.exports = exports = function(app) {
     var queueActivity = dq();
     notifyActivity.query('LISTEN "activity_watcher"');
     notifyActivity.on('notification', function(data) {
-        log.verbose("activity_watcher", data.payload);
+        //log.verbose("activity_watcher", data.payload);
         queueActivity.push(exports.tick);
     });
 
@@ -113,7 +113,7 @@ exports.process = function(row, cb) {
     
     if (!template) {
         // TODO: Raven
-        log.debug('Not sure how to send activity of type %s', row.type)
+        //log.debug('Not sure how to send activity of type %s', row.type)
         return cb()
     }
 

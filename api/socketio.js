@@ -1,11 +1,33 @@
 var log = require('./log')(__filename)
 , debug = log.debug;
 
-var Router = function(io){
-    
+var Router = function(app, io){
+    var _clients = {}
     var defaultFunctions = [];
     var errorCb;
       
+    
+    io.on('connection', function (socket) {
+        //debug("router connection ", socket.id);
+        _clients[socket.id] = socket;
+        socket.on('disconnect', function() {
+            debug("disconnect ", socket.id);
+            var client = _clients[socket.id];
+            //debug("client.user", client.user);
+            if(client){
+                if(client.user){
+                    app.security.sessionWs.remove(client.user.id, function(err){
+                        debug("ws session removed for ", client.user.id);
+                    })
+                }
+                delete  _clients[socket.id];
+            } else {
+                log.error("cannot found client from id", socket.id)
+            }
+           
+        });
+    });
+    
     this.onDefault = function(cb){
         defaultFunctions.push(cb)
     }
@@ -52,6 +74,7 @@ var Router = function(io){
         //debug("Router.on %s has %s cb, #defaults %s", eventName, functions.length, defaultFunctions.length);
         
         io.on('connection', function (socket) {
+            //debug("on connection ", socket.id);
             socket.on(eventName, function (data) {
                 //console.log(data);
                 onEvent(socket, 0, functions, eventName, data);
@@ -65,7 +88,7 @@ module.exports = function (app, server) {
     exports.app = app;
     var io = require('socket.io').listen(server);
     
-    var router = new Router(io);
+    var router = new Router(app, io);
     
     function demand(client, eventName, data, next){
         //debug("demand ", client.session);

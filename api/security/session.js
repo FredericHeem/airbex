@@ -95,7 +95,7 @@ exports.create = function(email, ip, cb) {
 
         if (user) {
             assert(user.primaryKey)
-            debug('creating session key with user pk %s', user.primaryKey)
+            //debug('creating session key with user pk %s', user.primaryKey)
             var key = exports.getSessionKey(serverSalt, user.primaryKey)
             exports.app.activity(user.id, 'Login', {"ip": ip});
             
@@ -115,8 +115,8 @@ exports.getSessionKey = function(serverSalt, userKey) {
     hash.update(serverSalt)
     hash.update(userKey)
     var res = hash.digest('hex')
-    debug('getSessionKey: created session key %s from server salt %s + user key %s',
-        pretty(res), pretty(serverSalt), pretty(userKey))
+    //debug('getSessionKey: created session key %s from server salt %s + user key %s',
+    //    pretty(res), pretty(serverSalt), pretty(userKey))
     return res
 }
 

@@ -20,7 +20,7 @@ exports.handler = function(req, res, next) {
     exports.lookup(req.query.key, function(err, key) {
         if (err) return next(err)
         if (!key) {
-            return res.send(401, {
+            return res.status(401).send({
                 name: 'ApiKeyNotFound',
                 message: 'API key not found'
             })
@@ -32,14 +32,14 @@ exports.handler = function(req, res, next) {
             if (err) return next(err)
             assert(user)
             req.user = user
-            debug('api key %s attached (user #%d)', key.id.substr(0, 10), user.id)
+            //debug('api key %s attached (user #%d)', key.id.substr(0, 10), user.id)
             next()
         })
     })
 }
 
 exports.getUserFromApiKey = function(apiKey, cb) {
-    debug("getUserFromApiKey");
+    //debug("getUserFromApiKey");
     exports.lookup(apiKey, function(err, key) {
         if (err) return cb(err)
         if (!key) {
@@ -52,7 +52,7 @@ exports.getUserFromApiKey = function(apiKey, cb) {
         exports.app.security.users.fromUserId(key.userId, function(err, user) {
             if (err) return cb(err)
             assert(user)
-            debug('getUserFromApiKey: %s attached (user #%d)', key.id.substr(0, 10), user.id)
+            //debug('getUserFromApiKey: %s attached (user #%d)', key.id.substr(0, 10), user.id)
             cb(null, {key:key, user:user})
         })
     })

@@ -17,7 +17,9 @@ describe('Admin', function () {
     before(function(done) {
         testMngr.start().then(done).fail(done);
     });
-    
+    after(function(done) {
+        testMngr.stop().then(done).fail(done);
+    });
     function createAndCancelBankCredit(client, bankCreditInfo, done) {
         client.bankCreditCreate(bankCreditInfo)
         .then(function(bankCreditResult) {

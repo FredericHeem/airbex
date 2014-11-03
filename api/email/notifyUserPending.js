@@ -14,9 +14,19 @@ module.exports = exports = function(app) {
         return;
     }
     
-    exports.tickUserPending();
+    this.stop = function(){
+        debug("stop");
+        //clearTimeout(_tickHandle);
+    }
     
-    var notifyUserPending = pg(config.pg_read_url, config.pg_native).get()
+    this.start = function(){
+        debug("start");
+        exports.tickUserPending();
+    }
+    
+    
+    
+    var notifyUserPending = app.conn.notifyUserPending.get()
     
     var queueUserPending = dq(1);
     notifyUserPending.query('LISTEN "user_pending_watcher"');
@@ -67,12 +77,13 @@ exports.tickUserPending = function(cb) {
 
     var query = "SELECT * FROM user_pending where state='created'"
 
-    exports.app.conn.read.get().query(query, function(err, dr) {
+    var query = exports.app.conn.read.get().query(query, null, function(err, dr) {
         if (err) {
             // TODO: Raven
-            log.error('tickUserPending Failed to check for new email notifications')
-            log.error(err)
+            log.error('tickUserPending Failed to check for pending user')
+            log.error(err.toString())
             cb && cb(err)
+            return 
         }
 
         debug('tickUserPending processing %s rows', dr.rowCount || 'no')
@@ -84,6 +95,9 @@ exports.tickUserPending = function(cb) {
             cb && cb();
         })
         
+    })
+    query.on('error', function(error){
+        log.error("db ", error)
     })
 }
 

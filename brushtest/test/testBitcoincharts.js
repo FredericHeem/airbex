@@ -20,6 +20,9 @@ describe('Charts', function () {
     before(function(done) {
         testMngr.start().then(done).fail(done);
     });
+    after(function(done) {
+        testMngr.stop().then(done).fail(done);
+    });
     
     describe('ChartsPublic', function () {
         it('ChartsPublicTrade', function (done) {

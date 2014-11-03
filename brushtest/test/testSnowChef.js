@@ -20,6 +20,9 @@ describe('SnowChef', function () {
         .then(done)
         .fail(done);
     });
+    after(function(done) {
+        testMngr.stop().then(done).fail(done);
+    });
     
     describe('SnowChefFunding', function () {
         this.timeout(10e3);

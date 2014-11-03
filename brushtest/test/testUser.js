@@ -19,6 +19,9 @@ describe('User', function () {
     before(function(done) {
         testMngr.start().then(done).fail(done);
     });
+    after(function(done) {
+        testMngr.stop().then(done).fail(done);
+    });
     
     describe('UserPublic', function () {
         it('UserPublicAlice', function (done) {

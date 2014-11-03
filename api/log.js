@@ -8,7 +8,7 @@ var baseDir = path.resolve(__dirname, '..');
 var container = new winston.Container();
 container.add("exception", {
     console: {
-        handleExceptions: true,
+        handleExceptions: false,
         timestamp: true,
         label: "EXCEPTION",
         colorize: true

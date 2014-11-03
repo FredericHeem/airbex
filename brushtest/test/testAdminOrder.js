@@ -18,7 +18,9 @@ describe('AdminOrders', function () {
     before(function(done) {
         testMngr.start().then(testMngr.login).then(done).fail(done);
     });
-    
+    after(function(done) {
+        testMngr.stop().then(done).fail(done);
+    });
     describe('AdminOrderNotAuthenticated', function () {
         it('AdminOrdersNotAuthenticated', function (done) {
             client.get('admin/orders')

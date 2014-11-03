@@ -17,6 +17,9 @@ describe('WebSocket', function () {
     before(function(done) {
         testMngr.start().then(done).fail(done);
     });
+    after(function(done) {
+        testMngr.stop().then(done).fail(done);
+    });
     
     describe('WebSocketKo', function () {
         this.timeout(5e3);

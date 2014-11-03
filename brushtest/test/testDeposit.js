@@ -18,6 +18,9 @@ describe('TestDeposit', function () {
     before(function(done) {
         testMngr.start().then(done).fail(done);
     });
+    after(function(done) {
+        testMngr.stop().then(done).fail(done);
+    });
     
     describe('TestDepositBTCNotAuthenticated', function () {
         it('TestDepositBTCAddressNotAuthenticated', function (done) {

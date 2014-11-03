@@ -16,15 +16,23 @@ module.exports = exports = function(app) {
     
     app.eventEmitter.on("activity", onActivityWebSocket);
     
-    exports.tick();
-    
-    var notifyActivity = pg(config.pg_read_url, config.pg_native).get()
+    var notifyActivity = app.conn.notifyActivity.get()
     var queueActivity = dq();
     notifyActivity.query('LISTEN "activity_watcher"');
     notifyActivity.on('notification', function(data) {
-        //log.verbose("activity_watcher", data.payload);
+        log.verbose("activity_watcher", data.payload);
         queueActivity.push(exports.tick);
     });
+    
+    this.stop = function(){
+        debug("stop");
+        //clearTimeout(_tickHandle);
+    }
+    
+    this.start = function(){
+        debug("start");
+        exports.tick();
+    }
 
 }
 
@@ -139,15 +147,16 @@ exports.tick = function(cb) {
     log.verbose("tick");
     var query = 'SELECT * FROM pending_email_notify'
 
-    exports.app.conn.read.get().query(query, function(err, dr) {
+    var query = exports.app.conn.read.get().query(query, function(err, dr) {
         if (err) {
             // TODO: Raven
             log.error('Failed to check for new email notifications')
-            log.error(err)
+            log.error(err.toString())
             cb && cb(err)
+            return;
         }
 
-        //debug('processing %s rows', dr.rowCount || 'no')
+        debug('processing %s rows', dr.rowCount || 'no')
 
         async.each(dr.rows, exports.process, function() {
             if (!dr.rowCount) {
@@ -176,5 +185,8 @@ exports.tick = function(cb) {
                 cb && cb()
             })
         })
+    })
+    query.on('error', function(error){
+        log.error("db ", error)
     })
 }

@@ -17,9 +17,14 @@ describe('Activities', function () {
     var clientBob = testMngr.client("bob");
     
     before(function(done) {
-        testMngr.start().then(done).fail(done);
+        testMngr.start().then(done).fail(function(err){
+            console.log("error", err);
+            done(err)
+        });
     });
-    
+    after(function(done) {
+        testMngr.stop().then(done).fail(done);
+    });
     describe('ActivitiesPublic', function () {
         it('ActivitiesPublicAlice', function (done) {
             client.activities()

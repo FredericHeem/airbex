@@ -8,13 +8,16 @@ var App = require('../../api/ExpressApp');
 var app = new App();
 
 
+console.log("TestMngr mod");
+
 
 var TestMngr = function(config){
-    debug("TestMngr ");
+    console.log("TestMngr ctr");
+    
     var clientsMap = {};
     var clients = [];
     var clientsConfig = {};
-    var started = false;
+    
     var snowBot = new SnowBot(config);
     var snowChef = new SnowChef(snowBot, config);
     
@@ -28,21 +31,28 @@ var TestMngr = function(config){
     
     this.start = function(){
         //console.log("TestMngr start");
-        var deferred = Q.defer();
-        if(started){
-            console.log("TestMngr already started");
-            debug("already started")
-            deferred.resolve();
-        } else {
-            Q.all([this.dbConnect()/*, app.start()*/])
-            .then(function(){
-                started = true;
-                deferred.resolve()
-            }).fail(deferred.reject);
-        }
-        return deferred.promise;
+        return Q.all([this.dbConnect(), app.start()])
+        .then(function(){
+            console.log('started')
+        })
+//        var deferred = Q.defer();
+//        if(started){
+//            console.log("TestMngr already started");
+//            debug("already started")
+//            deferred.resolve();
+//        } else {
+//            Q.all([this.dbConnect(), app.start()])
+//            .then(function(){
+//                started = true;
+//                deferred.resolve()
+//            }).fail(deferred.reject);
+//        }
+//        return deferred.promise;
     }
     
+    this.stop = function(){
+        return app.stop();
+    }
     this.bot = function(){
         return snowBot;
     }

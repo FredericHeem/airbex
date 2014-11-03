@@ -1,3 +1,4 @@
+var Q = require("q");
 var async = require('async')
 , _ = require('lodash')
 , num = require('num')
@@ -29,18 +30,15 @@ var async = require('async')
 , assert = require('assert')
 
 module.exports = exports = function(app, conn, cb) {
-    exports.markets = {};
-    exports.currencies = {};
-
-    if (!conn) {
-        log.error("no db connection, use hardcoded")
-        _.extend(exports, hardcoded)
-        cb && cb()
-        return exports
-    }
-
     debug("getting currencies info")
-    
+    if(exports.markets){
+        debug("getting currencies info already in cache")
+        return Q.when();
+    }
+    exports.markets = exports.markets || {};
+    exports.currencies = exports.currencies || {};
+    var deferred = Q.defer();
+
     async.parallel({
         currencies: function(cb) {
             conn.read.get().query({
@@ -62,11 +60,11 @@ module.exports = exports = function(app, conn, cb) {
             })
         }
     }, function(err, res) {
-        if (err) return cb(err)
+        if (err) return deferred.reject(err)
 
         debug("#markets %s", res.markets.length)
         res.markets.forEach(function(x) {
-            debug("market: %s", JSON.stringify(x, null, 4))
+            //debug("market: %s", JSON.stringify(x, null, 4))
             var marketName = x.name || (x.base_currency_id + x.quote_currency_id);
             exports.markets[marketName] = x
         })
@@ -75,19 +73,18 @@ module.exports = exports = function(app, conn, cb) {
 
         debug("#currencies %s", res.currencies.length)
         res.currencies.forEach(function(x) {
-            debug("currency: %s", JSON.stringify(x, null, 4))
+            //debug("currency: %s", JSON.stringify(x, null, 4))
             exports.currencies[x.currency_id] = x
             
             if(x.fiat == false){
             	require('./v1/bitcoin')(app, x.currency_id)
             }
-            
         })
 
-        cb && cb()
+        deferred.resolve();
     })
-
-    return exports
+    return deferred.promise;
+    //return exports
 }
 
 var numberRegex = /^[0-9\.]+$/

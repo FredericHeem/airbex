@@ -24,6 +24,9 @@ describe('Send', function () {
     before(function(done) {
         testMngr.start().then(done).fail(done);
     });
+    after(function(done) {
+        testMngr.stop().then(done).fail(done);
+    });
     
     describe('SendPublic', function () {
         it('SendPublicAlice', function (done) {

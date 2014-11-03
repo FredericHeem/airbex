@@ -13,8 +13,12 @@ describe('AssetProof', function () {
     var snowChef = testMngr.chef();
     var clientAdmin = testMngr.client("admin");
     var client = testMngr.client("alice");
+    
     before(function(done) {
         testMngr.start().then(testMngr.login).then(done).fail(done);
+    });
+    after(function(done) {
+        testMngr.stop().then(done).fail(done);
     });
     
     describe('UploadAsset', function () {

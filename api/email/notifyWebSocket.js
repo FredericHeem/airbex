@@ -19,7 +19,16 @@ module.exports = exports = function(app) {
         return;
     }
     
-    exports.tick();
+    this.stop = function(){
+        debug("stop");
+        clearTimeout(_tickHandle);
+    }
+    
+    this.start = function(){
+        debug("start");
+        exports.tick();
+    }
+    
 }
 
 var marketsGet = function() {
@@ -49,7 +58,7 @@ var depthGet = function(market) {
     var deferred = Q.defer();
     marketOps.depthGet(exports.app, {marketId:marketName}, function(err, depth){
         if(err) {
-            log.error("Cannot get depth", err);
+            log.error("Cannot get depth: ", err.toString());
             return deferred.reject(err);
         }
         
@@ -70,15 +79,21 @@ var depthsGet = function() {
         return depthGet(market);
     }))
 }
+var _tickHandle;
+
+//exports.stop = function(){
+//    debug("stop");
+//    clearTimeout(_tickHandle);
+//}
 
 exports.tick = function(cb) {
-    //debug("tick");
+    debug("tick");
     Q.all([marketsGet(), depthsGet()])
     .then(function(){
     })
     .fin(function(){
-        //debug("tick done");
-        setTimeout(exports.tick, 5e3);
+        debug("tick done");
+        _tickHandle = setTimeout(exports.tick, 5e3);
     })
 }
 

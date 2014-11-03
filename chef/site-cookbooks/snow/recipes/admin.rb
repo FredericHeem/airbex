@@ -50,7 +50,7 @@ deploy_revision node[:snow][:admin][:app_directory] do
         group "root"
         cwd "#{release_path}/admin"
         code %{
-          npm install
+          npm install --production
           PATH=$PATH:./node_modules/.bin
           grunt production
         }

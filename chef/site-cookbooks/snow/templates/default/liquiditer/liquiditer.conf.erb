@@ -1,0 +1,14 @@
+start on startup
+console log
+env NAME=liquiditer-<%= @service %>
+env HOME=/home/ubuntu
+chdir /home/ubuntu/liquiditer/current/
+
+script
+    echo $$ > /var/run/$NAME.pid
+    sudo -Eu ubuntu /usr/bin/liquiditer-<%= @service %>.sh
+end script
+
+post-stop script
+   rm -f /var/run/$NAME.pid
+end script

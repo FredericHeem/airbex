@@ -8,19 +8,21 @@ var Router = function(app, io){
       
     
     io.on('connection', function (socket) {
-        //debug("router connection ", socket.id);
+        debug("router connection %s, #clients %s", socket.id, Object.keys(_clients).length);
         _clients[socket.id] = socket;
         socket.on('disconnect', function() {
-            debug("disconnect ", socket.id);
+            debug("disconnect %s, #clients %s", socket.id, Object.keys(_clients).length);
             var client = _clients[socket.id];
             //debug("client.user", client.user);
             if(client){
+                delete  _clients[socket.id];
                 if(client.user){
                     app.security.sessionWs.remove(client.user.id, function(err){
                         debug("ws session removed for ", client.user.id);
                     })
                 }
-                delete  _clients[socket.id];
+                
+                
             } else {
                 log.error("cannot found client from id", socket.id)
             }

@@ -21,7 +21,6 @@ module.exports = exports = function(app) {
     notifyActivity.query('LISTEN "activity_watcher"');
     notifyActivity.on('notification', function(data) {
         if(data.channel === 'activity_watcher'){
-            debug("activity_watcher: ", JSON.stringify(data));
             //log.verbose("activity_watcher", data.payload);
             queueActivity.push(exports.tick);
         }
@@ -147,7 +146,7 @@ function onActivityWebSocket(userId, activity){
 }
 
 exports.tick = function(cb) {
-    log.verbose("tick");
+    //log.verbose("tick");
     var query = 'SELECT * FROM pending_email_notify'
 
     var query = exports.app.conn.read.get().query(query, function(err, dr) {
@@ -159,7 +158,7 @@ exports.tick = function(cb) {
             return;
         }
 
-        debug('processing %s rows', dr.rowCount || 'no')
+        //debug('processing %s rows', dr.rowCount || 'no')
 
         async.each(dr.rows, exports.process, function() {
             if (!dr.rowCount) {

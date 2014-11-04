@@ -20,8 +20,11 @@ module.exports = exports = function(app) {
     var queueActivity = dq();
     notifyActivity.query('LISTEN "activity_watcher"');
     notifyActivity.on('notification', function(data) {
-        log.verbose("activity_watcher", data.payload);
-        queueActivity.push(exports.tick);
+        if(data.channel === 'activity_watcher'){
+            debug("activity_watcher: ", JSON.stringify(data));
+            //log.verbose("activity_watcher", data.payload);
+            queueActivity.push(exports.tick);
+        }
     });
     
     this.stop = function(){

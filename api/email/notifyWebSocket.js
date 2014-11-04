@@ -8,6 +8,7 @@ var log = require('../log')(__filename)
 , marketOps = require('../v1/markets')
 , Q = require('q')
 
+var _tickHandle;
 var _marketsSummary;
 var _depths = {};
 
@@ -28,7 +29,6 @@ module.exports = exports = function(app) {
         debug("start");
         exports.tick();
     }
-    
 }
 
 var marketsGet = function() {
@@ -41,7 +41,7 @@ var marketsGet = function() {
         }
 
         if(!_.isEqual(_marketsSummary, marketsSummary)){
-            debug(JSON.stringify(marketsSummary));
+            //debug(JSON.stringify(marketsSummary));
             _marketsSummary = marketsSummary;
             exports.app.socketio.io.emit('/v1/markets', {data:marketsSummary});
         }
@@ -63,7 +63,7 @@ var depthGet = function(market) {
         }
         
         if(!_.isEqual(_depths[marketName], depth)){
-            debug(JSON.stringify(depth));
+            //debug(JSON.stringify(depth));
             _depths[marketName] = depth;
             exports.app.socketio.io.emit('/v1/markets/' + marketName + '/depth', {data:depth});
         }
@@ -79,12 +79,7 @@ var depthsGet = function() {
         return depthGet(market);
     }))
 }
-var _tickHandle;
 
-//exports.stop = function(){
-//    debug("stop");
-//    clearTimeout(_tickHandle);
-//}
 
 exports.tick = function(cb) {
     debug("tick");

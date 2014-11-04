@@ -24,15 +24,15 @@ module.exports = exports = function(app) {
         exports.tickUserPending();
     }
     
-    
-    
     var notifyUserPending = app.conn.notifyUserPending.get()
     
     var queueUserPending = dq(1);
     notifyUserPending.query('LISTEN "user_pending_watcher"');
     notifyUserPending.on('notification', function(data) {
-        debug("user_pending_watcher", JSON.stringify(data));
-        queueUserPending.push(exports.tickUserPending);
+        if(data.channel === 'user_pending_watcher'){
+            debug("user_pending_watcher: ", JSON.stringify(data));
+            queueUserPending.push(exports.tickUserPending);
+        }
     });
 }
 
@@ -86,7 +86,7 @@ exports.tickUserPending = function(cb) {
             return 
         }
 
-        debug('tickUserPending processing %s rows', dr.rowCount || 'no')
+        log.info('tickUserPending processing %s rows', dr.rowCount || 'no')
 
         async.each(dr.rows, exports.processUserPending, function() {
             if (!dr.rowCount) {

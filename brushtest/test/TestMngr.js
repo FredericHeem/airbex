@@ -35,19 +35,6 @@ var TestMngr = function(config){
         .then(function(){
             console.log('started')
         })
-//        var deferred = Q.defer();
-//        if(started){
-//            console.log("TestMngr already started");
-//            debug("already started")
-//            deferred.resolve();
-//        } else {
-//            Q.all([this.dbConnect(), app.start()])
-//            .then(function(){
-//                started = true;
-//                deferred.resolve()
-//            }).fail(deferred.reject);
-//        }
-//        return deferred.promise;
     }
     
     this.stop = function(){

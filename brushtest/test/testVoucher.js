@@ -100,7 +100,10 @@ describe('Voucher', function () {
                     .fail(callback);
                 }, function(err) {
                     //console.log("redeem voucher done: " + err ? err : "");
-                    //if(err) return done(err)
+                    if(err) {
+                        console.log("redeem error: ", err)
+                        //return done(err)
+                    }
                     
                 });
             })

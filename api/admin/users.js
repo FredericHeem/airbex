@@ -206,7 +206,7 @@ exports.accounts = function(req, res, next) {
             '   a.hold,',
             '   (a.balance - a.hold) available',
             'FROM account a',
-            'WHERE a.user_id = $1',
+            'WHERE a.user_id = $1 AND a.active=true',
             'ORDER BY currency_id, type ASC'
         ].join('\n'),
         values: [req.params.user]

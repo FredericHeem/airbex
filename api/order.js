@@ -4,75 +4,76 @@ var log = require('./log')(__filename)
 , format = require('util').format
 , num = require('num');
 
-exports.createInstantBuy = function(userId, req, res, next) {
-	if (!req.app.validate(req.body, 'v1/spend', res)) return
+//exports.createInstantBuy = function(userId, req, res, next) {
+//	if (!req.app.validate(req.body, 'v1/spend', res)) return
+//
+//	debug("createInstantBuy: ", JSON.stringify(req.body));
+//
+//	var quote = req.app.cache.getQuoteCurrency(req.body.market)
+//	var amount = req.app.cache.parseCurrency(req.body.amount, quote);
+//	debug("createInstantBuy %s in %s", amount, quote);
+//
+//	req.app.conn.write.get().query("BEGIN");
+//	req.app.conn.write.get().query({
+//		text: 
+//			[
+//			 'SELECT convert_bid($1, market_id, $2) oid',
+//			 'FROM market',
+//			 'WHERE base_currency_id || quote_currency_id = $3;'
+//			 ].join('\n'),
+//			 values: 
+//				 [userId,
+//				  amount,
+//				  req.body.market
+//				  ]
+//	}, function(err, dr) {
+//		if (err) {
+//			debug("spend error: %s", err.message);
+//			if (err.message.match(/non_negative_available/)) {
+//				return res.status(400).send({
+//					name: 'NoFunds',
+//					message: 'Insufficient funds'
+//				})
+//			}
+//
+//			if (err.message.match(/inserted with zero volume/)) {
+//				return res.status(400).send({
+//					name: 'AmountTooSmall',
+//					message: 'Spend amount is too small'
+//				})
+//			}
+//
+//			return next(err)
+//		}
+//
+//		if (!dr.rowCount) {
+//			return res.send(404, {
+//				name: 'MarketNotFound',
+//				message: 'Market not found'
+//			})
+//		}
+//	})	
+//
+//	req.app.conn.write.get().query({
+//		text: "UPDATE purchase_order set state = $1 where id = $2",
+//		values: [
+//		         'Purchased',
+//		         req.body.purchaseorder_id
+//		         ]
+//	}, function(err, dr) {
+//		if (err) {
+//			debug("spend error: %s", err.message);
+//			return next(err)
+//		}
+//	})	
+//	req.app.conn.write.get().query("COMMIT", function() {
+//		debug("commited")
+//		res.send(201, {
+//			id: ""
+//		})
+//	})
+//}
 
-	debug("createInstantBuy: ", JSON.stringify(req.body));
-
-	var quote = req.app.cache.getQuoteCurrency(req.body.market)
-	var amount = req.app.cache.parseCurrency(req.body.amount, quote);
-	debug("createInstantBuy %s in %s", amount, quote);
-
-	req.app.conn.write.get().query("BEGIN");
-	req.app.conn.write.get().query({
-		text: 
-			[
-			 'SELECT convert_bid($1, market_id, $2) oid',
-			 'FROM market',
-			 'WHERE base_currency_id || quote_currency_id = $3;'
-			 ].join('\n'),
-			 values: 
-				 [userId,
-				  amount,
-				  req.body.market
-				  ]
-	}, function(err, dr) {
-		if (err) {
-			debug("spend error: %s", err.message);
-			if (err.message.match(/non_negative_available/)) {
-				return res.status(400).send({
-					name: 'NoFunds',
-					message: 'Insufficient funds'
-				})
-			}
-
-			if (err.message.match(/inserted with zero volume/)) {
-				return res.status(400).send({
-					name: 'AmountTooSmall',
-					message: 'Spend amount is too small'
-				})
-			}
-
-			return next(err)
-		}
-
-		if (!dr.rowCount) {
-			return res.send(404, {
-				name: 'MarketNotFound',
-				message: 'Market not found'
-			})
-		}
-	})	
-
-	req.app.conn.write.get().query({
-		text: "UPDATE purchase_order set state = $1 where id = $2",
-		values: [
-		         'Purchased',
-		         req.body.purchaseorder_id
-		         ]
-	}, function(err, dr) {
-		if (err) {
-			debug("spend error: %s", err.message);
-			return next(err)
-		}
-	})	
-	req.app.conn.write.get().query("COMMIT", function() {
-		debug("commited")
-		res.send(201, {
-			id: ""
-		})
-	})
-}
 exports.create = function(userId, req, res, next) {
     log.verbose("create order user: %s, %s", userId, JSON.stringify(req.body));
     if (!req.app.validate(req.body, 'v1/order_create', res)) {
@@ -106,14 +107,16 @@ exports.create = function(userId, req, res, next) {
         if(num(amount).lt(req.app.cache.markets[market].bidminvolume)){
             return res.status(400).send({
                 name: 'BadRequest',
-                message: 'Volume too low'
+                message: 'Volume too low',
+                bidminvolume: req.app.cache.markets[market].bidminvolume
             })
         }
     } else {
         if(num(amount).lt(req.app.cache.markets[market].askminvolume)){
             return res.status(400).send({
                 name: 'BadRequest',
-                message: 'Volume too low'
+                message: 'Volume too low',
+                askminvolume: req.app.cache.markets[market].askminvolume
             })
         }
     }

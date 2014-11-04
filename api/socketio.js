@@ -8,7 +8,10 @@ var Router = function(app, io){
       
     
     io.on('connection', function (socket) {
-        debug("router connection %s, #clients %s", socket.id, Object.keys(_clients).length);
+        var ua = socket.handshake.headers['user-agent'] || "???" ;
+        debug("router connection %s from %s, ua: %s, #clients %s", 
+                socket.id, socket.handshake.address, ua, Object.keys(_clients).length);
+        //debug(JSON.stringify(socket.handshake))
         _clients[socket.id] = socket;
         socket.on('disconnect', function() {
             debug("disconnect %s, #clients %s", socket.id, Object.keys(_clients).length);

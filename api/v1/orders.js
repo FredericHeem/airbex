@@ -35,7 +35,7 @@ exports.index = function(req, res, next) {
             '   type, price, volume,',
             '   original, matched, cancelled',
             'FROM order_view o',
-            'INNER JOIN market m ON m.market_id = o.market_id',
+            'INNER JOIN market_active_view m ON m.market_id = o.market_id',
             'WHERE user_id = $1 AND volume > 0',
             'ORDER BY order_id DESC'
         ].join('\n'),
@@ -52,7 +52,7 @@ exports.history = function(req, res, next) {
             'SELECT order_id, market, type, volume, matched, cancelled,',
             '   original, price, average_price',
             'FROM order_history o',
-            'INNER JOIN market m ON m.market_id = o.market_id',
+            'INNER JOIN market_active_view m ON m.market_id = o.market_id',
             'WHERE user_id = $1 AND matched > 0',
             'ORDER BY order_id DESC',
             'LIMIT 100'

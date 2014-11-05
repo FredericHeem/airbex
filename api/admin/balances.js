@@ -21,7 +21,7 @@ exports.index = function(req, res, next) {
     req.app.conn.read.get().query([
         'SELECT a.currency_id currency, a.type, SUM(a.balance) balance',
         'FROM account a',
-        'INNER JOIN "currency" c ON a.currency_id = c.currency_id',
+        'INNER JOIN "currency_active_view" c ON a.currency_id = c.currency_id',
         'GROUP BY a.currency_id, a.type',
         'ORDER BY type, currency'
     ].join('\n'), function(err, dr) {

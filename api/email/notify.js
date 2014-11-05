@@ -6,6 +6,8 @@ var log = require('../log')(__filename)
 , dq = require('deferred-queue')
 , pg = require('../pg');
 
+var _tickHandle;
+
 module.exports = exports = function(app) {
     exports.app = app
     var config = app.config;
@@ -16,19 +18,19 @@ module.exports = exports = function(app) {
     
     app.eventEmitter.on("activity", onActivityWebSocket);
     
-    var notifyActivity = app.conn.notifyActivity.get()
-    var queueActivity = dq();
-    notifyActivity.query('LISTEN "activity_watcher"');
-    notifyActivity.on('notification', function(data) {
-        if(data.channel === 'activity_watcher'){
-            //log.verbose("activity_watcher", data.payload);
-            queueActivity.push(exports.tick);
-        }
-    });
+//    var notifyActivity = app.conn.notifyActivity.get()
+//    var queueActivity = dq();
+//    notifyActivity.query('LISTEN "activity_watcher"');
+//    notifyActivity.on('notification', function(data) {
+//        if(data.channel === 'activity_watcher'){
+//            //log.verbose("activity_watcher", data.payload);
+//            queueActivity.push(exports.tick);
+//        }
+//    });
     
     this.stop = function(){
         debug("stop");
-        //clearTimeout(_tickHandle);
+        clearTimeout(_tickHandle);
     }
     
     this.start = function(){
@@ -145,8 +147,15 @@ function onActivityWebSocket(userId, activity){
     })
 }
 
-exports.tick = function(cb) {
-    //log.verbose("tick");
+exports.tick = function()
+{
+    exports.checkPendingEmailNotify(function(){
+        _tickHandle = setTimeout(exports.tick, 2e3);
+    })
+}
+
+exports.checkPendingEmailNotify = function(cb) {
+    log.verbose("checkPendingEmailNotify");
     var query = 'SELECT * FROM pending_email_notify'
 
     var query = exports.app.conn.read.get().query(query, function(err, dr) {
@@ -168,7 +177,7 @@ exports.tick = function(cb) {
 
             var tip = _.max(dr.rows, 'activity_id').activity_id
 
-            debug('setting tip to %s', tip)
+            debug('checkPendingEmailNotify setting tip to %s', tip)
 
             exports.app.conn.write.get().query({
                 text: [

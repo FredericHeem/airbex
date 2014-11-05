@@ -40,7 +40,7 @@ deploy_revision "/home/ubuntu/liquiditer" do
     purge_before_symlink([])
 end
 
-services = %w(bitstampbtcusd bitfinexbtcusd bitfinexltcbtc btceltcbtc)
+services = %w(bitstampbtcusd bitfinexbtcusd bitfinexltcbtc bitfinexdrkbtc btceltcbtc)
 services.each do |service|
   template "/etc/init/liquiditer-#{service}.conf" do
     source "liquiditer/liquiditer.conf.erb"

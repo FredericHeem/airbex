@@ -10,7 +10,7 @@
         "currency": {
             "type": "string",
             "required": true,
-            "pattern": "^[A-Z]{3}$"
+            "pattern": "^[A-Z]{3,4}$"
         },
         "amount": {
             "type": "string",

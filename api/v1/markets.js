@@ -42,6 +42,7 @@ exports.marketsInfoGet = function(app, user, cb){
         "m.askmaxprice,",
         "m.bidmintotal,",
         "m.askmintotal,",
+        "m.quote_scale_diplay,",
         "(SELECT fee_bid_taker_ratio($1, m.market_id)) AS fee_bid_taker,",
         "(SELECT fee_bid_maker_ratio($1, m.market_id)) AS fee_bid_maker,",
         "(SELECT fee_ask_taker_ratio($1, m.market_id)) AS fee_ask_taker,",
@@ -108,7 +109,8 @@ exports.marketsGet = function(app, user, cb){
                 low: formatPriceOrNull(app, row.low, name),
                 bid: formatPriceOrNull(app, row.bid, name),
                 ask: formatPriceOrNull(app, row.ask, name),
-                volume: formatVolumeOrNull(app, row.volume, name)
+                volume: formatVolumeOrNull(app, row.volume, name),
+                quote_scale_diplay:row.quote_scale_diplay
             }
         }))
     })

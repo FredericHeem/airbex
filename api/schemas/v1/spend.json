@@ -9,7 +9,7 @@
         "market": {
             "type": "string",
             "required": true,
-            "pattern": "^[A-Z]{6}$"
+            "pattern": "^[A-Z]{6,7}$"
         },
         "purchaseorder_id": {
             "type": "string",

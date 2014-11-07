@@ -119,6 +119,7 @@ describe('Orders', function () {
             .fail(done)
         });
         it('OrderActivity', function (done) {
+            this.timeout(4e3)
             apiwsBob.getIo().once('activity', function(activities){
                 //console.log("ACT", activities);
                 assert(activities)

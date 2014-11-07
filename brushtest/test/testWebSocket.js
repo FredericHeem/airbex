@@ -40,7 +40,8 @@ describe('WebSocket', function () {
     describe('WebSocketPublic', function () {
         var apiws = new Airbex.WebSocketClient({url:config.url});
         before(function(done) {
-            apiws.start().then(done, done);
+            apiws.start()
+            .then(done, done);
         });
         after(function(done) {
             apiws.stop();
@@ -99,12 +100,26 @@ describe('WebSocket', function () {
         });
     });
     describe('WebSocketApiKey', function () {
-        var apiws = new Airbex.WebSocketClient({
-            url:config.url,
-            apiKey:client.config.apiKey
-        });
+        var apiws
+        var apiKey;
         before(function(done) {
-            apiws.start().fail(done)
+            client.login()
+            .then(function(){
+                return client.get('v1/keys')
+            })
+            .then(function(result){
+                assert(result);
+                apiKey = result[0];
+                assert(apiKey)
+                console.log(apiKey)
+            })
+            .then(function(){
+                apiws = new Airbex.WebSocketClient({
+                    url:config.url,
+                    apiKey:apiKey.id
+                });
+                return apiws.start()
+            })
             .then(done, done);
         });
         it('MarketsAuthenticatedOk', function (done) {

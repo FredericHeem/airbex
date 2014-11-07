@@ -41,7 +41,7 @@ describe('TestDeposit', function () {
         });
         it('TestDepositBTCAddress', function (done) {
             var currency = 'BTC';
-            client.getDepositAddress(currency)
+            clientAdmin.getDepositAddress(currency)
             .then(function(result){
                 assert(result);
                 assert(result.address)
@@ -52,7 +52,7 @@ describe('TestDeposit', function () {
         
         it('TestDepositAddresses', function (done) {
             async.forEach(config.currencies, function(currency, callback) {
-                client.getDepositAddress(currency)
+                clientAdmin.getDepositAddress(currency)
                 .then(function(result){
                     assert(result);
                     assert(result.address)
@@ -65,14 +65,6 @@ describe('TestDeposit', function () {
             });
         });
         
-//        it('TestDepositBTCOk', function (done) {
-//            var currency = 'BTC';
-//            var amount = "1";
-//
-//            snowBot.depositComplete(client, amount, currency)
-//            .then(done)
-//            .fail(done);
-//        });
         it('TestDepositAllOk', function (done) {
             var amount = "1";
             async.forEach(config.currencies, function(currency, callback) {

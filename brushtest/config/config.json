@@ -1,7 +1,7 @@
 {
   "url" : "http://localhost:5071/",
   "url_admin" : "http://localhost:5071/",
-  "pg_write_url" : "postgres://postgres:postgres@localhost:5432/snow",
+  "pg_write_url" : "postgres://postgres:postgres1234!!!!!!!@localhost:5432/snow",
   "urlBaseRest": "https://demo.airbex.net/api/",
   "userMax":"2", 
   "currencies":["BTC","LTC"],

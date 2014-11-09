@@ -1,0 +1,1 @@
+update market set bidminvolume=100000000000, askminvolume=100000000000 where market_id=11;

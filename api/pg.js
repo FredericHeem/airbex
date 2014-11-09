@@ -5,7 +5,7 @@ debug = log.debug
 module.exports = function(url, useNative) {
     var pg = require('pg')
     if (useNative) pg = pg['native']
-    log.info("db connect")
+    log.info("db connect to ", url)
     var state = 'idle';
     this.client = new pg.Client(url)
     var reconnectIn = 10e3; // 10 sec
@@ -47,7 +47,7 @@ module.exports = function(url, useNative) {
             state = 'connecting';
             client.connect(function(err){
                 if(err){
-                    log.info('connect ', err);
+                    log.error('connect ', err);
                     state = 'error';
                     reconnect(client)
                 } else {

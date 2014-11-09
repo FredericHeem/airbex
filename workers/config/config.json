@@ -1,3 +1,9 @@
 {
-
+    "pg_url": {
+                "user":"postgres",
+                "host": "127.0.0.1",
+                "database" :"snow",
+                "ssl": false,
+                "password" : "postgres1234!!!!!!!"
+    }
 }

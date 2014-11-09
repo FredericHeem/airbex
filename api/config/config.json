@@ -9,14 +9,14 @@
         "host": "localhost",
         "database": "snow",
         "ssl": false,
-        "password": "postgres1234"
+        "password": "postgres1234!!!!!!!"
     },
     "pg_write_url": {
         "user": "postgres",
         "host": "localhost",
         "database": "snow",
         "ssl": false,
-        "password": "postgres1234"
+        "password": "postgres1234!!!!!!!"
     },
 
     "port": 5071,

@@ -69,7 +69,8 @@ exports.process = function(row, cb) {
     if (row.type == 'FillOrder') {
         template = 'fill-order'
         locals.market = details.market
-        locals.type = details.type
+        locals.type = details.type;
+        locals.fee_ratio = details.fee_ratio;
         locals.filled = stripZeroes(details.filled || details.original);
         locals.base = exports.app.cache.getBaseCurrency(details.market)
         var baseScale = exports.app.cache.getCurrencyScaleDisplay(locals.base)
@@ -129,7 +130,7 @@ exports.process = function(row, cb) {
         return cb()
     }
 
-    exports.app.eventEmitter.emit("activity", row.user_id, {type: row.type, details: locals})
+    exports.app.eventEmitter.emit("activity", row.user_id, {type: row.type, details: row.details})
     
     exports.app.email.send(row.user_id, row.language, template, locals, cb);
 }

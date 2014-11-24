@@ -137,16 +137,16 @@ describe('Spend', function () {
                     //console.log("AF Alice : ", balanceAlice)
                     //console.log("AF Bob: ", balanceBob)
                     assert(num(balanceAlice[bc].balance).gt(num(balanceAliceB4[bc].balance)))
-                    /*console.log("DIFF ALICE QC" + num(balanceAliceB4[qc].balance)
+                    console.log("DIFF ALICE QC" + num(balanceAliceB4[qc].balance)
                             .sub(num(balanceAlice[qc].balance))
                             .sub(num(amount)).toString());
                     console.log("DIFF BOB QC" + num(balanceBob[qc].balance)
                             .sub(num(balanceBobB4[qc].balance))
-                            .sub(num(amount)).toString());*/
+                            .sub(num(amount)).toString());
                     
                     assert(num(balanceBob[qc].balance)
                     .sub(num(balanceBobB4[qc].balance))
-                    .sub(num(amount)).eq(num(0)))
+                    .sub(num(amount)).gt(num(0)))
                     
                     //console.log("DIFF BC ALICE" + num(balanceAlice[bc].balance).sub(num(balanceAliceB4[bc].balance)).toString());
                     //console.log("DIFF BC BOB" + num(balanceBob[bc].balance).sub(num(balanceBobB4[bc].balance)).toString());

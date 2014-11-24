@@ -7,6 +7,7 @@ var TestMngr = require('./TestMngr');
 var num = require('num');
 var _ = require('lodash');
 var Airbex = require('airbex-client');
+var Q = require('Q');
 
 describe('Orders', function () {
     "use strict";
@@ -18,7 +19,8 @@ describe('Orders', function () {
     var client = testMngr.client("alice");
     var clientConfig = testMngr.clientConfig("alice");
     var clientBob = testMngr.client("bob");
-   
+    var bc = "BTC";
+    var qc = "EUR"
     before(function(done) {
         testMngr.start().then(done).fail(done);
     });
@@ -74,6 +76,8 @@ describe('Orders', function () {
                 return apiwsBob.login(clientBob.config.email, clientBob.config.password);
             })
             .then(function(){
+                clientBob.delete('v1/orders', {market:config.market})
+                .then(done).fail(done)
             })
             .then(done)
             .fail(done);
@@ -97,6 +101,120 @@ describe('Orders', function () {
             this.timeout(10e3);
             client.cancelAll().then(done).fail(done)
         });
+        it('CancelAllForMarket', function (done) {
+            this.timeout(5e3)
+            clientBob.delete('v1/orders', {market:config.market})
+            .then(done).fail(done)
+        });
+        it('OrderActivity', function (done) {
+            this.timeout(4e3)
+            apiwsBob.getIo().once('activity', function(activities){
+                //console.log("ACT", activities);
+                assert(activities)
+                done();
+            })
+            var amount = "0.010";
+            var askPrice = "1000";
+            var bidPrice = "1010"
+            var balanceAliceB4,balanceBobB4;
+            Q.all([client.balances(), clientBob.balances()])
+            .spread(function (balanceAlice, balanceBob) {
+                balanceAliceB4 = balanceAlice;
+                balanceBobB4 = balanceBob;
+                
+                console.log("B4 Alice : ", balanceAlice)
+                console.log("B4 Bob: ", balanceBob)
+                return clientBob.order({
+                    market: config.market,
+                    type: "ask",
+                    price: askPrice,
+                    amount: amount
+                })
+            })
+            .then(function(res) {
+                assert(res.id)
+                return client.order({
+                    market: config.market,
+                    type: "bid",
+                    price: bidPrice,
+                    amount: amount
+                })
+            })
+            .then(function(res) {
+                assert(res.id)
+               return Q.all([client.balances(), clientBob.balances()])
+                .spread(function (balanceAlice, balanceBob) {
+                    console.log("AF Alice : ", balanceAlice)
+                    console.log("AF Bob: ", balanceBob)
+                    
+                    
+                    //assert(num(balanceAlice[bc].balance).gt(num(balanceAliceB4[bc].balance)))
+                    console.log("DIFF ALICE QC: " + num(balanceAlice[qc].balance)
+                            .sub(num(balanceAliceB4[qc].balance).toString()));
+                    console.log("DIFF BOB QC: " + num(balanceBob[qc].balance)
+                            .sub(num(balanceBobB4[qc].balance)).toString());
+
+                    console.log("DIFF ALICE BC: " + num(balanceAlice[bc].balance)
+                            .sub(num(balanceAliceB4[bc].balance).toString()));
+                    console.log("DIFF BOB BC: " + num(balanceBob[bc].balance)
+                            .sub(num(balanceBobB4[bc].balance)).toString());
+                    
+                    
+                    assert(num(balanceBobB4[bc].balance)
+                    .sub(num(balanceBob[bc].balance))
+                    .sub(num(amount)).eq(num(0)))
+                    
+                    assert(num(balanceAlice[bc].balance)
+                    .sub(num(balanceAliceB4[bc].balance))
+                    .sub(num(amount)).eq(num(0)))
+                    
+                    console.log("amount:", num(askPrice).set_precision(5).mul(amount).toString());
+                    
+                    assert(num(balanceBob[qc].balance)
+                    .sub(num(balanceBobB4[qc].balance))
+                    .sub(num(askPrice).set_precision(5).mul(amount)).gt(num(0)))
+                    
+                    assert(num(balanceAliceB4[qc].balance)
+                    .sub(num(balanceAlice[qc].balance))
+                    .sub(num(askPrice).set_precision(5).mul(amount)).gt(num(0)))
+                    
+                    //num(askPrice).set_precision(5).div(amount);
+                    //console.log("DIFF BC ALICE" + num(balanceAlice[bc].balance).sub(num(balanceAliceB4[bc].balance)).toString());
+                    //console.log("DIFF BC BOB" + num(balanceBob[bc].balance).sub(num(balanceBobB4[bc].balance)).toString());
+                    
+                    
+                    /*assert(num(balanceAlice[bc].balance)
+                    .sub(num(balanceAliceB4[bc].balance))
+                     .sub(num(balanceBobB4[bc].balance))
+                    .add(num(balanceBob[bc].balance)).eq(num(0)));*/
+                    
+                    //assert(num(balanceAliceB4.balance).sub(num(amount)).eq(num(balanceAlice.balance)))
+                    //assert(num(balanceBobB4.balance).add(num(amount)).eq(num(balanceBob.balance)))
+                    
+                })
+            })
+            .then(function() {
+                return clientBob.get('v1/activities')
+            })
+            .then(function(activities) {
+                assert(activities);
+                console.log("Bob: ", activities[0])
+                console.log("bob: ", activities[1])
+                return client.get('v1/activities')
+            })
+            .then(function(activities) {
+                assert(activities);
+                console.log("Alice: ", activities[0])
+                console.log("Alice: ", activities[1])
+                var fillOrder = activities[1];
+                assert(fillOrder);
+                assert.equal(fillOrder.type, 'FillOrder');
+                var createOrder = activities[0];
+                assert(createOrder);
+                assert.equal(createOrder.type, 'CreateOrder');
+            })
+            .fail(done)
+        });
         it('aliceBid', function (done) {
             client.order({
                 market: config.market,
@@ -118,37 +236,8 @@ describe('Orders', function () {
             })
             .fail(done)
         });
-        it('OrderActivity', function (done) {
-            this.timeout(4e3)
-            apiwsBob.getIo().once('activity', function(activities){
-                //console.log("ACT", activities);
-                assert(activities)
-                done();
-            })
-            
-            clientBob.order({
-                market: config.market,
-                type: "ask",
-                price: "1000",
-                amount: "0.001"
-            }).then(function(res) {
-                assert(res.id)
-                return client.order({
-                    market: config.market,
-                    type: "bid",
-                    price: "1000",
-                    amount: "0.001"
-                })
-            }).then(function(res) {
-                assert(res.id)
-                //console.log('Order bid #%s placed', res.id)
-            })
-            .fail(done)
-        });
-        it('CancelAllForMarket', function (done) {
-            client.delete('v1/orders', {market:config.market})
-            .then(done).fail(done)
-        });
+        
+
         it('bobAsk', function (done) {
             clientBob.order({
                 market: config.market,

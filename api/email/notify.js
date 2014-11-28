@@ -67,7 +67,7 @@ exports.process = function(row, cb) {
 
     
     if (row.type == 'FillOrder') {
-        template = 'fill-order'
+        template = details.price ? 'fill-order': 'fill-order-instant';
         locals.market = details.market
         locals.type = details.type;
         locals.fee_ratio = details.fee_ratio;
@@ -124,19 +124,26 @@ exports.process = function(row, cb) {
         template = 'apikey-create'
     }
     
+    exports.app.eventEmitter.emit("activity", row.user_id, {type: row.type, details: row.details})
+    
     if (!template) {
         // TODO: Raven
         //log.debug('Not sure how to send activity of type %s', row.type)
         return cb()
     }
-
-    exports.app.eventEmitter.emit("activity", row.user_id, {type: row.type, details: row.details})
     
     exports.app.email.send(row.user_id, row.language, template, locals, cb);
 }
 
+var activityTypeBlackList = ['Login', 'ApiKeyCreate', 'EnableTwoFactor', 'RemoveTwoFactor'];
+
 function onActivityWebSocket(userId, activity){
+
     debug("onActivityWebSocket userId %s, type %s", userId, activity);
+    if(_.contains(activityTypeBlackList, activity.type)){
+        //debug("onActivityWebSocket discard");
+        return;   
+    }
     exports.app.security.sessionWs.getSocketId(userId, function(err, socketId){
         if(err) return;
         if(socketId){

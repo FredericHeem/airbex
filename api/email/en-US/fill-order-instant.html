@@ -1,0 +1,13 @@
+Your instant order has been filled
+<p>
+    Hi <%= firstName || 'there' %>,
+</p>
+
+<p>
+    Your instant order to <%= type == 'bid' ? 'buy' : 'sell' %>
+    <%= original %> <%= base %> for a total of <%= total %> <%= quote %>
+
+    has been completed.
+</p>
+
+<% include signature.html %>

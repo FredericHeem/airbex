@@ -30,6 +30,35 @@ describe('Markets', function () {
                 done();
             }).fail(done)
         });
+        it('VohlcDayBTCUSD', function (done) {
+            client.get('v1/markets/BTCUSD/vohlc?range=1d').then(function(vohlc) {
+                //console.log(vohlc)
+                assert(vohlc);
+                assert(vohlc.length);
+                done();
+            })
+            .fail(done)
+        });
+        it('VohlcWeek', function (done) {
+            client.get('v1/markets/BTCUSD/vohlc?range=1w').then(function(vohlc) {
+                console.log("#vohlc", vohlc.length)
+                assert(vohlc);
+                assert(vohlc.length);
+                done();
+            })
+            .fail(done)
+        });
+        it('VohlcMonth', function (done) {
+            client.get('v1/markets/BTCUSD/vohlc?range=1m').then(function(vohlc) {
+                assert(vohlc);
+                assert(vohlc.length);
+                console.log("#vohlc", vohlc.length)
+                console.log(vohlc[0])
+                console.log(vohlc[vohlc.length - 1])
+                done();
+            })
+            .fail(done)
+        });
     });
     
     describe('Markets', function () {

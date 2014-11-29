@@ -192,11 +192,24 @@ exports.depthGet = function(app, params, cb) {
 }
 
 exports.vohlc = function(req, res, next) {
+    var range = req.query['range'];
+    //console.log("params:", req.query);
+    console.log("param:", range);
+    var vohlcFn = 'vohlc';
+    if(range = '1d'){
+        vohlcFn = 'vohlc_minute';
+    } else if(range = '1w'){
+        vohlcFn = 'vohlc_hour';
+    } else if(range = '1m'){
+        vohlcFn = 'vohlc';
+    }
+    
     req.app.conn.read.get().query({
         text: [
             'SELECT *',
-            'FROM vohlc',
-            'WHERE market = $1'
+            'FROM ' + vohlcFn,
+            'WHERE market = $1',
+            'LIMIT 5000'
         ].join('\n'),
         values: [req.params.marketId]
     }, function(err, dr) {

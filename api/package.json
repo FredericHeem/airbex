@@ -20,7 +20,7 @@
     "ejs": "1.0.0",
     "speakeasy": "1.0.3",
     "pg-builder": "1.0.2",
-    "libphonenumber": "git://github.com/justcoin/libphonenumber.git#b15651311b27544958f03adcb159dd8c335aeda4",
+    "libphonenumber": "0.0.9",
     "ripple-lib": "0.8.2",
     "analytics-node": "1.1.0",
     "twilio": "1.7.0",

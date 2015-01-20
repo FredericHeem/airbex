@@ -90,7 +90,7 @@ exports.cancelAll = function(req, res, next) {
     }, function(err, dr) {
         if (err) return next(err)
         res.status(204).end()
-        req.app.activity(req.user.id, 'CancelOrderMarket', { market: market })
+        //req.app.activity(req.user.id, 'CancelOrderMarket', { market: market })
     })
 }
 
@@ -115,6 +115,6 @@ exports.cancel = function(req, res, next) {
             })
         }
         res.status(204).end()
-        req.app.activity(req.user.id, 'CancelOrder', { id: +req.params.id })
+        //req.app.activity(req.user.id, 'CancelOrder', { id: +req.params.id })
     })
 }

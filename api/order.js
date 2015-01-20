@@ -236,7 +236,7 @@ exports.create = function(userId, req, res, next) {
                 message: 'Failed to match entire all-or-nothing order'
             })
         }
-
+/*
         req.app.activity(userId, 'CreateOrder', {
             market: market,
             type: req.body.type,
@@ -245,7 +245,7 @@ exports.create = function(userId, req, res, next) {
             address: req.body.address,
             aon: req.body.aon || false
         })
-
+*/
         res.status(201).send({ id: row.oid })
     })
 }

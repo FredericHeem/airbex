@@ -206,12 +206,12 @@ describe('Orders', function () {
                 assert(activities);
                 console.log("Alice: ", activities[0])
                 console.log("Alice: ", activities[1])
-                var fillOrder = activities[1];
+                var fillOrder = activities[0];
                 assert(fillOrder);
                 assert.equal(fillOrder.type, 'FillOrder');
-                var createOrder = activities[0];
-                assert(createOrder);
-                assert.equal(createOrder.type, 'CreateOrder');
+                //var createOrder = activities[0];
+                //assert(createOrder);
+                //assert.equal(createOrder.type, 'FillOrder');
             })
             .fail(done)
         });

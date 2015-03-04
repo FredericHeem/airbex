@@ -4,5 +4,5 @@ compilecrypto "litecoind" do
     cryptoCode "ltc"
     gitRepo "git://github.com/litecoin-project/litecoin.git"
     gitRef "v0.10.0.2"
-    compileCommand "./autogen.sh && ./configure --enable-tests=false && make"
+    compileCommand "./autogen.sh && ./configure --enable-tests=false --with-incompatible-bdb && make"
 end

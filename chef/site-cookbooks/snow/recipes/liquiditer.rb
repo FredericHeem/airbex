@@ -2,6 +2,9 @@ include_recipe "apt"
 include_recipe "nodejs"
 include_recipe "solo-search"
 
+package 'git' do
+end
+
 bag = Chef::EncryptedDataBagItem.load("snow", 'main')
 env_bag = bag[node.chef_environment]
 

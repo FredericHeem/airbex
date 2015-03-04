@@ -3,6 +3,6 @@ compilecrypto "litecoind" do
     deamonName "litecoind"
     cryptoCode "ltc"
     gitRepo "git://github.com/litecoin-project/litecoin.git"
-    gitRef "v0.8.7.4"
-    compileCommand "cd src && sudo make -f makefile.unix"
+    gitRef "v0.10.0.2"
+    compileCommand "./autogen.sh && ./configure --enable-tests=false && make"
 end

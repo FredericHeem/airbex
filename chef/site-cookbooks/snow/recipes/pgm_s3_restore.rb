@@ -6,6 +6,9 @@ include_recipe "aws"
 include_recipe "solo-search"
 include_recipe "snow::pgm_s3"
 
+bag = Chef::EncryptedDataBagItem.load("snow", 'main')
+env_bag = bag[node.chef_environment]
+
 pgm_ip = env_bag['pgm']['ip'] || "127.0.0.1"
 
 pg_data_path = node[:postgresql][:data_directory]

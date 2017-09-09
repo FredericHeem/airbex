@@ -1,0 +1,61 @@
+<p>This method retrieves the balances for all currencies.</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li>No parameter is required</li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends an array of the balances for all currencies.</p>
+
+<ul>
+  <li><strong><code>currency:</code></strong> The currency code, e.g <code>BTC</code>.</li>
+  <li><strong><code>balance:</code></strong> The total balance: the sum of <code>hold</code> and <code>available</code>.</li>
+  <li><strong><code>hold:</code></strong> Amount on hold for open orders and pending withdraws.</li>
+  <li><strong><code>available:</code></strong> The available balance for withdraw and to open new orders.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>
+[{
+    "currency": "LTC",
+    "balance": "127.84402560",
+    "hold": "0.00000000",
+    "available": "127.84402560"
+}, {
+    "currency": "BTC",
+    "balance": "1.84705401",
+    "hold": "0.86130500",
+    "available": "0.98574901"
+}, {
+    "currency": "USD",
+    "balance": "0.00000",
+    "hold": "0.00000",
+    "available": "0.00000"
+}, {
+    "currency": "DOGE",
+    "balance": "1010000.00000000",
+    "hold": "0.00000000",
+    "available": "1010000.00000000"
+}, {
+    "currency": "CZK",
+    "balance": "17384.08350",
+    "hold": "0.00000",
+    "available": "17384.08350"
+}, {
+    "currency": "EUR",
+    "balance": "21725.46343",
+    "hold": "0.00000",
+    "available": "21725.46343"
+}, {
+    "currency": "DRK",
+    "balance": "990.00000000",
+    "hold": "40.00000000",
+    "available": "950.00000000"
+}]
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>

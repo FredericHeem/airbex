@@ -1,0 +1,26 @@
+<h3 id="success">Success</h3>
+
+<p>Successes differ from errors in that their body may not be a simple response object with a code and a message. The headers however are consistent across all calls:</p>
+
+<ul>
+  <li><code>GET</code>, <code>PUT</code>, <code>DELETE</code> returns <code>200 OK</code> on success,</li>
+  <li><code>DELETE</code> returns <code>202 No Content</code> on success,</li>
+  <li><code>POST </code> returns 201 on success,</li>
+</ul>
+
+<h3 id="error">Error</h3>
+
+<p>Error responses are simply returning <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html">standard HTTP error codes</a> along with some additional information:</p>
+
+<ul>
+  <li>The error code is sent back as a status header,</li>
+  <li>The body includes an object describing both the code and message (for debugging and/or display purposes),</li>
+</ul>
+
+<p>For a call with an missing API key for example:</p>
+
+<p><code>Status: 401 Unauthorized</code>
+<code>{
+    "name": "NotAuthenticated",
+    "message": "Both API key and session cookie missing"
+}</code></p>

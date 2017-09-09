@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<head>
+  <title>Airbex Bitcoin Exchange Api documentation</title>
+  <meta charset='utf-8'/>
+  <meta name='description' content='Airbex bitcoin exchange API documentation'/>
+  <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1'/>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
+  <link href='assets.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+  <nav id='sidebar'>
+	<a href="https://airbex.net"><img src="img/logo-airbex-small.png" alt="Airbex"/></a>
+<h1>Airbex Bitcoin Exchange Api documentation</h1>
+
+<ul id='links'>
+  
+    
+    <li><a href='#/description'>Description</a></li>
+    
+  
+    
+    <li><a href='#/authentication'>Authenticate</a></li>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+    <li><a href='#/response-status-codes'>Response status codes</a></li>
+    
+  
+  
+  <li><h2>public</h2>
+    <ul>
+    
+              
+        <li class=''><a href='#'></a></li>
+      
+    
+              
+        <li class='GET'><a href='#/depth'>Get market depth</a></li>
+              
+        <li class='GET'><a href='#/market-public'>Get markets summary</a></li>
+              
+        <li class='GET'><a href='#/currencies'>Get currencies information</a></li>
+      
+    
+    </ul>
+  </li>
+
+  <li><h2>authenticated</h2>
+    <ul>
+    
+              
+        <li class=''><a href='#'></a></li>
+      
+    
+              
+        <li class='GET'><a href='#/3-whoami'>Who am I</a></li>
+              
+        <li class='POST'><a href='#/11-order-create'>Create an order</a></li>
+              
+        <li class='DELETE'><a href='#/11-order-cancel'>Delete an order</a></li>
+              
+        <li class='GET'><a href='#/11-get-orders'>Get open orders</a></li>
+              
+        <li class='GET'><a href='#/10-balance'>Get the balance</a></li>
+      
+    
+    </ul>
+  </li>
+
+  <li><h2>proof of reserve</h2>
+    <ul>
+    
+              
+        <li class=''><a href='#'></a></li>
+      
+    
+              
+        <li class='GET'><a href='#/3-asset-proof'>Get the asset proof</a></li>
+              
+        <li class='GET'><a href='#/2-liability-tree'>Get the liability partial tree</a></li>
+              
+        <li class='GET'><a href='#/1-liability-root'>Get the root liability</a></li>
+      
+    
+    </ul>
+  </li>
+
+</ul>
+</nav>
+
+<section id='content'>
+
+  <article class=''>
+    <a name='/description' href='#/description'><h2>Description</h2></a>
+    <section class='body'>
+      <p>This is the documentation for the REST API of <a href="https://airbex.net">Airbex</a>, a cryptocurrency exchange with Proof of Reserve.</p>
+
+<p>This API allows software engineer to create automated trading program.</p>
+
+<p>Airbex provides a test environment which uses testnet coins, 
+use this server while developing without risk of losing real cryptocurrency. </p>
+
+<p>Here are the base url for test and production environment:</p>
+
+<ul>
+  <li><code>https://airbex.net/api</code> for production</li>
+  <li><code>https://demo.airbex.net/api</code> for development</li>
+</ul>
+
+
+    </section>
+  </article>
+
+  <article class=''>
+    <a name='/authentication' href='#/authentication'><h2>Authenticate</h2></a>
+    <section class='body'>
+      <p>Authentication for third party program is done through API keys that can be created on the website under <strong><code>Account/API Key</code></strong>.
+The HTTP request should contain the key as query parameter:</p>
+
+<p><code>https://demo.airbex.net/api/v1/balances?key=longkeyinhex</code></p>
+
+<p>Do not share with key with anyone, in case of doubt, delete the key and recreate one. </p>
+
+<h3 id="response">Response</h3>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='GET'>
+    <a name='/3-asset-proof' href='#/3-asset-proof'><h2><code><b>GET</b> /v1/proof/asset/:currency</code> Get the asset proof</h2></a>
+    <section class='body'>
+      <p>This method returns to asset proof which is composed of a list the exchange addresses in their possession alongside their signature with a particular message.</p>
+
+<p>The signatures cryptographically prove the ownership of the addresses by the exchange. </p>
+
+<p>The message to sign contains a blockchain hash, and this is used to prove when the signature was created.</p>
+
+<p>For more information about the proof of asset, please refer to the <a href="https://github.com/olalonde/proof-of-assets">proof of asset specification</a></p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li><strong><code>currency:</code></strong> the currency code, e.g <code>BTC</code></li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends the asset proof.</p>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>{
+    "currency": "BTC",
+    "message": "Airbex Btc Asset",
+    "blockhash": "000000000000000010cd86c9346a8c7c6b3babb5a440a9295b6ed6d00a328c8e",
+    "signatures": [{
+        "address": "1H7RFM1C5UCPSyoNwimhMa9Ntz82iib8uY",
+        "signature": "G0ZG3Lz7mOwc2LD6Lf/3rNgPDMTUBqOQSHaKlv4x0AH+E17yfNnvUcEz/UdS2X4x/4Ji7bHKb+1j1u/rL9xGCNA="
+    }, {
+        "address": "1DsgBjnUHiuK2KGsiTfxbwwFTaabngvjmn",
+        "signature": "HENBzklf4olJT+KE2QcH70GWpKfiNG2UjC9p7XshBTCMsP3YiGZzuDQxGR/2bN61PDBMZ2Wem0jvQpcRrahXpWw="
+    }, {
+        "address": "16BzmcweNGVGsc1yDYhPXmcZBYPMdKcaYP",
+        "signature": "HGHXVRGiz4L+VlICaxHJshBaahpAm+lSp5SnvFNleJZUJSgF+Djry7VS2MM9EBfG/eW4/W0pTZ13QFE4MaCKtAw="
+    }, {
+        "address": "13xYGWCNobfCas29NxqgQRjqTmh2hUPedz",
+        "signature": "G4CubIsbjQwYSY//hj+E1cOe0Bk/09LaNcu+Z+kiD6CqT4GKdWzODVuRteteZeIAon/JLQW4PYa+Ai6iPO6A1NQ="
+    }, {
+        "address": "16MbRvtoR4YosTHxns6VB9JSXw4s3xE6BP",
+        "signature": "Hxz5DJhsDgVle426gWcRQdIFrkUJqzw+RUJBDa3eUfGsyI/GPstavUULG+bHVoGwe4TzTPtKhu6yCEYyNbTtcts=",
+        "wallet": "hot"
+    }, {
+        "address": "1AeCLxN5C7qMawh6eCPutkVHryVvyhbGAD",
+        "signature": "IAxoZLxePkB+hizO4MxVuPrQE4WnNJUfju/xCYM178Xq3x89MC3Yt2UPZrUdb3dQ5/BqIqF/R6YPG3IPF/2erS4=",
+        "wallet": "hot"
+    }, {
+        "address": "1DehKj5dSHoH4WniDVMHV2jpAAPfUi3rS4",
+        "signature": "H8hLa+rbjyMlTjBgY6Mix5P0UiV5qQRMXxM5UU2ItMgfezX6aEYlm6khHIivgnXkefnKFSBfa2oGx8YoEaU+by0=",
+        "wallet": "hot"
+    }]
+}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='GET'>
+    <a name='/2-liability-tree' href='#/2-liability-tree'><h2><code><b>GET</b> /v1/proof/liability/:currency</code> Get the liability partial tree</h2></a>
+    <section class='body'>
+      <p>This method returns to liability partial tree of the user for the given cryptocurrency.</p>
+
+<p>For a description of the response, please have a look at the <a href="https://github.com/olalonde/proof-of-liabilities">proof of liability specification</a></p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li><strong><code>currency:</code></strong> the currency code, e.g <code>BTC</code></li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends the root liability.</p>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>{
+    "id": "0 BTC liabilities",
+    "partial_tree": {
+        "left": {
+            "left": {
+                "left": {
+                    "data": {
+                        "sum": "0",
+                        "hash": "23424cd1601dd9e827be77d2026f3d1846d18ba69cd32d47db0b41578bd58570"
+                    }
+                },
+                "right": {
+                    "left": {
+                        "left": {
+                            "data": {
+                                "sum": "0",
+                                "hash": "28b0f92d84e7727218a8b0a54c63e8facbfd512ee534996578d34dea3bd003fe"
+                            }
+                        },
+                        "right": {
+                            "data": {
+                                "user": "frederic.heem@gmail.com",
+                                "sum": "3.45898099",
+                                "nonce": "2a644219e77147c24ace672675c51528"
+                            }
+                        }
+                    },
+                    "right": {
+                        "data": {
+                            "sum": "0",
+                            "hash": "ea20139a00a7b56822081b77cc99588c0db322a03f39da70bb65159b65e2706d"
+                        }
+                    }
+                }
+            },
+            "right": {
+                "data": {
+                    "sum": "4",
+                    "hash": "f0ae10bec263268a988e5067968215ac8285bafbb6341d186e6be8cc7ff9e58d"
+                }
+            }
+        },
+        "right": {
+            "data": {
+                "sum": "0",
+                "hash": "821b596965b93fafa8a5d76ec979777eee43d18d3b19a971a8d2b266aa917192"
+            }
+        }
+    }
+}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='GET'>
+    <a name='/1-liability-root' href='#/1-liability-root'><h2><code><b>GET</b> /v1/proof/root/:currency</code> Get the root liability</h2></a>
+    <section class='body'>
+      <p>This method returns to root liability for the given cryptocurrency.</p>
+
+<p>For more information about the root liability, please refer to the <a href="https://github.com/olalonde/proof-of-liabilities">proof of liability specification</a></p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li><strong><code>currency:</code></strong> the currency code, e.g <code>BTC</code></li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends the root liability.</p>
+
+<ul>
+  <li><strong><code>sum:</code></strong> The total balance.</li>
+  <li><strong><code>hash:</code></strong> The hash of the user’s balance merkle tree.</li>
+  <li><strong><code>currency:</code></strong> The currency code.</li>
+  <li><strong><code>timestamp:</code></strong> The unix timestamp.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>{
+    "root": {
+        "sum": "7.45898099",
+        "hash": "ef129eb0b44b2635486d491242a31e1f37aceb664a421722d5092a9c528ef907"
+    },
+    "currency": "BTC",
+    "timestamp": 1409136916181
+}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='GET'>
+    <a name='/3-whoami' href='#/3-whoami'><h2><code><b>GET</b> /v1/whoami</code> Who am I</h2></a>
+    <section class='body'>
+      <p>This method retrieves information about the authenticated user</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li>No parameter is required</li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends information about the authenticated user.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> is the id of user.</li>
+  <li><strong><code>email:</code></strong> is the user’s email address</li>
+  <li><strong><code>admin:</code></strong> true for admin user.</li>
+  <li><strong><code>twoFactor:</code></strong> true if two factor authentication is enabled</li>
+  <li><strong><code>poi:</code></strong> true if proof of identity is verified.</li>
+  <li><strong><code>poa:</code></strong> true if proof of address is verified.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>{
+    "id": 1,
+    "email": "justin.case@gmail.com",
+    "admin": true,
+    "tag": 1403052671,
+    "phone": null,
+    "firstName": "justin",
+    "lastName": "case",
+    "username": null,
+    "address": "kings road",
+    "country": "UK",
+    "postalArea": "N129LA",
+    "city": "London",
+    "securityLevel": 4,
+    "language": "en-US",
+    "twoFactor": false,
+    "poi": true,
+    "poa": true
+}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='POST'>
+    <a name='/11-order-create' href='#/11-order-create'><h2><code><b>POST</b> /v1/order</code> Create an order</h2></a>
+    <section class='body'>
+      <p>This method creates an order on the given market</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li><strong><code>amount:</code></strong> The amount of base currency to buy or sell.</li>
+  <li><strong><code>market:</code></strong> The market id where the order will be placed, e.g <code>BTCUSD</code>.</li>
+  <li><strong><code>price:</code></strong> The price in quote currency at which to buy or sell. <code>null</code> for instant order.</li>
+  <li><strong><code>type:</code></strong> <code>bid</code>: buy order, <code>ask</code>: sell order.</li>
+</ul>
+
+<p><code>{
+  amount: "0.1",
+  market: "BTCUSD",
+  price: "614",
+  type: "ask"
+}
+</code></p>
+
+<h3 id="response">Response</h3>
+
+<p>Sends the order id.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> The order id.</li>
+</ul>
+
+<p><code>Status: 201 Created</code></p>
+
+<p><code>{"id":182}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='DELETE'>
+    <a name='/11-order-cancel' href='#/11-order-cancel'><h2><code><b>DELETE</b> /v1/order/:id</code> Delete an order</h2></a>
+    <section class='body'>
+      <p>This method deletes an order on the given market.</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li><strong><code>id:</code></strong> The order id to delete.</li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>The HTTP response code is <code>204</code> for successful deletion.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> The order id to delete</li>
+</ul>
+
+<p><code>Status: 204 No Content</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='GET'>
+    <a name='/11-get-orders' href='#/11-get-orders'><h2><code><b>GET</b> /v1/orders</code> Get open orders</h2></a>
+    <section class='body'>
+      <p>This method retrieves the list of open orders</p>
+
+<h3 id="request">Request</h3>
+
+<p>No parameter is required for the method.</p>
+
+<h3 id="response">Response</h3>
+
+<p>Sends an array of open orders for all markets.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> The order id.</li>
+  <li><strong><code>market:</code></strong> The market id where the order was placed, e.g <code>BTCUSD</code>.</li>
+  <li><strong><code>type:</code></strong> <code>bid</code>: buy order, <code>ask</code>: sell order.</li>
+  <li><strong><code>price:</code></strong> The price in quote currency at which to buy or sell.</li>
+  <li><strong><code>amount:</code></strong> The amount of base currency to buy or sell.</li>
+  <li><strong><code>remaining:</code></strong> The remaining amount ready to be buy or sell.</li>
+  <li><strong><code>matched:</code></strong> The amount already bought or sold.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>[{
+    "id": 181,
+    "market": "BTCEUR",
+    "type": "ask",
+    "price": "451.00000",
+    "amount": "0.10000000",
+    "remaining": "0.10000000",
+    "matched": "0.00000000"
+}, 
+{
+    "id": 161,
+    "market": "DRKBTC",
+    "type": "ask",
+    "price": "0.00190000",
+    "amount": "10.00000000",
+    "remaining": "10.00000000",
+    "matched": "0.00000000"
+}]
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='GET'>
+    <a name='/10-balance' href='#/10-balance'><h2><code><b>GET</b> /v1/balances</code> Get the balance</h2></a>
+    <section class='body'>
+      <p>This method retrieves the balances for all currencies.</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li>No parameter is required</li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends an array of the balances for all currencies.</p>
+
+<ul>
+  <li><strong><code>currency:</code></strong> The currency code, e.g <code>BTC</code>.</li>
+  <li><strong><code>balance:</code></strong> The total balance: the sum of <code>hold</code> and <code>available</code>.</li>
+  <li><strong><code>hold:</code></strong> Amount on hold for open orders and pending withdraws.</li>
+  <li><strong><code>available:</code></strong> The available balance for withdraw and to open new orders.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>
+[{
+    "currency": "LTC",
+    "balance": "127.84402560",
+    "hold": "0.00000000",
+    "available": "127.84402560"
+}, {
+    "currency": "BTC",
+    "balance": "1.84705401",
+    "hold": "0.86130500",
+    "available": "0.98574901"
+}, {
+    "currency": "USD",
+    "balance": "0.00000",
+    "hold": "0.00000",
+    "available": "0.00000"
+}, {
+    "currency": "DOGE",
+    "balance": "1010000.00000000",
+    "hold": "0.00000000",
+    "available": "1010000.00000000"
+}, {
+    "currency": "CZK",
+    "balance": "17384.08350",
+    "hold": "0.00000",
+    "available": "17384.08350"
+}, {
+    "currency": "EUR",
+    "balance": "21725.46343",
+    "hold": "0.00000",
+    "available": "21725.46343"
+}, {
+    "currency": "DRK",
+    "balance": "990.00000000",
+    "hold": "40.00000000",
+    "available": "950.00000000"
+}]
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='GET'>
+    <a name='/depth' href='#/depth'><h2><code><b>GET</b> /v1/markets/:id/depth</code> Get market depth</h2></a>
+    <section class='body'>
+      <p>This method retrieves the market depth which is the collection of bid and ask open orders.</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li><strong><code>id:</code></strong> is the id of the market, i.e <code>BTCUSD</code></li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends back the market depth.</p>
+
+<ul>
+  <li><strong><code>bids:</code></strong> is an array containing the bid pairs: volume and price.</li>
+  <li><strong><code>asks:</code></strong> is an array containing the ask pairs: volume and price.</li>
+</ul>
+
+<p>Volume unit is in the base currency, e.g <strong><code>BTC</code></strong>.</p>
+
+<p>Price unit is in the quote currency, e.g <strong><code>USD</code></strong>.</p>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>{
+    "bids": [
+        ["612.00000", "0.09000000"],
+        ["611.00000", "0.10000000"],
+        ["610.00000", "1.00000000"],
+        ["600.00000", "1.00000000"],
+        ["590.00000", "1.00000000"]
+    ],
+    "asks": [
+        ["650.00000", "0.02000000"],
+        ["653.00000", "0.03000000"],
+        ["655.00000", "0.10000000"],
+        ["660.00000", "0.10000000"],
+        ["670.00000", "0.10000000"],
+        ["680.00000", "0.10000000"]
+    ]
+}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='GET'>
+    <a name='/market-public' href='#/market-public'><h2><code><b>GET</b> /v1/markets</code> Get markets summary</h2></a>
+    <section class='body'>
+      <p>This method retrieves the markets information</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li>No parameter is required</li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends back a collection of markets.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> is the id of the market.</li>
+  <li><strong><code>bc:</code></strong> is the base currency.</li>
+  <li><strong><code>qc:</code></strong> is the quote currency.</li>
+  <li><strong><code>last:</code></strong> is the last price traded.</li>
+  <li><strong><code>high:</code></strong> is the highest price in the last 24 hours.</li>
+  <li><strong><code>low:</code></strong> is the lowest price in the last 24 hours.</li>
+  <li><strong><code>bid:</code></strong> is the price of the highest bid.</li>
+  <li><strong><code>ask:</code></strong> is the price of the lowest ask.</li>
+  <li><strong><code>volume:</code></strong> is the volume of the last 24 hours.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>{
+[{
+    "id": "BTCEUR",
+    "bc": "BTC",
+    "qc": "EUR",
+    "last": "460.00000",
+    "high": null,
+    "low": null,
+    "bid": "450.00000",
+    "ask": "451.00000",
+    "volume": null
+}, {
+    "id": "BTCUSD",
+    "bc": "BTC",
+    "qc": "USD",
+    "last": "612.00000",
+    "high": null,
+    "low": null,
+    "bid": "612.00000",
+    "ask": "650.00000",
+    "volume": null
+}, {
+    "id": "DOGEBTC",
+    "bc": "DOGE",
+    "qc": "BTC",
+    "last": null,
+    "high": null,
+    "low": null,
+    "bid": "0.00010000",
+    "ask": null,
+    "volume": null
+}, {
+    "id": "DRKBTC",
+    "bc": "DRK",
+    "qc": "BTC",
+    "last": "0.00180000",
+    "high": null,
+    "low": null,
+    "bid": "0.00180000",
+    "ask": "0.00190000",
+    "volume": null
+}, {
+    "id": "LTCBTC",
+    "bc": "LTC",
+    "qc": "BTC",
+    "last": "0.01900000",
+    "high": null,
+    "low": null,
+    "bid": "0.02000000",
+    "ask": "0.02100000",
+    "volume": null
+}]
+}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class='GET'>
+    <a name='/currencies' href='#/currencies'><h2><code><b>GET</b> /v1/currencies</code> Get currencies information</h2></a>
+    <section class='body'>
+      <p>This method retrieves the list of currencies</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li>No parameter is required</li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends back a collection of currencies supported by the exchange.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> is the id of the currency.</li>
+  <li><strong><code>fiat:</code></strong> false for cryptocurrencies.</li>
+  <li><strong><code>scale:</code></strong> is the scale of currency, i.e the number of digits.</li>
+  <li><strong><code>scale_display:</code></strong> is the scale to display the currency.</li>
+  <li><strong><code>name:</code></strong> is the firendly name of the currency.</li>
+  <li><strong><code>withdraw_min:</code></strong> the minimum amount to withdraw.</li>
+  <li><strong><code>withdraw_max:</code></strong> the maximun amount to withdraw.</li>
+  <li><strong><code>withdraw_fee:</code></strong> fees for withdraw, these fees goes for either the miners or the bank.</li>
+  <li><strong><code>conf_time:</code></strong> the cryptocurrency confirmation time which is the average duration time between blocks.</li>
+  <li><strong><code>min_conf:</code></strong> the minimum of confirmations to credit the deposit.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>[{
+    "id": "BTC",
+    "fiat": false,
+    "scale": 8,
+    "scale_display": 6,
+    "name": "Bitcoin",
+    "withdraw_min": "0.00100000",
+    "withdraw_max": "10.00000000",
+    "withdraw_fee": "0.00010000",
+    "conf_time": 600,
+    "min_conf": 2
+}, {
+    "id": "CZK",
+    "fiat": true,
+    "scale": 5,
+    "scale_display": 0,
+    "name": "Czech Crown",
+    "withdraw_min": "1.00000",
+    "withdraw_max": "50000.00000",
+    "withdraw_fee": "0.10000",
+    "conf_time": 600,
+    "min_conf": 6
+}, {
+    "id": "DOGE",
+    "fiat": false,
+    "scale": 8,
+    "scale_display": 0,
+    "name": "Dogecoin",
+    "withdraw_min": "1.00000000",
+    "withdraw_max": "10000000.00000000",
+    "withdraw_fee": "1.00000000",
+    "conf_time": 60,
+    "min_conf": 10
+}, {
+    "id": "DRK",
+    "fiat": false,
+    "scale": 8,
+    "scale_display": 3,
+    "name": "Darkcoin",
+    "withdraw_min": "0.00100000",
+    "withdraw_max": "100.00000000",
+    "withdraw_fee": "0.00100000",
+    "conf_time": 150,
+    "min_conf": 4
+}, {
+    "id": "EUR",
+    "fiat": true,
+    "scale": 5,
+    "scale_display": 2,
+    "name": "Euro",
+    "withdraw_min": "1.00000",
+    "withdraw_max": "50000.00000",
+    "withdraw_fee": "0.10000",
+    "conf_time": 600,
+    "min_conf": 6
+}, {
+    "id": "LTC",
+    "fiat": false,
+    "scale": 8,
+    "scale_display": 3,
+    "name": "Litecoin",
+    "withdraw_min": "0.00100000",
+    "withdraw_max": "10.00000000",
+    "withdraw_fee": "0.00100000",
+    "conf_time": 150,
+    "min_conf": 4
+}, {
+    "id": "USD",
+    "fiat": true,
+    "scale": 5,
+    "scale_display": 2,
+    "name": "US Dollar",
+    "withdraw_min": "1.00000",
+    "withdraw_max": "50000.00000",
+    "withdraw_fee": "0.10000",
+    "conf_time": 600,
+    "min_conf": 6
+}]
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>
+
+    </section>
+  </article>
+
+  <article class=''>
+    <a name='/response-status-codes' href='#/response-status-codes'><h2>Response status codes</h2></a>
+    <section class='body'>
+      <h3 id="success">Success</h3>
+
+<p>Successes differ from errors in that their body may not be a simple response object with a code and a message. The headers however are consistent across all calls:</p>
+
+<ul>
+  <li><code>GET</code>, <code>PUT</code>, <code>DELETE</code> returns <code>200 OK</code> on success,</li>
+  <li><code>DELETE</code> returns <code>202 No Content</code> on success,</li>
+  <li><code>POST </code> returns 201 on success,</li>
+</ul>
+
+<h3 id="error">Error</h3>
+
+<p>Error responses are simply returning <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html">standard HTTP error codes</a> along with some additional information:</p>
+
+<ul>
+  <li>The error code is sent back as a status header,</li>
+  <li>The body includes an object describing both the code and message (for debugging and/or display purposes),</li>
+</ul>
+
+<p>For a call with an missing API key for example:</p>
+
+<p><code>Status: 401 Unauthorized</code>
+<code>{
+    "name": "NotAuthenticated",
+    "message": "Both API key and session cookie missing"
+}</code></p>
+
+    </section>
+  </article>
+
+</section>
+
+  
+  <!--[if lt IE 9]><script src='http://html5shim.googlecode.com/svn/trunk/html5.js'></script><![endif]-->
+  <script src='assets.js' type='text/javascript'></script>
+  <script>require('boot');</script>
+</body>
+</html>

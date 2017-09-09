@@ -1,0 +1,45 @@
+<p>This method retrieves information about the authenticated user</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li>No parameter is required</li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends information about the authenticated user.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> is the id of user.</li>
+  <li><strong><code>email:</code></strong> is the user’s email address</li>
+  <li><strong><code>admin:</code></strong> true for admin user.</li>
+  <li><strong><code>twoFactor:</code></strong> true if two factor authentication is enabled</li>
+  <li><strong><code>poi:</code></strong> true if proof of identity is verified.</li>
+  <li><strong><code>poa:</code></strong> true if proof of address is verified.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>{
+    "id": 1,
+    "email": "justin.case@gmail.com",
+    "admin": true,
+    "tag": 1403052671,
+    "phone": null,
+    "firstName": "justin",
+    "lastName": "case",
+    "username": null,
+    "address": "kings road",
+    "country": "UK",
+    "postalArea": "N129LA",
+    "city": "London",
+    "securityLevel": 4,
+    "language": "en-US",
+    "twoFactor": false,
+    "poi": true,
+    "poa": true
+}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>

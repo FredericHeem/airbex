@@ -1,0 +1,43 @@
+<p>This method retrieves the list of open orders</p>
+
+<h3 id="request">Request</h3>
+
+<p>No parameter is required for the method.</p>
+
+<h3 id="response">Response</h3>
+
+<p>Sends an array of open orders for all markets.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> The order id.</li>
+  <li><strong><code>market:</code></strong> The market id where the order was placed, e.g <code>BTCUSD</code>.</li>
+  <li><strong><code>type:</code></strong> <code>bid</code>: buy order, <code>ask</code>: sell order.</li>
+  <li><strong><code>price:</code></strong> The price in quote currency at which to buy or sell.</li>
+  <li><strong><code>amount:</code></strong> The amount of base currency to buy or sell.</li>
+  <li><strong><code>remaining:</code></strong> The remaining amount ready to be buy or sell.</li>
+  <li><strong><code>matched:</code></strong> The amount already bought or sold.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>[{
+    "id": 181,
+    "market": "BTCEUR",
+    "type": "ask",
+    "price": "451.00000",
+    "amount": "0.10000000",
+    "remaining": "0.10000000",
+    "matched": "0.00000000"
+}, 
+{
+    "id": 161,
+    "market": "DRKBTC",
+    "type": "ask",
+    "price": "0.00190000",
+    "amount": "10.00000000",
+    "remaining": "10.00000000",
+    "matched": "0.00000000"
+}]
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>

@@ -1,0 +1,82 @@
+<p>This method retrieves the markets information</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li>No parameter is required</li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends back a collection of markets.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> is the id of the market.</li>
+  <li><strong><code>bc:</code></strong> is the base currency.</li>
+  <li><strong><code>qc:</code></strong> is the quote currency.</li>
+  <li><strong><code>last:</code></strong> is the last price traded.</li>
+  <li><strong><code>high:</code></strong> is the highest price in the last 24 hours.</li>
+  <li><strong><code>low:</code></strong> is the lowest price in the last 24 hours.</li>
+  <li><strong><code>bid:</code></strong> is the price of the highest bid.</li>
+  <li><strong><code>ask:</code></strong> is the price of the lowest ask.</li>
+  <li><strong><code>volume:</code></strong> is the volume of the last 24 hours.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>{
+[{
+    "id": "BTCEUR",
+    "bc": "BTC",
+    "qc": "EUR",
+    "last": "460.00000",
+    "high": null,
+    "low": null,
+    "bid": "450.00000",
+    "ask": "451.00000",
+    "volume": null
+}, {
+    "id": "BTCUSD",
+    "bc": "BTC",
+    "qc": "USD",
+    "last": "612.00000",
+    "high": null,
+    "low": null,
+    "bid": "612.00000",
+    "ask": "650.00000",
+    "volume": null
+}, {
+    "id": "DOGEBTC",
+    "bc": "DOGE",
+    "qc": "BTC",
+    "last": null,
+    "high": null,
+    "low": null,
+    "bid": "0.00010000",
+    "ask": null,
+    "volume": null
+}, {
+    "id": "DRKBTC",
+    "bc": "DRK",
+    "qc": "BTC",
+    "last": "0.00180000",
+    "high": null,
+    "low": null,
+    "bid": "0.00180000",
+    "ask": "0.00190000",
+    "volume": null
+}, {
+    "id": "LTCBTC",
+    "bc": "LTC",
+    "qc": "BTC",
+    "last": "0.01900000",
+    "high": null,
+    "low": null,
+    "bid": "0.02000000",
+    "ask": "0.02100000",
+    "volume": null
+}]
+}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>

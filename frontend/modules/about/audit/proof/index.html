@@ -1,56 +1,132 @@
 <div class="container">
-	<div class="row">
-		<div class="about-nav"></div>
-		<div class="col-lg-6">
-			<h1>Audit</h1>
-			<div id="audit-warning" class="alert alert-warning hidden">
-				<i class="fa fa-info-circle"></i>
-				<span class="audit-message"></span>
-			</div>
-			<div id="audit-error" class="alert alert-danger hidden">
-				<i class="fa fa-bug"></i>
-				<span class="audit-message"></span>
-			</div>
-			<div id="auditing">
-				<h4>Verifying liabilities and assets</h4>
-				<img src="img/ajax-loader.gif">
-			</div>
-			<div id="audited" class="hidden">
-				<div>
-					<div id="solvency">
-						<h1 class="error hidden" id="insolvent">
-							Site insolvent! <span class="amount"></span> BTC missing.
-						</h1>
-						<h1 class="success hidden" id="solvent">
-							Site solvent! <span class="amount"></span> BTC surplus.
-						</h1>
-					</div>
-					<div id="lproof-verified">
-						<h4 class="success">Liability proof successful</h4>
-						<p>
-							<strong>Total Liabilities:</strong> <span id="root_value"></span>
-							<span> BTC</span> <br> <strong>User:</strong> <span
-								id="user"></span><br> <strong>User Balance:</strong> <span
-								id="value"></span> <span> BTC</span><br> <strong>Total
-								Liabilities hash:</strong> <span id="root_hash"></span><br>
-						</p>
-					</div>
+    <div class="col-sm-10 col-lg-10">
+        <h1>Audit</h1>
+        <div id="audit-info" class="alert alert-info">
+            <i class="fa fa-info-circle"></i> <img id="aproof-auditing"
+                width="20" src="img/ajax-loader.gif"> <span
+                class="audit-message"></span>
+        </div>
+        <div id="audit-warning" class="alert alert-warning hidden">
+            <i class="fa fa-info-circle"></i> <span
+                class="audit-message"></span>
+        </div>
+        <div id="audit-error" class="alert alert-danger hidden">
+            <i class="fa fa-bug"></i> <span class="audit-message"></span>
+        </div>
+        <div id="solvency" class="hidden">
+            <div id="solvency-error" class="alert alert-danger hidden">
+                <i class="fa fa-bug"></i> Site may be insolvent: <span
+                    class="amount"></span> are not signed. </span>
+            </div>
+            <h1 class="success hidden" id="solvent">
+                Site solvent! <span class="amount"></span> surplus.
+            </h1>
+        </div>
 
-					<div id="aproof-verified">
-						<h4 class="success">Solvency proof successful</h4>
-						<p>
-							<strong>Site:</strong> <span id="site"></span><br> <strong>Balance:</strong>
-							<span id="balance"></span><span> BTC</span><br>
-						</p>
-					</div>
-					<div id="aproof-ko" class="error hidden">
-						<h4>
-							Assert proof cannot be determined: <span id="aproof-error"></span>
-						</h4>
-						<p></p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+        <div class="row">
+            <div id="asset" class="col-md-6 col-lg-6">
+                <div id="aproof-verified" class="hidden">
+                    <h4 class="success">Asset proof</h4>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>Total Assets:</td>
+                                <td><span id="balance">N/A</span></td>
+                            </tr>
+                            <tr>
+                                <td>Assets offline:</td>
+                                <td><span id="balance-cold">N/A</span></td>
+                            </tr>
+                            <tr>
+                                <td>Assets online:</td>
+                                <td><span id="balance-hot">N/A</span></td>
+                            </tr>
+
+                            <tr>
+                                <td>Message:</td>
+                                <td><span id="site"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Date:</td>
+                                <td><a id="blockhash"
+                                    target="_blank"></a></td>
+                            </tr>
+                            <tr>
+                                <td>Assets file:</td>
+                                <td><a
+                                    href="/api/v1/proof/asset/<%= currency %>">View</a>
+                                    or <a
+                                    href="/api/v1/proof/asset/<%= currency %>"
+                                    download="<%= currency %>-assets.json">Download</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table id="signature-table"
+                        class="table table-bordered table-striped">
+                        <thead>
+                            <tr class="header">
+                                <th>Address</th>
+                                <th>Balance</th>
+                                <!--                                    <th>Signature</th> -->
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="aproof-ko" class="error hidden">
+                    <h4>
+                        Assert proof cannot be determined: <span
+                            id="aproof-error"></span>
+                    </h4>
+                    <p></p>
+                </div>
+
+            </div>
+            <div id="liability" class="col-md-6 col-lg-6">
+                <div id="lproof-auditing">
+                    <h4>Verifying liabilities ...</h4>
+                    <img src="img/ajax-loader.gif">
+                </div>
+                <div id="lproof-verified" class="hidden">
+                    <h4 class="success">Liability proof</h4>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>Total Liabilities:</td>
+                                <td><span id="root_value"></span></td>
+                            </tr>
+                            <tr>
+                                <td>User:</td>
+                                <td><span id="user"></span></td>
+                            </tr>
+                            <tr>
+                                <td>User balance:</td>
+                                <td><span id=value></span></td>
+                            </tr>
+                            <tr>
+                                <td>Date:</td>
+                                <td><span id="date"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Root:</td>
+                                <td><a
+                                    href="/api/v1/proof/root/<%= currency %>">View</a>
+                                    or <a download="root.json"
+                                    href="/api/v1/proof/root/<%= currency %>">Download
+                                        root.json</a></td>
+                            </tr>
+                            <tr>
+                                <td>Partial Tree:</td>
+                                <td><a
+                                    href="/api/v1/proof/liability/<%= currency %>">View</a>
+                                    or <a download="partial_tree.json"
+                                    href="/api/v1/proof/liability/<%= currency %>">Download
+                                        partial_tree.json</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

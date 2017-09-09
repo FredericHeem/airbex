@@ -1,5 +1,4 @@
-var nav = require('../nav')
-,  itemTemplate = require('./item.html')
+var itemTemplate = require('./item.html')
 , template = require('./index.html')
 
 module.exports = function(skip) {
@@ -14,8 +13,8 @@ module.exports = function(skip) {
         if (skip) q.skip = skip
         $el.addClass('is-loading')
         api.call('v1/transactions', q)
+        .then(paint)
         .fail(errors.alertFromXhr)
-        .done(paint)
     }
 
     function paint(res) {
@@ -56,8 +55,6 @@ module.exports = function(skip) {
     }
 
     search()
-
-    $el.find('.account-nav').replaceWith(nav('transactions').$el)
 
     return controller
 }

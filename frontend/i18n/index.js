@@ -13,14 +13,14 @@ var util = require('util')
 }
 , moment = require('moment')
 
-require('moment/lang/nb')
+//require('moment/lang/nb')
 
 var i18n = module.exports = function(key) {
     if (!i18n.dict) throw new Error('language not set')
 
     var s = i18n.dict[key]
     if (typeof s == 'undefined') {
-        debug(key + ' is not defined for ' + i18n.lang + ' falling back to ' + fallback)
+        //debug(key + ' is not defined for ' + i18n.lang + ' falling back to ' + fallback)
         s = dicts[fallback][key]
     }
 
@@ -58,7 +58,7 @@ i18n.resolve = function(lang) {
     }
 
     if (!lang || !dicts[lang]) {
-        debug('language %s not available. falling back to %s', lang || '<null>', fallback)
+        //debug('language %s not available. falling back to %s', lang || '<null>', fallback)
         lang = fallback
     }
 
@@ -83,6 +83,7 @@ i18n.set = function(lang) {
 
         if (!api.user) {
             return setTimeout(function() {
+                debug('reloading')
                 window.location.reload()
             })
         }
@@ -90,11 +91,12 @@ i18n.set = function(lang) {
         debug('patching user with new language (background)')
 
         return api.patchUser({ language: lang })
-        .fail(errors.reportFromXhr)
-        .done(function() {
+        .then(function() {
             debug('user has been patched. reloading')
-            return window.location.reload()
+            //return window.location.reload()
+            return
         })
+        .fail(errors.reportFromXhr)
     }
 
     i18n.desired = lang
@@ -115,7 +117,7 @@ i18n.set = function(lang) {
 
     debug('setting language of moment')
 
-    if (i18n.lang == 'nb-NO') moment.lang('nb')
+    if (lang == 'nb-NO') moment.lang('nb')
     else moment.lang('en')
 
     debug('changing html and content-language attributes')

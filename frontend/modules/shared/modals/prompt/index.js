@@ -1,12 +1,13 @@
 var template = require('./index.html')
 , _ = require('lodash')
 
-module.exports = function(prompt, opts) {
+module.exports = function(prompt, promptType, opts) {
     var deferred = $.Deferred()
     , $el = $('<div class=shared-modal-prompt>')
     .html(template(_.extend({
         title: '',
-        prompt: prompt || i18n('shared.modals.prompt.prompt')
+        prompt: prompt || i18n('shared.modals.prompt.prompt'),
+        promptType: promptType || 'text'
     }, opts)))
     , $modal = $el.find('.modal')
 

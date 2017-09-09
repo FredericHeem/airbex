@@ -1,7 +1,6 @@
 var template = require('./index.html')
-, sjcl = require('../../../vendor/sjcl')
+, sjcl = require('../../../vendor/sjcl/sjcl')
 , _ = require('lodash')
-, nav = require('../nav')
 
 module.exports = function(code) {
     var $el = $('<div class=deposit-voucher>').html(template())
@@ -71,10 +70,17 @@ module.exports = function(code) {
         var code = parseCode()
 
         api.redeemVoucher(code)
-        .always(function() {
-            $form.field('code')
-            .enabled(true)
-            $submit.loading(false)
+        .then(function(body) {
+            if (body) {
+                $el.addClass('is-redeemed')
+                .find('.credit')
+                .html(numbers.formatAmount(body.amount, body.currency))
+            } else {
+                $el.addClass('is-cancelled')
+            }
+
+            $form.field('code').val('').focus()
+            api.fetchBalances()
         })
         .fail(function(err) {
             if (err.name == 'VoucherNotFound') {
@@ -84,18 +90,10 @@ module.exports = function(code) {
 
             errors.alertFromXhr(err)
         })
-        .done(function(body) {
-            if (body) {
-                $el.addClass('is-redeemed')
-                .find('.credit')
-                .html(numbers.formatAmount(body.amount, body.currency) +
-                    ' ' + body.currency)
-            } else {
-                $el.addClass('is-cancelled')
-            }
-
-            $form.field('code').val('').focus()
-            api.balances()
+        .fin(function() {
+            $form.field('code')
+            .enabled(true)
+            $submit.loading(false)
         })
     })
 
@@ -105,8 +103,6 @@ module.exports = function(code) {
     })
 
     $form.field('code').focusSoon()
-
-    $el.find('.deposit-nav').replaceWith(nav('voucher').$el)
 
     return controller
 }

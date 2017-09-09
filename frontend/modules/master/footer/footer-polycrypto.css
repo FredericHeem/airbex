@@ -1,0 +1,22 @@
+#footer {
+    background-image url("wallpaper-airbex.png");
+    padding-bottom: 2em;
+    padding-top: 2em;
+    text-align: center;
+    width:100%;
+    color: #0e7eae;
+}
+
+.footer-links li {
+    display: inline;
+    padding: 0.5em;
+}
+
+.footer-links {
+    margin: 10px 0;
+    padding-left: 0
+}
+
+.footer-links li:first-child {
+    padding-left: 0
+}

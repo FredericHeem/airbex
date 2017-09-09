@@ -4,7 +4,7 @@ module.exports = function(router, master, authorize) {
         master(require('./resetpassword')(), 'resetpassword')
     })
     .add(/^(?:auth\/)?signOut$/, function() {
-        api.logout().done(function() {
+        api.logout().then(function() {
             setTimeout(function(){window.location = '/';},3000);
             
         })
@@ -15,7 +15,7 @@ module.exports = function(router, master, authorize) {
     })
     .add(/^(?:auth\/)?login(?:\?after=(.+))?$/, function(after) {
         if (api.user) return router.after(after, true)
-        master(require('./login')(after ? after : "#account/funds"), 'login')
+        master(require('./login')(after), 'login')
     })
     .add(/^auth\/verifyphone(?:\?after=(.+))?$/, function(after) {
         if (!authorize.user(1)) return

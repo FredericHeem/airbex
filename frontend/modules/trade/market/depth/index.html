@@ -19,11 +19,15 @@
                                 <tr>
                                     <th>
                                         <%= i18n('markets.market.depth.columns.price') %>
-                                        <small style="font-size:0.65em"><%- id.substr(3) %></small>
+                                        <small style="font-size:0.65em"><%- quote_currency %></small>
                                     </th>
                                     <th>
                                         <%= i18n('amount') %>
-                                        <small style="font-size:0.65em"><%- id.substr(0, 3) %></small>
+                                        <small style="font-size:0.65em"><%- base_currency %></small>
+                                    </th>
+                                    <th>
+                                        Total
+                                        <small style="font-size:0.65em"><%- base_currency %></small>
                                     </th>
                                 </tr>
                             </thead>
@@ -36,11 +40,15 @@
                                 <tr>
                                     <th>
                                         <%= i18n('markets.market.depth.columns.price') %>
-                                        <small style="font-size:0.65em"><%- id.substr(3) %></small>
+                                        <small style="font-size:0.65em"><%- quote_currency %></small>
                                     </th>
                                     <th>
                                         <%= i18n('amount') %>
-                                        <small style="font-size:0.65em"><%- id.substr(0, 3) %></small>
+                                        <small style="font-size:0.65em"><%- base_currency %></small>
+                                    </th>
+                                    <th>
+                                        Total
+                                        <small style="font-size:0.65em"><%- base_currency %></small>
                                     </th>
                                 </tr>
                             </thead>

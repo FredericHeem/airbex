@@ -1,66 +1,66 @@
 <div class="container">
-    <div class="withdraw-nav"></div>
 
-    <div class="col-lg-9">
-        <h1 class="content-title"><%- i18n('withdraw.email.heading') %></h1>
+    <h1 class="content-title"><%- i18n('withdraw.email.heading') %></h1>
 
-        <div class="content-area">
-            <p class="lead">
-                <%- i18n('withdraw.email.lead') %>
-            </p>
+    <div class="content-area">
+        <p class="lead"><%- i18n('withdraw.email.lead') %></p>
 
-            <div class="row">
-                <div class="col-lg-8">
-                    <form class="transfer-form">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="amount-placeholder"></div>
-                            </div>
+        <div class="row">
+            <div class="col-lg-8">
+                <form class="transfer-form">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="amount-placeholder"></div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="email form-group">
-                                    <label for="email">
-                                        <%- i18n('withdraw.email.transfer.email.label') %>
-                                    </label>
-                                    <input type="text" name="email" class="field form-control" />
-                                    <span class="help-block"></span>
-                                </div>
-
-                                <div class="actions form-group">
-                                    <button type="submit" class="submit btn btn-success btn-large">
-                                        <%- i18n('withdraw.email.transfer.submit') %>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </form>
-
-                    <form class="send-form">
-                        <strong><span class="email"></span> <%- i18n('withdraw.email.send.heading') %></strong>
-                        <p><%- i18n('withdraw.email.send.intro') %></p>
-
-                        <div class="actions form-group">
-                            <button type="submit" class="submit btn btn-success btn-large">
-                                <%- i18n('withdraw.email.transfer.submit') %>
-                            </button>
-                        </div>
-                    </form>
-
-                    <div class="send-confirmed">
-                        <strong><%- i18n('withdraw.email.confirmed.heading') %></strong>
-                        <p class="confirmation"></p>
-
-                        <p>
-                            <a href="#withdraw/email">
-                                <%- i18n('withdraw.email.confirmed.send another') %>
-                            </a>
-                            <%- i18n('withdraw.email.confirmed.or') %>
-                            <a href="#"><%- i18n('withdraw.email.confirmed.return to overview') %></a>
-                        </p>
                     </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="email form-group">
+                                <label for="email"> <%-
+                                    i18n('withdraw.email.transfer.email.label')
+                                    %> </label> <input type="text" name="email"
+                                    class="field form-control" /> <span
+                                    class="help-block"></span>
+                            </div>
+
+                            <div class="actions form-group">
+                                <button type="submit"
+                                    class="submit btn btn-success btn-large">
+                                    <%-
+                                    i18n('withdraw.email.transfer.submit')
+                                    %></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+                <form class="send-form">
+                    <strong><span class="email"></span> <%-
+                        i18n('withdraw.email.send.heading') %></strong>
+                    <p><%- i18n('withdraw.email.send.intro') %></p>
+
+                    <div class="actions form-group">
+                        <button type="submit"
+                            class="submit btn btn-success btn-large">
+                            <%- i18n('withdraw.email.transfer.submit')
+                            %></button>
+                    </div>
+                </form>
+
+                <div class="send-confirmed">
+                    <strong><%-
+                        i18n('withdraw.email.confirmed.heading') %></strong>
+                    <p class="confirmation"></p>
+
+                    <p>
+                        <a href="#withdraw/email"> <%-
+                            i18n('withdraw.email.confirmed.send another') %> </a> <%-
+                        i18n('withdraw.email.confirmed.or') %> <a
+                            href="#"><%-
+                            i18n('withdraw.email.confirmed.return to overview') %></a>
+                    </p>
                 </div>
             </div>
         </div>

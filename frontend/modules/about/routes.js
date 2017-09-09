@@ -10,7 +10,7 @@ module.exports = function(router, master, authorize) {
         if (!authorize.user(2)) return
         master(require('./audit')())
     })
-    .add(/^(?:about\/)?audit\/([a-zA-Z]{3})$/, function(currency) {
+    .add(/^(?:about\/)?audit\/([a-zA-Z]{3,4})$/, function(currency) {
         if (!authorize.user(2)) return
         master(require('./audit/proof')(currency))
     })

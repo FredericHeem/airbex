@@ -1,28 +1,40 @@
-<div class="container">
-    <div class="trade-nav"></div>
+	<div>
+		<h1 class="content-title hidden-xs"><%-
+			i18n('markets.market.heading', base, quote) %></h1>
 
-    <div class="col-lg-9">
-        <h1 class="content-title"><%- i18n('markets.market.heading', base, quote) %></h1>
+		<div class="row">
+			<div class="col-lg-6">
 
-        <div class="row">
-            <div class="col-lg-6">                
-                <div class="order-modes clearfix row-right">
-                    <a class="instant" href="#trade/<%= id %>/instant/<%= type %>"><%- i18n('trade.nav.instant') %><div class="arrow"></div></a>
-                    <a class="advanced" href="#trade/<%= id %>/advanced/<%= type %>"><%- i18n('trade.nav.advanced') %><div class="arrow"></div></a>
-                </div>
-                <div class="visible-order-mode-market">
-                    <div class="market-order">
-                    </div>
-                </div>
+				<ul class="nav nav-tabs nav-justified" role="tablist">
+					<li class="active" id="trade-buy"><a 
+						class="instant" href="#trade/<%= id %>/buy">BUY <%- base %> </a></li>
+					<li id="trade-sell"><a  class="advanced"
+						href="#trade/<%= id %>/sell">SELL <%- base %> </a></li>
+				</ul>
 
-                <div class="visible-order-mode-limit">
-                    <div class="limit-order">
-                    </div>
-                </div>
-            </div>
 
-            <div class="depth-container col-lg-6">
-            </div>
-        </div>
-    </div>
-</div>
+				<div class="order-modes clearfix">
+					<a id="trade-instant" class="instant"
+						href="#trade/<%= id %>/instant"><%- i18n('trade.nav.instant')
+						%>
+						<div class="arrow"></div>
+					</a> <a id="trade-advanced" class="advanced"
+						href="#trade/<%= id %>/advanced"><%-
+						i18n('trade.nav.advanced') %>
+						<div class="arrow"></div>
+					</a>
+				</div>
+
+				<div id="trade-form"></div>
+
+
+			</div>
+			<div class="col-lg-6">
+				<div class="depth-container"></div>
+			</div>
+
+		</div>
+		<div class="row">
+			<div class="stats-container"></div>
+		</div>
+	</div>

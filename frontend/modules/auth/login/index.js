@@ -104,14 +104,12 @@ module.exports = function(after) {
         $.removeCookie('session', { path: '/' })
 
         return api.login($email.find('input').val(), $password.find('input').val())
-        .always(function() {
-            $submit.prop('disabled', false)
-            .removeClass('is-loading')
-            .html(i18n('login.login button'))
-        }).done(function() {
+        .then(function(response) {
             debug('login success')
             router.after(after)
-        }).fail(function(err) {
+        })
+        .fail(function(err) {
+            debug('login failed ', err)
             if (err !== null && err.name == 'SessionNotFound') {
                 $email
                 .addClass('has-error')
@@ -128,6 +126,11 @@ module.exports = function(after) {
 
             errors.alertFromXhr(err)
         })
+        .finally(function() {
+            $submit.prop('disabled', false)
+            .removeClass('is-loading')
+            .html(i18n('login.login button'))
+        })
     }
 
     function submitOtp() {
@@ -136,6 +139,9 @@ module.exports = function(after) {
             $password.find('input').val(),
             $form.field('otp').val()
         )
+        .then(function() {
+            router.after(after)
+        })
         .fail(function(err) {
             if (err.name == 'WrongOtp') {
                 $otp.addClass('is-wrong has-error')
@@ -151,15 +157,14 @@ module.exports = function(after) {
 
             // Backend has restarted/client has timed out
             if (err.name == 'SessionNotFound') {
+                debug('reloading')
                 window.location = '/'
                 return
             }
 
             errors.alertFromXhr(err)
         })
-        .done(function() {
-            router.after(after)
-        })
+
     }
 
     $form.on('submit', function(e) {
@@ -195,7 +200,7 @@ module.exports = function(after) {
 
         var method = useOtp ? submitOtp : login
 
-        method().always(function() {
+        method().finally(function() {
             $submit.loading(false)
         })
     })

@@ -9,6 +9,6 @@
     "commit": "78c08e8cd2f47f29c3d3c233d195b1e6dddbeaf1"
   },
   "_source": "git://github.com/caolan/async.git",
-  "_target": "x",
+  "_target": "0.6.2",
   "_originalSource": "async"
 }

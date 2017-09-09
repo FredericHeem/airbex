@@ -31,8 +31,23 @@
                 <div class="form-group password">
                     <label class="control-label">New password</label>
                     <input type="password" class="input-small form-control" name="password" />
+                    <span class="help-block"></span>
                 </div>
-
+                <div class="form-group otp">
+                    <label class="control-label"><%=
+                        i18n('login.otp.label') %></label>
+                     <input type="text"
+                        name="otp" class="form-control"> 
+                     <span
+                        class="help-block visible-wrong"> <%-
+                        i18n('auth.login.otp.error.wrong') %> </span> 
+                     <span
+                        class="help-block visible-invalid"> <%-
+                        i18n('auth.login.otp.error.invalid') %> </span>
+                     <span
+                        class="help-block visible-locked-out">
+                        <%- i18n('auth.login.otp.error.locked out') %> </span>
+                </div>
                 <div class="form-group">
                     <label class="control-label"></label>
                     <button type="submit" class="submit btn btn-success">Reset password</button>

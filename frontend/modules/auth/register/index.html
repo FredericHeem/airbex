@@ -2,7 +2,7 @@
     
     <div class="hidden-submitted">
     
-        <h3><%= i18n('register.heading') %></h3>
+        <h2><%= i18n('register.heading', company) %></h2>
 
         <form class="register-form">
             <div class="form-group email">
@@ -24,7 +24,7 @@
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" name="terms"> <%= i18n('auth.register.agree.lead') %>
-                        <a href="/<%= ~i18n.desired.match(/no/i) ? 'no' : 'en' %>/terms" target="_blank"><%= i18n('auth.register.agree.link') %></a>
+                        <a href="/en/terms" target="_blank"><%= i18n('auth.register.agree.link') %></a>
                     </label>
                 </div>
          </div>
@@ -39,7 +39,7 @@
     </div>
 
     <div class="visible-submitted submitted">
-        <h3><%- i18n('auth.register.submitted.heading') %></h3>
+        <h2><%- i18n('auth.register.submitted.heading') %></h2>
 
         <p class="instruction" style="margin-top:24px;line-height:1.5em;font-size:1.2em;"></p>
 

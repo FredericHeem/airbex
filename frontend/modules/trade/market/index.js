@@ -1,10 +1,9 @@
 var template = require('./index.html')
-, nav = require('../nav')
 
 module.exports = function(market, mode, type) {
     var $el = $('<div class="trade-market">').html(template({
-        base: market.substr(0, 3),
-        quote: market.substr(3, 3),
+        base:  api.getBaseCurrency(market),
+        quote:  api.getQuoteCurrency(market),
         id: market,
         mode: mode == 'limit' ? 'advanced' : 'instant',
         type: type == 'ask' ? 'sell' : 'buy'
@@ -12,17 +11,40 @@ module.exports = function(market, mode, type) {
     , controller = {
         $el: $el
     }
-    , marketOrder = require('./marketorder')(market)
-    , limitOrder = require('./limitorder')(market)
+    , tradeForm
     , depth = require('./depth')(market)
+    , stats = require('../stats')(market)
 
-    $el.find('.market-order').replaceWith(marketOrder.$el)
-    $el.find('.limit-order').replaceWith(limitOrder.$el)
+    //Update currency in top nav
+    api.trigger('market', market)
+    
+    api.fetchMarkets()
+    
+    if(type === "ask"){
+        if(mode === 'market'){
+            tradeForm = require('./marketorder')(market, 'ask')
+        } else {
+            tradeForm = require('./limitorder')(market, 'ask')
+        }
+    } else {
+        if(mode === 'market'){
+            tradeForm = require('./marketorder')(market, 'bid')
+        } else {
+            tradeForm = require('./limitorder')(market, 'bid')
+        }    	
+    }
+    
+    api.depth(market);
+    
+    $el.find('#trade-form').replaceWith(tradeForm.$el)
     $el.find('.depth-container').html(depth.$el)
+    $el.find('.stats-container').html(stats.$el)
 
-    $el.find('.order-modes .instant').toggleClass('active', mode == 'market')
-    $el.find('.order-modes .advanced').toggleClass('active', mode == 'limit')
-
+    $el.find('#trade-buy').toggleClass('active', type == 'bid')
+    $el.find('#trade-sell').toggleClass('active', type == 'ask')
+    $el.find('#trade-instant').toggleClass('active', mode == 'market')
+    $el.find('#trade-advanced').toggleClass('active', mode == 'limit')
+    
     // Set order mode (market or limit)
     function setOrderMode(mode) {
         $el.removeClasses(/^is-order-mode/).addClass('is-order-mode-' + mode)
@@ -32,18 +54,12 @@ module.exports = function(market, mode, type) {
         $el.find('input:visible:first').focus()
     }
 
-    setOrderMode(mode)
-
-    var subModule = mode == 'limit' ? limitOrder : marketOrder
-    subModule.setOrderType(type)
 
     $el.on('remove', function() {
-        marketOrder.$el.triggerHandler('remove')
-        limitOrder.$el.triggerHandler('remove')
+    	tradeForm.$el.triggerHandler('remove')
         depth.$el.triggerHandler('remove')
     })
 
-    $el.find('.trade-nav').replaceWith(nav(market, mode, type).$el)
 
     return controller
 }

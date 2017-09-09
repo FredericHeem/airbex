@@ -1,27 +1,28 @@
 var template = require('./index.html')
-, nav = require('../nav')
 , itemTemplate = require('./item.html')
+, debug = require('../../../helpers/debug')('funds');
 
 module.exports = function() {
     var $el = $('<div class=account-funds>').html(template())
     , controller = {
         $el: $el
     }
-
-    function balances(items) {
+    
+    debug("");
+    
+    function balancesFunds(items) {
         $el.find('.balances tbody').html($.map(items, function(x) {
             return itemTemplate(x)
         }))
     }
 
-    api.on('balances', balances)
-    api.balances.value && balances(api.balances.value)
+    api.on('balances', balancesFunds)
+    
+    api.balances && balancesFunds(api.balances)
 
     $el.on('remove', function() {
-        api.off('balances', balances)
+        api.off('balances', balancesFunds)
     })
-
-    $el.find('.account-nav').replaceWith(nav('funds').$el)
 
     $el.toggleClass('has-two-factor-enabled', !!api.user.twoFactor)
 

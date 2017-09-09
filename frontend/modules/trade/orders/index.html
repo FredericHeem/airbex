@@ -1,7 +1,5 @@
-<div class="container">
-    <div class="trade-nav"></div>
-
-    <div class="col-lg-9">
+<div class="row">
+    <div class="col-sm-10 col-lg-9">
         <h1 class="content-title"><%= i18n('orders.heading') %></h1>
 
         <div class="content-area">
@@ -11,11 +9,10 @@
                         <th><%= i18n('orders.column headers.id') %></th>
                         <th><%= i18n('orders.column headers.market') %></th>
                         <th><%= i18n('orders.column headers.type') %></th>
-                        <th><%= i18n('orders.column headers.price') %></th>
-                        <th><%= i18n('orders.column headers.volume') %></th>
-                        <th><%- i18n('trade.orders.header.matched') %></th>
-                        <th><%- i18n('trade.orders.header.remaining') %></th>
-                        <th><%- i18n('trade.orders.header.cancelled') %></th>
+                        <th class="number"><%= i18n('orders.column headers.price') %></th>
+                        <th class="number hidden-xs"><%= i18n('orders.column headers.volume') %></th>
+                        <th class="number hidden-xs"><%- i18n('trade.orders.header.matched') %></th>
+                        <th class="number"><%- i18n('trade.orders.header.remaining') %></th>
                         <th></th>
                     </tr>
                 </thead>
@@ -32,9 +29,9 @@
                         <th><%= i18n('orders.column headers.id') %></th>
                         <th><%= i18n('orders.column headers.market') %></th>
                         <th><%= i18n('orders.column headers.type') %></th>
-                        <th><%= i18n('orders.column headers.requested price') %></th>
-                        <th><%= i18n('orders.column headers.matched') %></th>
-                        <th><%= i18n('orders.column headers.average price') %></th>
+                        <th class="number"><%= i18n('orders.column headers.requested price') %></th>
+                        <th class="number"><%= i18n('orders.column headers.matched') %></th>
+                        <th class="number"><%= i18n('orders.column headers.average price') %></th>
                     </tr>
                 </thead>
                 <tbody class="items"></tbody>

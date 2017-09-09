@@ -1,7 +1,6 @@
 var itemTemplate = require('./item.html')
 , historyItemTemplate = require('./history-item.html')
 , template = require('./index.html')
-, nav = require('../nav')
 
 module.exports = function() {
     var $el = $('<div class=trade-orders>').html(template())
@@ -20,8 +19,8 @@ module.exports = function() {
 
     function historyItemsChanged(items) {
         $historyItems.append($.map(items, function(item) {
-            item.base = item.market.substr(0, 3)
-            item.quote = item.market.substr(3, 3)
+            item.base = api.getBaseCurrency(item.market)
+            item.quote = api.getQuoteCurrency(item.market)	
             var $el = $(historyItemTemplate(item))
             $el.attr('data-id', item.id)
             return $el
@@ -30,14 +29,14 @@ module.exports = function() {
 
     function refresh() {
         api.call('v1/orders')
+        .then(itemsChanged)
         .fail(errors.alertFromXhr)
-        .done(itemsChanged)
     }
 
     function refreshHistory() {
         api.call('v1/orders/history')
+        .then(historyItemsChanged)
         .fail(errors.alertFromXhr)
-        .done(historyItemsChanged)
     }
 
     $items.on('click', 'button.cancel', function(e) {
@@ -47,6 +46,10 @@ module.exports = function() {
         $(this).loading(true, 'Deleting...')
 
         api.call('v1/orders/' + $item.attr('data-id'), null, { type: 'DELETE' })
+        .then(function() {
+            api.fetchBalances()
+            $item.remove()
+        })
         .fail(function(err) {
             if (err.name == 'OrderNotFound') {
                 alertify.alert('The order has already been deleted', function() {
@@ -57,16 +60,11 @@ module.exports = function() {
 
             errors.alertFromXhr(err)
         })
-        .done(function() {
-            api.balances()
-            $item.remove()
-        })
+
     })
 
     refresh()
     refreshHistory()
-
-    $el.find('.trade-nav').replaceWith(nav('orders').$el)
 
     return controller
 }

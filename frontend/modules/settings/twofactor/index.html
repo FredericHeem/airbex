@@ -1,7 +1,4 @@
-<div class="container">
-    <div class="settings-nav"></div>
-
-    <div class="col-lg-9">
+<div class="row">
         <h1 class="content-title"><%- i18n('settings.twofactor.heading') %></h1>
 
         <div class="content-area">
@@ -13,7 +10,7 @@
                     <a href="http://www.windowsphone.com/s?appid=e7994dbc-2336-4950-91ba-ca22d653759b" target="_blank"><img src="img/two-factor/microsoft.png"/></a>
                 </p>
 
-                <img class="two-factor-image" src="https://chart.googleapis.com/chart?chs=250x250&chld=L|0&cht=qr&chl=otpauth://totp/<%= location.hostname %>:<%- encodeURIComponent(api.user.id) %>%3Fsecret=<%= secret %>%26issuer=Logosxchange" />
+                <img class="two-factor-image" src="https://chart.googleapis.com/chart?chs=250x250&chld=L|0&cht=qr&chl=otpauth://totp/<%= location.hostname %>:<%- encodeURIComponent(api.user.id) %>%3Fsecret=<%= secret %>%26issuer=Airbex" />
 
                 <form name="enable">
                     <div class="row">

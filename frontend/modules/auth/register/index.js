@@ -7,7 +7,7 @@ var _ = require('lodash')
 , template = require('./index.html')
 
 module.exports = function(after) {
-    var $el = $('<div class=auth-register>').html(template())
+    var $el = $('<div class=auth-register>').html(template(window.config))
     , controller = {
         $el: $el
     }
@@ -169,11 +169,7 @@ module.exports = function(after) {
         , password = $password.find('input').val()
 
         api.register(email, password)
-        .always(function() {
-            $submit.prop('disabled', false)
-            .removeClass('is-loading')
-            .html(i18n('register.create button'))
-        }).done(function() {
+        .then(function(error) {
             $el.addClass('has-submitted')
             $.cookie('register.userKey', api.getUserKey(email, password))
             $.cookie('register.email', email)
@@ -205,6 +201,11 @@ module.exports = function(after) {
                 return
             }
             errors.alertFromXhr(err)
+        })
+        .finally(function() {
+            $submit.prop('disabled', false)
+            .removeClass('is-loading')
+            .html(i18n('register.create button'))
         })
     }
 

@@ -1,10 +1,11 @@
 var priceTemplate = require('./price.html')
 , template = require('./index.html')
-, uptodate = require('../../../../helpers/uptodate')
+, num = require('num')
+, debug = require('../../../../helpers/debug')('depth')
 
 module.exports = function(id) {
-    var base = id.substr(0, 3)
-    , quote = id.substr(3)
+    var base = api.getBaseCurrency(id)
+    , quote = api.getQuoteCurrency(id)
     , $el = $('<div class="depth">').html(template({
         id: id,
         base_currency: base,
@@ -14,39 +15,50 @@ module.exports = function(id) {
         $el: $el
     }
     , $depth = controller.$el.find('.depth')
-    , maxLevels = 1000
-
-    function onDepth(depth) {
-        // Bids (sorted and capped)
-        $depth.find('.bids-depth')
-        .find('tbody').html($.map(depth.bids.slice(0, maxLevels), function(level) {
+    , maxLevels = 15
+    , quote_scale_diplay = api.markets[id].quote_scale_diplay
+    
+    function depthLevelHtml(quotes){
+        var cumVolume = num(0);
+        return $.map(quotes, function(level) {
+            cumVolume = cumVolume.add(num(level[1]))
             return priceTemplate({
                 price: level[0],
-                volume: level[1]
+                price_scale: quote_scale_diplay,
+                volume: level[1],
+                volume_scale:numbers.getCurrencyOption(base).scale_display,
+                cumVolume:cumVolume.toString()
             })
-        }))
+        })
+    }
+    
+    function onDepth(depth) {
+        // Bids (sorted and capped)
+        debug("onDepth");
+        
+        $depth.find('.bids-depth')
+        .find('tbody').html(depthLevelHtml(depth.bids.slice(0, maxLevels)))
 
         // Asks
         $depth.find('.asks-depth')
-        .find('tbody').html($.map(depth.asks.slice(0, maxLevels), function(level) {
-            return priceTemplate({
-                price: level[0],
-                volume: level[1]
-            })
-        }))
+         .find('tbody').html(depthLevelHtml(depth.asks.slice(0, maxLevels)))
     }
 
-    // Subscribe to depth, show current if any, and refresh it now
+    function onDepthWebSocket(result) {
+        debug("onDepthWebSocket for %s", result.data.marketId)
+        //onDepth(result.data)
+        api.trigger('depth:' + result.data.marketId, result.data)
+    }
+    
+    if(!api.depth[id]) api.depth(id);
+    
+    api.onWebSocket('/v1/markets/' + id + '/depth', onDepthWebSocket);
     api.on('depth:' + id, onDepth)
     api.depth[id] && onDepth(api.depth[id])
 
     $el.on('remove', function() {
-        refresh.stop()
+        api.offWebSocket('/v1/markets/' + id + '/depth', onDepthWebSocket);
         api.off('depth:' + id, onDepth)
-    })
-
-    var refresh = uptodate(api.depth.bind(api, id), null, {
-        now: !api.depth[id]
     })
 
     return controller

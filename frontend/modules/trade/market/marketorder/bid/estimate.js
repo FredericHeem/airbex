@@ -1,5 +1,5 @@
 var _ = require('lodash')
-, debug = require('../../../../../helpers/debug')('trade:estimate')
+, debug = require('../../../../../helpers/debug')('trade:bidestimate')
 , num = require('num')
 
 exports.receive = function(market, desired) {
@@ -8,9 +8,8 @@ exports.receive = function(market, desired) {
         debug('no depth available to estimate')
         return
     }
-
-    var base = market.substr(0, 3)
-    , quote = market.substr(3)
+    var base = api.getBaseCurrency(market)
+    , quote = api.getQuoteCurrency(market)
     , baseCurrency = _.find(api.currencies.value, { id: base })
     , basePrec = baseCurrency.scale
     , quotePrec = _.find(api.currencies.value, { id: quote }).scale
@@ -20,8 +19,10 @@ exports.receive = function(market, desired) {
     , remaining = num(desired)
 
     receive.set_precision(basePrec)
-    remaining.set_precision(quotePrec)
+    remaining.set_precision(basePrec)
 
+    debug('receive: desired %s', remaining.toString())
+                
     var filled
 
     _.some(asks, function(level) {
@@ -32,11 +33,10 @@ exports.receive = function(market, desired) {
         }
 
         filled = level.total.gte(remaining)
+        debug('receive: remaining %s / %s = %s',
+        		 remaining, level.price, remaining.div(level.price).set_precision(basePrec))
 
-        // debug('%s / %s = %s', remaining, level.price, remaining.div(level.price))
-
-        var take = filled ? remaining.div(level.price) : level.volume
-        take.set_precision(level.volume.get_precision())
+        var take = filled ? remaining.div(level.price).set_precision(basePrec) : level.volume
 
         if (take.eq(0)) {
             debug('would take zero from the level. this implies filled before')
@@ -50,11 +50,11 @@ exports.receive = function(market, desired) {
 
         var total = level.price.mul(take)
 
-        // debug('our total %s', total)
+        debug('our total %s', total)
 
         remaining = remaining.sub(total)
 
-        // debug('remaining after take %s', remaining)
+        debug('remaining after take %s', remaining)
 
         if (filled) {
             debug('level has filled remainder of order')
@@ -64,39 +64,45 @@ exports.receive = function(market, desired) {
 
     if (filled) {
         debug('filled! receive %s, remaining %s',
-            receive.toString(), remaining.toString())
-    }
-
-    if (filled) {
+                receive.toString(), remaining.toString());
         return {
             amount:  receive.toString(),
             remaining: remaining
         }
+    } else {
+        debug("not enough liquidity")
     }
 }
 
 exports.summary = function(market, amount, feeRatio) {
-    var receive = exports.receive(market, amount)
-    , quote = market.substr(3)
+    var base = api.getBaseCurrency(market)
+    , quote = api.getQuoteCurrency(market)
+    , basePrec = api.currencies[base].scale
     , quotePrec = api.currencies[quote].scale
+    , quoteDisplay = api.currencies[quote].scale_display;
+    
+    var amountWithoutFee = num(amount).set_precision(quotePrec).div(num('1.00000').add(feeRatio)).set_precision(quotePrec);
+    debug("summary: amount with fee: %s, fee ratio: %s, amount with fees: %s", amount, feeRatio, amountWithoutFee.toString());
+    var fee = num(amount).sub(amountWithoutFee).set_precision(quotePrec)
+    
+    var receive = exports.receive(market, amountWithoutFee.toString())
 
-    if (!receive || !parseFloat(receive.amount)) return null
+    if (!receive || !parseFloat(receive.amount)) {
+        return null;
+    }
 
-    var price = num(amount)
+    var price = amountWithoutFee
     .sub(receive.remaining)
-    .set_precision(quotePrec)
     .div(receive.amount)
-    .set_precision(3)
-
-    var fee = num(amount)
-    .mul(feeRatio)
     .set_precision(quotePrec)
 
-    var receiveAfter = exports.receive(market, num(amount).sub(fee)).amount
+    debug("amount with fee: %d, amount without fee: %d, fee: %d, receive: %s, price %s",
+            amount, amountWithoutFee.toString(), fee.toString(), receive.amount.toString(), price.toString());
 
     return {
-        receive: receiveAfter.toString(),
+        receive: receive.amount.toString(),
         fee: fee.toString(),
-        price: price.toString()
+        price: price.toString(),
+        amountWithoutFee:amountWithoutFee 
     }
 }

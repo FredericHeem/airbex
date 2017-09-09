@@ -1,5 +1,4 @@
-var nav = require('../nav')
-, util = require('util')
+var util = require('util')
 , _ = require('lodash')
 , template = require('./index.html')
 , validation = require('../../../helpers/validation')
@@ -20,8 +19,6 @@ module.exports = function(after) {
     }))
 
     // Navigation
-    $el.find('.settings-nav').replaceWith(nav('profile').$el)
-
     var validateFirstName = validation.fromRegex($el.find('.first-name'), /^.{1,50}$/)
     , validateLastName = validation.fromRegex($el.find('.last-name'), /^.{1,50}$/)
     , validateAddress = validation.fromRegex($el.find('.address'), /^[\s\S]{1,200}$/)
@@ -63,7 +60,7 @@ module.exports = function(after) {
             values.country = $el.field('country').val()
 
             api.call('v1/users/identity', values)
-            .done(function() {
+            .then(function() {
                 _.extend(api.user, values)
                 api.trigger("user", api.user)
                 if (typeof Intercom != 'undefined' && Intercom) {
@@ -102,7 +99,7 @@ module.exports = function(after) {
         var lang = api.user.language
 
         if (lang) {
-            var countryCodeGuess = lang.substr(lang.length - 2, 2)
+            var countryCodeGuess = lang.substr(lang.length - 2, 2).toUpperCase()
             $el.field('country').val(countryCodeGuess)
         }
     }

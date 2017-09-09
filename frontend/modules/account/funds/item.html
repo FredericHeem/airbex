@@ -1,20 +1,8 @@
 <tr class="item" data-id="<%= currency %>">
-    <td class="currency" style="vertical-align:middle">
-        <% if (currency == 'USD') { %>
-            <a href="#deposit/bank/USD"><%= currency %></a>
-        <% } else if (currency == 'EUR') { %>
-            <a href="#deposit/bank/EUR"><%= currency %></a>
-        <% } else if (currency == 'CHF') { %>
-            <a href="#deposit/bank/CHF"><%= currency %></a>
-        <% } else if (currency == 'BTC') { %>
-            <a href="#deposit/bitcoin"><%= currency %></a>
-        <% } else if (currency == 'LTC') { %>
-            <a href="#deposit/litecoin"><%= currency %></a>
-        <% } else { %>
-            <%= currency %>
-        <% } %>
+    <td class="currency">
+      <a href="#wallet/<%= currency %>"><%= numbers.getCurrencyOption(currency).name %></a>
     </td>
-    <td class="amount"><%= numbers.format(balance, numbers.getCurrencyOption(currency)) %></td>
-    <td class="amount hidden-sm"><%= numbers.format(hold, numbers.getCurrencyOption(currency)) %></td>
-    <td class="amount"><%= numbers.format(available, numbers.getCurrencyOption(currency)) %></td>
+    <td class="amount"><%= numbers.formatCurrency(balance, currency) %></td>
+    <td class="amount hidden-xs"><%= numbers.formatCurrency(hold, currency) %></td>
+    <td class="amount"><%= numbers.formatCurrency(available, currency) %></td>
 </tr>

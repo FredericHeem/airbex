@@ -1,0 +1,7 @@
+
+	<td><%= id %></td>
+	<td><%= numbers.format(amount, numbers.getCurrencyOption(quote_currency)) %> <%= quote_currency %></td>
+	<td><%= moment(created_at).format('LLL') %></td>
+	<td><%= address  ? address : "" %></td>
+	<td><span id="status" class="label"><%= state %></span></td>
+

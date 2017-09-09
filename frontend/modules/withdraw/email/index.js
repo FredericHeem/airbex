@@ -1,6 +1,5 @@
 var template = require('./index.html')
 , format = require('util').format
-, nav = require('../nav')
 
 module.exports = function() {
     var $el = $('<div class="withdraw-email">').html(template())
@@ -48,8 +47,11 @@ module.exports = function() {
         $transferButton.loading(true, 'Sending...')
 
         api.sendToUser($transferForm.field('email').val(), amount.value(), amount.currency())
-        .always(function() {
-            $transferButton.loading(false)
+        .then(function() {
+            showConfirmation(format('You sent %s to %s',
+                numbers(amount.value(), { currency: amount.currency() }),
+                $transferForm.field('email').val()))
+            api.fetchBalances()
         })
         .fail(function(err) {
             $transferButton.enabled(true)
@@ -75,10 +77,8 @@ module.exports = function() {
 
             errors.alertFromXhr(err)
         })
-        .done(function() {
-            showConfirmation(format('You sent %s to %s',
-                numbers(amount.value(), { currency: amount.currency() }),
-                $transferForm.field('email').val()))
+        .finally(function() {
+            $transferButton.loading(false)
         })
     })
 
@@ -95,18 +95,20 @@ module.exports = function() {
         $sendButton.loading(true)
 
         api.sendToUser($transferForm.field('email').val(), amount.value(), amount.currency(), true)
-        .always(function() {
-            $sendButton.loading(false)
-        })
-        .fail(function(err) {
-            errors.alertFromXhr(err)
-        })
-        .done(function() {
+        .then(function() {
             $sendButton.enabled(false)
             showConfirmation(format('You sent %s to %s',
                 numbers(amount.value(), { currency: amount.currency() }),
                 $transferForm.field('email').val()))
         })
+        .fail(function(err) {
+            errors.alertFromXhr(err)
+        })
+        .finally(function() {
+            $sendButton.loading(false)
+        })
+
+
     })
 
     $el.on('click', 'a[href="#withdraw/email"]', function() {
@@ -119,9 +121,6 @@ module.exports = function() {
     $el.on('remove', function() {
         amount.$el.triggerHandler('remove')
     })
-
-    // Insert navigation
-    $el.find('.withdraw-nav').replaceWith(nav('email').$el)
 
     return controller
 }

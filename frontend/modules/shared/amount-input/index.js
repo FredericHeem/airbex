@@ -1,7 +1,7 @@
 var template = require('./index.html')
 , _ = require('lodash')
 , num = require('num')
-, debug = require('debug')('snow:amount-input')
+, debug = require('debug')('amount-input')
 , format = require('util').format
 
 module.exports = function(opts) {
@@ -22,8 +22,13 @@ module.exports = function(opts) {
     }
 
     if (opts.max == 'available') {
-        opts.max = function(x) {
-            return api.balances[x].available
+        opts.max = function(currency) {
+            var max = num(api.balances[currency].available).sub(api.currencies[currency].withdraw_fee);
+            if(max.lt(0)){
+                max = num(0)
+            }
+            
+            return max.toString();
         }
     }
 
@@ -50,6 +55,11 @@ module.exports = function(opts) {
         $amount.removeClass('has-error is-too-high is-invalid has-too-high-precision is-too-small')
     }
 
+    $el.on('click', '.all', function(e) {
+        e.preventDefault()
+        ctrl.value(opts.max(ctrl.currency()))
+    })
+    
     ctrl.currency = function(val) {
         if (val !== undefined) {
             if (opts.showAvailable && api.balances[val]) {

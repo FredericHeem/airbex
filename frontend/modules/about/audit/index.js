@@ -1,8 +1,6 @@
 var template = require('./index.html')
-, nav = require('../nav')
-, debug = require('debug')('snow:audit')
-
-
+, debug = require('debug')('audit')
+, itemTemplate = require('./item.html')
 
 module.exports = function(currency) {
     var $el = $(template())
@@ -10,10 +8,18 @@ module.exports = function(currency) {
         $el: $el
     }
 
-    $el.find('.about-nav').replaceWith(nav('audit').$el)
+    debug('audit ', currency);
 
-    console.log('audit ', currency);
+    function onCurrencies(currencies) {
+        $el.find('.currencies').html($.map(currencies, function(currency) {
+            if(currency.fiat == false){
+                return itemTemplate({currency: currency.id})
+            }
+        }))
+    }
 
+    api.on('currencies', onCurrencies)
+    api.currencies.values && onCurrencies(api.currencies.value)
     
     return controller
 }

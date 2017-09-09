@@ -1,11 +1,10 @@
 /* global -api */
 var _ = require('lodash')
 , sjcl = require('./vendor/sjcl/sjcl')
-, emitter = require('./helpers/emitter')
-, api = module.exports = emitter()
-, callingCodes = require('./assets/callingcodes.json')
-, debug = require('./helpers/debug')('snow:api')
+, api = module.exports
+, debug = require('./helpers/debug')('api')
 , authorize = require('./authorize')
+, Q = require('q')
 
 function shortSha(s) {
     return s.substr(0, 4)
@@ -20,12 +19,12 @@ api.getUserKey = function(email, password) {
     return sha256(email.toLowerCase() + password)
 }
 
-function keyFromCredentials(sid, email, password) {
+api.keyFromCredentials = function(sid, email, password) {
     var ukey = api.getUserKey(email, password)
-    return keyFromUserKey(sid, ukey)
+    return api.keyFromUserKey(sid, ukey)
 }
 
-function keyFromUserKey(sid, ukey) {
+api.keyFromUserKey = function(sid, ukey) {
     var skey = sha256(sid + ukey)
     debug('created skey %s from sid %s and ukey %s', shortSha(skey),
         shortSha(sid), shortSha(ukey))
@@ -46,9 +45,46 @@ function formatQuerystring(qs) {
     return params.length ? '?' + params.join('&') : ''
 }
 
-api.call = function(method, data, options) {
+api.currencies = {};
+api.markets = {};
+api.balances = {};
+
+api.call = function(method, data, options, deferredIn) {
+    
+    var deferred = deferredIn || Q.defer();
+    debug('call data: ', JSON.stringify(data))
+            
+    function retryWithPassword(token, msgPrefix) {
+        debug('retryWithPassword method: %s, token: %s, msg: %s', method, token, msgPrefix)
+
+        return authorize.password(msgPrefix)
+        .then(function(password) {
+            if (password === null) {
+                debug('authorize.password returned null. user has cancelled')
+                var err = new Error('Password cancelled')
+                err.name = 'PasswordCancelled'
+                deferred.reject(err)
+            } else {
+                debug('retryWithPassword password %s', password)
+                var sessionKey = api.keyFromCredentials(token, api.user.email.toLowerCase(), password)
+                
+                data.sessionKey = sessionKey;
+                return api.call(method, data, options, deferred)
+                .fail(function(err) {
+                    if(err){
+                        debug('retryWithPassword error')
+                        deferred.reject(err)
+                    } else {
+                        debug('retryWithPassword password mismatch')
+                        return retryWithPassword(token, "Password mismatch")
+                    }
+                })
+            }
+        })
+    }
+    
     function retryWithOtp(msgPrefix) {
-        debug('OtpRequired received, retrying')
+        debug('retryWithOtp: ', msgPrefix)
 
         return authorize.otp(msgPrefix)
         .then(function(otp) {
@@ -57,13 +93,14 @@ api.call = function(method, data, options) {
 
                 var err = new Error('Two-factor authentication cancelled')
                 err.name = 'TwoFactorCancelled'
-                return $.Deferred().reject(err)
+                return deferred.reject(err)
             }
 
             debug('retrying request with otp %s', otp)
-
-            return api.call(method, _.extend({ otp: otp }, data), options)
+            data.otp = otp
+            return api.call(method, data, options, deferred)
             .then(null, function(err) {
+                debug('OTP is blocked. Can try again.')
                 if (err.name == 'WrongOtp') {
                     debug('Wrong OTP supplied. Can try again.')
                     return retryWithOtp(i18n('api.call.wrong otp'))
@@ -101,41 +138,62 @@ api.call = function(method, data, options) {
 
     var xhr = $.ajax(settings)
     xhr.settings = settings
-
-    return xhr
-    .then(null, function(xhr, statusText, status) {
-        var body = errors.bodyFromXhr(xhr)
-
-        var error = {
-            xhr: xhr,
-            xhrOptions: options,
-            body: body,
-            statusText: statusText,
-            status: status,
-            name: body && body.name ? body.name : null,
-            message: body && body.message || null
-        }
-
-        return error
-    }).then(null, function(err) {
-        debug('Error from XHR (generic handler running): %s', err.name || 'Unnamed')
-
-        if (err.name == 'OtpRequired' && !options.authorizing) {
-            debug('%s error received and not authorizing. can retry with otp', err.name)
-            return retryWithOtp()
-        }
-
-        if (~['SessionNotFound'].indexOf(err.name)) {
-            if (!options.authorizing) {
-                debug('invalidating "session" because of %s', err.name)
-                $.removeCookie('session', { path: '/' })
-                location.reload()
-                return $.Deferred()
+    
+    Q.promise(function () {
+        xhr.then(function (data) {
+            deferred.resolve(data);
+        }, function (jqXHR, statusText, status) {
+            delete jqXHR.then; // treat xhr as a non-promise
+            var body = errors.bodyFromXhr(jqXHR);
+            
+            var error = {
+                    xhr: xhr,
+                    xhrOptions: options,
+                    body: body,
+                    statusText: statusText,
+                    status: status,
+                    name: body && body.name ? body.name : null,
+                    message: body && body.message || null,
+                    token: body && body.token || null
             }
-        }
-
-        return err
-    })
+            debug('api error: %s', JSON.stringify(error));
+            var name = error.name;
+            var message = error.message;
+            var token = error.token;
+            if (name == 'PasswordRequired' && !options.authorizing) {
+                debug('%s, token %s', message, token)
+                return retryWithPassword(token, "Please enter your pasword")
+            }
+            if (name == 'PasswordInvalid' && !options.authorizing) {
+                debug('%s, token %s', message, token)
+                return retryWithPassword(token, "Incorrect password, please enter your pasword")
+            }
+            if (name == 'OtpRequired' && !options.authorizing) {
+                debug('%s error received and not authorizing. can retry with otp', name)
+                return retryWithOtp()
+            }
+            if (name == 'WrongOtp' && !options.authorizing) {
+                debug('%s error received and not authorizing. can retry with otp', name)
+                return retryWithOtp(i18n('api.call.wrong otp'))
+            }
+            if (name == 'BlockedOtp' && !options.authorizing) {
+                debug('%s error received and not authorizing. can retry with otp', name)
+                return retryWithOtp(i18n('api.call.blocked otp'))
+            }
+            
+            if (~['SessionNotFound'].indexOf(name)) {
+                if (!options.authorizing) {
+                    debug('invalidating "session" because of %s', name)
+                    $.removeCookie('session', { path: '/' })
+                    location.reload()
+                    return $.Deferred()
+                }
+            }
+            
+            deferred.reject(error);
+        });
+    });
+    return deferred.promise;
 }
 
 api.securityLevel = function(val) {
@@ -150,84 +208,50 @@ api.securityLevel = function(val) {
     return api.user.securityLevel
 }
 
-api.loginWithKey = function(key) {
+api.sessionKeySave = function(key){
     if (key) {
-        debug('logging in with key %s', key)
+        debug('sessionKeySave %s', key)
         $.cookie('session', key, {
             path: '/',
             secure: window.location.protocol == 'https:'
         })
     }
+}
 
-    return api.call('v1/whoami', null, { authorizing: true })
-    .then(function(user) {
-        $.cookie('existingUser', true, { path: '/', expires: 365 * 10 })
-
-        api.user = user
-        api.securityLevel(user.securityLevel)
-
-        api.user.countryFriendly = function() {
-            if (!user.country) return null
-            var item = _.find(callingCodes, { code: user.country })
-            return item ? item.name : 'Unknown'
-        }
-
-        api.trigger('user', user)
-
-        $app.addClass('is-logged-in')
-        .addClass('is-user-country-' + (api.user.country || 'unknown'))
-    })
+api.login = function(email, password) {
+    debug('login for %s', email);
+    return api.loginWithUserKey(email, api.getUserKey(email, password))
 }
 
 api.logout = function() {
     debug('logging out')
-
     api.user = null
-
+    var deferred = Q.defer();
     if ($.cookie('session')) {
         return api.call('security/session', null, { type: 'DELETE', authorizing: true })
         .then(null, function(err) {
             if (err.name == 'SessionNotFound') {
                 debug('ignoring session not found in logout')
-                return $.Deferred().resolve()
+                return deferred.resolve()
+            } else {
+                deferred.reject()
             }
-            return err
         })
-        .always(function() {
+        .fin(function() {
             $.removeCookie('session', { path: '/' })
-            
             alertify.log(i18n('logout.message'))
+            deferred.resolve()
         })
     }
 
-    return $.Deferred().resolve()
-}
-
-api.loginWithUserKey = function(email, userKey) {
-    debug('creating session for %s', email)
-    return api.call('security/session', { email: email }, { authorizing: true })
-    .then(function(res) {
-        debug('retrieved session id: %s', res.id)
-        var key = keyFromUserKey(res.id, userKey)
-        return api.loginWithKey(key)
-    })
-}
-
-api.login = function(email, password) {
-    debug('creating session for %s', email)
-    return api.call('security/session', { email: email }, { authorizing: true })
-    .then(function(res) {
-        debug('retrieved session id: %s', res.id)
-        var key = keyFromCredentials(res.id, email, password)
-        return api.loginWithKey(key)
-    })
+    return deferred.resolve()
 }
 
 api.twoFactor = function(email, password, otp) {
     return api.call('v1/twoFactor/auth', {
         otp: otp
     }, { authorizing: true }).then(function() {
-        return api.loginWithKey()
+        return api.loginWithSessionKey()
     })
 }
 
@@ -239,49 +263,39 @@ api.register = function(email, password) {
     })
 }
 
-api.balances = function() {
-    return api.call('v1/balances')
-    .done(function(balances) {
-        var sortOrder = _.pluck(api.currencies.value, 'id')
+api.onBalances = function(balances) {
+    
+    var sortOrder = _.pluck(api.currencies.value, 'id')
 
-        api.balances.current = balances.sort(function(a, b) {
-            return sortOrder.indexOf(a.currency) - sortOrder.indexOf(b.currency)
-        })
-
-        _.each(balances, function(item) {
-            api.balances[item.currency] = item
-            api.trigger('balances:' + item.currency, item)
-        })
-
-        api.trigger('balances', balances)
+    api.balances.current = balances.sort(function(a, b) {
+        return sortOrder.indexOf(a.currency) - sortOrder.indexOf(b.currency)
     })
+
+    api.balances = {};
+    
+    _.each(balances, function(item) {
+        api.balances[item.currency] = item
+        api.trigger('balances:' + item.currency, item)
+    })
+    
+    //debug('onBalances trigger ', balances)
+    api.trigger('balances', balances)
+    
 }
 
-api.currencies = function() {
-    var sortOrder = ['USD', 'CHF', 'EUR', 'NOK', 'BTC', 'LTC', 'XRP']
-
-    return api.call('v1/currencies')
-    .done(function(currencies) {
-        api.currencies.value = currencies.sort(function(a, b) {
-            return sortOrder.indexOf(a.id) - sortOrder.indexOf(b.id)
-        })
-
-        _.each(currencies, function(item) {
-            api.currencies[item.id] = item
-            api.trigger('currencies:' + item.id, item)
-        })
-
-        api.trigger('currencies', currencies)
+api.onCurrencies = function(currencies) {
+    debug('onCurrencies')
+    var sortOrder = ['USD', 'EUR', 'CZK', 'BTC', 'LTC', 'DOGE', 'DRK']
+    api.currencies.value = currencies.sort(function(a, b) {
+        return sortOrder.indexOf(a.id) - sortOrder.indexOf(b.id)
     })
-}
 
-api.bootstrap = function() {
-    return $.when(
-        api.currencies(),
-        api.markets()
-    ).done(function() {
-        $app.removeClass('is-loading')
+    _.each(currencies, function(item) {
+        api.currencies[item.id] = item
+        api.trigger('currencies:' + item.id, item)
     })
+
+    api.trigger('currencies', currencies)
 }
 
 api.sendToUser = function(email, amount, currency, allowNewUser) {
@@ -293,9 +307,9 @@ api.sendToUser = function(email, amount, currency, allowNewUser) {
     })
 }
 
-api.resetPasswordEnd = function(email, phoneCode, newPassword) {
+api.resetPasswordEnd = function(email, phoneCode, newPassword, twaFaCode) {
     var key = sha256(email.toLowerCase() + newPassword)
-    , body = { email: email, code: phoneCode, key: key }
+    , body = { email: email, code: phoneCode, key: key, otp:twaFaCode}
 
     return api.call('v1/resetPassword/end', body, { type: 'POST' })
 }
@@ -309,39 +323,64 @@ api.patchUser = function(attrs) {
     return api.call('v1/users/current', attrs, { type: 'PATCH' })
 }
 
-api.markets = function() {
-    return api.call('v1/markets')
-    .then(function(markets) {
-        var sortOrder = ['BTCUSD', 'BTCEUR', 'BTCCHF', 'BTCNOK', 'LTCBTC', 'BTCXRP']
+api.getBaseCurrency = function (marketName){
+    var market = api.markets[marketName];
+    if(market){
+        return market.bc
+    } else {
+        return "???"
+    }
+}
 
-        api.markets.value = markets.sort(function(a, b) {
-            return sortOrder.indexOf(a.id) - sortOrder.indexOf(b.id)
-        })
+api.getQuoteCurrency = function (marketName){
+    var market = api.markets[marketName];
+    if(market){
+        return market.qc
+    } else {
+        return "???"
+    }
+}
 
-        _.each(markets, function(item) {
-            api.markets[item.id] = item
-            api.trigger('markets:' + item.id, item)
-        })
+api.onMarkets = function(markets) {
+    //debug('onMarkets: ', JSON.stringify(markets, null, 4))
+    if(!markets) return;
+    var sortOrder = ['BTCUSD', 'BTCEUR', 'LTCBTC', 'DOGEBTC', 'DRKBTC']
+    
+    api.markets.value = markets.sort(function(a, b) {
+        return sortOrder.indexOf(a.id) - sortOrder.indexOf(b.id)
+    })
 
-        api.trigger('markets', markets)
+    _.each(markets, function(item) {
+        api.markets[item.id] = item
+        api.trigger('markets:' + item.id, item)
+    })
+
+    api.trigger('markets', markets)
+}
+
+api.onMarketsInfo = function(marketsInfo) {
+    debug('onMarketsInfo: ', JSON.stringify(marketsInfo, null, 4))
+    if(!marketsInfo) return;
+    api.marketsInfo = {};
+    _.each(marketsInfo, function(item) {
+        api.marketsInfo[item.id] = item
     })
 }
 
-api.depth = function(id) {
-    debug('retrieving depth for %s...', id)
+api.onDepth = function(depth) {
+    var marketId = depth.marketId;
+    debug('onDepth for market ', marketId)
+    //debug('onDepth for %s. %s bids, %s asks', marketId,
+    //        depth.bids.length, depth.asks.length);
 
-    return api.call('v1/markets/' + id + '/depth')
-    .then(function(depth) {
-        debug('depth retrieved for %s. %s bids, %s asks', id,
-            depth.bids.length, depth.asks.length)
+    api.depth[marketId] = depth
+    api.trigger('depth', { market: marketId, depth: depth })
+    api.trigger('depth:'+ marketId, depth)
 
-        api.depth[id] = depth
-        api.trigger('depth', { market: id, depth: depth })
-        api.trigger('depth:'+ id, depth)
-
-        return depth
-    })
+    //return depth
 }
+
+
 
 // curl -H "Content-type: application/json" -X POST \
 // -d '{ "amount": "123.45", "currency": "BTC" }' \
@@ -363,33 +402,15 @@ api.createVoucher = function(amount, currency) {
 // 204: (voucher cancelled)
 api.redeemVoucher = function(code) {
     return api.call('v1/vouchers/' + code + '/redeem', null, { type: 'POST' })
-    .then(function(body, status, xhr) {
-        if (xhr.status == 204) {
-            return null
-        }
-
-        return body
-    })
 }
 
-api.bitcoinAddress = function() {
-    return api.call('v1/BTC/address')
+api.getCryptoAddress = function(currency) {
+    return api.call('v1/' + currency + '/address')
     .then(function(result) {
-        return result.address
-    })
-    .done(function(address) {
-        api.bitcoinAddress.value = address
-        api.trigger('bitcoinAddress', address)
-    })
-}
-
-api.litecoinAddress = function() {
-    return api.call('v1/LTC/address')
-    .then(function(result) {
-        return result.address
-    })
-    .done(function(address) {
-        api.trigger('litecoinAddress', address)
+        var address = result.address;
+        debug("getCryptoAddress %s: %s", currency, address)
+        api.cryptoAddress[currency] = address;
+        api.trigger('cryptoAddress' + currency, address);
     })
 }
 
@@ -419,7 +440,7 @@ api.activities = function(since) {
     }
 
     return api.call('v1/activities', null, options)
-    .done(function(items) {
+    .then(function(items) {
         api.trigger('activities', items)
     })
 }
@@ -428,86 +449,29 @@ api.bankAccounts = function() {
     return api.call('v1/bankAccounts')
 }
 
-api.feeRatio = function(market) {
-    return 0.005
+api.setDefaultFiat = function (currency){
+    $.cookie('currencyDefaultFiat', currency, { expires: 10 * 356 * 7 })
+}
+
+api.setDefaultCrypto = function (currency){
+    $.cookie('currencyDefaultCrypto', currency, { expires: 10 * 356 * 7 })
 }
 
 api.defaultDigitalCurrency = function() {
-    // todo: bal
-    return 'BTC'
+    var currency = $.cookie('currencyDefaultCrypto') || 'BTC';
+    return currency;
 }
 
 api.defaultMarket = function() {
-    return 'BTC' + api.defaultFiatCurrency()
+	var market = $.cookie('tradeMarket') || 'BTCEUR';
+    return market
+}
+
+api.isFiat = function (currency){
+	return api.currencies[currency].fiat
 }
 
 api.defaultFiatCurrency = function() {
-    debug('guessing user default fiat currency')
-
-    if (api.balances.current) {
-        debug('trying to guess on balances')
-
-        var sortedFiats = _.filter(api.balances.current, function(x) {
-            return x.balance > 0 && api.currencies[x.currency].fiat
-        }).sort(function(a, b) {
-            return b.balance - a.balance
-        })
-
-        var fiat = sortedFiats[0]
-
-        if (fiat) {
-            debug('guessing from highest sorted fiat: %s (%s)', fiat.currency, fiat.balance)
-            return fiat.currency
-        } else {
-            debug('no fiat balances to guess from')
-        }
-    }
-
-    var sepa = require('./assets/sepa.json')
-
-    if (!api.user || !api.user.country) {
-        debug('user is not logged in / no country set')
-
-        if (!i18n.desired) {
-            debug('user has no desired language. guessing USD')
-            return 'EUR'
-        }
-
-        var countryCodeGuess = i18n.desired.substr(i18n.desired.length - 2, 2)
-
-        debug('country code guess %s (from desired lang %s)', countryCodeGuess || '(none)', i18n.desired)
-
-        if (countryCodeGuess.length != 2) {
-            debug('no country code guess, guessing USD')
-            return 'EUR'
-        }
-
-        if (countryCodeGuess == 'NO') {
-            debug('country code guess is NO, guessing NOK')
-            return 'NOK'
-        }
-
-        if (~sepa.indexOf(countryCodeGuess)) {
-            debug('country code guess is in SEPA, guessing EUR')
-            return 'EUR'
-        }
-
-        debug('not sepa, guessing USD')
-
-        return 'EUR'
-    }
-
-    if (api.user.country == 'NO') {
-        debug('user country is NO, guessing NOK')
-        return 'NOK'
-    }
-
-    if (~sepa.indexOf(api.user.country)) {
-        debug('user is in sepa, guessing EUR')
-        return 'EUR'
-    }
-
-    debug('user is not in sepa')
-
-    return 'EUR'
+	var currency = $.cookie('currencyDefaultFiat') || 'EUR';
+    return currency;
 }

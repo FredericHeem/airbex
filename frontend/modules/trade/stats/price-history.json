@@ -8,6 +8,23 @@
         "labelStyle": {
             "display": "none"
         },
+        "buttons" : [{
+            'type' : 'day',
+            'count' : 1,
+            'text' : '1D'
+        }, {
+            'type' : 'week',
+            'count' : 1,
+            'text' : '1W'
+        }, {
+            'type' : 'month',
+            'count' : 1,
+            'text' : '1M'
+        }, {
+            'type' : 'all',
+            'count' : 1,
+            'text' : 'All'
+        }],
         "buttonTheme": {
             "fill": "none",
             "stroke": "none",
@@ -45,12 +62,14 @@
     "xAxis": {
         "title": {
             "text": null
+        },
+        "events" : {
         }
     },
     "chart": {
-        "height": 300
+        "height": 500
     },
-    "colors": ["#7EB3B5"],
+    "colors": ["#2a6496"],
     "series": [
         {
             "type": "area",

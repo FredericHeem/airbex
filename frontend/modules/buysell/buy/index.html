@@ -1,0 +1,66 @@
+
+<div class="container" id="buy-container">
+
+	<div class="buysell-nav"></div>
+	
+	<div class="col-lg-6">
+		<div class='order-view'></div>
+		<h3>Purchase Bitcoin with Swiss Francs and Euro</h3>
+		<form class="well entry">
+			<div class="col-lg-6">
+				<div class="row">
+					<div class="amount-placeholder"></div>
+				</div>
+			</div>
+
+			<div class="form-group address">
+				<label class="control-label">If you already have a wallet, please enter the bitcoin
+					address where we will send the funds: </label>
+				<div class="input-group">
+					<input class="field form-control input-address" type="text" name="address"/>
+				</div>
+			</div>
+			<div>
+				<button type="submit" class="btn btn-success btn-block">Proceed
+					to payment</button>
+			</div>
+		</form>
+
+		<div class="review hide">
+			<h4>Review</h4>
+			<p>Please the send the following amount to AIRBEX's bank account.</p>
+
+			<table class="table table-compact payment-details">
+				<tr>
+					<td>Bank name:</td>
+					<td><strong><span class="bankname"></span></strong> CIC</td>
+				</tr>
+				<tr>
+					<td>IBAN</td>
+					<td><strong><span class="iban"></span></strong>
+						CH7408710035549922002</td>
+				</tr>
+				<tr>
+					<td>Amount to send:</td>
+					<td><strong><span class="amount"></span></strong> <span class="quote_currency"></span></td>
+				</tr>
+				<tr>
+					<td>Bitcoin address</td>
+					<td><strong><span class="address"></span></strong></td>
+				</tr>
+			</table>
+
+			<div class="actions">
+				<button class="btn btn-success btn-large confirm">Yes, I
+					have transfered <span class="amount"></span> <span class="quote_currency"></span> to AIRBEX bank's account</button>
+				<button class="btn cancel">Cancel</button>
+			</div>
+		</div>
+		<div class="summary hide">
+			<h4>Review</h4>
+			<p>Well done, please wait until the bank transfer has been
+				credited</p>
+
+		</div>
+	</div>
+</div>

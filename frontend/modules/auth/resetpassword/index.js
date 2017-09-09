@@ -1,5 +1,5 @@
 require('../../../vendor/shake')
-
+var _ = require('lodash')
 var template = require('./index.html')
 
 module.exports = function() {
@@ -17,8 +17,41 @@ module.exports = function() {
     , $end = $el.find('.end')
     , $endForm = $end.find('.end-form')
     , $phoneCode = $phoneForm.find('.code')
+    , $otp = $endForm.find('.otp')
     , $password = $endForm.find('.password')
+    , $submit = $endForm.find('button')
 
+    function validateOtp() {
+        var expression = /^[0-9]{6}$/
+        , valid = $otp.field('otp').val().match(expression)
+
+        $otp
+        .removeClass('is-wrong is-locked-out')
+        .toggleClass('is-invalid has-error', !valid)
+        .toggleClass('is-valid', !!valid)
+
+        return valid
+    }
+    
+    function validatePassword() {
+        var password = $password.find('input').val()
+        , $hint = $password.find('.help-block')
+
+        var valid = password.length >= 6
+
+        if (password.length === 0 || valid) {
+            $password.removeClass('has-error')
+            if (valid) $password.addClass('success')
+            $hint.empty()
+        } else {
+            $password.removeClass('success').addClass('has-error')
+        }
+
+        $password.toggleClass('is-valid', valid)
+
+        return valid
+    }
+    
     $beginForm.on('submit', function(e) {
         e.preventDefault()
 
@@ -35,13 +68,13 @@ module.exports = function() {
 
             if (err.name == 'NoVerifiedEmail') {
                 alertify.alert('Sorry, but your user has no verified email ' +
-                    'and cannot reset password. Contact support@sbex.ch')
+                    'and cannot reset password. Contact ' + window.config.email_support)
                 return
             }
 
             if (err.name == 'NoVerifiedPhone') {
                 alertify.alert('Sorry, but your user has no verified phone ' +
-                    'and cannot reset password. Contact support@sbex.ch')
+                    'and cannot reset password. Contact ' + window.config.email_support)
                 return
             }
 
@@ -52,21 +85,32 @@ module.exports = function() {
 
             if (err.name == 'ResetPasswordLockedOut') {
                 alertify.alert('Sorry, but you tried to reset your password ' +
-                    'not long ago. Try again later or contact support@sbex.ch.')
+                    'not long ago. Try again later or contact ' + window.config.email_support)
                 return
             }
 
             errors.alertFromXhr(err)
         })
-        .done(function() {
+        .then(function(res) {
             $button.html('Check your email').removeClass('btn-primary')
+            if(!res.has2fa){
+                $(".otp").hide()
+            }
+            if(res.hasPhone){
+                setTimeout(function() {
+                    $begin.fadeTo(1000, 0.75)
+                    $phone.show()
+                    $phoneCode.focusSoon()
 
-            setTimeout(function() {
-                $begin.fadeTo(1000, 0.75)
-                $phone.show()
-                $phoneCode.focusSoon()
+                }, 10e3)
+            } else {
+                setTimeout(function() {
+                    $begin.fadeTo(1000, 0.75)
 
-            }, 15e3)
+                    $end.show()
+                    $password.focusSoon()
+                }, 10e3)
+            }
         })
     })
 
@@ -89,12 +133,41 @@ module.exports = function() {
         e.preventDefault()
 
         var password = $password.find('input').val()
+        var phoneCode = $phoneCode.find('input').val()
+        var twaFaCode = $otp.find('input').val()
 
-        api.resetPasswordEnd(email, phoneCode, password)
-        .fail(errors.alertFromXhr)
+        var fields = [$password]
+        var useOtp = $endForm.find('.otp:visible').length
+
+        validatePassword()
+
+        if (useOtp) {
+            validateOtp()
+            fields.push($otp)
+        }
+        var invalid = false
+        _.some(fields, function($e) {
+            if ($e.hasClass('is-valid')) return
+            $submit.shake()
+            $e.find('input').focus()
+            invalid = true
+            return true
+        })
+
+        if (invalid) return
+        
+        api.resetPasswordEnd(email, phoneCode, password, twaFaCode)
+        .fail(function(err){
+            if (err.name == 'MustConfirmEmailFirst') {
+                alertify.alert('Please click on the link sent in the email.')
+                return
+            } 
+            errors.alertFromXhr(err)
+            
+        })
         .done(function() {
             // TODO: i18n
-            alert('Reset complete. Please do not forget your password again.')
+            alert('Reset complete')
             window.location = '/'
         })
     })

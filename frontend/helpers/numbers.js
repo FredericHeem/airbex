@@ -67,7 +67,18 @@ exports.addThousands = function(s, ds, ts) {
     return parts.join(ds)
 }
 
+exports.formatCurrency = function(number, currency) {
+    var scale_display = api.currencies[currency].scale_display
+    //console.log("formatCurrency %s %s, scale: %s", number, currency, scale_display)
+    return this.format(Num(number).round(scale_display).toString(), {
+        currency: currency,
+        thousands: true,
+        precision: scale_display
+    })
+}
+
 exports.formatAmount = function(number, currency) {
+	var scale = api.currencies[currency].scale
     return this.format(number, {
         currency: currency,
         thousands: true
@@ -89,19 +100,16 @@ exports.formatPrice = function(number) {
     })
 }
 
-var currencyDisplayOption = {
- "BTC": {'maxPrecision':8}, 
- "LTC": {'maxPrecision':8}, 
- "EUR": {'maxPrecision':2},
- "CHF": {'maxPrecision':2},
- "USD": {'maxPrecision':2},
- "GBP": {'maxPrecision':2}
-};
-
-
 exports.getCurrencyOption = function(currency) {
-    var option = currencyDisplayOption[currency]
+    var option = api.currencies[currency]
     return option;
+}
+
+exports.getCurrencyNum = function(value, currency) {
+    var scale = api.currencies[currency].scale
+    , result = Num(value).mul(Math.pow(10, scale))
+    result.set_precision(0)
+    return result
 }
 
 exports.parse = function(s) {

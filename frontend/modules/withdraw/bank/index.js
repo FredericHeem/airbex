@@ -1,6 +1,5 @@
 var format = require('util').format
 , _ = require('lodash')
-, nav = require('../nav')
 , template = require('./index.html')
 , sepa = require('../../../assets/sepa.json')
 , wire = require('../../../assets/wire.json')
@@ -19,8 +18,8 @@ module.exports = function(currency) {
         maxPrecision: 2
     })
 
-    var allowed = ~sepa.indexOf(api.user.country) || ~wire.indexOf(api.user.country)
-
+    //var allowed = ~sepa.indexOf(api.user.country) || ~wire.indexOf(api.user.country)
+    var allowed = true;
     // Insert amount control
     $el.find('.amount-placeholder').append(amount.$el)
 
@@ -30,8 +29,7 @@ module.exports = function(currency) {
 
     // Enumerate bank accounts
     api.bankAccounts()
-    .fail(errors.alertFromXhr)
-    .done(function(accounts) {
+    .then(function(accounts) {
         $el.toggleClass('is-empty', !accounts.length)
 
         $account.html(_.map(accounts, function(a) {
@@ -40,6 +38,7 @@ module.exports = function(currency) {
                 a.id, _.escape(formatters.bankAccount(a)))
         }))
     })
+    .fail(errors.alertFromXhr)
 
     $form.on('submit', function(e) {
         e.preventDefault()
@@ -51,14 +50,14 @@ module.exports = function(currency) {
             bankAccount: +$account.val(),
             currency: amount.currency()
         })
-        .fail(errors.alertFromXhr)
-        .done(function() {
-            api.balances()
+        .then(function() {
+            api.fetchBalances()
             router.go('#withdraw/withdraws')
         })
+        .fail(errors.alertFromXhr)
+
     })
 
-    $el.find('.withdraw-nav').replaceWith(nav('bank').$el)
     $el.toggleClass('is-allowed', !!allowed)
 
     return ctrl

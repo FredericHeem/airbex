@@ -1,100 +1,81 @@
-<div class="container">
-    <div class="deposit-nav"></div>
 
-    <div class="col-lg-9">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="content-title"><%= i18n('deposit.bank.EUR.heading') %></h1>
+<div class="col-lg-9">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="content-title"><%=
+                i18n('deposit.bank.EUR.heading') %></h1>
 
-                <div class="content-area">
-                    <p class="lead visible-allowed">
-                        <%= i18n('deposit.bank.EUR.intro') %>
-                    </p>
+            <div class="content-area">
+                <p class="lead visible-allowed"><%=
+                    i18n('deposit.bank.EUR.intro') %></p>
 
-                    <div class="hidden-allowed">
-                        <div class="alert lead">
-                            Sorry, but at this time we do not accept bank deposits from your country,
-                            <strong><%= api.user.countryFriendly() %></strong>.
-                        </div>
+                <div class="hidden-allowed">
+                    <div class="alert lead">
+                        Sorry, but at this time we do not accept bank
+                        deposits from your country, <strong><%=
+                            api.user.countryFriendly() %></strong>.
                     </div>
-
-                    <div class="payment-details visible-allowed">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <strong><%= i18n('deposit.bank.EUR.recipient') %></strong>
-                            </div>
-                            <div class="col-lg-6">
-                               us
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <strong>IBAN</strong>
-                            </div>
-
-                            <div class="col-lg-6">
-                                CH05 1250 6115 084
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <strong>SWIFT/BIC</strong>
-                            </div>
-
-                            <div class="col-lg-6">
-                                CHBANOKKXXX
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <strong><%= i18n('deposit.bank.EUR.messageToRecipient') %></strong>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <%= messageToRecipient %>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <strong><%= i18n('deposit.bank.EUR.minimumAmount') %></strong>
-                            </div>
-
-                            <div class="col-lg-6">
-                                25 EUR %>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <strong><%= i18n('deposit.bank.EUR.our bank') %></strong>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <small>
-                                    CIC<br />
-                                    1 rue du lac<br />
-                                    <br />
-                                    Neufchatel
-                                </small>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <strong><%= i18n('deposit.bank.EUR.fee') %></strong>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <abbr title="Single Euro Payments Area">SEPA</abbr>: ~2.50 EUR<br />
-                                International: ~7.50 EUR<br />
-                                <small>See <a href="/en/terms" target="_blank">Terms</a></small>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+                <div class="alert alert-warning">
+                    <i class="fa fa-warning"></i>
+                    <%- i18n('deposit.bank.warning', messageToRecipient) %>
+                </div>
+                <div class="payment-details visible-allowed">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td><%=
+                                    i18n('deposit.bank.recipient') %></td>
+                                <td>Global Transaction Services LLC</td>
+                            </tr>
+                            <tr>
+                                <td><%=
+                                    i18n('deposit.bank.recipientAddress')
+                                    %></td>
+                                <td>1201 West Peachtree Street,
+                                    Suite 32, 30309 Atlanta, Georgia,
+                                    USA</td>
+                            </tr>
+                            <tr>
+                                <td>IBAN</td>
+                                <td>PL55124069600403009120161737</td>
+                            </tr>
+                            <tr>
+                                <td>SWIFT</td>
+                                <td>PKOPPLPW</td>
+                            </tr>
+                            <tr>
+                                <td><%=
+                                    i18n('deposit.bank.EUR.messageToRecipient')
+                                    %></td>
+                                <td><span class="label-messageToRecipient label label-info"><%= messageToRecipient %></span></td>
+                            </tr>
+                            <tr>
+                                <td><%=
+                                    i18n('deposit.bank.EUR.minimumAmount')
+                                    %></td>
+                                <td>100 Euro</td>
+                            </tr>
+                            <tr>
+                                <td><%=
+                                    i18n('deposit.bank.ourbank') %></td>
+                                <td>Bank Pekao SA</td>
+                            </tr>
+                            <tr>
+                                <td><%=
+                                    i18n('deposit.bank.ourbankaddress')
+                                    %></td>
+                                <td>Oddzial w Warszawie III ul. T.
+                                    Czackiego 21/23, 00-950 Warszawa,
+                                    Poland</td>
+                            </tr>
+                            <tr>
+                                <td><%=
+                                    i18n('deposit.bank.EUR.fee') %></td>
+                                <td>8 USD, converted on the spot by the bank in Euro</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

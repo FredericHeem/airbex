@@ -1,6 +1,6 @@
 module.exports = function(router, master) {
     return router
-    .add(/^$/, function() {
+    .add(/^dashboard$/, function() {
         master(require('./index')())
     })
 }

@@ -4,7 +4,7 @@
     <td><%= destination %></td>
     <td><%= status %></td>
     <td>
-        <% if (state == 'requested') { %>
+        <% if (state == 'requested' || state == 'sendingEmail') { %>
             <button class="cancel btn btn-danger btn-block"><%= i18n('withdraws.cancel') %></button>
         <% } %>
     </td>

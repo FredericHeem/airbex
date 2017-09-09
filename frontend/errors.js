@@ -15,6 +15,10 @@ exports.bodyFromXhr = function(xhr) {
 }
 
 exports.alertFromXhr = function(error) {
+    if(!error){
+        debug('alertFromXhr no error')
+        return;
+    }
     if (!error.xhr) {
         debug('alertFromXhr called with non XHR error. throwing')
         throw error

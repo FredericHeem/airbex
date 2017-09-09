@@ -1,26 +1,13 @@
-#area > .deposit-btc
+#area .deposit-crypto
     .address
-        font-size 1.6em
+        font-size: 1em
         padding-top 20px
         padding-bottom 20px
-        text-align center
-        border solid 1px #ccc
 
     .disclaimer
-        font-size 0.85em
+        font-size 1em
 
-#area > .deposit-ltc
-    .address
-        font-size 1.6em
-        padding-top 20px
-        padding-bottom 20px
-        text-align center
-        border solid 1px #ccc
-
-    .disclaimer
-        font-size 0.85em
-
-#area > .deposit-voucher
+#area .deposit-voucher
     states redeeming redeemed cancelled
 
     .form
@@ -40,17 +27,22 @@
                 max-width 10em
 
 
-#area > .deposit-bank-EUR, .deposit-bank-USD, .deposit-bank-NOK
+#area .deposit-ccc
+    #logoccc
+        background:black;
+        width:300px;
+            
+#area .deposit-bank
     states allowed
 
+    .label-messageToRecipient
+        font-size 1em
+      
     .payment-details
         font-size 1.2em
 
         .row
             margin-top 1em
-
-#area > .deposit-bank-NOK
-    states step-sender, step-payment, step-summary
 
 table.depth th,
 .level .price,

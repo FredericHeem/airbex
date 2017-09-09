@@ -1,0 +1,80 @@
+.row h3 {
+	text-align: center;
+}
+#dashboard .currency-block {
+	display:inline-block;
+	margin:0.4em;
+	padding:0.4em;
+}
+
+#dashboard table {
+    width:100%;
+}
+
+#dashboard .balance {
+    padding: 1em;
+    background-color: rgb(11,37,52);
+    color: white;
+}
+
+#dashboard .currency-symbol {
+    padding:0.3em;
+}
+
+#dashboard tr {
+    width: auto;
+}
+
+#dashboard td {
+    text-align: right;
+}
+
+#dashboard td:first-child {
+    text-align: right;
+}
+
+#dashboard td:last-child {
+	text-align: right;
+	
+}
+#dashboard .currency-symbol-CHF  {
+    color: rgb(213,43,30);
+}
+
+#dashboard .currency-symbol-EUR  {
+    color: #0e7eae;
+}
+
+#dashboard .currency-symbol-BTC {
+    color: darkorange;
+}
+
+#dashboard .currency-symbol-LTC  {
+    color: silver;
+}
+
+#dashboard ul {
+    list-style: none;
+    width:100%;
+    padding-left: 0;
+    text-align: center;
+}
+
+#dashboard ul li {
+    padding: 0.5em;
+    text-align: center;
+}
+
+#dashboard li a {
+    color: white;
+}
+
+#dashboard .withdraw {
+	background-color: #1e3e52;
+	color: white;
+}
+
+#dashboard .deposit {
+    background-color: #0e7eae;
+    color: white;
+}

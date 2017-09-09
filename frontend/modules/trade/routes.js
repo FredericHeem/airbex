@@ -6,19 +6,19 @@ module.exports = function(router, master, authorize) {
         var market = $.cookie('tradeMarket') || api.defaultMarket()
         router.go(format('trade/%s', market), true)
     })
-    .add(/^trade\/([A-Z]{6})$/, function(market) {
+    .add(/^trade\/([A-Z]{6,7})$/, function(market) {
         router.go(format(
             'trade/%s/%s',
             market,
             $.cookie('tradeMode') == 'advanced' ? 'advanced' : 'instant'),
         true)
     })
-    .add(/^trade\/([A-Z]{6})\/stats$/,
+    .add(/^trade\/([A-Z]{6,7})\/stats$/,
         function(market)
     {
         master(require('./stats')(market), 'trade')
     })
-    .add(/^trade\/([A-Z]{6})\/(advanced|instant)$/, function(market, mode) {
+    .add(/^trade\/([A-Z]{6,7})\/(advanced|instant)$/, function(market, mode) {
         router.go(format(
             'trade/%s/%s/%s',
             market,
@@ -26,7 +26,15 @@ module.exports = function(router, master, authorize) {
             $.cookie('tradeType') == 'sell' ? 'sell' : 'buy'),
         true)
     })
-    .add(/^trade\/([A-Z]{6})\/(instant|advanced)\/(buy|sell)$/,
+    .add(/^trade\/([A-Z]{6,7})\/(buy|sell)$/, function(market, bidask) {
+        router.go(format(
+            'trade/%s/%s/%s',
+            market,
+            $.cookie('tradeMode') == 'advanced' ? 'advanced' : 'instant',
+            bidask),
+        true)
+    })
+    .add(/^trade\/([A-Z]{6,7})\/(instant|advanced)\/(buy|sell)$/,
         function(market, mode, type)
     {
         if (!authorize.user(2)) return

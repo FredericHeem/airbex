@@ -1,0 +1,16 @@
+    <div class="deposit-crypto-inner">
+        <h1 class="content-title"><%= i18n('depositcrypto.heading', name, currency) %></h1>
+
+        <div class="content-area">
+            <p class="disclaimer"><%= i18n('depositcrypto.disclaimer', min_conf, duration) %></p>
+            <p><%= i18n('depositcrypto.address.label', name) %>:</p>
+            <div class="qrcode"></div>
+            <p class="address"><%= i18n('loading') %>...</p>
+            <div class="pending_deposit">
+              <p>Pending deposit, confirmations: <span class="confirmation"></span> of out <%= min_conf %></p>
+            </div>
+            <div class="no_pending_deposit">
+              <p>No pending deposit</p>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,69 @@
+	<div class="col-lg-9">
+		<div class="row">
+			<div class="col-lg-12">
+				<h1 class="content-title"><%= i18n('deposit.bank.CZK.heading')
+					%></h1>
+
+				<div class="content-area">
+					<p class="lead visible-allowed"><%=
+						i18n('deposit.bank.CZK.intro') %></p>
+
+					<div class="hidden-allowed">
+						<div class="alert lead">
+							Sorry, but at this time we do not accept bank deposits from your
+							country, <strong><%= api.user.countryFriendly() %></strong>.
+						</div>
+					</div>
+
+					<div class="payment-details visible-allowed">
+						<table class="table">
+							<tbody>
+								<tr>
+									<td><%= i18n('deposit.bank.recipient') %></td>
+									<td>Pocketcoin SE</td>
+								</tr>
+								<tr>
+									<td><%= i18n('deposit.bank.recipientAddress') %></td>
+									<td>Sokolovska 428/130, Karlin, 186 00 Praha 8, Czech
+										Republic</td>
+								</tr>
+								<tr>
+									<td>IBAN</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>SWIFT</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td><%= i18n('messageToRecipient') %></td>
+									<td><%= messageToRecipient %></td>
+								</tr>
+								<tr>
+									<td><%= i18n('minimumAmount') %></td>
+									<td>100 CZK</td>
+								</tr>
+								<tr>
+									<td><%= i18n('deposit.bank.ourbank') %></td>
+									<td>CSOB: Ceskoslovenska obchodni banka, a.s.</td>
+								</tr>
+								<tr>
+									<td><%= i18n('deposit.bank.ourbankaddress') %></td>
+									<td>Radlicka 333/150, Prague 5, Czech Republic</td>
+								</tr>
+								<tr>
+									<td><%= i18n('fee') %></td>
+									<td>10 CZK</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>

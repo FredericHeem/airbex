@@ -1,6 +1,5 @@
 var template = require('./index.html')
 , itemTemplate = require('./item.html')
-, nav = require('../nav')
 
 module.exports = function() {
     var $el = $('<div class="vouchers">').html(template())
@@ -11,8 +10,9 @@ module.exports = function() {
 
     function refresh() {
         api.call('v1/vouchers')
+        .then(itemsUpdated)
         .fail(errors.alertFromXhr)
-        .done(itemsUpdated)
+        
     }
 
     function itemsUpdated(items) {
@@ -30,8 +30,9 @@ module.exports = function() {
         , url = 'v1/vouchers/' + $item.attr('data-id') + '/redeem'
 
         api.call(url, null, { type: 'POST' })
-        .always(function() {
-            $button.loading(false)
+        .then(function() {
+            $item.fadeAway()
+            api.fetchBalances()
         })
         .fail(function(err) {
             if (err.name == 'VoucherNotFound') {
@@ -42,15 +43,14 @@ module.exports = function() {
 
             errors.alertFromXhr(err)
         })
-        .done(function() {
-            $item.fadeAway()
-            api.balances()
+        .finally(function() {
+            $button.loading(false)
         })
+
+
     })
 
     refresh()
-
-    $el.find('.account-nav').replaceWith(nav('vouchers').$el)
 
     return controller
 }

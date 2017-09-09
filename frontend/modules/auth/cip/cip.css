@@ -1,0 +1,38 @@
+#area>.auth-cip .visible-finished {
+    display: none
+}
+
+#area>.auth-cip .is-finished .visible-finished,#area>.auth-cip .has-finished .visible-finished,#area>.auth-cip.is-finished .visible-finished,#area>.auth-cip.has-finished .visible-finished
+    {
+    display: block
+}
+
+#area>.auth-cip .is-finished tr.visible-finished,#area>.auth-cip .has-finished tr.visible-finished,#area>.auth-cip.is-finished tr.visible-finished,#area>.auth-cip.has-finished tr.visible-finished
+    {
+    display: table-row
+}
+
+#area>.auth-cip .is-finished span.visible-finished,#area>.auth-cip .has-finished span.visible-finished,#area>.auth-cip.is-finished span.visible-finished,#area>.auth-cip.has-finished span.visible-finished
+    {
+    display: inline
+}
+
+#area>.auth-cip .is-finished .help-block.visible-finished,#area>.auth-cip .has-finished .help-block.visible-finished,#area>.auth-cip.is-finished .help-block.visible-finished,#area>.auth-cip.has-finished .help-block.visible-finished
+    {
+    visibility: visible
+}
+
+#area>.auth-cip .is-finished table.visible-finished,#area>.auth-cip .has-finished table.visible-finished,#area>.auth-cip.is-finished table.visible-finished,#area>.auth-cip.has-finished table.visible-finished
+    {
+    display: table
+}
+
+#area>.auth-cip .is-finished .btn.visible-finished,#area>.auth-cip .has-finished .btn.visible-finished,#area>.auth-cip.is-finished .btn.visible-finished,#area>.auth-cip.has-finished .btn.visible-finished
+    {
+    display: inline-block
+}
+
+#area>.auth-cip .is-finished .hidden-finished,#area>.auth-cip .has-finished .hidden-finished,#area>.auth-cip.is-finished .hidden-finished,#area>.auth-cip.has-finished .hidden-finished
+    {
+    display: none
+}

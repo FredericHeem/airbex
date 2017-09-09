@@ -1,0 +1,71 @@
+.color1 { color: #1681b5}
+.color2 { color: #f3e76a}
+.color3 { color: #ffffff}
+.color4 { color: #c5bb5c}
+.color5 { color: #a09144}
+.color6 { color: #2487b8}
+.color7 { color: #404041}
+.color8 { color: #76777a}
+
+
+.top-nav-bar {
+    background-color: white;
+    border:0;
+}
+
+.navbar,
+.navbar-brand,
+.navbar-nav > li > a {
+    line-height: 80px;
+    min-height: 80px;
+    padding-top: 0;
+    padding-bottom:0;
+    
+}
+
+.top-nav-bar > a  {
+    color:white !important;
+    padding-bottom:0;
+    color: white;
+}
+
+.top-nav-bar > a:hover {
+    color: white !important;
+}
+
+.lilogin, .liregister  {
+   width:10em;
+   text-align:center;
+}
+
+.lilogin {
+    background-color:#f3e76a;
+}
+
+.liregister {
+    background-color:#c5bb5c; 
+}
+
+.lilogin > a:hover {
+    //color: #0e7eae !important;
+}
+
+.liregister > a:hover {
+    //color: #1e3e52 !important;
+}
+
+.navbar {
+	margin-bottom:0px;
+}
+[id^="reminder-"] {
+    display:none;
+    width: auto;
+    
+    max-width:800px;
+    margin: 0 auto;
+    margin-bottom:18px;
+}
+
+
+
+

@@ -6,21 +6,24 @@
     <% } %>
     <meta charset="utf-8">
     <title><%= title %></title>
-    <meta name="description" content="Buy, sell and trade Bitcoin and Logos at fair prices with Logosxchange, the secure Bitcoin and Logos exchange. Create a Logos wallet and exchange your BTC to LGS.">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="description" content="Buy, sell and trade Bitcoin with Airbex, bitcoin exchange with Proof of Reserve">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
     <meta name="google-site-verification" content="" />
+    <link href="//fonts.googleapis.com/css?family=Montserrat:400normal;subset=all" rel="stylesheet" type="text/css">
+    
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<!-- Latest compiled and minified JavaScript -->
 
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <link href="/app.css" rel="stylesheet">
 
-    <link rel="apple-touch-icon" href="/touchicon.png">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/touch-icon-ipad-retina.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/touch-icon-iphone-retina.png">
+    <link rel="apple-touch-icon" href="/airbex-square.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/airbex-square.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/airbex-square.png">
     <link rel="apple-touch-icon-precomposed" href="/touch-icon-iphone.png">
-    <link rel="icon" href="/favicon.png">
-    <!--[if IE]><link rel="shortcut icon" href="/favicon.ico"><![endif]-->
-    <meta name="msapplication-TileImage" content="/tileicon.png">
+    <link rel="icon" href="/favicon.ico">
+    <!--[if IE]><link rel="shortcut icon" href="/favicon.png"><![endif]-->
+    <meta name="msapplication-TileImage" content="/favicon.png">
 
     <script type="text/javascript">
         if ('-ms-user-select' in document.documentElement.style && navigator.userAgent.match(/IEMobile\/10\.0/)) {
@@ -29,18 +32,37 @@
             document.getElementsByTagName('head')[0].appendChild(msViewportStyle);
         }
     </script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    <% if (segment !== undefined) { %>
-        <script type="text/javascript">
-          var analytics=analytics||[];(function(){var e=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group"],t=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var n=0;n<e.length;n++)analytics[e[n]]=t(e[n])})(),analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)};
-          analytics.load("<%- segment %>");
-        </script>
-    <% } %>
+      ga('create', 'UA-54161124-1', 'auto');
+      ga('send', 'pageview');
+
+</script>
+<script type="text/javascript">
+    var $zoho = $zoho || {
+        livedesk : {
+            values : {},
+            ready : function() {
+            }
+        }
+    };
+    var d = document;
+    s = d.createElement("script");
+    s.type = "text/javascript";
+    s.defer = true;
+    s.src = "https://livedesk.zoho.com/airbex/float.ls?embedname=airbex";
+    t = d.getElementsByTagName("script")[0];
+    t.parentNode.insertBefore(s, t);
+</script>
 </head>
-<body>
+<body id="skrollr-body">
 <script>window.environment = '<%= environment %>'</script>
-<script type='text/javascript' src='https://cdn.firebase.com/v0/firebase.js'></script>
 <script src="/vendor.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 <script src="/app.js"></script>
-<div class="wrapper">
+
 

@@ -1,76 +1,147 @@
 <% include partials/header-en.ejs %>
-  <div class="cover row">
-    <div class="cover-content col-md-12" style="text-align:center">
-    <a href="/client/#auth/login" class="btn btn-success pull-right btn-login">Login</a>
-	
-    <a href="/en/">
-        <img src="/logo.png" class="logo" alt="Logosxchange logo">
-    </a>
-    <!--<div class="exchangerates">
-        <p class="rates">
-            <span id="BTCNOK" class="largerfont">0</span> LGS/BTC
-            <span id="BTCEUR" class="largerfont spacebetween">0</span> BTC/LGS
-        </p>
-    </div>
-	-->
-	
-      <p class="tagline">
-        Logos Exchange
-      </p>
-      <p class="sub-tagline">
-        Buy and trade Logos and BTC
-      </p>
 
-      <a class="cta btn-success btn" href="/client/#auth/register">Join the exchange</a>
-    </div>
-  </div>
+<div class="container main-area" >
 
- <!-- <div class="flags pull-right">
-      <a href="#set-language" data-language="nb-NO"><img src="/NO.png" alt="Norsk" /></a>
-      <a href="#set-language" data-language="en-US"><img src="/US.png" alt="English" /></a>
-  </div>
--->
-  <div class="customer-count row">
-    <strong class="user-count">10 000</strong> Users connected right now
-  </div>
+    <div class="row summary">
+        <div class="col-lg-6" id="col-speech">
+            <p class="tagline">AIRBEX - THE AUDITABLE BITCOIN
+                EXCHANGE</p>
+            <p class="sub-tagline">TRADE CRYPO-CURRENCIES, WITH
+                PEACE OF MIND</p>
+            <br>
+            <p class="sub2-tagline">Bitcoin - Litecoin - Dogecoin -
+                Darkcoin</p>
+            <br>
+            <p class="sub2-tagline">US Dollar - Euro</p>
+            <br>
+            <div class="btn-group">
+                <a href='/client/#auth/register' type="button"
+                    class="btn btn-default btn-lg"> <i
+                    class="fa fa-rocket"></i> Open account
+                </a> <a href='https://demo.airbex.net/client/#auth/register'
+                    type="button" class="btn btn-default btn-lg"> <i
+                    class="fa fa-flask"></i> Open demo account
+                </a> <a href='/client/#auth/login' type="button"
+                    class="btn btn-default btn-lg"> <i
+                    class="fa fa-sign-in"></i> Login
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6 col-logo"
+            data-40p-start="padding-left:0px;top:0px;"
+            data-70p-start="padding-left:400px;top:0px">
+            <img src="/btc-ltc-doge.png" id="btcltcdoge"
+                alt="BTCLTCDOGE">
+        </div>
+    </div>
 
-  <div class="vias container">
-    <div class="col-md-4">
-      <p class="icon-container"><i class="fa fa-star fa-5"></i></p>
-      <h3>Easy to Use</h3>
-      <p>Whether you're just getting into Bitcoin or an experienced trader, it's fast to set up an account and easy to start trading.</p>
-    </div>
-    <div class="col-md-4">
-      <p class="icon-container"><i class="fa fa-bitcoin fa-5"></i></p>
-      <h3>0% Trading Fee</h3>
-      <p>Through 2013 there is 0% trading fee for BTC and LGS on Logosxchange. For other currencies, the fee is only 0.5% per trade.</p>
-    </div>
-    <div class="col-md-4">
-      <p class="icon-container"><i class="fa fa-lock fa-5"></i></p>
-      <h3>Superior Security</h3>
-      <p>With Logosxchange, over 90% of customer funds are stored in a fire-proof bank vault. Your security is always our top priority.</p>
-    </div>
-  </div>
+    <div class="row markets">
+        <div class="col-lg-6 col-logo"
+         data--600-top="left:-600px;"
+            data--200-top="left:0px;" 
+            data-100p-top="left:-000px;"
+            data-40p-top="left:0px;">
+            <img src="/note.png" alt="USD-EUR-CZK">
+        </div>
+        <div class="col-lg-6 " id="col-logo"
+            data--600-top="right:-600px;" 
+            data--200-top="right:0px;"
+            data-100p-top="right:-000px;" 
+            data-40p-top="right:0px;">
 
-  <hr>
-<!--  <div class="container media" style="text-align:center">
-    <h2>As featured in</h2>
-    <p>TV shows</p>
-  </div>
--->
-  <hr>
+            <div class="col-lg-8 col-lg-offset-2" id="markets"></div>
+        </div>
 
-  <div class="container testimonials"  style="text-align:center">
-    <div>
-      <h3>Our customers say</h3>
     </div>
-    <div class="testimonial">
-      <div class="quote">
-            <span class="before-quote">“</span>I need to find out who made this ! WoW ! Impressed !<span class="after-quote">”</span>
-          </div>
-      <div class="quoter">
-        Disi D. from Torland
-      </div>
+
+    <div class="row por">
+
+        <div class="col-lg-6"
+         data--600-top="left:-600px;"
+            data--100-top="left:0px;" 
+            data-100p-top="left:-700px;"
+            data-40p-top="left:0px;">
+            <div class="col-lg-2">
+                <p class="icon-container">
+                    <i class="fa fa-eye fa-4x"></i>
+                </p>
+            </div>
+            <div class="col-lg-10">
+                <h3>PROOF OF RESERVE</h3>
+                <p>Airbex implements a real-time proof of reserve
+                    that allows users to verify the Airbex's assets and
+                    liabilities.
+                <p>The proof of solvency ensures there is enough
+                    funds in the Airbex's wallet (assets) to cover
+                    user's funds (liabilities).</p>
+                <p>Airbex operates on full reserve, not fractional
+                    reserve, in other words, if every users request to
+                    withdraw all their funds, Airbex has enough reserve
+                    to honour the withdraw's request.
+                <p>
+                <p>Users can check the balance of the online (hot)
+                    and offline (cold) wallet for each cryptocurrency.</p>
+            </div>
+        </div>
+        <div class="col-lg-6 col-logo" class="col-lg-6 " id="col-logo"
+            data--600-top="right:-600px;" 
+            data--100-top="right:0px;"
+            data-100p-top="right:-700px;"
+            data-40p-top="right:0px;">
+            <img src="/scrable-proof.jpg" alt="Proof-of-Reserve">
+        </div>
     </div>
-  </div>
+
+    <div class="row summary">
+
+        <div class="overview">
+            <div class="col-md-4">
+                <p class="icon-container">
+                    <i class="fa fa-flask fa-4x"></i>
+                </p>
+                <h3>AIRBEX DEMO</h3>
+                <p>
+                    For training purpose, visit <a href="">demo.airbex.net</a>.
+                
+                <p>
+                <p>
+                    <a target="_blank"
+                        href="https://en.bitcoin.it/wiki/Testnet">Testnet</a>
+                    Bitcoin, Litecoin, Dogecoin and Darkcoin can be
+                    traded without the risk of using real
+                    cryptocurrencies.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <p class="icon-container">
+                    <i class="fa fa-trophy fa-4x"></i>
+                </p>
+                <h3>TAKER MAKER FEE MODEL</h3>
+                <p>Users are rewarded by lower fee when placing an
+                    order that adds liquidity to the market.</p>
+                <p>Maker fees down to -0.1%</p>
+            </div>
+            <div class="col-md-4">
+                <p class="icon-container">
+                    <i class="fa fa-shield fa-4x"></i>
+                </p>
+                <h3>SECURITY</h3>
+                <p>Security is the number one priority.</p>
+                <p>Use double authentication to protect the access
+                    of your account.</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+if($(window).width() >= 640){
+    skrollr.init({
+        forceHeight:true,
+        smoothScrolling : true,
+        mobileDeceleration : 0.004
+    });
+}
+</script>
 <% include partials/footer-en.ejs %>

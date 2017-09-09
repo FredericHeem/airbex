@@ -18,26 +18,32 @@ function numberWithCommas(x) {
     return x;
 }
 
+function setLanguage(language){
+    var path = window.location.pathname;
+    var date = new Date();
+    date.setFullYear(date.getFullYear() + 10);
+    if(window.location.pathname.indexOf(".html") > 0){
+    	return;
+    }
+    
+    if (language == 'fr-FR' && path.indexOf('/fr/') < 0) {
+        document.cookie = 'language=fr-FR;expires=' + date.toGMTString() + ';path=/';
+        window.location = '/fr/';
+    }
+    else if (path.indexOf('/en/') < 0) {
+        document.cookie = 'language=en-US;expires=' + date.toGMTString() + ';path=/';
+        window.location = '/en/';
+    }	
+}
 
 $(function() {
-    $('.customer-count').css('opacity', 0);
-
-    var supportsSvg = function() {
-        var e = document.createElement('div');
-        e.innerHTML = '<svg></svg>';
-        return !!(window.SVGSVGElement && e.firstChild instanceof window.SVGSVGElement);
-    };
-
-    if (!supportsSvg())
-    {
-        $('.header .logo').attr('src', '/justcoin.png');
-    }
-
+	setLanguage('en')
+	
     if (window.Firebase) {
-        var firebaseName = 'justcoin-dev'
+        var firebaseName = 'airbex-dev'
 
-        if (window.environment == 'production') firebaseName = 'justcoin'
-        if (window.environment == 'staging') firebaseName = 'justcoin-staging'
+        if (window.environment == 'production') firebaseName = 'airbex'
+        if (window.environment == 'staging') firebaseName = 'airbex-staging'
 
         var firebaseRef = new Firebase('https://' + firebaseName + '.firebaseIO.com/')
 
@@ -61,17 +67,12 @@ $(function() {
     $('.flags a[href="#set-language"]').click(function(event){
         event.preventDefault();
         var language = $(this).attr('data-language');
-        var path = window.location.pathname;
-        var date = new Date();
-        date.setFullYear(date.getFullYear() + 10);
-
-        if (language == 'nb-NO' && path != '/no/') {
-            document.cookie = 'language=nb-NO;expires=' + date.toGMTString() + ';path=/';
-            window.location = '/no/';
-        }
-        else if (language == 'en-US' && path != '/en/') {
-            document.cookie = 'language=en-US;expires=' + date.toGMTString() + ';path=/';
-            window.location = '/en/';
+        setLanguage(language);
+    });
+    
+    $(document).on('click','.navbar-collapse.in',function(e) {
+        if( $(e.target).is('a') ) {
+            $(this).collapse('hide');
         }
     });
 })

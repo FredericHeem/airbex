@@ -1,12 +1,37 @@
 module.exports = function(grunt) {
+    
+    // Load grunt tasks automatically
+    require('load-grunt-tasks')(grunt);
+
+    // Time how long tasks take. Can help when optimizing build times
+    require('time-grunt')(grunt);
+    
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-
+        
         clean: {
             development: 'public',
             production: 'dist'
         },
-
+        browserify: {
+            options: {
+                detectGlobals: false,
+                transform: ['browserify-ejs']
+            },
+            production: {
+                files: {
+                    'dist/main.js': 'app/main.js'
+                }
+            },
+            development: {
+                options: {
+                    debug: true
+                },
+                files: {
+                    'public/main.js': 'app/main.js'
+                }
+            }
+        },
         copy: {
             development: {
                 expand: true,
@@ -19,7 +44,7 @@ module.exports = function(grunt) {
             production: {
                 expand: true,
                 cwd: 'assets',
-                src: ['img/**', 'app.js'],
+                src: ['*'],
                 dest: 'dist',
                 filter: 'isFile'
             }
@@ -46,7 +71,7 @@ module.exports = function(grunt) {
             },
             development: {
                 files: {
-                    'public/app.css': 'index.styl'
+                    'public/app.css': 'index.css'
                 }
             }
         },
@@ -59,7 +84,8 @@ module.exports = function(grunt) {
 
                 files: {
                     'public/vendor.js': [
-                        'vendor/jquery*.js'
+                        'vendor/jquery*.js',
+                        'vendor/skrollr.min.js'
                     ]
                 }
             }
@@ -78,7 +104,7 @@ module.exports = function(grunt) {
                 },
 
                 files: {
-                    'dist/app.js': 'dist/app.js'
+                    'dist/main.js': 'dist/main.js'
                 }
             }
         },
@@ -90,7 +116,7 @@ module.exports = function(grunt) {
 
             production: {
                 files: {
-                    'dist/index.html': 'public/index.html',
+                    'dist/index.html': 'public/index-en.html',
                     'dist/index.no.html': 'public/index.no.html'
                 }
             }
@@ -107,7 +133,7 @@ module.exports = function(grunt) {
         connect: {
             development: {
                 options: {
-                    hostname: 'localhost',
+                    hostname: '0.0.0.0',
                     port: 7072,
                     base: 'public',
                     open: false,
@@ -124,7 +150,7 @@ module.exports = function(grunt) {
                             }
 
                             proxy.proxyRequest(req, res, {
-                                host: 'localhost',
+                                host: '0.0.0.0',
                                 port: 7072
                             })
                         })
@@ -153,12 +179,12 @@ module.exports = function(grunt) {
             },
 
             stylus: {
-                files: '**/*.styl',
+                files: ['**/*.styl', '**/*.css'],
                 tasks: ['stylus']
             },
 
             grunt: {
-                files: ['Gruntfile.js'],
+                files: ['Gruntfile.js','app/**/*.js','app/**/*.html'],
                 tasks: ['development']
             }
         },
@@ -172,20 +198,9 @@ module.exports = function(grunt) {
         }
     })
 
-    grunt.loadNpmTasks('grunt-concurrent')
-    grunt.loadNpmTasks('grunt-contrib-clean')
-    grunt.loadNpmTasks('grunt-contrib-concat')
-    grunt.loadNpmTasks('grunt-contrib-connect')
-    grunt.loadNpmTasks('grunt-contrib-copy')
-    grunt.loadNpmTasks('grunt-contrib-cssmin')
-    grunt.loadNpmTasks('grunt-contrib-htmlmin')
-    grunt.loadNpmTasks('grunt-contrib-stylus')
-    grunt.loadNpmTasks('grunt-contrib-uglify')
-    grunt.loadNpmTasks('grunt-contrib-watch')
-    grunt.loadNpmTasks('grunt-ejs')
-
     grunt.registerTask('development', [
         'copy:development',
+        'browserify:development',
         'stylus',
         'concat',
         'ejs:all'
@@ -193,6 +208,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('production', [
         'copy:production',
+        'browserify:production',
         'stylus',
         'concat',
         'uglify',

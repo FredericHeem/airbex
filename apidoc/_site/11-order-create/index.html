@@ -1,0 +1,33 @@
+<p>This method creates an order on the given market</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li><strong><code>amount:</code></strong> The amount of base currency to buy or sell.</li>
+  <li><strong><code>market:</code></strong> The market id where the order will be placed, e.g <code>BTCUSD</code>.</li>
+  <li><strong><code>price:</code></strong> The price in quote currency at which to buy or sell. <code>null</code> for instant order.</li>
+  <li><strong><code>type:</code></strong> <code>bid</code>: buy order, <code>ask</code>: sell order.</li>
+</ul>
+
+<p><code>{
+  amount: "0.1",
+  market: "BTCUSD",
+  price: "614",
+  type: "ask"
+}
+</code></p>
+
+<h3 id="response">Response</h3>
+
+<p>Sends the order id.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> The order id.</li>
+</ul>
+
+<p><code>Status: 201 Created</code></p>
+
+<p><code>{"id":182}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>

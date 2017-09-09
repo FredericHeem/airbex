@@ -1,0 +1,34 @@
+<p>This method returns to root liability for the given cryptocurrency.</p>
+
+<p>For more information about the root liability, please refer to the <a href="https://github.com/olalonde/proof-of-liabilities">proof of liability specification</a></p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li><strong><code>currency:</code></strong> the currency code, e.g <code>BTC</code></li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends the root liability.</p>
+
+<ul>
+  <li><strong><code>sum:</code></strong> The total balance.</li>
+  <li><strong><code>hash:</code></strong> The hash of the user’s balance merkle tree.</li>
+  <li><strong><code>currency:</code></strong> The currency code.</li>
+  <li><strong><code>timestamp:</code></strong> The unix timestamp.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>{
+    "root": {
+        "sum": "7.45898099",
+        "hash": "ef129eb0b44b2635486d491242a31e1f37aceb664a421722d5092a9c528ef907"
+    },
+    "currency": "BTC",
+    "timestamp": 1409136916181
+}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>

@@ -1,0 +1,7 @@
+.*
+!.gitignore
+!.gitmodules
+*~
+
+components/
+

@@ -1,0 +1,43 @@
+<p>This method retrieves the market depth which is the collection of bid and ask open orders.</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li><strong><code>id:</code></strong> is the id of the market, i.e <code>BTCUSD</code></li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends back the market depth.</p>
+
+<ul>
+  <li><strong><code>bids:</code></strong> is an array containing the bid pairs: volume and price.</li>
+  <li><strong><code>asks:</code></strong> is an array containing the ask pairs: volume and price.</li>
+</ul>
+
+<p>Volume unit is in the base currency, e.g <strong><code>BTC</code></strong>.</p>
+
+<p>Price unit is in the quote currency, e.g <strong><code>USD</code></strong>.</p>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>{
+    "bids": [
+        ["612.00000", "0.09000000"],
+        ["611.00000", "0.10000000"],
+        ["610.00000", "1.00000000"],
+        ["600.00000", "1.00000000"],
+        ["590.00000", "1.00000000"]
+    ],
+    "asks": [
+        ["650.00000", "0.02000000"],
+        ["653.00000", "0.03000000"],
+        ["655.00000", "0.10000000"],
+        ["660.00000", "0.10000000"],
+        ["670.00000", "0.10000000"],
+        ["680.00000", "0.10000000"]
+    ]
+}
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>

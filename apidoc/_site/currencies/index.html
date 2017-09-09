@@ -1,0 +1,108 @@
+<p>This method retrieves the list of currencies</p>
+
+<h3 id="request">Request</h3>
+
+<ul>
+  <li>No parameter is required</li>
+</ul>
+
+<h3 id="response">Response</h3>
+
+<p>Sends back a collection of currencies supported by the exchange.</p>
+
+<ul>
+  <li><strong><code>id:</code></strong> is the id of the currency.</li>
+  <li><strong><code>fiat:</code></strong> false for cryptocurrencies.</li>
+  <li><strong><code>scale:</code></strong> is the scale of currency, i.e the number of digits.</li>
+  <li><strong><code>scale_display:</code></strong> is the scale to display the currency.</li>
+  <li><strong><code>name:</code></strong> is the firendly name of the currency.</li>
+  <li><strong><code>withdraw_min:</code></strong> the minimum amount to withdraw.</li>
+  <li><strong><code>withdraw_max:</code></strong> the maximun amount to withdraw.</li>
+  <li><strong><code>withdraw_fee:</code></strong> fees for withdraw, these fees goes for either the miners or the bank.</li>
+  <li><strong><code>conf_time:</code></strong> the cryptocurrency confirmation time which is the average duration time between blocks.</li>
+  <li><strong><code>min_conf:</code></strong> the minimum of confirmations to credit the deposit.</li>
+</ul>
+
+<p><code>Status: 200 OK</code></p>
+
+<p><code>[{
+    "id": "BTC",
+    "fiat": false,
+    "scale": 8,
+    "scale_display": 6,
+    "name": "Bitcoin",
+    "withdraw_min": "0.00100000",
+    "withdraw_max": "10.00000000",
+    "withdraw_fee": "0.00010000",
+    "conf_time": 600,
+    "min_conf": 2
+}, {
+    "id": "CZK",
+    "fiat": true,
+    "scale": 5,
+    "scale_display": 0,
+    "name": "Czech Crown",
+    "withdraw_min": "1.00000",
+    "withdraw_max": "50000.00000",
+    "withdraw_fee": "0.10000",
+    "conf_time": 600,
+    "min_conf": 6
+}, {
+    "id": "DOGE",
+    "fiat": false,
+    "scale": 8,
+    "scale_display": 0,
+    "name": "Dogecoin",
+    "withdraw_min": "1.00000000",
+    "withdraw_max": "10000000.00000000",
+    "withdraw_fee": "1.00000000",
+    "conf_time": 60,
+    "min_conf": 10
+}, {
+    "id": "DRK",
+    "fiat": false,
+    "scale": 8,
+    "scale_display": 3,
+    "name": "Darkcoin",
+    "withdraw_min": "0.00100000",
+    "withdraw_max": "100.00000000",
+    "withdraw_fee": "0.00100000",
+    "conf_time": 150,
+    "min_conf": 4
+}, {
+    "id": "EUR",
+    "fiat": true,
+    "scale": 5,
+    "scale_display": 2,
+    "name": "Euro",
+    "withdraw_min": "1.00000",
+    "withdraw_max": "50000.00000",
+    "withdraw_fee": "0.10000",
+    "conf_time": 600,
+    "min_conf": 6
+}, {
+    "id": "LTC",
+    "fiat": false,
+    "scale": 8,
+    "scale_display": 3,
+    "name": "Litecoin",
+    "withdraw_min": "0.00100000",
+    "withdraw_max": "10.00000000",
+    "withdraw_fee": "0.00100000",
+    "conf_time": 150,
+    "min_conf": 4
+}, {
+    "id": "USD",
+    "fiat": true,
+    "scale": 5,
+    "scale_display": 2,
+    "name": "US Dollar",
+    "withdraw_min": "1.00000",
+    "withdraw_max": "50000.00000",
+    "withdraw_fee": "0.10000",
+    "conf_time": 600,
+    "min_conf": 6
+}]
+</code></p>
+
+<p>For errors responses, see the <a href="#response-status-codes">response status codes documentation</a>.</p>

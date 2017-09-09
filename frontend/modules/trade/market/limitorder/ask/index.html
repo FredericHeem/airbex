@@ -1,4 +1,4 @@
-<div class="well row-right">
+<div class="well">
     <p class="available-container">
         <%- i18n('markets.market.limitorder.ask.available.you have') %>
         <span class="available">...</span>
@@ -47,23 +47,55 @@
                 <span class="visible-precision-too-high">
                     <%- i18n('markets.market.limitorder.ask.price.too many decimals') %>
                 </span>
+                <span class="visible-too-small">
+                    <%- i18n('markets.market.marketorder.bid.spend.too small') %>
+                </span>
+                <span class="visible-too-high">
+                    <%- i18n('markets.market.marketorder.bid.spend.toohigh') %>
+                </span>               
             </span>
         </div>
 
         <table class="order-summary table">
             <tr>
                 <th>
-                    <%- i18n('markets.market.limitorder.ask.summary.total') %>
+                    <%- i18n('subtotal') %>
                 </th>
                 <td class="subtotal">
                 </td>
             </tr>
             <tr>
                 <th>
-                    <%- i18n('markets.market.limitorder.ask.summary.fee') %>
+                    Maker Fee <span class="fee-ratio-maker"><%- fee_ask_maker * 100 %>%</span>
                 </th>
-                <td class="fee"></td>
+                <td class="fee-maker">
+                </td>
             </tr>
+            <tr>
+                <th>
+                    Taker Fee <span id="fee-ratio-taker"><%- fee_ask_taker * 100 %>%</span>
+                </th>
+                <td class="fee-taker">
+                </td>
+            </tr>
+            <tr>
+            <th>
+                <%- i18n('totalToReceived') %>
+                </th>
+                <td class="total-received"></td>
+            </tr>
+            <tr>
+                <th>
+                </th>
+                <td>
+                <span id="total-too-small" class="hide">
+                    <%- i18n('totaltoosmall') %>
+                </span>
+                <span id="total-too-high" class="hide">
+                    <%- i18n('totaltoohigh') %>
+                </span>
+                </td>
+            </tr>            
         </table>
 
         <button type="submit" class="btn btn-success btn-block">

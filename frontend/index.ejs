@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html xml:lang="en" lang="en">
 <head>
-    <title>Logosxchange - Official Logos Bitcoin Exchange</title>
+    <title><%= config.title %> </title>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Language" content="en" />
-    <meta name="description" content="Buy and sell Logos and Bitcoin" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="x-assets-proof" data="/btc-assets.json">
-    <meta name="x-liabilities-proof-root" data="/api/v1/proof/root/btc">
-    <meta name="x-liabilities-proof" data="/api/v1/proof/liability/btc">
+    <meta name="description" content="<%= config.description %>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+    <link href="//fonts.googleapis.com/css?family=Montserrat:400normal;subset=all" rel="stylesheet" type="text/css">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" href="img/favicon-<%= config.company %>.ico">
     <script src="head.js?<%= +new Date() %>"></script>
     <script type="text/javascript">
         if ('-ms-user-select' in document.documentElement.style && navigator.userAgent.match(/IEMobile\/10\.0/)) {
@@ -20,16 +19,20 @@
     </script>
     
     <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+<!--     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"> -->
     <link href="vendor.css?<%= +new Date() %>" rel="stylesheet" media="screen">
     <link href="app.css?<%= +new Date() %>" rel="stylesheet" media="screen">
+
 </head>
 
-<body class="is-loading">
+<body>
     <!--[if lte IE 8]>
         <div class="old-browser"><h4>Your browser is too old</h4><p><a href="http://browsehappy.com">Upgrade now</a></p></div>
     <![endif]-->
-
+    
+    <script>window.environment = '<%= environment %>'</script>
     <script src="vendor.js?<%= +new Date() %>"></script>
+<!--     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script> -->
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <script src="app.js?<%= +new Date() %>"></script>
 </body>

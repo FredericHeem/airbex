@@ -1,6 +1,5 @@
 var moment = require('moment')
 , template = require('./index.html')
-, nav = require('../nav')
 
 module.exports = function() {
     var itemTemplate = require('./item.html')
@@ -28,6 +27,8 @@ module.exports = function() {
                 item.status = i18n('withdraws.states.processing')
             } else if (item.state == 'requested') {
                 item.status = i18n('withdraws.states.requested')
+            } else if (item.state == 'sendingEmail') {
+                item.status = i18n('withdraws.states.sendingEmail')
             } else if (item.state == 'cancelled') {
                 if (item.error) {
                     item.status = i18n('withdraws.states.cancelled.error', item.error)
@@ -52,11 +53,12 @@ module.exports = function() {
         $el.addClass('is-loading')
 
         api.call('v1/withdraws')
+        .then(itemsChanged)
         .fail(errors.alertFromXhr)
-        .always(function() {
+        .finally(function() {
             $el.removeClass('is-loading')
         })
-        .done(itemsChanged)
+        
     }
 
     $items.on('click', '.cancel', function(e) {
@@ -64,16 +66,14 @@ module.exports = function() {
         var $item = $(e.target).closest('.item')
 
         api.call('v1/withdraws/' + $item.attr('data-id'), null, { type: 'DELETE' })
-        .fail(errors.alertFromXhr)
-        .done(function() {
-            api.balances()
+        .then(function() {
+            api.fetchBalances()
             refresh()
         })
+        .fail(errors.alertFromXhr)
     })
 
     refresh()
-
-    $el.find('.withdraw-nav').replaceWith(nav('withdraws').$el)
 
     return controller
 }

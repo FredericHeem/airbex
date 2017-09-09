@@ -3,7 +3,6 @@ var util = require('util')
 , template = require('./index.html')
 , callingcodes = require('../../../assets/callingcodes.json')
 , validation = require('../../../helpers/validation')
-, nav = require('../../settings/nav')
 
 module.exports = function(after) {
     var $el = $('<div class=auth-verifyphone>').html(template())
@@ -18,25 +17,23 @@ module.exports = function(after) {
     , slowTimer
     , parsedNumber
 
-    $el.find('.account-nav').replaceWith(nav('phone').$el)
-    
     // Populate country dropdown
     $country.field().html($.map(callingcodes, function(item) {
         return util.format('<option value="%s">%s (%s)</option>',
             item.code, item.name, item.dial_code)
     }))
+    
+    if (api.user.country) {
+    	$country.field().val(api.user.country)
+    } else {
+        // Guess the user's country
+        var lang = api.user.language
 
-    // Guess user country from his language
-    var country = 'US'
-    , desired = i18n.desired ? /[a-z]{2}$/i.exec(i18n.desired) : null
-    debug('desired language (from i18n): %s', desired)
-
-    if (desired) {
-        country = desired[0].toUpperCase()
-        debug('country from language: %s', country)
-        $country.field().val(country)
+        if (lang) {
+            var countryCodeGuess = lang.substr(lang.length - 2, 2).toUpperCase()
+            $country.field().val(countryCodeGuess)
+        }
     }
-
     var validateNumber = validation.fromRegex($number, /^[0-9-\.,\(\) ]{1,13}$/)
     validation.monitorField($number.field(), validateNumber)
 
@@ -71,11 +68,7 @@ module.exports = function(after) {
                 number: values.number,
                 country: $country.field().val()
             })
-            .always(function() {
-                $phoneForm
-                .removeClass('is-loading')
-            })
-            .done(function(res) {
+            .then(function(res) {
                 setTimeout(function() {
                     $el.addClass('has-texted')
                     $code.field().focus()
@@ -106,6 +99,10 @@ module.exports = function(after) {
 
                 errors.alertFromXhr(err)
             })
+            .finally(function() {
+                $phoneForm
+                .removeClass('is-loading')
+            })
         })
     })
 
@@ -132,11 +129,7 @@ module.exports = function(after) {
             return api.call('v1/users/verify', {
                 code: values.code
             })
-            .always(function() {
-                $verifyForm
-                .removeClass('is-loading')
-            })
-            .done(function() {
+            .then(function() {
                 api.user.phone = parsedNumber
                 api.securityLevel(2)
                 $app.trigger('verifiedphone', { number: parsedNumber })
@@ -158,6 +151,10 @@ module.exports = function(after) {
 
                 errors.alertFromXhr(err)
             })
+            .finally(function() {
+                $verifyForm
+                .removeClass('is-loading')
+            })
         })
     })
 
@@ -172,22 +169,24 @@ module.exports = function(after) {
         $el.removeClass('is-slow')
 
         api.call('v1/users/verify/call', {})
-        .fail(errors.alertFromXhr)
-        .done(function() {
+        .then(function() {
             $el.addClass('is-voice')
             $code.field().focus()
         })
-
+        .fail(errors.alertFromXhr)
     })
 
     $number.field().focusSoon()
 
-    api.on('user', function(user) {
+    function onUser(user){
         if(user){
             if(user.phone){
                 $el.addClass('is-phone-verified')
-            } 
+            }
         }
-    })
+    }
+
+    onUser(api.user)
+    api.on('user', onUser)
     return ctrl
 }

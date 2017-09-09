@@ -1,4 +1,4 @@
-var debug = require('../../helpers/debug')('snow:master')
+var debug = require('../../helpers/debug')('master')
 , page
 , template = require('./index.html')
 , area
@@ -8,6 +8,7 @@ var debug = require('../../helpers/debug')('snow:master')
 , $nav
 
 var master = module.exports = function(val, name) {
+    debug('master name %s', name)
     if (!$area) {
         debug('master called before render')
         return val
@@ -49,6 +50,11 @@ master.render = function() {
     $nav = $top.find('.nav')
     master.$el.find('.top').replaceWith(header.$el)
     master.$el.find('.footer').replaceWith(require('./footer')().$el)
+    require('./sidenav')(master.$el.find('.sidenav'))
+
+    $('.preloader').hide();
+    
 
     return master.$l
 }
+

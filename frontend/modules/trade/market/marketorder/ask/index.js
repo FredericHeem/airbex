@@ -5,13 +5,15 @@ var num = require('num')
 , balanceLabel = require('../../../../shared/balance')
 , validation = require('../../../../../helpers/validation')
 , confirm = require('../../../../shared/modals/confirm')
+, debug = require('../../../../../helpers/debug')('trade:askmarketorder')
 
-module.exports = function(market) {
-    var base = market.substr(0, 3)
-    , quote = market.substr(3, 3)
-    , feeRatio = api.feeRatio(market)
+module.exports = function(market) {	
+    var base = api.getBaseCurrency(market)
+    , quote = api.getQuoteCurrency(market)
+    , feeRatio = api.marketsInfo[market].fee_ask_taker
     , basePrec = api.currencies[base].scale
-    , amountPrec = api.currencies[base].scale - api.markets[market].scale
+    , quotePrec = api.currencies[quote].scale
+    , quoteDisplay = api.currencies[quote].scale_display
     , $el = $('<div class="ask">').html(template({
         base: base,
         quote: quote
@@ -22,7 +24,7 @@ module.exports = function(market) {
     , ctrl = {
         $el: $el
     }
-    , minAsk = 0.001;
+    , askminvolume = api.marketsInfo[market].askminvolume
     
     // Validation
     var validateAmount = validation.fromFn($el.find('.amount'), function(d, val) {
@@ -30,7 +32,7 @@ module.exports = function(market) {
 
         if (!val || val <= 0) return d.reject('is-invalid')
 
-        if(val < minAsk){
+        if(num.lt(numbers.getCurrencyNum(val, base), numbers.getCurrencyNum(askminvolume, base))){
             return d.reject('is-too-small')
         }
         
@@ -75,7 +77,8 @@ module.exports = function(market) {
         .then(function(values) {
             var confirmText = i18n(
                 'markets.market.marketorder.ask.confirm',
-                numbers(values.amount, { currency: base }), quote)
+                numbers.formatCurrency(values.amount, base),
+                quote)
 
             return confirm(confirmText)
             .then(function() {
@@ -84,24 +87,25 @@ module.exports = function(market) {
         })
         .done(function(values) {
             $submit.loading(true, i18n('markets.market.marketorder.ask.placing order'))
-
+            var orderAmount = values.amount;
+            debug("orderAmount net: ", orderAmount);
             api.call('v1/orders', {
                 market: market,
                 type: 'ask',
-                amount: num(values.amount).mul('1.00000').div(num('1').add(feeRatio)).toString(),
+                amount: orderAmount,
                 price: null
             })
-            .always(function() {
-                $submit.loading(false)
-            })
-            .fail(errors.alertFromXhr)
-            .done(function() {
+            .then(function() {
                 api.depth(market)
-                api.balances()
+                api.fetchBalances()
 
-                alertify.log(i18n('trade.market.order placed'))
+                //alertify.log(i18n('trade.market.order placed'))
 
                 $amount.field().val('')
+            })
+            .fail(errors.alertFromXhr)
+            .finally(function() {
+                $submit.loading(false)
             })
         })
     })
@@ -122,12 +126,13 @@ module.exports = function(market) {
             return
         }
 
+        var price = numbers.format(summary.price, 
+                { precision: api.markets[market].quote_scale_diplay},
+                quote);
+        
         $summary.find('.receive-price')
-        .html(numbers.format(summary.price, { precision: quotePrec, currency: quote }))
-        .attr('title', numbers.format(summary.price, {
-            precision: api.markets[market].scale,
-            currency: quote
-        }))
+        .html(price)
+        .attr('title', price)
 
         if (feeRatio === 0) {
             $summary.find('.fee')
@@ -136,19 +141,13 @@ module.exports = function(market) {
             .html('FREE')
         } else {
             $summary.find('.fee')
-            .html(numbers.format(summary.fee, { precision: basePrec, currency: base }))
-            .attr('title', numbers.format(summary.fee, {
-                precision: api.currencies[base].scale,
-                currency: base
-            }))
+            .html(numbers.formatCurrency(summary.fee, quote))
+            .attr('title', numbers.formatAmount(summary.fee, quote))
         }
 
         $summary.find('.receive-quote')
-        .html(numbers.format(summary.receive, { precision: quotePrec, currency: quote }))
-        .attr('title', numbers.format(summary.receive, {
-            precision: api.currencies[quote].scale,
-            currency: quote
-        }))
+        .html(numbers.formatCurrency(summary.receive, quote))
+        .attr('title',  numbers.formatAmount(summary.receive, quote))
     }
 
     $el.on('click', '[data-action="sell-all"]', function(e) {

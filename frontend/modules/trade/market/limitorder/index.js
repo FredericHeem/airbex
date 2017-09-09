@@ -1,19 +1,23 @@
 var template = require('./index.html')
 
-module.exports = function(market) {
+module.exports = function(market, orderType) {
     var $el = $('<div class="limit-order">').html(template({
-        base: market.substr(0, 3),
-        quote: market.substr(3, 3),
+        base: api.getBaseCurrency(market),
+        quote: api.getQuoteCurrency(market),
         market: market
     }))
     , controller = {
         $el: $el
     }
-    , bid = require('./bid')(market)
-    , ask = require('./ask')(market)
+    , bidask;
+    if(orderType === 'bid'){
+    	bidask = require('./bid')(market)
+    } else {
+    	bidask = require('./ask')(market)
+    }
 
-    $el.find('.bid').replaceWith(bid.$el)
-    $el.find('.ask').replaceWith(ask.$el)
+    $el.find('.askbid').replaceWith(bidask.$el)
+    
 
     // Set order type (bid or ask)
     function setOrderType(type) {
@@ -37,8 +41,7 @@ module.exports = function(market) {
 
     // Dispose
     $el.on('remove', function() {
-        bid.$el.triggerHandler('remove')
-        ask.$el.triggerHandler('remove')
+    	bidask.$el.triggerHandler('remove')
     })
 
     controller.setOrderType = setOrderType

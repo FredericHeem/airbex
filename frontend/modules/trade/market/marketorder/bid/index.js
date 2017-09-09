@@ -8,8 +8,8 @@ var num = require('num')
 , validation = require('../../../../../helpers/validation')
 
 module.exports = exports = function(market) {
-    var base = market.substr(0, 3)
-    , quote = market.substr(3, 3)
+    var base = api.getBaseCurrency(market)
+    , quote = api.getQuoteCurrency(market)
     , $el = $('<div class="bid">').html(template({
         base: base,
         quote: quote
@@ -21,16 +21,22 @@ module.exports = exports = function(market) {
     , $amount = $el.find('.amount')
     , $submit = $form.find('[type="submit"]')
     , depth
-    , feeRatio = api.feeRatio(market)
+    , feeRatio = api.marketsInfo[market].fee_bid_taker
     , quotePrec = api.currencies[quote].scale
     , basePrec = api.currencies[base].scale
-    , minAsk = 0.1; // In base currency 
+    , bidmintotal = api.marketsInfo[market].bidmintotal
+    , baseScaleDisplay = api.currencies[base].scale_display;
     
     var validateAmount = validation.fromFn($el.find('.amount'), function(d, val) {
         val = numbers.parse(val)
         if (!val || val <= 0) return d.reject('is-invalid')
 
-        if(val < minAsk){
+        var summary = estimate.summary(market, val, feeRatio)
+        if (!summary) {
+            return d.reject('is-too-deep')
+        }
+        
+        if(num.lt(numbers.getCurrencyNum(summary.amountWithoutFee, quote), numbers.getCurrencyNum(bidmintotal, quote))){
             return d.reject('is-too-small')
         }
         
@@ -68,7 +74,7 @@ module.exports = exports = function(market) {
             return confirm(
                 i18n('markets.market.marketorder.bid.confirm',
                     base,
-                    numbers(values.amount, { currency: quote, precision: quotePrec, })))
+                    numbers.formatCurrency(values.amount, quote)))
             .then(function() {
                 return values
             })
@@ -78,21 +84,23 @@ module.exports = exports = function(market) {
         })
         .done(function(values) {
             $submit.loading(true, i18n('markets.market.marketorder.bid.placing order'))
+            var summary = estimate.summary(market, values.amount, feeRatio)
 
+            debug("amount: %s, amount without fees: %s", values.amount, summary.amountWithoutFee)
             api.call('v1/spend', {
                 market: market,
-                amount: num(values.amount).mul('1.000000').div(num('1').add(feeRatio)).toString()
+                amount: summary.amountWithoutFee
             })
-            .always(function() {
-                $submit.loading(false)
+            .then(function() {
+                api.depth(market)
+                api.fetchBalances()
+
+                //alertify.log(i18n('trade.market.order placed'))
+                $amount.field().focus().val('')
             })
             .fail(errors.alertFromXhr)
-            .done(function() {
-                api.depth(market)
-                api.balances()
-
-                alertify.log(i18n('trade.market.order placed'))
-                $amount.field().focus().val('')
+            .finally(function() {
+                $submit.loading(false)
             })
         })
     })
@@ -113,30 +121,29 @@ module.exports = exports = function(market) {
             return
         }
 
+        var price = numbers.format(summary.price, 
+                { precision: api.markets[market].quote_scale_diplay},
+                quote);
+        
         $summary.find('.receive-price')
-        .html(numbers.format(summary.price, { precision: quotePrec, currency: quote }))
-        .attr('title', numbers.format(summary.price, { precision: quotePrec, currency: quote }))
+        .html(price)
+        .attr('title', price)
 
-        if (feeRatio === 0) {
+        if (num(feeRatio).lte(0)) {
             $summary.find('.fee')
             .css('color', 'green')
-            .css('font-weight', 'bold')
-            .html('FREE')
-        } else {
-            $summary.find('.fee')
-            .html(numbers.format(summary.fee, { precision: quotePrec, currency: quote }))
-            .attr('title', numbers.format(summary.fee, {
-                precision: quotePrec,
-                currency: quote
-            }))
-        }
-
+        } 
+        $summary.find('.fee')
+        .html(numbers.formatCurrency(summary.fee, quote))
+        .attr('title', numbers.formatAmount(summary.fee, quote))
+        
+        var receive = numbers.format(summary.receive, 
+                { precision: baseScaleDisplay},
+                base);
+        
         $summary.find('.receive-quote')
-        .html(numbers(summary.receive, { precision: basePrec, currency: base }))
-        .attr('title', numbers(summary.receive, {
-            precision: basePrec,
-            currency: base
-        }))
+        .html(receive)
+        .attr('title', receive)
     }
 
     $el.on('click', '[data-action="spend-all"]', function(e) {

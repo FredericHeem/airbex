@@ -1,14 +1,10 @@
-
-.navbar {
+#alert-connection {
 	margin-bottom:0px;
+    text-align:center;
+    position:fixed;
+    bottom:0px;
+    left: 0;
+    right: 0;
+    z-index: 15;
 }
-[id^="reminder-"] {
-    display:none;
-    width: auto;
-    
-    max-width:800px;
-    margin: 0 auto;
-    margin-bottom:18px;
-}
-
 

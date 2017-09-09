@@ -1,4 +1,44 @@
 module.exports=[
+                {
+                    "name": "Switzerland",
+                    "dial_code": "+41",
+                    "code": "CH"
+                },
+                {
+                    "name": "Belgium",
+                    "dial_code": "+32",
+                    "code": "BE"
+                },
+                {
+                    "name": "France",
+                    "dial_code": "+33",
+                    "code": "FR"
+                },
+                {
+                    "name": "Germany",
+                    "dial_code": "+49",
+                    "code": "DE"
+                },
+                {
+                    "name": "Italy",
+                    "dial_code": "+39",
+                    "code": "IT"
+                },
+                {
+                    "name": "Portugal",
+                    "dial_code": "+351",
+                    "code": "PT"
+                },
+                {
+                    "name": "Spain",
+                    "dial_code": "+34",
+                    "code": "ES"
+                },               {
+                    "name": "United Kingdom",
+                    "dial_code": "+44",
+                    "code": "GB"
+                },
+                
     {
         "name": "Afghanistan",
         "dial_code": "+93",

@@ -1,6 +1,32 @@
 <%
-    var title = 'Logosxchange · Secure Bitcoin and Logos Exchange (BTC, LGS)'
+    var title = 'AIRBEX - Auditable Bitcoin Exchange'
     var lang = 'en'
     var login = 'Log in'
 %>
 <% include header %>
+
+<header class="navbar not-logged-in" id="navbar-logged-in">
+    <div class="container-fluid expanded-panel">
+        <div class="row">
+            <div id="logo" class="col-xs-6 col-sm-2">
+                <a href="#"><img src="/logo-airbex-small.png" 
+                 title="AIRBEX, Air Bitcoin Exchange" alt="AIRBEX, Air Bitcoin Exchange"/></a>
+            </div>
+            <div id="top-panel" class="col-xs-6 col-sm-10">
+                <div class="row">
+                    <div class="col-xs-4 col-sm-4">
+<!--                         <a href="#" alt="MENU" title="MENU" class="show-sidebar"> -->
+<!--                           <i class="fa fa-bars"></i> -->
+<!--                         </a> -->
+                    </div>
+                    <div class="col-xs-6 col-sm-8 top-panel-right">
+                        <ul class="nav navbar-nav pull-right panel-menu">
+                            <li class="lilogin"><a href="/client/#auth/login">LOGIN</a></li>
+                            <li class="liregister"><a href="/client/#auth/register">REGISTER</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

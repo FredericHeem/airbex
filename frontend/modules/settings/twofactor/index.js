@@ -1,5 +1,4 @@
 var template = require('./index.html')
-, nav = require('../nav')
 , base32 = require('thirty-two')
 , validation = require('../../../helpers/validation')
 
@@ -16,8 +15,8 @@ function generate_key_ascii(length) {
 
 module.exports = function() {
     var key = generate_key_ascii(20)
-    , keyBase32 = base32.encode(key).replace(/=/g, '')
-
+    var keyBase32 = base32.encode(key);
+    
     var $el = $('<div class=settings-twofactor>').html(template({
         secret: keyBase32
     }))
@@ -28,8 +27,6 @@ module.exports = function() {
     , $enableForm = $el.find('form[name="enable"]')
 
     $el.toggleClass('has-two-factor', api.user.twoFactor)
-
-    $el.find('.settings-nav').replaceWith(nav('twofactor').$el)
 
     var validateEnableOtp = validation.fromRegex(
         $enableForm.find('.otp'),
@@ -49,6 +46,10 @@ module.exports = function() {
             api.call('v1/twofactor/remove', {
                 otp: otp
             })
+            .then(function() {
+                api.user.twoFactor = false
+                router.reload()
+            })
             .fail(function(err) {
                 if (err.name == 'WrongOtp') {
                     $disableForm.find('.otp').addClass('is-wrong has-error')
@@ -62,10 +63,7 @@ module.exports = function() {
 
                 errors.alertFromXhr(err)
             })
-            .done(function() {
-                api.user.twoFactor = false
-                router.reload()
-            })
+
         })
     })
 
@@ -78,6 +76,11 @@ module.exports = function() {
             return api.call('v1/twofactor/enable', {
                 key: $enableForm.field('secret').val(),
                 otp: otp
+            })
+            .then(function() {
+                api.user.twoFactor = true
+                //alertify.log(i18n('settings.twofactor.enabled alert'))
+                router.go('')
             })
             .fail(function(err) {
                 // Ignore error about two factor already being enabled
@@ -99,11 +102,6 @@ module.exports = function() {
                 }
 
                 errors.alertFromXhr(err)
-            })
-            .done(function() {
-                api.user.twoFactor = true
-                alertify.log(i18n('settings.twofactor.enabled alert'))
-                router.go('')
             })
         })
         .always(function() {

@@ -1,0 +1,63 @@
+.top {
+    padding-bottom:16px;
+}
+
+.top-nav-bar {
+    background-image: url("img/wallpaper-airbex.png");
+    border: 0;
+}
+
+.navbar,
+.navbar-brand,
+.navbar-nav > li > a {
+    line-height: 80px;
+    min-height: 80px;
+    padding-top: 0;
+    padding-bottom:0;
+}
+
+.top-nav-bar > a  {
+    color:white !important;
+    padding-bottom:0;
+    color: white;
+}
+
+.top-nav-bar > a:hover {
+    color: white !important;
+}
+
+.lilogin, .liregister  {
+   width:10em;
+   text-align:center;
+}
+
+.lilogin {
+    background-color:#1e3e52;
+}
+
+.liregister {
+    background-color:#0e7eae; 
+}
+
+.lilogin > a:hover {
+    color: #0e7eae !important;
+}
+
+.liregister > a:hover {
+    color: #1e3e52 !important;
+}
+
+.navbar {
+	margin-bottom:0px;
+}
+
+[id^="reminder-"] {
+    display:none;
+    width: auto;
+    
+    max-width:800px;
+    margin: 0 auto;
+    margin-bottom:18px;
+}
+
+

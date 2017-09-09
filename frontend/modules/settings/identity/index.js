@@ -1,4 +1,3 @@
-var nav = require("../nav");
 var d = require("util");
 var _ = require("lodash");
 var template = require("./index.html");
@@ -30,37 +29,48 @@ module.exports = function(b) {
 
     function refresh() {
         api.call('v1/users/documents')
+        .then(documentChanged)
         .fail(errors.alertFromXhr)
-        .done(documentChanged)
     }
 
     refresh()
     
-    //var j = $el.find("form");
-    //var k = $el.find('[type="submit"]');
     var $fileupload_passport = $el.find("#fileupload");
-    $el.find(".settings-nav").replaceWith(nav("identity").$el);
     
-    var url = 'api/v1/users/documents';
+    var url = '/api/v1/users/documents';
+ 
     $fileupload_passport.fileupload({
         url: url,
         dataType: 'json',
-        done: function (e, data) {
-            console.log("fileupload done");
-            refresh();
-        },
-        progressall: function (e, data) {
-            console.log("fileupload progressall")
-            var progress = parseInt(data.loaded / data.total * 100, 10);
-            $('#progress .progress-bar').css(
-                    'width',
-                    progress + '%'
-            );
+        autoUpload: true,
+        acceptFileTypes: /(\.|\/)(gif|jpe?g|png|pdf)$/i,
+        maxFileSize: 5000000
+    }).on('fileuploadadd', function (e, data) {
+
+    }).on('fileuploadprocessalways', function (e, data) {
+        var index = data.index,
+        file = data.files[index];
+        if (file.error) {
+            alertify.alert("Cannot upload file \"" + file.name + "\": " + file.error)
         }
+    }).on('fileuploadprogressall', function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#progress .progress-bar').css(
+                'width',
+                progress + '%'
+        );
+    }).on('fileuploaddone', function (e, data) {
+        refresh();
+    }).on('fileuploadfail', function (e, data) {
+        $.each(data.files, function (index) {
+            var error = $('<span class="text-danger"/>').text('File upload failed.');
+            $(data.context.children()[index])
+            .append('<br>')
+            .append(error);
+        });
     }).prop('disabled', !$.support.fileInput)
     .parent().addClass($.support.fileInput ? undefined : 'disabled');
- 
-    //var t = !(api.user.poi || api.user.poa);
+
 
     return controller;
 };

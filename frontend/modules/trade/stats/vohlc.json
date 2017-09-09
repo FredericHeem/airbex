@@ -4,8 +4,18 @@
         "backgroundColor": "transparent"
     },
 
-    "rangeSelector": {
-        "selected": 1
+    "rangeSelector" : {
+        "buttons" : [{
+            'type' : 'day',
+            'count' : 1,
+            'text' : '1D'
+        }, {
+            'type' : 'all',
+            'count' : 1,
+            'text' : 'All'
+        }],
+        'selected' : 1,
+        'inputEnabled' : false
     },
 
     "navigator": {

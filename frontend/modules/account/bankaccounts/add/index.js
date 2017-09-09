@@ -31,7 +31,7 @@ module.exports = function() {
         keyboard: false,
         backdrop: 'static'
     })
-
+    
     var validateIban = validation.fromFn($el.find('.iban'), function(d, iban) {
         if (!ibanChecker.isValid(iban))  {
             console.log("invalid iban: %s", iban)
@@ -80,12 +80,12 @@ module.exports = function() {
                 accountNumber: values.accountNumber,
                 routingNumber: values.routingNumber === '' ? null : values.routingNumber
             })
-            .always(function() {
-                $submit.loading(false)
+            .then(function() {
+                history.go(-1)
             })
             .fail(errors.alertFromXhr)
-            .done(function() {
-                history.go(-1)
+            .finally(function() {
+                $submit.loading(false)
             })
         })
     })

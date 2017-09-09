@@ -1,0 +1,18 @@
+{
+  "config":{
+    "company": "Airbex",
+    "title": "Airbex - Auditable crypto currency exchange",
+    "description": "Buy and sell Bitcoin, Litecoin and other crypto currencies with EUR and USD.",
+    "email_support" : "support@airbex.net",
+    "bank_account": true,
+    "purchase_order": false,
+    "deposit": true,
+    "trade": true,
+    "show_fiat": true,
+    "api_keys": true,
+    "transactions": true,
+    "show_market_summary": false,
+    "market_default": "BTCEUR",
+    "audit": true
+  }
+}

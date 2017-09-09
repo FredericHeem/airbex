@@ -1,9 +1,12 @@
 {
   "name": "lproof",
   "_cacheHeaders": {
+    "ETag": "\"1af3f643f2df9387af4bfe7b455420f279f49f9e\"",
+    "Content-Length": "42072",
     "Content-Type": "application/x-gzip",
     "Content-Disposition": "attachment; filename=olalonde-proof-of-liabilities-1af3f64.tar.gz"
   },
+  "_release": "e-tag:1af3f643f",
   "_source": "https://github.com/olalonde/proof-of-liabilities/tarball/master",
   "_target": "*",
   "_originalSource": "https://github.com/olalonde/proof-of-liabilities/tarball/master"

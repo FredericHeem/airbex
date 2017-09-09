@@ -1,0 +1,62 @@
+<div class="col-lg-9">
+    <div class="row">
+        <div class="col-lg-12">
+            <p>
+                
+            </p>
+            <h1 class="content-title"><%=
+                i18n('deposit.ccc.heading') %> <a target="_blank" href="https://cryptocapital.co"><img id="logoccc" src="img/logoccc.png" /></a></h1>
+
+            <div class="content-area">
+                <p><%- i18n('deposit.ccc.intro') %></p>
+
+                <p>
+                <ol>
+                    <li><%- i18n('deposit.ccc.step1', currency) %></li>
+                    <li><%- i18n('deposit.ccc.step2', currency) %></li>
+                    <li><p><%- i18n('deposit.ccc.step3') %></p></li>
+                    <li><p><%- i18n('deposit.ccc.addnewbenef') %></p>
+                        <div class="payment-details">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>Company name</td>
+                                        <td>Airbex S.A</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Address</td>
+                                        <td>Panama</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Country</td>
+                                        <td>Panama</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Account Number</td>
+                                        <td><%= accountNo %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Currency</td>
+                                        <td><%= currency %></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div></li>
+                    <li><%- i18n('deposit.ccc.step4') %></li>
+                    <li><%- i18n('deposit.ccc.step5', accountNo, currency) %></li>
+                    <li><%- i18n('deposit.ccc.step6', messageToRecipient) %></li>
+                </ul>
+                <br>
+  <div class="alert alert-warning">
+                            <i class="fa fa-warning"></i> <%-
+                            i18n('deposit.bank.warning',
+                            messageToRecipient) %>
+                        </div>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>

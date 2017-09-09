@@ -1,5 +1,4 @@
-var nav = require('../nav')
-, validation = require('../../../helpers/validation')
+var validation = require('../../../helpers/validation')
 , template = require('./index.html')
 
 module.exports = function() {
@@ -9,9 +8,6 @@ module.exports = function() {
     }
     , $form = $el.find('form')
     , $submit = $el.find('[type="submit"]')
-
-    // Navigation
-    $el.find('.settings-nav').replaceWith(nav('changepassword').$el)
 
     var validatePassword = validation.fromFn($el.find('.password'), function(d, val) {
         if (val.length < 6) return d.reject('is-too-short')
@@ -40,10 +36,16 @@ module.exports = function() {
         return validate(true)
         .then(function(values) {
             return api.changePassword(values.password)
-            .done(function() {
-                alertify.log(i18n('settings.changepassword.password changed'))
+ 
+            .then(function() {
+                //alertify.log(i18n('settings.changepassword.password changed'))
                 router.go('')
-            }).fail(errors.alertFromXhr)
+            })
+            .fail(errors.alertFromXhr)
+            .finally(function() {
+                $form.removeClass('is-loading')
+                $submit.loading(false)
+            })
         })
         .always(function() {
             $form.removeClass('is-loading')

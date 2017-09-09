@@ -18,18 +18,9 @@ module.exports = exports = function(fn, cb, opts) {
     , lastHash
 
     function refresh() {
+        debug('refresh')
         fn()
-        .fail(function(err) {
-            debug('failed to refresh: %s', err.message)
-
-            timer || (cb && cb(err))
-            timer = null
-
-            debug('retrying in %ds', opts.retryInterval/1e3)
-
-            queue(opts.retryInterval)
-        })
-        .done(function(res) {
+        .then(function(res) {
             cb && cb(null, res)
 
             var hash = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(
@@ -51,6 +42,17 @@ module.exports = exports = function(fn, cb, opts) {
             timer = null
             queue(interval)
         })
+        .fail(function(err) {
+            debug('failed to refresh: %s', err.message)
+
+            timer || (cb && cb(err))
+            timer = null
+
+            debug('retrying in %ds', opts.retryInterval/1e3)
+
+            queue(opts.retryInterval)
+        })
+
     }
 
     function queue(interval) {

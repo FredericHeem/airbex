@@ -1,20 +1,13 @@
-#area > .withdraw-bitcoin
+#area .withdraw-crypto
     states entry review summary
 
     .summary
         .status
-            states requested processing completed cancelled updating
-
+            states requested processing completed cancelled updating sendingEmail
+ 
 #area > .withdraw-email
     .send-form, .send-confirmed
         display none
-
-#area > .withdraw-litecoin
-    states entry review summary
-
-    .summary
-        .status
-            states requested processing completed cancelled updating
 
 #area > .withdraw-ripple
     states entering reviewing sending
@@ -46,13 +39,9 @@
             input
                 max-width 9em
 
-#area > .withdraw-bank
+#area  .withdraw-bank
     states empty allowed
 
-#area > .withdraw-withdraws
+#area  .withdraw-withdraws
     states empty loading loaded
 
-.withdraw-nav
-    .nav li i
-        display inline-block
-        width 1.1em

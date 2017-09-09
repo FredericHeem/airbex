@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+console.error('WARNING: This tool does not currently conform with latest specification.');
+
 var program = require('commander'),
   bitcoin = require('bitcoin'),
   async = require('async'),
@@ -29,12 +31,12 @@ program
   .action(function (file) {
     var obj = JSON.parse(fs.readFileSync(file));
     if (baproof.verifySignatures(obj)) {
-      console.log(obj.id + ' signatures are valid!');
+      console.log(obj.message + ' signatures are valid!');
     }
     else {
       console.error('INVALID signature found!');
-      process.exit(-1);
     }
+    process.exit(-1);
   });
 
 program
@@ -65,20 +67,31 @@ program
         cb();
       });
     }, function (err) {
-      if (err) { 
-        console.log(err);
+      if (err) {
+        console.error(err);
         process.exit(-1);
       }
       console.log(total);
     });
-    
   });
 
 program
-  .command('signall <id>')
+  .command('signall <message> <blockhash>')
   .description('Generates an asset proof file with all private keys in wallet.')
+  .option('--keys <keys>', 'Comma separated list of private keys used to sign.', parse_list)
   .option('--addresses <addresses>', 'Comma separated list of addresses to sign.', parse_list)
-  .action(function (id, opts) {
+  .option('--currency <currency>', 'Currency: BTC, LTC, DOGE etc ...', 'BTC')
+  .option('--testnet <testnet>', 'Testnet')
+  .action(function (message, blockhash, opts) {
+    // Private keys are passed directly, no need to do RPC calls
+    if (opts.keys) {
+      var res = baproof.signAll(opts.keys, message, blockhash);
+      console.log(JSON.stringify(res));
+      return;
+    }
+
+    var msg = blockhash + '|' + message;
+
     var client = new bitcoin.Client({
       host: program.host,
       port: program.port,
@@ -93,7 +106,10 @@ program
 
     var addresses = opts.addresses || [],
       output = {
-        id: id,
+        currency: opts.currency,
+        testnet: opts.testnet,
+        message: message,
+        blockhash: blockhash,
         signatures: []
       };
 
@@ -103,13 +119,12 @@ program
       function (cb) {
         if (addresses.length > 0) return cb();
 
-        client.cmd('listreceivedbyaddress', 0, true, function (err, res){
+        client.cmd('listunspent', 0, function (err, res){
           if (err) return cb(err);
 
           if (!res.length) {
             return cb('No address found in bitcoin wallet!');
           }
-
           res.forEach(function (hash) {
             addresses.push(hash.address);
           });
@@ -117,9 +132,8 @@ program
         });
       },
       function (cb) {
-
         async.each(addresses, function (addr, cb) {
-          client.cmd('signmessage', addr, id, function (err, res) {
+          client.cmd('signmessage', addr, msg, function (err, res) {
             if (err) return cb(err);
 
             output.signatures.push({
@@ -132,7 +146,7 @@ program
         }, cb);
       }
     ], function (err) {
-      if (err) return console.error(err);            
+      if (err) return console.error(err);
       if (program.human) {
         console.log(output);
       }
@@ -145,3 +159,4 @@ program
   });
 
 program.parse(process.argv);
+if (!program.args.length) program.help();

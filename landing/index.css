@@ -1,0 +1,126 @@
+body {
+	font-family: 'Montserrat';
+	color:#1e3e52;
+	font-size:16px;
+}
+
+/* General */
+body,html {
+    height: 5000px;
+    padding: 0;
+    margin: 0;
+}
+
+
+.main-area .row{
+	margin-bottom:40px;
+}
+
+#col-speech{
+	margin-bottom:20px;
+}
+
+@media (max-width: 400px) {
+	.navbar {
+	   margin-bottom:0px;
+	}
+}
+
+#logo img {
+	margin-top:10px;
+	height:60px;
+}
+
+.summary {
+	padding:20px;
+}
+
+.cover {
+	padding:0;
+    margin-top:1em;
+    margin-bottom:0em; 
+}
+
+.cover img {
+	height:200px; 
+}
+
+.cover-content {
+    padding-left:0em;  
+}
+
+.tagline {
+	font-weight:bold;
+	font-size:2em;
+}
+
+.sub-tagline {
+    font-weight:bold;
+    font-size:1.6em;
+}
+#btcltcdoge{
+	width:400px;
+}
+.col-logo {
+    text-align: center;
+    vertical-align:middle;
+    display: table-cell;
+}
+
+.icon-container .fa{
+	//color:#0e7eae;
+	padding:5px;
+}
+
+.overview{
+    margin-top:0em;
+    margin-bottom:0; 
+    padding-top:1em;
+    padding-bottom:1em;
+    margin-left:-180px;
+    padding-left:200px;
+    margin-right:-180px;
+    padding-right:200px;
+}
+
+#footer {
+    padding-bottom: 2em;
+    padding-top: 2em;
+    text-align: center;
+    width:100%;
+}
+
+.footer-links {
+	padding-left:0px;
+}
+
+.footer-links li {
+    display: inline;
+    padding: 0.5em;
+}
+
+.carousel-container {
+    width:100%;
+    margin:auto;	
+}
+
+.carousel-inner .item img {
+	height: 320px;
+	text-align:center;
+	margin:auto;
+}
+
+.carousel-caption {
+	margin-top:200px;
+	margin-bottom:5px;
+}
+
+#zlsbub {
+	display:none;
+}
+
+.zlsblue-btn {
+	background-color:#0e7eae !important;
+}
+
+

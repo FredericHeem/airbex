@@ -15,7 +15,7 @@ module.exports = exports = function() {
         timer = setTimeout(function() {
             if (!api.user) return
             debug('logging out from inactivity')
-            api.logout().done(router.now)
+            api.logout().then(router.now)
         }, duration)
     }
 

@@ -1,4 +1,4 @@
-Swiss bitcoin exchange web front end
+Airbex bitcoin exchange web front end
 ===
 
 Installation
@@ -14,11 +14,11 @@ Execution
 Start the api server:
 
 # cd snow/api
-#Ênode index
+#Ênpm start
 
 Start the front end webserver:
 
-# grunt serve
+# npm start
 
 Open a browser at http://localhost:7073/
 

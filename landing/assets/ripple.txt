@@ -1,8 +1,8 @@
 [domain]
-justcoin.com
+airbex.com
 
 [federation_url]
-https://justcoin.com/api/ripple/federation
+https://airbex.com/api/ripple/federation
 
 [accounts]
 rJHygWcTLVpSXkowott6kzgZU6viQSVYM1

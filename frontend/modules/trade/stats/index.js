@@ -1,6 +1,5 @@
 var template = require('./index.html')
 , _ = require('lodash')
-, nav = require('../nav')
 
 function depthToAccumulative(depth) {
     function toHash(pairs) {
@@ -12,7 +11,7 @@ function depthToAccumulative(depth) {
 
     if (depth.bids.length && depth.asks.length) {
         var center = (parseFloat(depth.bids[0][0]) + parseFloat(depth.asks[0][0])) / 2
-        , maxSpread = 0.25
+        , maxSpread = 0.4
 
         depth.bids = depth.bids.filter(function(x) {
             return x[0] >= center * (1 - maxSpread)
@@ -88,8 +87,8 @@ function splitVohlc(data) {
 }
 
 module.exports = function(market) {
-    var base = market.substr(0, 3)
-    , quote = market.substr(3)
+    var base = api.getBaseCurrency(market)
+    , quote = api.getQuoteCurrency(market)
     , $el = $('<div class=trade-stats>').html(template({
         market: market,
         base: base,
@@ -100,30 +99,71 @@ module.exports = function(market) {
     }
 
     var navMode = $.cookie('tradeMode') == 'advanced' ? 'limit' : 'market'
-    $el.find('.trade-nav')
-    .replaceWith(nav(market, navMode, 'stats').$el)
 
-    var depth = api.call('v1/markets/' + market + '/depth')
-
-    depth.then(depthToAccumulative)
-    .done(function(accu) {
+        
+    
+    api.on('depth:' + market, depthChart)
+    
+    $el.on('remove', function() {
+        api.off('depth:' + market, depthChart)
+    })
+    
+    var orderBookChart;
+    var $accu = $el.find('.book-accu')
+    
+    function initOrderBookChart(accu){
         var options = _.clone(require('./book-accu.json'), true)
-        options.series[0].data = accu.bids
-        options.series[1].data = accu.asks
         options.series[0].name = i18n('trade.stats.accu.buyers', base)
         options.series[1].name = i18n('trade.stats.accu.sellers', base)
         options.title.text = i18n('trade.stats.accu.title', base, quote)
         options.yAxis.title.text = i18n('trade.stats.accu.yAxis', base)
         options.xAxis.title.text = i18n('trade.stats.accu.xAxis', quote, base)
-
-        var $accu = $el.find('.book-accu')
-        $accu.highcharts(options)
-    })
+        options.series[0].data = accu.bids
+        options.series[1].data = accu.asks
+        orderBookChart = $accu.highcharts(options)
+    }
+    
+    function depthChart(depth){
+        console.log("depthChart #bids %s, #asks %s", depth.bids.length, depth.asks.length);
+        var accu = depthToAccumulative(depth);
+        if(!orderBookChart){
+            initOrderBookChart(accu);
+        } else {
+            var chart = $accu.highcharts();
+            chart.series[0].setData(accu.bids);
+            chart.series[1].setData(accu.asks);
+        }
+    }
 
     var vohlc = api.call('v1/markets/' + market + '/vohlc')
 
-    vohlc.then(vohlcToPrices).done(function(prices) {
-        var options = _.clone(require('./price-history.json'), true)
+    function afterSetExtremes(e) {
+
+        var url;
+        var currentExtremes = this.getExtremes();
+        var range = e.max - e.min;
+        var duration = '1m';
+        var oneDay = 1000 * 60 * 60 * 24;
+        if(range === oneDay) duration = '1d';
+        var oneWeek = oneDay * 7;
+        if(range === oneWeek) duration = '1w';
+        var oneMonth = oneWeek * 30;
+        if(range === oneMonth) duration = '1m';
+        
+        console.log("afterSetExtremes %s %s", e.max, e.min)
+        var chart = $el.find('.price-history').highcharts();
+        chart.showLoading('Loading data from server...');
+        api.call('v1/markets/' + market + '/vohlc', null, {qs:{"range":duration}})
+        .then(vohlcToPrices)
+        .then(function(prices) {
+            chart.series[0].setData(prices);
+            chart.hideLoading();
+        })
+    }
+    
+    vohlc.then(vohlcToPrices).then(function(prices) {
+        var options = _.clone(require('./price-history.json'), true);
+        options.xAxis.events.afterSetExtremes = afterSetExtremes;
         options.series[0].data = prices
         options.title.text = i18n('trade.stats.price history.title', base, quote)
         options.yAxis.title.text = i18n('trade.stats.price history.yAxis', quote, base)
@@ -133,7 +173,7 @@ module.exports = function(market) {
         $prices.highcharts('StockChart', options)
     })
 
-    vohlc.then(splitVohlc).done(function(data) {
+    vohlc.then(splitVohlc).then(function(data) {
         var options = _.clone(require('./vohlc.json'), true)
         options.series[0].data = data.ohlc
         options.series[1].data = data.volume

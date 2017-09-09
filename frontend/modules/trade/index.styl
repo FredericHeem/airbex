@@ -7,18 +7,24 @@
     .market-order, .limit-order
         states order-type-bid order-type-ask
 
+    .order-summary
+        #total-too-small, #total-too-high
+            color red
+          
     .limit-order
         .price
-            states precision-too-high
+            states precision-too-high too-small too-high  
 
         .bid
             .total
                 &.is-more-than-available
                     color red
-
+            .total
+                &.is-too-low
+                    color red
         .ask
             .amount
-                states insufficient-funds
+                states insufficient-funds too-small too-high
 
     .market-order
         .bid
@@ -27,7 +33,7 @@
 
         .ask
             .amount
-                states too-deep insufficient-funds precision-too-high too-small
+                states too-deep insufficient-funds precision-too-high too-small too-high
 
     .market-order, .limit-order
         .bid, .ask
@@ -36,7 +42,8 @@
                     text-align right
 
     .order-modes
-        padding-bottom: 20px
+        padding-top:10px;
+        padding-bottom: 4px
         background-color: #fff
 
         a
@@ -46,7 +53,7 @@
             text-align: center
             color: #fff
             text-decoration: none
-            background-color: #aaaaaa
+            background-color: #6aa6d6
             padding: 10px 0
             position: relative
 
@@ -66,7 +73,7 @@
 
 
             &.active
-                background-color: #07415b
+                background-color: #4a7495
 
                 .arrow
                     display: block;
@@ -74,6 +81,9 @@
 #area > .trade-orders
     .active-orders, .order-history
         td.number
+            text-align right
+    .active-orders, .order-history
+        th.number
             text-align right
 
 .trade-nav

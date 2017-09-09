@@ -1,5 +1,4 @@
 var template = require('./index.html')
-, nav = require('../nav')
 
 module.exports = function() {
     var $el = $('<div class="create-voucher is-creating">').html(template())
@@ -33,17 +32,19 @@ module.exports = function() {
         .enabled(false)
 
         api.createVoucher(amount.value(), amount.currency())
-        .always(function() {
+        .then(function() {
+            api.fetchBalances()
+            router.go('account/vouchers')
+        })
+        .fail(errors.alertFromXhr)
+        .finally(function() {
             $form.field('amount')
             .add($form.field('currency'))
             .enabled(true)
             $submit.loading(false)
         })
-        .fail(errors.alertFromXhr)
-        .done(function() {
-            api.balances()
-            router.go('account/vouchers')
-        })
+        
+
     })
 
     $el.find('.form-control:visible:not(disabled)').focusSoon()
@@ -52,9 +53,6 @@ module.exports = function() {
     $el.on('remove', function() {
         amount.$el.triggerHandler('remove')
     })
-
-    // Insert navigation
-    $el.find('.withdraw-nav').replaceWith(nav('voucher').$el)
 
     return ctrl
 }

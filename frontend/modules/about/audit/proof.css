@@ -1,0 +1,6 @@
+#proof-reserve ul.currencies > li {
+	padding:10px;
+	min-width:300px;
+	list-style:none;
+}
+

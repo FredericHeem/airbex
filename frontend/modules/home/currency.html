@@ -1,0 +1,32 @@
+<div class="currency-block currency-<%= currency %>">
+	<div class="balance">
+		<h3 class="currency-symbol currency-symbol-<%= currency %>">
+			<%= balance %> <span><%= currency %></span>
+		</h3>
+		<table>
+			<tr>
+				<td>
+				Available
+				<td>
+				<td>
+				 <%= available %>
+				<td>
+			</tr>
+			<tr>
+				<td>
+				Reserved
+				<td>
+				<td>
+				<%= hold %>
+				<td>
+			</tr>
+		</table>
+	</div>
+	<div>
+		<ul>
+			<li class="withdraw"><a href="#withdraw/<%= currency %>">WITHDRAW</a></li>
+			<li class="deposit"><a href="#deposit/<%= currency %>">DEPOSIT</a></li>
+		</ul>
+	</div>
+</div>
+

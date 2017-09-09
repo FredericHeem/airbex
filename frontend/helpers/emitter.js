@@ -1,11 +1,15 @@
+var debug = require('./debug')('emitter')
+
 module.exports = function(flags) {
     var events = {}
 
     function callbacks(event) {
+        debug("callbacks  event %s, #cb %s", event, events[event] ? events[event].toString(): "none");
         return events[event] || (events[event] = $.Callbacks(flags || 'unique memory'))
     }
 
     function on(event, handler) {
+        debug("on ", event);
         callbacks(event).add(handler)
     }
 
@@ -23,7 +27,9 @@ module.exports = function(flags) {
     }
 
     function trigger(event) {
-        callbacks(event).fire.apply(null, Array.prototype.slice.call(arguments, 1))
+        debug("trigger ", event)
+        var cb = callbacks(event);
+        cb.fire.apply(null, Array.prototype.slice.call(arguments, 1))
     }
 
     return {

@@ -10,6 +10,19 @@ exports.user = function(level, register) {
     return exports.demand(level || 0)
 }
 
+exports.password = function(prefix) {
+    function popup(prefix) {
+        return jcPrompt(prefix || i18n('PasswordPrompt'), 'password')
+        .then(function(password) {
+            if (!password) return null
+
+            return password
+        })
+    }
+
+    return popup(prefix)
+}
+
 exports.otp = function(prefix) {
     function popup(prefix) {
         return jcPrompt((prefix || '') + i18n('authorize.otp.prompt'))

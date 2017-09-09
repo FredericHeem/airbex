@@ -1,5 +1,4 @@
 var template = require('./index.html')
-, nav = require('../nav')
 , _ = require('lodash')
 , sepa = require('../../../assets/sepa.json')
 , wire = require('../../../assets/wire.json')
@@ -14,11 +13,11 @@ module.exports = function() {
         $el.addClass('is-loading')
 
         api.call('v1/bankAccounts')
-        .always(function() {
+        .then(renderAccounts)
+        .fail(errors.alertFromXhr)
+        .finally(function() {
             $el.removeClass('is-loading')
         })
-        .fail(errors.alertFromXhr)
-        .done(renderAccounts)
     }
 
     function renderAccounts(accounts) {
@@ -36,14 +35,11 @@ module.exports = function() {
         $el.toggleClass('is-empty', !accounts.length).addClass('is-loaded')
     }
 
-    if (!(~sepa.indexOf(api.user.country) || ~wire.indexOf(api.user.country))) {
-        $el.addClass('is-blocked')
-    }
+//    if (!(~sepa.indexOf(api.user.country) || ~wire.indexOf(api.user.country))) {
+//        $el.addClass('is-blocked')
+//    }
 
     refresh()
-
-
-    $el.find('.account-nav').replaceWith(nav('bankaccounts').$el)
 
     return controller
 }

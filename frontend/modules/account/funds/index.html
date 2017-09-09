@@ -1,7 +1,5 @@
-<div class="container">
-    <div class="account-nav"></div>
-
-    <div class="col-lg-9">
+<div>
+    <div>
         <h1 class="content-title"><%- i18n('account.funds.heading') %></h1>
 
         <div class="content-area">
@@ -9,17 +7,13 @@
                 <%- i18n('account.funds.two factor warning') %>
             </div>
 
-            <a href="#deposit/bank" class="btn btn-success" style="">
-                <%- i18n('account.funds.deposit now') %>
-            </a>
-
             <table class="balances table table-striped">
                 <thead>
                     <th class="currency"></th>
                     <th class="amount">
                         <%- i18n('account.funds.headers.balance') %>
                     </th>
-                    <th class="amount hidden-sm">
+                    <th class="amount hidden-xs">
                         <%- i18n('account.funds.headers.reserved') %>
                     </th>
                     <th class="amount">

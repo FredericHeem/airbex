@@ -1,5 +1,4 @@
-var nav = require('../nav')
-, validation = require('../../../helpers/validation')
+var validation = require('../../../helpers/validation')
 , template = require('./index.html')
 
 module.exports = function() {
@@ -11,9 +10,6 @@ module.exports = function() {
     }
     , $form = $el.find('form')
     , $submit = $el.find('[type="submit"]')
-
-    // Navigation
-    $el.find('.settings-nav').replaceWith(nav('username').$el)
 
     var validateUsername = function() {
         var val = $form.field('username').val()
@@ -41,11 +37,12 @@ module.exports = function() {
             return api.call('v1/users/current', {
                 username: values.username
             },  { type: 'PATCH' })
-            .done(function() {
+            .then(function() {
                 api.user.username = values.username
                 alertify.log(i18n('settings.username.saved'))
                 router.reload()
-            }).fail(errors.alertFromXhr)
+            })
+            .fail(errors.alertFromXhr)
         })
         .always(function() {
             $form.removeClass('is-loading')

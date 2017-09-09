@@ -1,100 +1,114 @@
-<div class="navbar navbar-default navbar-fixed-top logged-in"
-	id="navbar-logged-in">
-	<div class="container">
+<header class="navbar logged-in" id="navbar-logged-in">
+    <div class="container-fluid expanded-panel">
+        <div class="row">
+            <div id="logo" class="hidden-xs col-sm-2 col-md-2 col-lg-2">
+                <a href="#"><img src="img/logo-airbex-small.png"
+                    title="AIRBEX, Bitcoin Exchange"
+                    alt="AIRBEX, Bitcoin Exchange" /></a>
+            </div>
+            <div id="top-panel">
+                <div class="top-panel-left col-xs-5 col-sm-4 col-lg-3">
+                    <a href="#" alt="MENU" title="MENU"
+                        class="show-sidebar"> <i class="fa fa-bars"></i>
+                    </a>
 
-		<a href="#" class="navbar-brand">Logosxchange</a>
+                    <ul class="nav navbar-nav panel-menu pull-left">
+                        <li class="dropdown markets"><a href="#"
+                            class="dropdown-toggle"
+                            data-toggle="dropdown"> <span
+                                class="market-value"></span> <b
+                                class="caret"></b>
+                        </a>
+                            <ul
+                                class="dropdown-menu markets-dropdown-menu">
+                            </ul></li>
+                    </ul>
+                </div>
 
-		<button class="navbar-toggle" data-toggle="collapse"
-			data-target=".navHeaderCollapse">
-			<span class="icon-bar"></span> <span class="icon-bar"></span> <span
-				class="icon-bar"></span>
-		</button>
+                <div class="col-xs-7 col-sm-6 col-lg-7 top-panel-right">
 
-		<div class="collapse navbar-collapse navHeaderCollapse">
-
-			<ul class="nav navbar-nav navbar-left">
-
-				<li class="account active "><a href="#account"><%=
-						i18n('top.account') %></a></li>
-				<li class="trade"><a href="#trade"><%= i18n('top.trade') %></a></li>
-				<li class="deposit"><a href="#deposit"><%=
-						i18n('top.deposit') %></a></li>
-				<li class="withdraw"><a href="#withdraw"><%=
-						i18n('top.withdraw') %></a></li>
-			</ul>
-			<div class="pull-right summary">
-				<ul class="nav navbar-nav">
-
-					<li class="dropdown fiat"><a href="#" class="dropdown-toggle"
-						data-toggle="dropdown"> <span class="fiat-balance"></span> <b
-							class="caret"></b>
-					</a>
-						<ul class="dropdown-menu">
-							<li class="fiat-currencies"></li>
-						</ul></li>
-					<li class="dropdown digital"><a href="#"
-						class="dropdown-toggle" data-toggle="dropdown"> <span
-							class="digital-balance"></span> <b class="caret"></b>
-					</a>
-						<ul class="dropdown-menu">
-							<li class="digital-currencies"></li>
-						</ul></li>
-
-					<li class="dropdown"><a href="#" class="dropdown-toggle"
-						data-toggle="dropdown"><span class="user-name"> </span><b class="caret"></b></i> </a>
-						<ul class="dropdown-menu pull-right">
-							<li><a href="#settings"><%= i18n('top.settings') %></a></li>
-							<li><a href="#signOut"><%= i18n('top.log out') %></a></li>
-						</ul>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div id="reminder-profile" class="alert alert-warning alert-dismissable">
-	<i class="fa fa-info-circle"></i>
-	<button type="button" class="close" data-dismiss="alert"
-		aria-hidden="true">&times;</button>
-	<a href="#settings/profile"><%= i18n('settings.profile.warning') %></a>
-</div>
-
-<div id="reminder-identity" class="alert alert-warning alert-dismissable">
-	<i class="fa fa-info-circle"></i>
-	<button type="button" class="close" data-dismiss="alert"
-		aria-hidden="true">&times;</button>
-	<a href="#settings/identity"><%= i18n('settings.identity.warning') %></a>
-</div>
-
-<div id="reminder-phone" class="alert alert-warning alert-dismissable">
-    <i class="fa fa-info-circle"></i>
-    <button type="button" class="close" data-dismiss="alert"
-        aria-hidden="true">&times;</button>
-    <a href="#settings/phone"><%= i18n('settings.phone.warning') %></a>
-</div>
-
-<div class="navbar navbar-default navbar-fixed-top not-logged-in"
-	id="navbar-logged-in">
-	<div class="container">
-
-        <a class="brand" href="/"> <img src="/logos.png"></a>
-
-		<button class="navbar-toggle" data-toggle="collapse"
-			data-target=".navHeaderCollapse">
-			<span class="icon-bar"></span> <span class="icon-bar"></span> <span
-				class="icon-bar"></span>
-		</button>
-
-		<div class="collapse navbar-collapse navHeaderCollapse">
-			<div class="pull-right summary">
-				<ul class="nav navbar-nav">
-
-					<li class="active "><a href="#auth/login"><%= 'Login' %></a></li>
-					<li class="trade"><a href="#auth/register"><%= 'Register' %></a></li>
-				</ul>
-			</div>
-		</div>
-
-	</div>
-</div>
+                    <ul class="nav navbar-nav pull-right panel-menu">
+                        <li class="dropdown fiat"><a href="#"
+                            class="dropdown-toggle"
+                            data-toggle="dropdown"> <span
+                                class="fiat-balance"></span> <b
+                                class="caret"></b>
+                        </a>
+                            <ul class="dropdown-menu">
+                                <li class="fiat-currencies"></li>
+                            </ul></li>
+                        <li class="dropdown digital"><a href="#"
+                            class="dropdown-toggle"
+                            data-toggle="dropdown"> <span
+                                class="digital-balance"></span> <b
+                                class="caret"></b>
+                        </a>
+                            <ul class="dropdown-menu digital-currencies">
+                            </ul></li>
+                        <li class="dropdown" id="dropdown-user"><a
+                            href="#" class="dropdown-toggle"
+                            data-toggle="dropdown"> <i
+                                class="fa fa-user"></i><span
+                                class="user-name hidden-xs hidden-sm"></span> <b
+                                class="caret"></b>
+                        </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="ajax-link"
+                                    href="#account/activity">Activity</a></li>
+                                <li><a class="ajax-link"
+                                    href="#settings/profile">Profile</a></li>
+                                <li><a class="ajax-link"
+                                    href="#settings/identity">ID
+                                        check</a></li>
+                                <li><a class="ajax-link"
+                                    href="#settings/phone">Phone</a></li>
+                                <li><a class="ajax-link"
+                                    href="#settings/twofactor">Two
+                                        Factor Authentication</a></li>
+                                <li><a class="ajax-link"
+                                    href="#settings/changepassword">Change
+                                        password</a></li>
+                                <li><a class="ajax-link"
+                                    href="#settings/apikeys">API
+                                        keys</a></li>
+                                <li><a href="#signOut"> <span
+                                        class="text">Logout</span> <i
+                                        class="fa fa-power-off"></i>
+                                </a></li>
+                            </ul></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<header class="navbar not-logged-in" id="navbar-logged-in">
+    <div class="container-fluid expanded-panel">
+        <div class="row">
+            <div id="logo" class="hidden-xs col-xs-12 col-sm-2">
+                <a href="#"><img src="img/logo-airbex-small.png"
+                    title="AIRBEX, Air Bitcoin Exchange"
+                    alt="AIRBEX, Air Bitcoin Exchange" /></a>
+            </div>
+            <div id="top-panel" class="col-xs-12 col-sm-10">
+                <div class="row">
+                    <div class="col-xs-4 col-sm-4">
+                        <a href="#" alt="MENU" title="MENU"
+                            class="show-sidebar"> <i
+                            class="fa fa-bars"></i>
+                        </a>
+                    </div>
+                    <div class="col-xs-8 col-sm-8 top-panel-right">
+                        <ul class="nav navbar-nav pull-right panel-menu">
+                            <li class="lilogin"><a
+                                href="#auth/login">LOGIN</a></li>
+                            <li class="liregister"><a
+                                href="#auth/register">REGISTER</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div id="alert-connection" class="alert alert-warning">Connection to server lost, retrying</div>

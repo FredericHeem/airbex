@@ -1,0 +1,110 @@
+    <div class="withdraw-crypto-inner">
+        <h1 class="content-title"><%= i18n('withdrawcrypto.heading', name, currency) %></h1>
+
+        <div class="content-area clearfix">
+            <p class="disclaimer"><%= i18n('withdrawcrypto.intro', name) %></p>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <form class="entry visible-entry">
+                        <div class="row">
+                            <div class="col-lg-7">
+                                <div class="amount-placeholder"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-7">
+                                <div class="form-group address">
+                                    <label for="address" class="control-label">
+                                        <%= i18n('withdrawcrypto.address.label', currency) %> 
+                                    </label>
+
+                                    <input class="field form-control" type="text" name="address" />
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-success btn-large submit">
+                                        <%- i18n('withdraw.crypto.entry.submit', currency) %>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="review visible-review">
+                        <h4><%- i18n('withdraw.crypto.review.heading') %></h4>
+                        <p><%- i18n('withdraw.crypto.review.intro') %></p>
+
+                        <table class="table table-compact payment-details">
+                            <tr>
+                                <td><%- i18n('withdraw.crypto.review.send to') %></td>
+                                <td><strong><span class="address"></span></strong></td>
+                            </tr>
+                            <tr>
+                                <td><%- i18n('withdraw.crypto.review.amount') %></td>
+                                <td><strong><span class="amount"></span></strong> <%- currency %></td>
+                            </tr>
+                            <tr>
+                                <td><%- i18n('withdraw.crypto.review.fee') %></td>
+                                <td><span class="fee"></span></td>
+                            </tr>
+                        </table>
+
+                        <div class="actions">
+                            <button class="btn btn-success btn-large confirm">
+                                <%- i18n('withdraw.crypto.review.confirm') %>
+                            </button>
+                            <button class="btn cancel">
+                                <%- i18n('withdraw.crypto.review.cancel') %>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="summary visible-summary">
+                        <h4><%- i18n('withdraw.crypto.summary.heading') %></h4>
+                        <p><%- i18n('withdraw.crypto.summary.intro') %></p>
+                        <table class="table table-compact payment-details">
+                            <tr>
+                                <td><%- i18n('withdraw.crypto.summary.send to') %></td>
+                                <td><strong><span class="address"></span></strong></td>
+                            </tr>
+                            <tr>
+                                <td><%- i18n('withdraw.crypto.summary.amount') %></td>
+                                <td><strong><span class="amount"></span></strong> <%- currency %></td>
+                            </tr>
+                            <tr class="status">
+                                <td><%- i18n('withdraw.crypto.summary.status') %></td>
+                                <td>
+                                    <div class="visible-requested progress progress-striped active">
+                                        <div class="bar" style="width:25%"></div>
+                                    </div>
+                                    <div class="visible-sendingEmail">
+                                          <%- i18n('withdraw.crypto.summary.sendingEmail') %>
+                                    </div>
+                                    <div class="visible-processing progress progress-striped active">
+                                        <div class="bar" style="width:50%"></div>
+                                    </div>
+
+                                    <div class="visible-completed">
+                                        <div class="progress progress-success">
+                                            <div class="bar" style="width:100%"></div>
+                                        </div>
+                                        <%- i18n('withdraw.crypto.summary.status.success') %>
+                                    </div>
+
+                                    <div class="visible-cancelled">
+                                        <div class="progress progress-danger">
+                                            <div class="bar" style="width:100%"></div>
+                                        </div>
+                                        <%- i18n('withdraw.crypto.summary.status.cancelled') %>
+                                        <span class="cancelled-reason"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

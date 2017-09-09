@@ -89,6 +89,8 @@
 #area > .auth-resetpassword
     .phone, .end
         display none
+    .otp
+        states wrong, invalid, locked-out
 
 #area > .auth-norwaydeposit
     states finished
@@ -115,7 +117,10 @@
 
 .is-area-register
 .is-area-login
-    background: url('img/registerbg.jpg') repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
 
 .is-area-verifyphone
 .is-area-norwaydeposit

@@ -1,4 +1,5 @@
 <tr class="level">
-    <td class="price"><%= numbers(price, { trim: false }) %></td>
-    <td class="volume"><%= numbers(volume, { trim: false }) %></td>
+    <td class="price"><%= numbers(price, { trim: false, precision: price_scale}) %></td>
+    <td class="volume"><%= numbers(volume, { trim: false, precision: volume_scale}) %></td>
+    <td class="volume"><%= numbers(cumVolume, { trim: false, precision: volume_scale}) %></td>
 </tr>

@@ -1,12 +1,49 @@
 module.exports = function(grunt) {
+    var getConfigFile = function(){
+        var operator = process.env.SNOW_OPERATOR || "airbex";
+        return grunt.file.readJSON('./config/' + operator + '.json')
+    }
+    var getStylusFile = function(){
+        var operator = process.env.SNOW_OPERATOR || "airbex";
+        return "./css/" + operator + ".styl";
+    }	
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-
+        
+        jshint: {
+            options: {
+                jshintrc: '.jshintrc',
+                reporter: require('jshint-stylish')
+            },
+            all: [
+                '{,*/}*.js',
+                '!node_modules/*',
+                '!vendor/*',
+                '!public/*',
+                '!dist/*',
+                '!Gruntfile.js',
+                '!config.js'
+            ]
+        },
         clean: {
             development: 'public',
             production: 'dist'
         },
-
+        replace: {
+            config: {
+              options: {
+                patterns: [{
+                  json: getConfigFile()
+                }]
+              },
+              files: [{
+                expand: true,
+                flatten: true,
+                src: ['config.js'],
+                dest: 'config/'
+              }]
+            }
+        },
         copy: {
             development: {
                 files: [
@@ -14,13 +51,6 @@ module.exports = function(grunt) {
                             expand: true,
                             cwd: 'assets',
                             src: 'img/**',
-                            dest: 'public',
-                            filter: 'isFile'
-                        },
-                        {
-                            expand: true,
-                            cwd: 'assets/proof',
-                            src: '*.json',
                             dest: 'public',
                             filter: 'isFile'
                         }
@@ -34,13 +64,6 @@ module.exports = function(grunt) {
                             src: 'img/**',
                             dest: 'dist',
                             filter: 'isFile'
-                        },
-                        {
-                            expand: true,
-                            cwd: 'assets/proof',
-                            src: '*.json',
-                            dest: 'dist',
-                            filter: 'isFile'
                         }
                         ]
             }
@@ -48,7 +71,10 @@ module.exports = function(grunt) {
 
         ejs: {
             options: {
-                segment: process.env.SEGMENT
+                segment: process.env.SEGMENT,
+                optimizely: process.env.OPTIMIZELY,
+                environment: process.env.NODE_ENV || 'dev',
+                config:getConfigFile().config
             },
 
             'index.html': {
@@ -64,7 +90,7 @@ module.exports = function(grunt) {
                     'compress': false
                 },
                 files: {
-                    'public/app.css': 'index.styl'
+                    'public/app.css': ['index.styl',getStylusFile()]
                 }
             }
         },
@@ -90,15 +116,20 @@ module.exports = function(grunt) {
                                        'public/vendor.js': [
                                                             'vendor/jquery/jquery.js',
                                                             'vendor/jquery.cookie/jquery.cookie.js',
+                                                            'vendor/bootstrap/bootstrap.js',
                                                             'vendor/sjcl/sjcl.js',
                                                             'vendor/blueimp-file-upload/jquery.ui.widget.js',
+                                                            'vendor/blueimp-tmpl/tmpl.js',
+                                                            'vendor/blueimp-canvas-to-blob/canvas-to-blob.js',
+                                                            'vendor/blueimp-load-image/load-image.js',
+                                                            'vendor/blueimp-load-image/load-image-meta.js',
                                                             'vendor/blueimp-file-upload/jquery.iframe-transport.js',
                                                             'vendor/blueimp-file-upload/jquery.fileupload.js',
                                                             'vendor/blueimp-file-upload/jquery.fileupload-process.js',
+                                                            'vendor/blueimp-file-upload/jquery.fileupload-image.js',
                                                             'vendor/blueimp-file-upload/jquery.fileupload-validate.js',
                                                             'vendor/highstock.js',
                                                             'vendor/alertify/js/alertify.js',
-                                                            'vendor/bootstrap/bootstrap.js',
                                                             'vendor/iban.js',
                                                             'vendor/async/lib/async.js',
                                                             'vendor/baproof/build/baproof.js',
@@ -155,10 +186,6 @@ module.exports = function(grunt) {
             },
 
             application: {
-                options: {
-                    beautify: true
-                },
-
                 files: {
                     'dist/app.js': 'dist/app.js'
                 }
@@ -189,30 +216,55 @@ module.exports = function(grunt) {
         connect: {
             development: {
                 options: {
-                    hostname: 'localhost',
+                    hostname: '0.0.0.0',
                     port: 5072,
                     base: 'public',
                     open: false,
                     keepalive: true,
                     middleware: function(connect, options) {
-                        var proxy = require('http-proxy').createServer(function(req, res, proxy) {
+                        
+                        var http = require('http');
+                        var httpProxy = require('http-proxy');
+                        
+                        var demo = false;
+                        
+                        var remoteHostWeb = "http://127.0.0.1:5072";
+                        var remoteHostApi = "http://127.0.0.1:5071";
+                        var remoteHostWs = "http://127.0.0.1:5071";
+                        if(demo){
+                            //remoteHostWeb = "https://demo.airbex.net:443";
+                            remoteHostApi = "https://demo.airbex.net:443";
+                            remoteHostWs = "https://demo.airbex.net:443";
+                        }
+                        var proxyWeb = httpProxy.createProxyServer({ target: remoteHostWeb});
+                        var proxyApi = httpProxy.createProxyServer({ target: remoteHostApi});
+                        var proxyWs = httpProxy.createProxyServer({ target: remoteHostWs,ws:true });
+                        
+                        var server = http.createServer(function(req, res) {
+                            console.log("url ", req.url)
                             if (req.url.match(/^\/api\//)) {
                                 // remove /api prefix
-                                req.url = req.url.substr(4)
-
-                                return proxy.proxyRequest(req, res, {
-                                    host: 'localhost',
-                                    port: 5071
-                                })
+                                if(demo){
+                                    
+                                } else {
+                                    req.url = req.url.substr(4)
+                                }
+                                
+                                return proxyApi.web(req, res);
+                            } else if (req.url.match(/^\/socket.io\//)) {
+                                return proxyWs.web(req, res);
+                            } else if (req.url.match(/^\/explorer\//)) {
+                                return proxyApi.web(req, res);
                             }
-
-                            proxy.proxyRequest(req, res, {
-                                host: 'localhost',
-                                port: 5072
-                            })
-                        })
-
-                        proxy.listen(5073)
+                            proxyWeb.web(req, res);
+                        });
+                        
+                        server.on('upgrade', function (req, socket, head) {
+                            console.log("upgrade ", req.url)
+                            proxyWs.ws(req, socket, head);
+                        });
+                        
+                        server.listen(5073)
 
                         return [
                                 function(req, res, next) {
@@ -233,7 +285,7 @@ module.exports = function(grunt) {
             },
 
             styles: {
-                files: ['modules/**/*.styl', 'assets/**/*.styl', 'modules/**/*.css'],
+                files: ['css/**/*.styl', 'css/**/*.css','modules/**/*.styl', 'assets/**/*.styl', 'modules/**/*.css'],
                 tasks: 'stylus'
             },
 
@@ -262,41 +314,39 @@ module.exports = function(grunt) {
         }
     })
 
-    //grunt.loadNpmTasks('grunt-bower-task')
-    grunt.loadNpmTasks('grunt-browserify')
-    grunt.loadNpmTasks('grunt-concurrent')
-    grunt.loadNpmTasks('grunt-contrib-clean')
-    grunt.loadNpmTasks('grunt-contrib-concat')
-    grunt.loadNpmTasks('grunt-contrib-connect')
-    grunt.loadNpmTasks('grunt-contrib-copy')
-    grunt.loadNpmTasks('grunt-contrib-cssmin')
-    grunt.loadNpmTasks('grunt-contrib-htmlmin')
-    grunt.loadNpmTasks('grunt-contrib-stylus')
-    grunt.loadNpmTasks('grunt-contrib-uglify')
-    grunt.loadNpmTasks('grunt-contrib-watch')
-    grunt.loadNpmTasks('grunt-ejs')
+        // Load grunt tasks automatically
+    require('load-grunt-tasks')(grunt);
 
-    grunt.registerTask('development', [
-                                       //'bower',
-                                       'ejs',
-                                       'copy:development',
-                                       'stylus',
-                                       'concat',
-                                       'browserify:development'
-                                       ])
+    // Time how long tasks take. Can help when optimizing build times
+    require('time-grunt')(grunt);
 
-                                       grunt.registerTask('production', [
-                                                                         //'bower',
-                                                                         'ejs',
-                                                                         'copy:production',
-                                                                         'stylus',
-                                                                         'concat',
-                                                                         'browserify:production',
-                                                                         'uglify',
-                                                                         'htmlmin',
-                                                                         'cssmin'
-                                                                         ])
+    grunt.registerTask('development',
+            [
+             //'bower',
+             'replace:config',
+             'ejs',
+             'copy:development',
+             'stylus',
+             'concat',
+             'browserify:development'
+             ]
+    )
 
-                                                                         grunt.registerTask('serve', ['development', 'concurrent:serve'])
-                                                                         grunt.registerTask('default', ['development'])
+    grunt.registerTask('production',
+            [
+             //'bower',
+             'replace:config',
+             'ejs',
+             'copy:production',
+             'stylus',
+             'concat',
+             'browserify:production',
+             'uglify',
+             'htmlmin',
+             'cssmin'
+             ]
+    )
+
+    grunt.registerTask('serve', ['development', 'concurrent:serve'])
+    grunt.registerTask('default', ['development'])
 }

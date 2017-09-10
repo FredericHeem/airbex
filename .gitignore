@@ -7,4 +7,5 @@ node_modules/
 *.ps1
 npm-debug.log
 .vagrant
+log.txt
 

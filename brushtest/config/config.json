@@ -1,7 +1,7 @@
 {
   "url" : "http://localhost:5071/",
   "url_admin" : "http://localhost:5071/",
-  "pg_write_url" : "postgres://postgres:postgres1234!!!!!!!@localhost:5432/snow",
+  "pg_write_url" : "postgres://postgres:password@localhost:5432/snow",
   "urlBaseRest": "https://demo.airbex.net/api/",
   "userMax":"2", 
   "currencies":["BTC","LTC"],
@@ -22,10 +22,10 @@
 {
     "name": "admin",
     "email" : "frederic.heem@gmail.com",
-    "password" : "9dcpw400",
+    "password" : "password",
     "admin": "true",
     "country":"IT",
-    "number":"0607065268",
+    "number":"060712345678",
     "btc_deposit_address":"mvRZcE4GkHsDPtW8fSGLi8VaXe9D5iKpaR"
     
 },
@@ -36,7 +36,7 @@
     "email" : "alice@nomail.com",
     "password" : "newpassword",
     "country":"FR",
-    "number":"0607065268",
+    "number":"060712345612",
     "poi":true,
     "poa":true,
     "btc_deposit_address":"mvRZcE4GkHsDPtW8fSGLi8VaXe9D5iKpaR",

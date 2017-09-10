@@ -22,7 +22,7 @@ BEGIN
 
     -- Does the user exist?
     IF u IS NULL THEN
-        RAISE 'User not found', uid;
+        RAISE 'User not found %', uid;
     END IF;
 
     -- Has the user already verified his email?

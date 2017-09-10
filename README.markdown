@@ -1,6 +1,8 @@
 Airbex
 ===
 
-Airbex is a digital currency exchange with proof of reserve.
+Airbex is a white label crypto currency exchange with proof of reserve.
+
+
 
 

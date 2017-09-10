@@ -5,18 +5,18 @@
     "email_support": "support@airbex.net",
     "signature":"Airbex, the crypto currency exchange",
     "pg_read_url": {
-        "user": "postgres",
+        "user": "frederic",
         "host": "localhost",
         "database": "snow",
         "ssl": false,
-        "password": "postgres1234!!!!!!!"
+        "password": "password"
     },
     "pg_write_url": {
-        "user": "postgres",
+        "user": "frederic",
         "host": "localhost",
         "database": "snow",
         "ssl": false,
-        "password": "postgres1234!!!!!!!"
+        "password": "password"
     },
 
     "port": 5071,

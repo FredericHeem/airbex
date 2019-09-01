@@ -3,20 +3,20 @@
   "description": "access to snow",
   "version": "0.1.9",
   "dependencies": {
-    "request": "~2.12.0",
-    "async": "~0.2.9",
-    "lodash": "~1.2.1",
+    "request": "2.88.0",
+    "async": "3.1.0",
+    "lodash": "4.17.15",
     "num": "*",
-    "debug": "0.7.2",
-    "optimist": "~0.4.0",
-    "cli-table": "~0.2.0",
+    "debug": "4.1.1",
+    "optimist": "~0.6.1",
+    "cli-table": "~0.3.1",
     "sjcl": "x",
-    "q": "1.0.1",
-    "speakeasy": "1.0.3"
+    "q": "1.5.1",
+    "speakeasy": "2.0.0"
   },
   "devDependencies": {
-    "expect.js": "~0.2.0",
-    "mocha": "~1.12.0"
+    "expect.js": "~0.3.1",
+    "mocha": "6.2.0"
   },
   "bin": {
     "snow": "./bin/snow"

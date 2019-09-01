@@ -1,0 +1,19 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "admin/package.json",
+        "api/package.json",
+        "client/package.json",
+        "db/package.json",
+        "frontend/package.json",
+        "frontend/vendor/async/package.json",
+        "frontend/vendor/baproof/package.json",
+        "frontend/vendor/lproof/package.json",
+        "landing/package.json",
+        "marketmaker/package.json",
+        "workers/package.json"
+      ]
+    }
+  }
+}
